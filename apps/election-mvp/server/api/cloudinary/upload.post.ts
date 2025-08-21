@@ -4,7 +4,8 @@
  */
 
 import { v2 as cloudinary } from 'cloudinary'
-import type { CloudinaryUploadResult } from '~/utils/cloudinary'
+import type { CloudinaryUploadResult } from '../../../utils/cloudinary'
+import { buildCloudinaryUrl } from '../../../utils/cloudinary'
 
 export default defineEventHandler(async (event) => {
   try {

@@ -3,7 +3,8 @@
  * Upload, transformation et gestion d'images
  */
 
-import type { CloudinaryUploadResult, CloudinaryTransformOptions } from '~/utils/cloudinary'
+import type { CloudinaryUploadResult, CloudinaryTransformOptions } from '../utils/cloudinary'
+import { buildCloudinaryUrl, cloudinaryPresets } from '../utils/cloudinary'
 
 export const useCloudinary = () => {
   // État réactif
@@ -95,8 +96,11 @@ export const useCloudinary = () => {
     const results: CloudinaryUploadResult[] = []
     
     for (let i = 0; i < files.length; i++) {
+      const file = files[i]
+      if (!file) continue
+      
       try {
-        const result = await uploadFile(files[i], {
+        const result = await uploadFile(file, {
           ...options,
           onProgress: (fileProgress) => {
             const totalProgress = ((i + fileProgress / 100) / files.length) * 100
@@ -120,7 +124,6 @@ export const useCloudinary = () => {
    * Génère les URLs transformées pour un public_id
    */
   const getTransformedUrls = (publicId: string) => {
-    const { buildCloudinaryUrl, cloudinaryPresets } = useUtils()
 
     return {
       original: buildCloudinaryUrl(publicId),
@@ -186,7 +189,7 @@ export const useCloudinary = () => {
    */
   const removeUploadResult = (publicId: string) => {
     uploadResults.value = uploadResults.value.filter(
-      result => result.public_id !== publicId
+      (result: CloudinaryUploadResult) => result.public_id !== publicId
     )
   }
 

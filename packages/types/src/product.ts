@@ -78,7 +78,7 @@ export interface Category {
   readonly isActive: boolean
 }
 
-export interface PriceRule {
+export interface ProductPriceRule {
   readonly id: string
   readonly productId: string
   readonly minQuantity: number
@@ -89,43 +89,14 @@ export interface PriceRule {
 }
 
 // =====================================
-// TYPES CALCUL DE DEVIS
+// TYPES PERSONNALISATION
 // =====================================
-
-export interface QuoteItem {
-  readonly productId: string
-  readonly quantity: number
-  readonly customization?: ProductCustomization
-  readonly unitPrice: number
-  readonly totalPrice: number
-}
 
 export interface ProductCustomization {
   readonly logoUrl?: string
   readonly text?: string
   readonly colors?: readonly string[]
   readonly position?: CustomizationPosition
-}
-
-export interface Quote {
-  readonly id: string
-  readonly items: readonly QuoteItem[]
-  readonly subtotal: number
-  readonly tax: number
-  readonly total: number
-  readonly customerInfo: CustomerInfo
-  readonly status: QuoteStatus
-  readonly validUntil: Date
-  readonly createdAt: Date
-  readonly updatedAt: Date
-}
-
-export interface CustomerInfo {
-  readonly name: string
-  readonly email: string
-  readonly phone?: string
-  readonly organization?: string
-  readonly address?: string
 }
 
 // =====================================
@@ -139,13 +110,7 @@ export const CustomizationPosition = {
   CHEST: 'CHEST'
 } as const
 
-export const QuoteStatus = {
-  DRAFT: 'DRAFT',
-  SENT: 'SENT',
-  ACCEPTED: 'ACCEPTED',
-  REJECTED: 'REJECTED',
-  EXPIRED: 'EXPIRED'
-} as const
+// QuoteStatus est maintenant défini dans quote.ts
 
 export const ProductCategory = {
   TEXTILE: 'TEXTILE',
@@ -156,5 +121,4 @@ export const ProductCategory = {
 
 // Type unions
 export type CustomizationPosition = typeof CustomizationPosition[keyof typeof CustomizationPosition]
-export type QuoteStatus = typeof QuoteStatus[keyof typeof QuoteStatus]
 export type ProductCategory = typeof ProductCategory[keyof typeof ProductCategory]

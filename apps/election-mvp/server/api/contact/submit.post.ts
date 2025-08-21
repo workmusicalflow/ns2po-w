@@ -3,6 +3,7 @@
  */
 
 import type { ContactFormData, ContactSubmissionResponse } from '@ns2po/types'
+import { createTursoClient, generateId, formatDateForDB, stringifyForDB } from '@ns2po/database'
 
 export default defineEventHandler(async (event) => {
   try {
@@ -17,18 +18,36 @@ export default defineEventHandler(async (event) => {
     }
 
     // Génération d'un ID unique pour le contact
-    const contactId = `contact_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+    const contactId = generateId('CONTACT')
 
-    // TODO: Sauvegarder en base de données (Turso)
-    // Pour l'instant, on simule la sauvegarde
-    const contactData = {
-      id: contactId,
-      ...body,
-      status: 'new' as const,
-      createdAt: new Date().toISOString()
-    }
+    // Sauvegarder en base de données Turso
+    const db = createTursoClient()
+    
+    await db.execute(
+      `INSERT INTO contacts (
+        id, type, customer_data, subject, message, priority, status, 
+        related_quote_id, attachments, metadata, created_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        contactId,
+        body.type,
+        stringifyForDB(body.customer),
+        body.subject,
+        body.message,
+        body.priority || 'medium',
+        'new',
+        body.relatedQuote || null,
+        stringifyForDB(body.attachments || []),
+        stringifyForDB({
+          preferredContactMethod: body.preferredContactMethod,
+          urgency: body.urgency,
+          source: 'website_form'
+        }),
+        formatDateForDB(new Date())
+      ]
+    )
 
-    console.log('Contact reçu:', {
+    console.log('Contact sauvegardé en DB:', {
       id: contactId,
       type: body.type,
       customer: body.customer.email,

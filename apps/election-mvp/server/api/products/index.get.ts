@@ -3,7 +3,7 @@
  * Récupère tous les produits depuis Airtable
  */
 
-import { airtableService } from '~/services/airtable'
+import { airtableService } from '../../../services/airtable'
 
 export default defineEventHandler(async (event) => {
   try {

@@ -3,7 +3,7 @@
  * Recherche de produits par terme
  */
 
-import { airtableService } from '~/services/airtable'
+import { airtableService } from '../../../services/airtable'
 
 export default defineEventHandler(async (event) => {
   const query = getQuery(event)

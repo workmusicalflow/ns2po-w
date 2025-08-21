@@ -13,6 +13,8 @@
     "dev": "turbo dev",
     "lint": "turbo lint",
     "type-check": "turbo type-check",
+    "test": "turbo test",
+    "test:coverage": "turbo test:coverage",
     "clean": "turbo clean",
     "format": "prettier --write .",
     "format:check": "prettier --check ."

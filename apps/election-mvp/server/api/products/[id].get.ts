@@ -3,7 +3,7 @@
  * Récupère un produit spécifique par ID
  */
 
-import { airtableService } from '~/services/airtable'
+import { airtableService } from '../../../services/airtable'
 
 export default defineEventHandler(async (event) => {
   const id = getRouterParam(event, 'id')
@@ -32,7 +32,7 @@ export default defineEventHandler(async (event) => {
   } catch (error) {
     console.error(`Erreur API /products/${id}:`, error)
     
-    if (error.statusCode) {
+    if ((error as any).statusCode) {
       throw error
     }
     

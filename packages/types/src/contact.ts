@@ -82,15 +82,16 @@ export interface DeliveryInfo {
 
 export interface Timeline {
   requestedDelivery: string
+  deliveryDate?: string // Date de livraison souhaitée
   estimatedProduction: number // en jours
   estimatedDelivery: string
   isRushOrder: boolean
   rushOrderFee?: number
 }
 
-export type PaymentMethod = 'bank_transfer' | 'mobile_money' | 'cash' | 'credit_card' | 'check'
+export type PaymentMethod = 'bank_transfer' | 'mobile_money' | 'cash' | 'credit_card' | 'check' | 'commercial_contact'
 export type DeliveryMethod = 'pickup' | 'delivery' | 'shipping'
-export type PreorderStatus = 'draft' | 'submitted' | 'confirmed' | 'in_production' | 'ready' | 'delivered' | 'cancelled'
+export type PreorderStatus = 'draft' | 'submitted' | 'confirmed' | 'in_production' | 'ready' | 'delivered' | 'cancelled' | 'pending_payment' | 'processing'
 
 // === DEMANDES PERSONNALISÉES ===
 export interface CustomRequestFormData {
@@ -205,6 +206,8 @@ export interface ContactSubmissionResponse {
 export interface PreorderSubmissionResponse {
   success: boolean
   preorderId: string
+  trackingReference: string
+  trackingUrl: string
   message: string
   paymentInstructions?: PaymentInstructions
   nextSteps: string[]
@@ -222,3 +225,6 @@ export interface PaymentInstructions {
   }
   dueDate: string
 }
+
+// === STATUTS DE PAIEMENT ===
+export type PaymentStatus = 'pending' | 'partial' | 'paid' | 'overdue' | 'cancelled' | 'refunded' | 'processing'

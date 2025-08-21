@@ -6,8 +6,8 @@
 import type { 
   Product,
   Category,
-  PriceRule,
-  Quote,
+  ProductPriceRule,
+  QuoteRequest,
   CustomerInfo
 } from '@ns2po/types'
 
@@ -26,8 +26,8 @@ export class AirtableMcpService {
   async getProducts(): Promise<Product[]> {
     try {
       // Utilisation du MCP Airtable pour récupérer les records
-      const response = await $fetch('/api/airtable/products')
-      return response.data || []
+      const response = await $fetch('/api/airtable/products') as any
+      return (response as any).data || []
     } catch (error) {
       console.error('Erreur lors de la récupération des produits:', error)
       throw new Error('Impossible de récupérer les produits')
@@ -39,8 +39,8 @@ export class AirtableMcpService {
    */
   async getProduct(id: string): Promise<Product | null> {
     try {
-      const response = await $fetch(`/api/airtable/products/${id}`)
-      return response.data || null
+      const response = await $fetch(`/api/airtable/products/${id}`) as any
+      return (response as any).data || null
     } catch (error) {
       console.error(`Erreur lors de la récupération du produit ${id}:`, error)
       return null
@@ -52,8 +52,8 @@ export class AirtableMcpService {
    */
   async getCategories(): Promise<Category[]> {
     try {
-      const response = await $fetch('/api/airtable/categories')
-      return response.data || []
+      const response = await $fetch('/api/airtable/categories') as any
+      return (response as any).data || []
     } catch (error) {
       console.error('Erreur lors de la récupération des catégories:', error)
       throw new Error('Impossible de récupérer les catégories')
@@ -67,8 +67,8 @@ export class AirtableMcpService {
     try {
       const response = await $fetch('/api/airtable/products/search', {
         query: { q: query }
-      })
-      return response.data || []
+      }) as any
+      return (response as any).data || []
     } catch (error) {
       console.error(`Erreur lors de la recherche de produits avec "${query}":`, error)
       return []
@@ -78,13 +78,13 @@ export class AirtableMcpService {
   /**
    * Sauvegarde un devis en Airtable
    */
-  async saveQuote(quote: Omit<Quote, 'id'>): Promise<string | null> {
+  async saveQuote(quote: Omit<QuoteRequest, 'id'>): Promise<string | null> {
     try {
       const response = await $fetch('/api/airtable/quotes', {
         method: 'POST',
         body: quote
-      })
-      return response.id || null
+      }) as any
+      return (response as any).id || null
     } catch (error) {
       console.error('Erreur lors de la sauvegarde du devis:', error)
       return null

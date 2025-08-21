@@ -11,9 +11,26 @@
         </p>
       </div>
 
+      <!-- Search Bar -->
+      <Card class="mb-6">
+        <div class="flex gap-4">
+          <div class="flex-1">
+            <Input 
+              v-model="searchQuery"
+              type="text"
+              placeholder="Rechercher un produit..."
+              class="w-full"
+            />
+          </div>
+          <Button @click="resetFilters" variant="outline">
+            Réinitialiser
+          </Button>
+        </div>
+      </Card>
+
       <!-- Filters -->
       <Card class="mb-8">
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">
               Catégorie
@@ -23,15 +40,19 @@
               class="w-full border border-gray-300 rounded-md px-3 py-2"
             >
               <option value="">Toutes catégories</option>
-              <option value="textile">Textile</option>
-              <option value="gadget">Gadgets</option>
-              <option value="epi">EPI</option>
+              <option 
+                v-for="category in activeCategories" 
+                :key="category.id"
+                :value="category.slug"
+              >
+                {{ category.name }}
+              </option>
             </select>
           </div>
           
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">
-              Prix maximum
+              Prix maximum (FCFA)
             </label>
             <Input 
               v-model="maxPrice"
@@ -50,14 +71,16 @@
               placeholder="Qté min"
             />
           </div>
-          
-          <div class="flex items-end">
-            <Button @click="resetFilters" variant="outline" class="w-full">
-              Réinitialiser
-            </Button>
-          </div>
         </div>
       </Card>
+
+      <!-- Error Message -->
+      <div v-if="error" class="mb-8 p-4 bg-red-50 border border-red-200 rounded-lg">
+        <p class="text-red-700">{{ error }}</p>
+        <Button @click="loadProducts" variant="outline" size="small" class="mt-2">
+          Réessayer
+        </Button>
+      </div>
 
       <!-- Products Grid -->
       <div v-if="loading" class="text-center py-12">
@@ -65,8 +88,11 @@
         <p class="mt-4 text-gray-600">Chargement des produits...</p>
       </div>
 
-      <div v-else-if="filteredProducts.length === 0" class="text-center py-12">
+      <div v-else-if="filteredProducts.length === 0 && !loading" class="text-center py-12">
         <p class="text-gray-600 text-lg">Aucun produit trouvé avec ces critères</p>
+        <Button @click="resetFilters" variant="outline" class="mt-4">
+          Voir tous les produits
+        </Button>
       </div>
 
       <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -100,10 +126,20 @@
             
             <div class="flex justify-between items-center">
               <span class="text-lg font-bold text-blue-600">
-                {{ product.basePrice }}€
+                {{ product.basePrice.toLocaleString() }} FCFA
               </span>
               <span class="text-xs text-gray-500">
                 Min. {{ product.minQuantity }}
+              </span>
+            </div>
+            
+            <div v-if="product.tags && product.tags.length > 0" class="flex flex-wrap gap-1 mt-2">
+              <span 
+                v-for="tag in product.tags.slice(0, 3)" 
+                :key="tag"
+                class="px-2 py-1 bg-gray-100 text-xs text-gray-600 rounded"
+              >
+                {{ tag }}
               </span>
             </div>
           </div>
@@ -150,108 +186,77 @@ useHead({
   ]
 })
 
-// État réactif
-const loading = ref(true)
-const products = ref([])
+// Composables
+const { 
+  activeProducts, 
+  activeCategories, 
+  loading, 
+  error, 
+  loadProducts, 
+  loadCategories 
+} = useProducts()
+
+// État des filtres
 const selectedCategory = ref('')
 const maxPrice = ref('')
 const minQuantity = ref('')
-
-// Produits mockés pour la démo
-const mockProducts = [
-  {
-    id: 'prod-1',
-    name: 'T-shirt personnalisé',
-    category: 'Textile',
-    description: 'T-shirt 100% coton avec impression haute qualité de votre logo',
-    basePrice: 12,
-    minQuantity: 50,
-    maxQuantity: 5000,
-    image: null
-  },
-  {
-    id: 'prod-2',
-    name: 'Casquette brodée',
-    category: 'Textile',
-    description: 'Casquette réglable avec broderie de votre logo sur le devant',
-    basePrice: 8,
-    minQuantity: 25,
-    maxQuantity: 2000,
-    image: null
-  },
-  {
-    id: 'prod-3',
-    name: 'Stylo publicitaire',
-    category: 'Gadgets',
-    description: 'Stylo bille avec impression de votre message publicitaire',
-    basePrice: 0.8,
-    minQuantity: 100,
-    maxQuantity: 10000,
-    image: null
-  },
-  {
-    id: 'prod-4',
-    name: 'Masque personnalisé',
-    category: 'EPI',
-    description: 'Masque de protection avec impression de votre logo',
-    basePrice: 2.5,
-    minQuantity: 100,
-    maxQuantity: 5000,
-    image: null
-  }
-]
+const searchQuery = ref('')
 
 // Computed pour les produits filtrés
 const filteredProducts = computed(() => {
-  let filtered = products.value
+  let filtered = activeProducts.value
 
-  if (selectedCategory.value) {
+  // Filtrage par recherche
+  if (searchQuery.value.trim()) {
+    const query = searchQuery.value.toLowerCase()
     filtered = filtered.filter(p => 
-      p.category.toLowerCase() === selectedCategory.value.toLowerCase()
+      p.name.toLowerCase().includes(query) ||
+      p.description.toLowerCase().includes(query) ||
+      p.tags.some(tag => tag.toLowerCase().includes(query))
     )
   }
 
+  // Filtrage par catégorie
+  if (selectedCategory.value) {
+    filtered = filtered.filter(p => p.category === selectedCategory.value)
+  }
+
+  // Filtrage par prix maximum
   if (maxPrice.value) {
     filtered = filtered.filter(p => p.basePrice <= Number(maxPrice.value))
   }
 
+  // Filtrage par quantité minimum
   if (minQuantity.value) {
-    filtered = filtered.filter(p => p.minQuantity >= Number(minQuantity.value))
+    filtered = filtered.filter(p => p.minQuantity <= Number(minQuantity.value))
   }
 
   return filtered
 })
 
 // Méthodes
-const loadProducts = async () => {
-  loading.value = true
-  
-  try {
-    // Simulation d'un appel API
-    await new Promise(resolve => setTimeout(resolve, 1000))
-    products.value = mockProducts
-  } catch (error) {
-    console.error('Erreur lors du chargement des produits:', error)
-  } finally {
-    loading.value = false
-  }
-}
-
 const resetFilters = () => {
   selectedCategory.value = ''
   maxPrice.value = ''
   minQuantity.value = ''
+  searchQuery.value = ''
 }
 
 const addToQuote = (product) => {
   // TODO: Intégrer avec le store Pinia pour le panier
   console.log('Produit ajouté au devis:', product)
-  // Ici on pourrait naviguer vers la page de devis
-  navigateTo('/devis')
+  // Naviguer vers la page de devis avec le produit pré-sélectionné
+  navigateTo({
+    path: '/devis',
+    query: { productId: product.id }
+  })
 }
 
-// Lifecycle
-onMounted(() => {
-  loadProducts()
+// Chargement initial
+onMounted(async () => {
+  await Promise.all([
+    loadProducts(),
+    loadCategories()
+  ])
 })
 </script>

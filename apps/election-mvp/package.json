@@ -9,11 +9,15 @@
     "build": "nuxt build",
     "preview": "nuxt preview",
     "lint": "eslint .",
-    "type-check": "nuxt typecheck"
+    "type-check": "nuxt typecheck",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
+    "@libsql/client": "^0.15.12",
     "@ns2po/composables": "workspace:*",
     "@ns2po/config": "workspace:*",
+    "@ns2po/database": "workspace:*",
     "@ns2po/types": "workspace:*",
     "@ns2po/ui": "workspace:*",
     "@nuxtjs/cloudinary": "^4.0.0",
@@ -24,7 +28,9 @@
   },
   "devDependencies": {
     "@nuxt/devtools": "latest",
+    "@vitest/coverage-v8": "^1.6.0",
     "typescript": "^5.0.0",
+    "vitest": "^1.6.0",
     "vue-tsc": "^2.0.0"
   }
 }

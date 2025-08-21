@@ -15,9 +15,13 @@
     "build": "tsc",
     "dev": "tsc --watch",
     "lint": "eslint .",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage"
   },
   "devDependencies": {
-    "typescript": "^5.0.0"
+    "@vitest/coverage-v8": "^1.6.0",
+    "typescript": "^5.0.0",
+    "vitest": "^1.6.0"
   }
 }

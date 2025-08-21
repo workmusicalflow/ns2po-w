@@ -3,6 +3,7 @@
  */
 
 import type { PreorderFormData, PreorderSubmissionResponse } from '@ns2po/types'
+import { createTursoClient, CustomersService, OrdersService, PaymentInstructionsService, generateId, formatDateForDB, stringifyForDB, generateTrackingReference, generateTrackingUrl } from '@ns2po/database'
 
 export default defineEventHandler(async (event) => {
   try {
@@ -23,63 +24,103 @@ export default defineEventHandler(async (event) => {
       })
     }
 
-    // Génération d'un ID unique et référence de paiement
-    const preorderId = `PRE_${Date.now()}_${Math.random().toString(36).substr(2, 9).toUpperCase()}`
-    const paymentReference = `PAY_${preorderId.split('_')[1]}`
+    // Initialiser les services de base de données
+    const db = createTursoClient()
+    const customersService = new CustomersService(db)
+    const ordersService = new OrdersService(db)
+    const paymentService = new PaymentInstructionsService(db)
 
+    // Générer une référence de suivi unique
+    const trackingRef = generateTrackingReference('ORDER')
+    const preorderId = trackingRef.full
+    
     // Calcul des montants
     const totalAmount = body.items.reduce((sum, item) => sum + item.totalPrice, 0)
     const depositAmount = Math.round(totalAmount * 0.5) // 50% d'acompte
     const remainingAmount = totalAmount - depositAmount
 
-    // TODO: Sauvegarder en base de données (Turso)
-    const preorderData = {
-      id: preorderId,
-      ...body,
-      totalAmount,
-      depositAmount,
-      remainingAmount,
-      paymentReference,
-      status: 'submitted' as const,
-      createdAt: new Date().toISOString()
+    // Créer ou trouver le client
+    let customer = await customersService.findByEmail(body.customer.email)
+    
+    if (!customer) {
+      customer = await customersService.create({
+        email: body.customer.email,
+        firstName: body.customer.firstName,
+        lastName: body.customer.lastName,
+        phone: body.customer.phone,
+        company: body.customer.company,
+        addressLine1: body.customer.address?.line1,
+        city: body.customer.address?.city,
+        customerType: body.customer.customerType || 'individual'
+      })
     }
 
-    console.log('Pré-commande reçue:', {
-      id: preorderId,
-      customer: body.customer.email,
-      itemsCount: body.items.length,
-      totalAmount,
-      paymentMethod: body.paymentMethod
+    // Créer la commande avec l'ID de la référence de suivi
+    const order = await ordersService.create({
+      id: preorderId, // Utiliser la référence de suivi comme ID
+      customerId: customer.id,
+      customerData: body.customer,
+      items: body.items,
+      subtotal: totalAmount,
+      taxAmount: 0, // Pas de TVA sur l'acompte
+      totalAmount: depositAmount, // Commencer par l'acompte
+      paymentMethod: body.paymentMethod,
+      shippingAddress: body.deliveryInfo.address,
+      estimatedDeliveryDate: body.timeline?.deliveryDate ? new Date(body.timeline.deliveryDate) : undefined,
+      notes: `Pré-commande - Acompte: ${depositAmount} FCFA, Solde: ${remainingAmount} FCFA`,
+      metadata: {
+        preorder: true,
+        depositAmount,
+        remainingAmount,
+        timeline: body.timeline
+      }
     })
 
-    // TODO: Sauvegarder en base
-    // await savePreorder(preorderData)
-
-    // TODO: Envoyer confirmation par email
-    // await sendPreorderConfirmation(preorderData)
-
-    // Génération des instructions de paiement
-    const paymentInstructions = generatePaymentInstructions(
-      body.paymentMethod,
+    // Créer les instructions de paiement commercial
+    const paymentInstructions = await paymentService.createForOrder(
+      order.id,
       depositAmount,
-      paymentReference
+      'commercial_contact' // Toujours contact commercial pour MVP
     )
+
+    console.log('Pré-commande sauvegardée:', {
+      orderId: order.id,
+      customer: body.customer.email,
+      itemsCount: body.items.length,
+      depositAmount,
+      paymentMethod: 'commercial_contact'
+    })
 
     // Calcul de la livraison estimée
     const estimatedDelivery = calculateEstimatedDelivery(
       body.timeline?.estimatedProduction || 7
     )
 
+    // Extraire les instructions de paiement formatées
+    const instructionsData = JSON.parse(paymentInstructions.instructions)
+    
+    // Générer l'URL de suivi
+    const trackingUrl = generateTrackingUrl(preorderId)
+
     const response: PreorderSubmissionResponse = {
       success: true,
-      preorderId,
+      preorderId: order.id,
+      trackingReference: preorderId,
+      trackingUrl,
       message: 'Votre pré-commande a été enregistrée avec succès!',
-      paymentInstructions,
+      paymentInstructions: {
+        method: 'commercial_contact',
+        amount: depositAmount,
+        reference: paymentInstructions.reference,
+        dueDate: paymentInstructions.due_date || '',
+        details: instructionsData
+      },
       nextSteps: [
-        'Effectuez le versement de l\'acompte dans les 7 jours',
-        'Nous confirmerons votre commande après réception du paiement',
-        'La production démarrera dès confirmation',
-        'Vous serez informé(e) des étapes de production'
+        '📞 Contactez notre service commercial pour finaliser le paiement',
+        '💰 Versement de l\'acompte requis (50% du montant total)',
+        '✅ Confirmation de commande après réception du paiement',
+        '🏭 Démarrage de la production dès confirmation',
+        `📱 Suivez votre commande sur : ${trackingUrl}`
       ],
       estimatedDelivery
     }
@@ -88,7 +129,16 @@ export default defineEventHandler(async (event) => {
       success: true,
       data: {
         ...response,
-        paymentReference
+        orderId: order.id,
+        trackingReference: preorderId,
+        trackingUrl,
+        paymentReference: paymentInstructions.reference,
+        commercialContact: {
+          mobile: '+2250575129737',
+          fixe: '+2252721248803',
+          email: 'commercial@ns2po.ci',
+          horaires: 'Lundi-Vendredi: 8h-17h, Samedi: 8h-12h'
+        }
       }
     }
 
@@ -121,13 +171,16 @@ function generatePaymentInstructions(method: string, amount: number, reference: 
     reference,
     dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
     details: {
-      instructions: [] as string[]
+      instructions: [] as string[],
+      bankAccount: undefined as string | undefined,
+      mobileMoneyNumber: undefined as string | undefined
     }
   }
 
   switch (method) {
     case 'bank_transfer':
       baseInstructions.details = {
+        ...baseInstructions.details,
         bankAccount: 'CI05 CI123 45678 90123456789 01',
         instructions: [
           'Effectuez un virement bancaire sur notre compte :',
@@ -143,6 +196,7 @@ function generatePaymentInstructions(method: string, amount: number, reference: 
     
     case 'mobile_money':
       baseInstructions.details = {
+        ...baseInstructions.details,
         mobileMoneyNumber: '+225 07 XX XX XX XX',
         instructions: [
           'Envoyez le montant via Mobile Money :',
@@ -158,6 +212,7 @@ function generatePaymentInstructions(method: string, amount: number, reference: 
     
     case 'cash':
       baseInstructions.details = {
+        ...baseInstructions.details,
         instructions: [
           'Apportez le montant en espèces à nos bureaux :',
           'Adresse: Zone 4, Rue K55, Marcory - Abidjan',

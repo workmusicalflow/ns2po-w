@@ -7,7 +7,6 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "composite": true,
     "strict": true,
     "noUncheckedIndexedAccess": true,
     "noImplicitOverride": true,
@@ -28,7 +27,6 @@
     }
   },
   "references": [
-    { "path": "./apps/election-mvp" },
     { "path": "./packages/ui" },
     { "path": "./packages/types" },
     { "path": "./packages/config" },

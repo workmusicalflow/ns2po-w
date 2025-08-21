@@ -3,7 +3,7 @@
  * Récupère les règles de prix pour un produit
  */
 
-import { airtableService } from '~/services/airtable'
+import { airtableService } from '../../../../services/airtable'
 
 export default defineEventHandler(async (event) => {
   const productId = getRouterParam(event, 'id')

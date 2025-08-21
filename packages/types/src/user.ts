@@ -2,6 +2,29 @@
  * Types pour la gestion des utilisateurs
  */
 
+// === INFORMATIONS CLIENT ===
+export interface CustomerInfo {
+  email: string
+  firstName: string
+  lastName: string
+  phone?: string
+  company?: string
+  address?: CustomerAddress
+  customerType?: CustomerType
+  taxNumber?: string
+}
+
+export interface CustomerAddress {
+  line1: string
+  line2?: string
+  city: string
+  region?: string
+  postalCode?: string
+  country?: string
+}
+
+export type CustomerType = 'individual' | 'party' | 'candidate' | 'organization'
+
 export interface Utilisateur {
   readonly id: string
   readonly email: string

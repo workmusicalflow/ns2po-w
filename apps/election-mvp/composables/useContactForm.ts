@@ -214,16 +214,16 @@ export const useContactForm = () => {
       }
 
       // Appel API
-      const { data } = await $fetch('/api/contact/submit', {
+      const response = await $fetch('/api/contact/submit', {
         method: 'POST',
         body: payload
-      })
+      }) as any
 
-      lastSubmission.value = data
+      lastSubmission.value = response.data
 
       return {
         success: true,
-        contactId: data.id,
+        contactId: response.data.id,
         message: 'Votre message a été envoyé avec succès!',
         nextSteps: [
           'Nous traiterons votre demande dans les plus brefs délais',
@@ -270,22 +270,24 @@ export const useContactForm = () => {
       }
 
       // Appel API
-      const { data } = await $fetch('/api/preorder/submit', {
+      const response = await $fetch('/api/preorder/submit', {
         method: 'POST',
         body: payload
-      })
+      }) as any
 
-      lastSubmission.value = data
+      lastSubmission.value = response.data
 
       return {
         success: true,
-        preorderId: data.id,
+        preorderId: response.data.id,
+        trackingReference: response.data.trackingReference,
+        trackingUrl: response.data.trackingUrl,
         message: 'Votre pré-commande a été enregistrée avec succès!',
         paymentInstructions: {
           method: formData.paymentMethod,
           amount: depositAmount,
-          reference: data.paymentReference,
-          details: generatePaymentDetails(formData.paymentMethod, depositAmount, data.paymentReference),
+          reference: response.data.paymentReference,
+          details: generatePaymentDetails(formData.paymentMethod, depositAmount, response.data.paymentReference),
           dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString() // 7 jours
         },
         nextSteps: [

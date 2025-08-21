@@ -10,7 +10,7 @@ import type {
   AirtablePriceRule,
   Product,
   Category,
-  PriceRule
+  ProductPriceRule
 } from '@ns2po/types'
 
 export class AirtableService {
@@ -83,7 +83,7 @@ export class AirtableService {
   /**
    * Récupère les règles de prix pour un produit
    */
-  async getPriceRules(productId: string): Promise<PriceRule[]> {
+  async getPriceRules(productId: string): Promise<ProductPriceRule[]> {
     try {
       const records = await this.base('PriceRules')
         .select({
@@ -182,9 +182,9 @@ export class AirtableService {
   }
 
   /**
-   * Transforme un enregistrement Airtable PriceRule en objet PriceRule
+   * Transforme un enregistrement Airtable PriceRule en objet ProductPriceRule
    */
-  private transformAirtablePriceRule(record: AirtablePriceRule): PriceRule {
+  private transformAirtablePriceRule(record: AirtablePriceRule): ProductPriceRule {
     const fields = record.fields
     
     return {

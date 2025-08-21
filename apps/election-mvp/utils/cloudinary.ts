@@ -166,5 +166,5 @@ export function formatFileSize(bytes: number): string {
 export function extractPublicIdFromUrl(url: string): string | null {
   // Pattern pour extraire le public_id d'une URL Cloudinary
   const match = url.match(/\/upload\/(?:v\d+\/)?(.+)\.(?:jpg|jpeg|png|webp|gif|svg)$/i)
-  return match ? match[1] : null
+  return match?.[1] || null
 }
