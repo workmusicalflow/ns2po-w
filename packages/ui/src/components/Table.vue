@@ -17,8 +17,14 @@
             <div class="header-content">
               <span>{{ column.label }}</span>
               <div v-if="column.sortable" class="sort-icon">
-                <ChevronUpIcon v-if="sortColumn === column.key && sortOrder === 'asc'" class="w-4 h-4" />
-                <ChevronDownIcon v-else-if="sortColumn === column.key && sortOrder === 'desc'" class="w-4 h-4" />
+                <component 
+                  :is="ChevronUpIcon" 
+                  v-if="sortColumn === column.key && sortOrder === 'asc'" 
+                />
+                <component 
+                  :is="ChevronDownIcon" 
+                  v-else-if="sortColumn === column.key && sortOrder === 'desc'" 
+                />
                 <div v-else class="w-4 h-4" />
               </div>
             </div>
@@ -80,19 +86,34 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, defineComponent } from 'vue'
+import { computed, ref, h } from 'vue'
 import type { TableProps, SortOrder } from '@ns2po/types'
-import { SortOrder as SortOrderEnum, ButtonVariant, ButtonSize } from '@ns2po/types'
 import Button from './Button.vue'
 
-// Icons (simplified, in real project would use proper icon library)
-const ChevronUpIcon = defineComponent({
-  template: '<svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd" /></svg>'
-})
+// Icons (simplified functional components)
+const ChevronUpIcon = () => h('svg', { 
+  viewBox: '0 0 20 20', 
+  fill: 'currentColor',
+  class: 'w-4 h-4'
+}, [
+  h('path', {
+    'fill-rule': 'evenodd',
+    d: 'M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z',
+    'clip-rule': 'evenodd'
+  })
+])
 
-const ChevronDownIcon = defineComponent({
-  template: '<svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>'
-})
+const ChevronDownIcon = () => h('svg', { 
+  viewBox: '0 0 20 20', 
+  fill: 'currentColor',
+  class: 'w-4 h-4'
+}, [
+  h('path', {
+    'fill-rule': 'evenodd',
+    d: 'M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z',
+    'clip-rule': 'evenodd'
+  })
+])
 
 interface Props extends TableProps<any> {
   class?: string

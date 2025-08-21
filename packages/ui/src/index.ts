@@ -8,6 +8,7 @@ export { default as Button } from './components/Button.vue'
 export { default as Input } from './components/Input.vue'
 export { default as Card } from './components/Card.vue'
 export { default as Table } from './components/Table.vue'
+export { default as StatusBadge } from './components/StatusBadge.vue'
 
 // Types pour une meilleure compatibilité TypeScript
 export type { 
