@@ -1,9 +1,18 @@
 {
   "$schema": "https://turbo.build/schema.json",
+  "globalEnv": ["NODE_VERSION"],
+  "globalDependencies": [
+    "pnpm-lock.yaml",
+    ".npmrc"
+  ],
   "pipeline": {
+    "prepare": {
+      "cache": true,
+      "outputs": [".nuxt/**", ".nitro/**", ".output/**"]
+    },
     "build": {
       "dependsOn": ["^build"],
-      "outputs": [".next/**", "!.next/cache/**", "dist/**"]
+      "outputs": [".next/**", "!.next/cache/**", "dist/**", ".nuxt/**", ".output/**"]
     },
     "dev": {
       "cache": false,
@@ -13,7 +22,9 @@
       "dependsOn": ["^lint"]
     },
     "type-check": {
-      "dependsOn": ["^build"]
+      "dependsOn": ["^type-check", "prepare"],
+      "inputs": ["**/*.ts", "**/*.vue", "tsconfig*.json", "package.json"],
+      "outputs": []
     },
     "test": {
       "dependsOn": ["^test"],

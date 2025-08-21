@@ -8,8 +8,9 @@
     "dev": "nuxt dev",
     "build": "nuxt build",
     "preview": "nuxt preview",
+    "prepare": "nuxt prepare",
     "lint": "eslint .",
-    "type-check": "vue-tsc --noEmit",
+    "type-check": "nuxt typecheck",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage"
   },
