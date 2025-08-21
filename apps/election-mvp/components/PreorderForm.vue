@@ -408,7 +408,7 @@
 
 <script setup lang="ts">
 import { Button, Card } from '@ns2po/ui'
-import type { PreorderFormData, QuoteItem } from '@ns2po/types'
+import type { PreorderFormData, QuoteItem, PreorderItem } from '@ns2po/types'
 
 // Composables
 const { 
@@ -444,7 +444,8 @@ const preorderData = ref<PreorderFormData>({
     customerType: '',
     company: '',
     address: {
-      street: '',
+      line1: '',
+      line2: '',
       city: '',
       region: '',
       postalCode: '',
@@ -466,7 +467,8 @@ const preorderData = ref<PreorderFormData>({
   deliveryInfo: {
     method: 'pickup',
     address: {
-      street: '',
+      line1: '',
+      line2: '',
       city: '',
       region: '',
       postalCode: '',

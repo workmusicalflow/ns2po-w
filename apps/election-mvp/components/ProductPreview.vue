@@ -142,6 +142,14 @@ import type {
   CloudinaryUploadResult 
 } from '@ns2po/types'
 
+// Interface mutable pour la personnalisation du composant
+interface MutableProductCustomization {
+  logoUrl?: string
+  text?: string
+  colors?: string[]
+  position?: CustomizationPosition
+}
+
 interface Props {
   product: Product
 }
@@ -154,7 +162,7 @@ const emit = defineEmits<{
 }>()
 
 // État de personnalisation
-const customization = ref<ProductCustomization>({
+const customization = ref<MutableProductCustomization>({
   logoUrl: undefined,
   text: '',
   colors: [],
@@ -363,22 +371,11 @@ onMounted(() => {
   updatePreview()
 })
 
-// Composant icônes simplifiés (à remplacer par vraies icônes)
-const IconShirtFront = defineComponent({
-  template: `<div class="w-6 h-6 bg-gray-300 rounded flex items-center justify-center text-xs">F</div>`
-})
-
-const IconShirtBack = defineComponent({
-  template: `<div class="w-6 h-6 bg-gray-300 rounded flex items-center justify-center text-xs">B</div>`
-})
-
-const IconShirtSleeve = defineComponent({
-  template: `<div class="w-6 h-6 bg-gray-300 rounded flex items-center justify-center text-xs">M</div>`
-})
-
-const IconShirtChest = defineComponent({
-  template: `<div class="w-6 h-6 bg-gray-300 rounded flex items-center justify-center text-xs">P</div>`
-})
+// Composants icônes simplifiés (à remplacer par vraies icônes)
+const IconShirtFront = () => h('div', { class: 'w-6 h-6 bg-gray-300 rounded flex items-center justify-center text-xs' }, 'F')
+const IconShirtBack = () => h('div', { class: 'w-6 h-6 bg-gray-300 rounded flex items-center justify-center text-xs' }, 'B')
+const IconShirtSleeve = () => h('div', { class: 'w-6 h-6 bg-gray-300 rounded flex items-center justify-center text-xs' }, 'M')
+const IconShirtChest = () => h('div', { class: 'w-6 h-6 bg-gray-300 rounded flex items-center justify-center text-xs' }, 'P')
 </script>
 
 <style scoped>

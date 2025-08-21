@@ -178,7 +178,7 @@
                 >
                   <div class="product-image">
                     <img 
-                      :src="product.images[0]?.url || '/placeholder-product.jpg'"
+                      :src="product.image || '/placeholder-product.jpg'"
                       :alt="product.name"
                       class="product-img"
                     />
@@ -186,12 +186,12 @@
                   
                   <div class="product-info">
                     <h3 class="product-name">{{ product.name }}</h3>
-                    <p class="product-category">{{ product.category?.name }}</p>
+                    <p class="product-category">{{ product.category }}</p>
                     <p class="product-price">
                       À partir de {{ formatCurrency(product.basePrice) }}
                     </p>
                     <p class="product-min-qty">
-                      Quantité minimum: {{ product.minimumQuantity }}
+                      Quantité minimum: {{ product.minQuantity }}
                     </p>
                   </div>
 
@@ -390,6 +390,10 @@
 
 <script setup lang="ts">
 import { Button, Card, Input } from '@ns2po/ui'
+import type { CustomerInfo, Product, QuoteItem, QuoteCalculation } from '@ns2po/types'
+
+// Import du composant QuoteCalculator (sera créé si nécessaire)
+// import QuoteCalculator from '~/components/QuoteCalculator.vue'
 
 useHead({
   title: 'Devis - NS2PO Élections',
@@ -401,127 +405,172 @@ useHead({
   ]
 })
 
+// Variables d'état pour les étapes
+const currentStep = ref(0)
+
+const steps = [
+  { id: 'customer', label: 'Informations' },
+  { id: 'products', label: 'Produits' },
+  { id: 'calculate', label: 'Configuration' },
+  { id: 'finalize', label: 'Finalisation' }
+]
+
 // État réactif
-const clientInfo = ref({
-  name: '',
+const customerInfo = ref<Partial<CustomerInfo>>({
+  firstName: '',
+  lastName: '',
   email: '',
   phone: '',
-  organization: ''
-})
-
-const selectedProducts = ref([
-  // Produits d'exemple
-  {
-    id: 'prod-1',
-    name: 'T-shirt personnalisé',
-    category: 'Textile',
-    basePrice: 12,
-    quantity: 100,
-    minQuantity: 50,
-    maxQuantity: 5000,
-    total: 1200
+  company: '',
+  customerType: undefined,
+  address: {
+    line1: '',
+    city: '',
+    country: 'CI'
   }
-])
-
-const customization = ref({
-  message: '',
-  logo: null,
-  primaryColor: '#1e40af',
-  secondaryColor: '#ffffff'
 })
 
-// Computed values
-const subtotal = computed(() => {
-  return selectedProducts.value.reduce((sum, item) => sum + item.total, 0)
-})
+// État des produits
+const categories = ref<any[]>([])
+const filteredProducts = ref<Product[]>([])
+const selectedCategory = ref('')
+const searchQuery = ref('')
+const currentPage = ref(1)
+const totalPages = ref(1)
+const quoteItems = ref<QuoteItem[]>([])
+const currentCalculation = ref<QuoteCalculation | null>(null)
 
-const customizationCost = computed(() => {
-  // Coût de personnalisation basé sur le nombre de produits
-  const baseCustomizationCost = 50 // Coût de base pour la personnalisation
-  const perItemCost = 1 // Coût par article
-  const totalItems = selectedProducts.value.reduce((sum, item) => sum + item.quantity, 0)
-  
-  return baseCustomizationCost + (totalItems * perItemCost)
-})
+// Refs pour composants
+const calculatorRef = ref(null)
 
-const vatAmount = computed(() => {
-  return (subtotal.value + customizationCost.value) * 0.18
-})
-
-const totalAmount = computed(() => {
-  return subtotal.value + customizationCost.value + vatAmount.value
-})
-
-const canGenerateQuote = computed(() => {
-  return clientInfo.value.name && 
-         clientInfo.value.email && 
-         selectedProducts.value.length > 0
-})
-
-// Méthodes
-const updateQuantity = (index: number, event: Event) => {
-  const target = event.target as HTMLInputElement
-  const quantity = parseInt(target.value) || 0
-  const product = selectedProducts.value[index]
-  
-  if (quantity >= product.minQuantity && quantity <= product.maxQuantity) {
-    product.quantity = quantity
-    product.total = quantity * product.basePrice
+// Méthodes de navigation
+const goToStep = (step: number) => {
+  if (step >= 0 && step < steps.length) {
+    currentStep.value = step
   }
 }
 
-const removeProduct = (index: number) => {
-  selectedProducts.value.splice(index, 1)
-}
-
-const formatPrice = (price: number) => {
-  return new Intl.NumberFormat('fr-FR', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2
-  }).format(price)
-}
-
-const generateQuote = async () => {
-  try {
-    // TODO: Générer PDF avec jsPDF ou appel API
-    console.log('Génération du devis PDF...')
-    
-    // Simulation
-    await new Promise(resolve => setTimeout(resolve, 1000))
-    
-    // Ici on déclencherait le téléchargement du PDF
-    alert('Devis généré avec succès!')
-  } catch (error) {
-    console.error('Erreur lors de la génération du devis:', error)
+const nextStep = () => {
+  if (currentStep.value < steps.length - 1) {
+    currentStep.value++
   }
 }
 
-const submitPreOrder = async () => {
-  try {
-    // TODO: Soumettre la pré-commande via API
-    console.log('Soumission de la pré-commande...')
-    
-    const orderData = {
-      client: clientInfo.value,
-      products: selectedProducts.value,
-      customization: customization.value,
-      totals: {
-        subtotal: subtotal.value,
-        customization: customizationCost.value,
-        vat: vatAmount.value,
-        total: totalAmount.value
-      }
+const previousStep = () => {
+  if (currentStep.value > 0) {
+    currentStep.value--
+  }
+}
+
+// Méthodes de filtrage produits
+const filterProducts = () => {
+  // Simulation du filtrage des produits
+  console.log('Filtrage des produits:', { selectedCategory: selectedCategory.value, searchQuery: searchQuery.value })
+}
+
+const nextPage = () => {
+  if (currentPage.value < totalPages.value) {
+    currentPage.value++
+  }
+}
+
+const previousPage = () => {
+  if (currentPage.value > 1) {
+    currentPage.value--
+  }
+}
+
+// Méthodes de gestion des produits
+const addProductToQuote = (product: Product) => {
+  const newItem: QuoteItem = {
+    id: `item-${Date.now()}`,
+    productId: product.id,
+    product: product,
+    quantity: product.minQuantity,
+    unitPrice: product.basePrice,
+    customizations: [],
+    totalPrice: product.basePrice * product.minQuantity
+  }
+  quoteItems.value.push(newItem)
+}
+
+const isProductInQuote = (productId: string): boolean => {
+  return quoteItems.value.some(item => item.productId === productId)
+}
+
+const getItemTotal = (item: QuoteItem): number => {
+  return item.totalPrice
+}
+
+// Méthodes de calcul
+const onQuoteUpdated = (calculation: QuoteCalculation) => {
+  currentCalculation.value = calculation
+}
+
+const formatCurrency = (amount: number): string => {
+  return new Intl.NumberFormat('fr-CI', {
+    style: 'currency',
+    currency: 'XOF',
+    minimumFractionDigits: 0
+  }).format(amount)
+}
+
+const getCustomerTypeLabel = (type?: string): string => {
+  const labels: Record<string, string> = {
+    individual: 'Particulier',
+    party: 'Parti politique',
+    candidate: 'Candidat',
+    organization: 'Organisation'
+  }
+  return labels[type || ''] || type || 'Non spécifié'
+}
+
+// Actions finales
+const downloadQuote = () => {
+  console.log('Téléchargement du devis')
+}
+
+const sendQuote = () => {
+  console.log('Envoi du devis par email')
+}
+
+const saveQuote = () => {
+  console.log('Sauvegarde du devis')
+}
+
+const downloadPDF = () => {
+  console.log('Téléchargement PDF')
+}
+
+const sendByEmail = () => {
+  console.log('Envoi par email')
+}
+
+const startPreorder = () => {
+  navigateTo('/precommande')
+}
+
+const requestMeeting = () => {
+  console.log('Demande de rendez-vous')
+}
+
+const startNewQuote = () => {
+  // Réinitialiser le formulaire
+  currentStep.value = 0
+  customerInfo.value = {
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
+    company: '',
+    customerType: undefined,
+    address: {
+      line1: '',
+      city: '',
+      country: 'CI'
     }
-    
-    // Simulation d'appel API
-    await new Promise(resolve => setTimeout(resolve, 1500))
-    
-    alert('Pré-commande soumise avec succès! Nous vous contacterons sous 24h.')
-    
-    // Redirection vers page de confirmation
-    navigateTo('/confirmation')
-  } catch (error) {
-    console.error('Erreur lors de la soumission:', error)
   }
+  quoteItems.value = []
+  currentCalculation.value = null
 }
 </script>

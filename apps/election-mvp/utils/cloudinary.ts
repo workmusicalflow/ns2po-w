@@ -13,6 +13,8 @@ export interface CloudinaryUploadResult {
   bytes: number
   version: number
   url: string
+  thumbnail?: string
+  preview?: string
 }
 
 export interface CloudinaryTransformOptions {

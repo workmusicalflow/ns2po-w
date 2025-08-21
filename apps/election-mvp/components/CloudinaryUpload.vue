@@ -151,7 +151,7 @@
 
 <script setup lang="ts">
 import { Button } from '@ns2po/ui'
-import type { CloudinaryUploadResult } from '~/utils/cloudinary'
+import type { CloudinaryUploadResult } from '../utils/cloudinary'
 
 interface Props {
   preset?: 'logo' | 'product' | 'gallery' | 'avatar' | 'default'

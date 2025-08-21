@@ -30,17 +30,32 @@
           
           <div class="form-grid">
             <div class="form-group">
-              <label class="form-label">Nom complet *</label>
+              <label class="form-label">Prénom *</label>
               <input 
                 v-model="formData.customer.firstName"
                 type="text" 
                 class="form-input"
                 :class="{ 'error': hasFieldError('customer.firstName') }"
-                placeholder="Votre nom complet"
+                placeholder="Votre prénom"
                 required
               />
               <div v-if="hasFieldError('customer.firstName')" class="field-error">
                 {{ getFieldError('customer.firstName') }}
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Nom *</label>
+              <input 
+                v-model="formData.customer.lastName"
+                type="text" 
+                class="form-input"
+                :class="{ 'error': hasFieldError('customer.lastName') }"
+                placeholder="Votre nom"
+                required
+              />
+              <div v-if="hasFieldError('customer.lastName')" class="field-error">
+                {{ getFieldError('customer.lastName') }}
               </div>
             </div>
 
@@ -293,6 +308,7 @@
 <script setup lang="ts">
 import { Button, Card } from '@ns2po/ui'
 import type { ContactFormData, ContactType } from '@ns2po/types'
+import CloudinaryUpload from './CloudinaryUpload.vue'
 
 // Composables
 const { 
@@ -326,7 +342,8 @@ const formData = ref<ContactFormData>({
     customerType: '',
     company: '',
     address: {
-      street: '',
+      line1: '',
+      line2: '',
       city: '',
       region: '',
       postalCode: '',
@@ -361,6 +378,7 @@ const minDate = computed(() => {
 
 const isFormValid = computed(() => {
   return formData.value.customer.firstName.trim() &&
+         formData.value.customer.lastName.trim() &&
          formData.value.customer.email.trim() &&
          formData.value.customer.phone.trim() &&
          formData.value.subject.trim() &&
@@ -495,7 +513,8 @@ const resetForm = () => {
       customerType: '',
       company: '',
       address: {
-        street: '',
+        line1: '',
+        line2: '',
         city: '',
         region: '',
         postalCode: '',
