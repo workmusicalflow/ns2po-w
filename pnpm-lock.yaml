@@ -161,18 +161,12 @@ importers:
       '@typescript-eslint/parser':
         specifier: ^8.0.0
         version: 8.40.0(eslint@9.33.0)(typescript@5.9.2)
-      '@vitest/coverage-v8':
-        specifier: ^1.6.0
-        version: 1.6.1(vitest@1.6.1)
       eslint:
         specifier: ^9.0.0
         version: 9.33.0
       typescript:
         specifier: ^5.0.0
         version: 5.9.2
-      vitest:
-        specifier: ^1.6.0
-        version: 1.6.1(@types/node@24.3.0)(jsdom@24.1.3)
 
   packages/database:
     dependencies:
@@ -210,18 +204,12 @@ importers:
       '@typescript-eslint/parser':
         specifier: ^8.0.0
         version: 8.40.0(eslint@9.33.0)(typescript@5.9.2)
-      '@vitest/coverage-v8':
-        specifier: ^1.6.0
-        version: 1.6.1(vitest@1.6.1)
       eslint:
         specifier: ^9.0.0
         version: 9.33.0
       typescript:
         specifier: ^5.0.0
         version: 5.9.2
-      vitest:
-        specifier: ^1.6.0
-        version: 1.6.1(@types/node@24.3.0)(jsdom@24.1.3)
 
   packages/ui:
     dependencies:
