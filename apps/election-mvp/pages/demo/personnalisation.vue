@@ -14,16 +14,18 @@
 
       <!-- Sélecteur de produit -->
       <div class="mb-8">
-        <h2 class="text-xl font-semibold mb-4">Choisissez un produit</h2>
+        <h2 class="text-xl font-semibold mb-4">
+          Choisissez un produit
+        </h2>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
           <button
             v-for="product in demoProducts"
             :key="product.id"
-            @click="selectedProduct = product"
             :class="[
               'product-card',
               { 'product-card--selected': selectedProduct?.id === product.id }
             ]"
+            @click="selectedProduct = product"
           >
             <div class="product-image">
               <img 
@@ -31,14 +33,18 @@
                 :src="product.image" 
                 :alt="product.name"
                 class="w-full h-32 object-cover"
-              />
+              >
               <div v-else class="w-full h-32 bg-gray-200 flex items-center justify-center">
                 <span class="text-gray-500">{{ product.name }}</span>
               </div>
             </div>
             <div class="product-info">
-              <h3 class="font-medium">{{ product.name }}</h3>
-              <p class="text-sm text-gray-500">{{ product.category }}</p>
+              <h3 class="font-medium">
+                {{ product.name }}
+              </h3>
+              <p class="text-sm text-gray-500">
+                {{ product.category }}
+              </p>
               <p class="text-sm font-semibold text-blue-600">
                 {{ formatPrice(product.basePrice) }} FCFA
               </p>
@@ -70,6 +76,7 @@
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue'
 import ProductPreview from '../../components/ProductPreview.vue'
 import type { Product, ProductCustomization } from '@ns2po/types'
 

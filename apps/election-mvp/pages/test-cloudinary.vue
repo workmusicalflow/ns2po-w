@@ -8,7 +8,9 @@
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <!-- Upload Zone -->
         <div class="bg-white p-6 rounded-lg shadow-md">
-          <h2 class="text-xl font-semibold mb-4">Upload d'image</h2>
+          <h2 class="text-xl font-semibold mb-4">
+            Upload d'image
+          </h2>
           
           <div class="space-y-4">
             <!-- Sélecteur de preset -->
@@ -20,11 +22,21 @@
                 v-model="selectedPreset" 
                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
               >
-                <option value="default">Standard</option>
-                <option value="logo">Logo</option>
-                <option value="product">Produit</option>
-                <option value="gallery">Galerie</option>
-                <option value="avatar">Avatar</option>
+                <option value="default">
+                  Standard
+                </option>
+                <option value="logo">
+                  Logo
+                </option>
+                <option value="product">
+                  Produit
+                </option>
+                <option value="gallery">
+                  Galerie
+                </option>
+                <option value="avatar">
+                  Avatar
+                </option>
               </select>
             </div>
 
@@ -41,7 +53,9 @@
 
         <!-- Historique des uploads -->
         <div class="bg-white p-6 rounded-lg shadow-md">
-          <h2 class="text-xl font-semibold mb-4">Uploads récents</h2>
+          <h2 class="text-xl font-semibold mb-4">
+            Uploads récents
+          </h2>
           
           <div v-if="uploadHistory.length === 0" class="text-center py-8 text-gray-500">
             Aucun upload pour le moment
@@ -59,7 +73,7 @@
                   :src="upload.thumbnail" 
                   :alt="upload.public_id"
                   class="w-16 h-16 object-cover rounded-lg flex-shrink-0"
-                />
+                >
                 
                 <!-- Infos -->
                 <div class="flex-1 min-w-0">
@@ -77,8 +91,8 @@
                     <div class="flex items-center space-x-2">
                       <span class="text-xs font-medium text-gray-600">Original:</span>
                       <button 
-                        @click="copyToClipboard(upload.secure_url)"
                         class="text-xs text-blue-600 hover:text-blue-800 truncate max-w-xs"
+                        @click="copyToClipboard(upload.secure_url)"
                       >
                         {{ upload.secure_url }}
                       </button>
@@ -87,8 +101,8 @@
                     <div class="flex items-center space-x-2">
                       <span class="text-xs font-medium text-gray-600">Thumbnail:</span>
                       <button 
-                        @click="copyToClipboard(upload.thumbnail || '')"
                         class="text-xs text-blue-600 hover:text-blue-800 truncate max-w-xs"
+                        @click="copyToClipboard(upload.thumbnail || '')"
                       >
                         URL thumbnail
                       </button>
@@ -99,8 +113,8 @@
                 <!-- Actions -->
                 <div class="flex-shrink-0">
                   <button 
-                    @click="removeFromHistory(upload.public_id)"
                     class="text-red-600 hover:text-red-800 text-sm"
+                    @click="removeFromHistory(upload.public_id)"
                   >
                     Supprimer
                   </button>
@@ -113,7 +127,9 @@
 
       <!-- Démonstration transformations -->
       <div v-if="lastUpload" class="mt-8 bg-white p-6 rounded-lg shadow-md">
-        <h2 class="text-xl font-semibold mb-4">Transformations disponibles</h2>
+        <h2 class="text-xl font-semibold mb-4">
+          Transformations disponibles
+        </h2>
         
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div 
@@ -126,10 +142,14 @@
                 :src="transform?.url || ''" 
                 :alt="`Transform ${name}`"
                 class="w-full h-32 object-cover rounded-lg border"
-              />
+              >
             </div>
-            <h3 class="text-sm font-medium text-gray-700">{{ transform?.label || '' }}</h3>
-            <p class="text-xs text-gray-500">{{ transform?.description || '' }}</p>
+            <h3 class="text-sm font-medium text-gray-700">
+              {{ transform?.label || '' }}
+            </h3>
+            <p class="text-xs text-gray-500">
+              {{ transform?.description || '' }}
+            </p>
           </div>
         </div>
       </div>
@@ -149,7 +169,9 @@
 </template>
 
 <script setup lang="ts">
+import { ref, computed, onMounted, watch } from 'vue'
 import type { CloudinaryUploadResult } from '@ns2po/types'
+import { useCloudinary } from '../composables/useCloudinary'
 
 // Utilisation du head pour le titre de la page
 useHead({

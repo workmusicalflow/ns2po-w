@@ -3,29 +3,37 @@
     <Card class="preorder-form-card">
       <template #header>
         <div class="form-header">
-          <h2 class="form-title">Pré-commande</h2>
+          <h2 class="form-title">
+            Pré-commande
+          </h2>
           <p class="form-description">
             Finalisez votre commande avec un acompte de 50%
           </p>
         </div>
       </template>
 
-      <form @submit.prevent="handleSubmit" class="preorder-form-content">
+      <form class="preorder-form-content" @submit.prevent="handleSubmit">
         <!-- Résumé de la commande -->
         <div class="form-section">
-          <h3 class="section-title">🛒 Résumé de votre commande</h3>
+          <h3 class="section-title">
+            🛒 Résumé de votre commande
+          </h3>
           
           <div class="order-summary">
             <div v-for="item in preorderData.items" :key="item.productId" class="order-item">
               <div class="item-info">
-                <h4 class="item-name">{{ item.productName }}</h4>
+                <h4 class="item-name">
+                  {{ item.productName }}
+                </h4>
                 <p class="item-details">
                   Quantité: {{ item.quantity }} × {{ formatCurrency(item.unitPrice) }}
                 </p>
                 <div v-if="item.customizations.length > 0" class="item-customizations">
                   <span class="customization-label">Personnalisations:</span>
                   <ul>
-                    <li v-for="custom in item.customizations" :key="custom">{{ custom }}</li>
+                    <li v-for="custom in item.customizations" :key="custom">
+                      {{ custom }}
+                    </li>
                   </ul>
                 </div>
               </div>
@@ -53,7 +61,9 @@
 
         <!-- Informations client -->
         <div class="form-section">
-          <h3 class="section-title">👤 Informations de facturation</h3>
+          <h3 class="section-title">
+            👤 Informations de facturation
+          </h3>
           
           <div class="form-grid">
             <div class="form-group">
@@ -65,7 +75,7 @@
                 :class="{ 'error': hasFieldError('customer.firstName') }"
                 placeholder="Votre nom complet"
                 required
-              />
+              >
               <div v-if="hasFieldError('customer.firstName')" class="field-error">
                 {{ getFieldError('customer.firstName') }}
               </div>
@@ -80,7 +90,7 @@
                 :class="{ 'error': hasFieldError('customer.email') }"
                 placeholder="votre@email.com"
                 required
-              />
+              >
               <div v-if="hasFieldError('customer.email')" class="field-error">
                 {{ getFieldError('customer.email') }}
               </div>
@@ -95,7 +105,7 @@
                 :class="{ 'error': hasFieldError('customer.phone') }"
                 placeholder="+225 XX XX XX XX"
                 required
-              />
+              >
               <div v-if="hasFieldError('customer.phone')" class="field-error">
                 {{ getFieldError('customer.phone') }}
               </div>
@@ -108,34 +118,36 @@
                 type="text" 
                 class="form-input"
                 placeholder="Nom de votre organisation"
-              />
+              >
             </div>
           </div>
         </div>
 
         <!-- Informations de livraison -->
         <div class="form-section">
-          <h3 class="section-title">🚚 Livraison</h3>
+          <h3 class="section-title">
+            🚚 Livraison
+          </h3>
           
           <div class="form-group">
             <label class="form-label">Mode de livraison *</label>
             <div class="radio-group">
               <label class="radio-option">
                 <input 
-                  type="radio" 
                   v-model="preorderData.deliveryInfo.method" 
+                  type="radio" 
                   value="pickup"
                   @change="onDeliveryMethodChange"
-                />
+                >
                 <span class="radio-label">🏢 Retrait en magasin (gratuit)</span>
               </label>
               <label class="radio-option">
                 <input 
-                  type="radio" 
                   v-model="preorderData.deliveryInfo.method" 
+                  type="radio" 
                   value="delivery"
                   @change="onDeliveryMethodChange"
-                />
+                >
                 <span class="radio-label">🚛 Livraison à domicile</span>
               </label>
             </div>
@@ -152,7 +164,7 @@
                   :class="{ 'error': hasFieldError('deliveryInfo.address.street') }"
                   placeholder="Rue, numéro, quartier"
                   required
-                />
+                >
                 <div v-if="hasFieldError('deliveryInfo.address.street')" class="field-error">
                   {{ getFieldError('deliveryInfo.address.street') }}
                 </div>
@@ -167,7 +179,7 @@
                   :class="{ 'error': hasFieldError('deliveryInfo.address.city') }"
                   placeholder="Abidjan, Bouaké, etc."
                   required
-                />
+                >
                 <div v-if="hasFieldError('deliveryInfo.address.city')" class="field-error">
                   {{ getFieldError('deliveryInfo.address.city') }}
                 </div>
@@ -181,7 +193,7 @@
                   class="form-input"
                   placeholder="Nom de la personne qui recevra"
                   required
-                />
+                >
               </div>
 
               <div class="form-group">
@@ -192,7 +204,7 @@
                   class="form-input"
                   placeholder="+225 XX XX XX XX"
                   required
-                />
+                >
               </div>
             </div>
 
@@ -203,14 +215,16 @@
                 class="form-textarea"
                 placeholder="Indications particulières pour la livraison..."
                 rows="3"
-              ></textarea>
+              />
             </div>
           </div>
         </div>
 
         <!-- Timeline -->
         <div class="form-section">
-          <h3 class="section-title">📅 Planning</h3>
+          <h3 class="section-title">
+            📅 Planning
+          </h3>
           
           <div class="form-group">
             <label class="form-label">Date de livraison souhaitée *</label>
@@ -219,9 +233,9 @@
               type="date" 
               class="form-input"
               :min="minDeliveryDate"
-              @change="calculateTimeline"
               required
-            />
+              @change="calculateTimeline"
+            >
             <div class="field-hint">
               Délai minimum: {{ minProductionDays }} jours de production
             </div>
@@ -244,7 +258,9 @@
 
         <!-- Méthode de paiement -->
         <div class="form-section">
-          <h3 class="section-title">💳 Paiement de l'acompte</h3>
+          <h3 class="section-title">
+            💳 Paiement de l'acompte
+          </h3>
           
           <div class="payment-amount">
             <div class="amount-display">
@@ -257,7 +273,7 @@
             <label class="form-label">Méthode de paiement *</label>
             <div class="payment-options">
               <label class="payment-option">
-                <input type="radio" v-model="preorderData.paymentMethod" value="mobile_money" />
+                <input v-model="preorderData.paymentMethod" type="radio" value="mobile_money">
                 <div class="payment-card">
                   <div class="payment-icon">📱</div>
                   <div class="payment-details">
@@ -268,7 +284,7 @@
               </label>
               
               <label class="payment-option">
-                <input type="radio" v-model="preorderData.paymentMethod" value="bank_transfer" />
+                <input v-model="preorderData.paymentMethod" type="radio" value="bank_transfer">
                 <div class="payment-card">
                   <div class="payment-icon">🏦</div>
                   <div class="payment-details">
@@ -279,7 +295,7 @@
               </label>
               
               <label class="payment-option">
-                <input type="radio" v-model="preorderData.paymentMethod" value="cash" />
+                <input v-model="preorderData.paymentMethod" type="radio" value="cash">
                 <div class="payment-card">
                   <div class="payment-icon">💵</div>
                   <div class="payment-details">
@@ -294,7 +310,9 @@
 
         <!-- Demandes spéciales -->
         <div class="form-section">
-          <h3 class="section-title">📝 Demandes spéciales</h3>
+          <h3 class="section-title">
+            📝 Demandes spéciales
+          </h3>
           
           <div class="form-group">
             <label class="form-label">Instructions particulières</label>
@@ -303,13 +321,15 @@
               class="form-textarea"
               placeholder="Précisions sur la personnalisation, emballage spécial, etc."
               rows="4"
-            ></textarea>
+            />
           </div>
         </div>
 
         <!-- Conditions générales -->
         <div class="form-section">
-          <h3 class="section-title">📄 Conditions générales</h3>
+          <h3 class="section-title">
+            📄 Conditions générales
+          </h3>
           
           <div class="terms-content">
             <div class="terms-summary">
@@ -326,11 +346,11 @@
             <div class="form-group">
               <label class="checkbox-option">
                 <input 
-                  type="checkbox" 
-                  v-model="preorderData.agreedToTerms"
+                  v-model="preorderData.agreedToTerms" 
+                  type="checkbox"
                   :class="{ 'error': hasFieldError('agreedToTerms') }"
                   required
-                />
+                >
                 <span class="checkbox-label">
                   J'accepte les <a href="/conditions" target="_blank">conditions générales</a> 
                   et la <a href="/politique-confidentialite" target="_blank">politique de confidentialité</a> *
@@ -348,8 +368,8 @@
           <Button 
             type="button" 
             variant="outline" 
-            @click="$emit('cancel')"
             :disabled="isSubmitting"
+            @click="$emit('cancel')"
           >
             Annuler
           </Button>
@@ -373,7 +393,9 @@
         <!-- Message de succès -->
         <div v-if="submitSuccess" class="form-success">
           <div class="success-content">
-            <div class="success-icon">🎉</div>
+            <div class="success-icon">
+              🎉
+            </div>
             <div class="success-message">
               <h4>{{ submitSuccess.message }}</h4>
               <p><strong>Référence:</strong> {{ submitSuccess.preorderId }}</p>
@@ -381,8 +403,10 @@
               <div v-if="submitSuccess.paymentInstructions" class="payment-instructions">
                 <h5>Instructions de paiement:</h5>
                 <ul>
-                  <li v-for="instruction in submitSuccess.paymentInstructions.details.instructions" 
-                      :key="instruction">
+                  <li
+                    v-for="instruction in submitSuccess.paymentInstructions.details.instructions" 
+                    :key="instruction"
+                  >
                     {{ instruction }}
                   </li>
                 </ul>
@@ -395,7 +419,9 @@
               <div v-if="submitSuccess.nextSteps" class="next-steps">
                 <h5>Prochaines étapes:</h5>
                 <ol>
-                  <li v-for="step in submitSuccess.nextSteps" :key="step">{{ step }}</li>
+                  <li v-for="step in submitSuccess.nextSteps" :key="step">
+                    {{ step }}
+                  </li>
                 </ol>
               </div>
             </div>
@@ -407,7 +433,9 @@
 </template>
 
 <script setup lang="ts">
+import { ref, computed, onMounted } from 'vue'
 import { Button, Card } from '@ns2po/ui'
+import { useContactForm } from '../composables/useContactForm'
 import type { PreorderFormData, QuoteItem, PreorderItem } from '@ns2po/types'
 
 // Composables

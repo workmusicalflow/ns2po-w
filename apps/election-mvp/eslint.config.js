@@ -48,13 +48,28 @@ export default [
         defineNuxtPlugin: 'readonly',
         defineNuxtRouteMiddleware: 'readonly',
         useNuxtApp: 'readonly',
+        useFetch: 'readonly',
         createError: 'readonly',
         showError: 'readonly',
         clearError: 'readonly',
         isNuxt3: 'readonly',
         process: 'readonly',
         __dirname: 'readonly',
-        __filename: 'readonly'
+        __filename: 'readonly',
+        // Nitro/H3 server globals
+        defineEventHandler: 'readonly',
+        getQuery: 'readonly',
+        getRouterParam: 'readonly',
+        getRouterParams: 'readonly',
+        readBody: 'readonly',
+        readMultipartFormData: 'readonly',
+        setResponseHeader: 'readonly',
+        setResponseHeaders: 'readonly',
+        getRequestHeader: 'readonly',
+        getRequestHeaders: 'readonly',
+        sendRedirect: 'readonly',
+        // Nuxt config
+        defineNuxtConfig: 'readonly'
       }
     },
     plugins: {

@@ -2,11 +2,6 @@
   <div class="cloudinary-upload">
     <!-- Zone de drop -->
     <div 
-      @drop="handleDrop"
-      @dragover.prevent
-      @dragenter.prevent
-      @dragleave="isDragOver = false"
-      @dragover="isDragOver = true"
       :class="[
         'upload-zone',
         {
@@ -16,15 +11,20 @@
           'upload-zone--success': uploadResult
         }
       ]"
+      @drop="handleDrop"
+      @dragover.prevent
+      @dragenter.prevent
+      @dragleave="isDragOver = false"
+      @dragover="isDragOver = true"
     >
       <!-- État initial / drop zone -->
       <div v-if="!isUploading && !uploadResult" class="upload-content">
         <div class="upload-icon">
           <svg viewBox="0 0 24 24" fill="none" class="w-12 h-12">
-            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="currentColor" stroke-width="2"/>
-            <polyline points="14,2 14,8 20,8" stroke="currentColor" stroke-width="2"/>
-            <line x1="16" y1="13" x2="8" y2="13" stroke="currentColor" stroke-width="2"/>
-            <line x1="16" y1="17" x2="8" y2="17" stroke="currentColor" stroke-width="2"/>
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="currentColor" stroke-width="2" />
+            <polyline points="14,2 14,8 20,8" stroke="currentColor" stroke-width="2" />
+            <line x1="16" y1="13" x2="8" y2="13" stroke="currentColor" stroke-width="2" />
+            <line x1="16" y1="17" x2="8" y2="17" stroke="currentColor" stroke-width="2" />
           </svg>
         </div>
         
@@ -41,9 +41,9 @@
         </div>
 
         <Button 
-          @click="triggerFileInput"
           variant="primary"
           :disabled="isUploading"
+          @click="triggerFileInput"
         >
           Choisir un fichier
         </Button>
@@ -51,9 +51,13 @@
 
       <!-- État de chargement -->
       <div v-if="isUploading" class="upload-loading">
-        <div class="loading-spinner"></div>
-        <h3 class="loading-title">Upload en cours...</h3>
-        <p class="loading-subtitle">{{ uploadProgress }}%</p>
+        <div class="loading-spinner" />
+        <h3 class="loading-title">
+          Upload en cours...
+        </h3>
+        <p class="loading-subtitle">
+          {{ uploadProgress }}%
+        </p>
       </div>
 
       <!-- Résultat success -->
@@ -63,11 +67,13 @@
             :src="uploadResult.thumbnail" 
             :alt="uploadResult.public_id"
             class="preview-image"
-          />
+          >
         </div>
         
         <div class="success-info">
-          <h3 class="success-title">Upload réussi !</h3>
+          <h3 class="success-title">
+            Upload réussi !
+          </h3>
           <p class="success-details">
             {{ formatFileSize(uploadResult.bytes) }} • 
             {{ uploadResult.width }}×{{ uploadResult.height }}
@@ -75,17 +81,17 @@
           
           <div class="success-actions">
             <Button 
-              @click="resetUpload" 
               variant="outline" 
-              size="small"
+              size="small" 
+              @click="resetUpload"
             >
               Changer d'image
             </Button>
             
             <Button 
-              @click="copyUrl" 
               variant="secondary" 
-              size="small"
+              size="small" 
+              @click="copyUrl"
             >
               {{ copiedUrl ? 'Copié !' : 'Copier URL' }}
             </Button>
@@ -97,19 +103,23 @@
       <div v-if="error" class="upload-error">
         <div class="error-icon">
           <svg viewBox="0 0 24 24" fill="none" class="w-8 h-8">
-            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
-            <line x1="15" y1="9" x2="9" y2="15" stroke="currentColor" stroke-width="2"/>
-            <line x1="9" y1="9" x2="15" y2="15" stroke="currentColor" stroke-width="2"/>
+            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" />
+            <line x1="15" y1="9" x2="9" y2="15" stroke="currentColor" stroke-width="2" />
+            <line x1="9" y1="9" x2="15" y2="15" stroke="currentColor" stroke-width="2" />
           </svg>
         </div>
         
-        <h3 class="error-title">Erreur d'upload</h3>
-        <p class="error-message">{{ error }}</p>
+        <h3 class="error-title">
+          Erreur d'upload
+        </h3>
+        <p class="error-message">
+          {{ error }}
+        </p>
         
         <Button 
-          @click="resetUpload" 
           variant="danger" 
-          size="small"
+          size="small" 
+          @click="resetUpload"
         >
           Réessayer
         </Button>
@@ -121,23 +131,25 @@
       ref="fileInput"
       type="file"
       accept="image/jpeg,image/png,image/webp,image/svg+xml"
-      @change="handleFileSelect"
       class="hidden"
-    />
+      @change="handleFileSelect"
+    >
 
     <!-- Prévisualisation avancée (optionnelle) -->
     <div v-if="uploadResult && showPreview" class="upload-preview">
-      <h4 class="preview-title">Prévisualisations</h4>
+      <h4 class="preview-title">
+        Prévisualisations
+      </h4>
       
       <div class="preview-grid">
         <div class="preview-item">
           <label>Thumbnail (300×300)</label>
-          <img :src="uploadResult.thumbnail" alt="Thumbnail" />
+          <img :src="uploadResult.thumbnail" alt="Thumbnail">
         </div>
         
         <div class="preview-item">
           <label>Aperçu (800×600)</label>
-          <img :src="uploadResult.preview" alt="Preview" />
+          <img :src="uploadResult.preview" alt="Preview">
         </div>
       </div>
       
@@ -150,6 +162,7 @@
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue'
 import { Button } from '@ns2po/ui'
 import type { CloudinaryUploadResult } from '../utils/cloudinary'
 

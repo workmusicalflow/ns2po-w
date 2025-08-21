@@ -2,7 +2,9 @@
   <div class="product-preview">
     <!-- Configuration de personnalisation -->
     <div class="customization-panel">
-      <h3 class="panel-title">Personnalisation</h3>
+      <h3 class="panel-title">
+        Personnalisation
+      </h3>
       
       <!-- Upload du logo -->
       <div class="customization-section">
@@ -24,7 +26,7 @@
           placeholder="Votre texte ici..."
           class="text-input"
           maxlength="50"
-        />
+        >
       </div>
 
       <!-- Position -->
@@ -34,11 +36,11 @@
           <button
             v-for="position in availablePositions"
             :key="position.value"
-            @click="customization.position = position.value"
             :class="[
               'position-btn',
               { 'position-btn--active': customization.position === position.value }
             ]"
+            @click="customization.position = position.value"
           >
             <div class="position-icon">
               <component :is="position.icon" />
@@ -55,16 +57,16 @@
           <button
             v-for="color in availableColors"
             :key="color.value"
-            @click="toggleColor(color.value)"
             :class="[
               'color-btn',
               { 'color-btn--selected': customization.colors?.includes(color.value) }
             ]"
             :style="{ backgroundColor: color.hex }"
             :title="color.name"
+            @click="toggleColor(color.value)"
           >
             <svg v-if="customization.colors?.includes(color.value)" class="color-check" viewBox="0 0 24 24">
-              <path d="M20.285 2l-11.285 11.567-5.286-5.011-3.714 3.716 9 8.728 15-15.285z" fill="white"/>
+              <path d="M20.285 2l-11.285 11.567-5.286-5.011-3.714 3.716 9 8.728 15-15.285z" fill="white" />
             </svg>
           </button>
         </div>
@@ -73,7 +75,9 @@
 
     <!-- Prévisualisation -->
     <div class="preview-panel">
-      <h3 class="panel-title">Aperçu</h3>
+      <h3 class="panel-title">
+        Aperçu
+      </h3>
       
       <!-- Canvas de prévisualisation -->
       <div class="preview-container">
@@ -87,8 +91,12 @@
         <!-- Overlay pour afficher les détails -->
         <div class="preview-overlay">
           <div class="overlay-content">
-            <h4 class="product-name">{{ product.name }}</h4>
-            <p class="product-category">{{ product.category }}</p>
+            <h4 class="product-name">
+              {{ product.name }}
+            </h4>
+            <p class="product-category">
+              {{ product.category }}
+            </p>
             
             <div v-if="customization.text || customization.logoUrl" class="customization-summary">
               <div v-if="customization.logoUrl" class="summary-item">
@@ -121,10 +129,10 @@
 
       <!-- Actions -->
       <div class="preview-actions">
-        <Button @click="resetCustomization" variant="outline">
+        <Button variant="outline" @click="resetCustomization">
           Réinitialiser
         </Button>
-        <Button @click="saveCustomization" variant="primary">
+        <Button variant="primary" @click="saveCustomization">
           Valider la personnalisation
         </Button>
       </div>
@@ -133,6 +141,7 @@
 </template>
 
 <script setup lang="ts">
+import { ref, nextTick, watch, onMounted, h } from 'vue'
 import { Button } from '@ns2po/ui'
 import CloudinaryUpload from './CloudinaryUpload.vue'
 import type { 

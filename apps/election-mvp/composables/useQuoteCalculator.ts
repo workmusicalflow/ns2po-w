@@ -3,6 +3,7 @@
  * Gère la logique métier de tarification, remises et taxes
  */
 
+import { ref, readonly } from 'vue'
 import type {
   QuoteRequest,
   QuoteItem,

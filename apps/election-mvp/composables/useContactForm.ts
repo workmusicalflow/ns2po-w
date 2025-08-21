@@ -2,6 +2,7 @@
  * Composable pour la gestion des formulaires de contact et pré-commandes
  */
 
+import { ref, readonly } from 'vue'
 import type {
   ContactFormData,
   PreorderFormData,

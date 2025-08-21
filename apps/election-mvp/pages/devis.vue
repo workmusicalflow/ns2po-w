@@ -47,8 +47,12 @@
               ]"
               @click="goToStep(index)"
             >
-              <div class="step-number">{{ index + 1 }}</div>
-              <div class="step-label">{{ step.label }}</div>
+              <div class="step-number">
+                {{ index + 1 }}
+              </div>
+              <div class="step-label">
+                {{ step.label }}
+              </div>
             </div>
           </div>
         </div>
@@ -57,21 +61,33 @@
         <div class="step-content">
           <!-- Étape 1: Informations client -->
           <div v-if="currentStep === 0" class="step-panel">
-            <h2 class="step-title">Informations client</h2>
+            <h2 class="step-title">
+              Informations client
+            </h2>
             <p class="step-description">
               Renseignez vos informations pour personnaliser votre devis
             </p>
 
-            <form @submit.prevent="nextStep" class="customer-form">
+            <form class="customer-form" @submit.prevent="nextStep">
               <div class="form-grid">
                 <div class="form-group">
                   <label class="form-label">Type de client *</label>
                   <select v-model="customerInfo.customerType" class="form-select" required>
-                    <option value="">Sélectionner</option>
-                    <option value="individual">Particulier</option>
-                    <option value="party">Parti politique</option>
-                    <option value="candidate">Candidat</option>
-                    <option value="organization">Organisation</option>
+                    <option value="">
+                      Sélectionner
+                    </option>
+                    <option value="individual">
+                      Particulier
+                    </option>
+                    <option value="party">
+                      Parti politique
+                    </option>
+                    <option value="candidate">
+                      Candidat
+                    </option>
+                    <option value="organization">
+                      Organisation
+                    </option>
                   </select>
                 </div>
 
@@ -83,7 +99,7 @@
                     class="form-input" 
                     placeholder="Votre nom complet"
                     required
-                  />
+                  >
                 </div>
 
                 <div class="form-group">
@@ -94,7 +110,7 @@
                     class="form-input" 
                     placeholder="votre@email.com"
                     required
-                  />
+                  >
                 </div>
 
                 <div class="form-group">
@@ -105,7 +121,7 @@
                     class="form-input" 
                     placeholder="+225 XX XX XX XX"
                     required
-                  />
+                  >
                 </div>
 
                 <div class="form-group">
@@ -115,7 +131,7 @@
                     type="text" 
                     class="form-input" 
                     placeholder="Nom de votre organisation"
-                  />
+                  >
                 </div>
 
                 <div class="form-group">
@@ -125,7 +141,7 @@
                     type="text" 
                     class="form-input" 
                     placeholder="Abidjan, Bouaké, etc."
-                  />
+                  >
                 </div>
               </div>
 
@@ -139,7 +155,9 @@
 
           <!-- Étape 2: Sélection produits -->
           <div v-else-if="currentStep === 1" class="step-panel">
-            <h2 class="step-title">Sélection des produits</h2>
+            <h2 class="step-title">
+              Sélection des produits
+            </h2>
             <p class="step-description">
               Choisissez vos produits dans notre catalogue
             </p>
@@ -150,8 +168,10 @@
               <div class="catalog-filters">
                 <div class="filter-group">
                   <label class="filter-label">Catégorie</label>
-                  <select v-model="selectedCategory" @change="filterProducts" class="filter-select">
-                    <option value="">Toutes les catégories</option>
+                  <select v-model="selectedCategory" class="filter-select" @change="filterProducts">
+                    <option value="">
+                      Toutes les catégories
+                    </option>
                     <option v-for="category in categories" :key="category.id" :value="category.id">
                       {{ category.name }}
                     </option>
@@ -162,11 +182,11 @@
                   <label class="filter-label">Recherche</label>
                   <input 
                     v-model="searchQuery"
-                    @input="filterProducts"
-                    type="text" 
+                    type="text"
                     class="filter-input" 
-                    placeholder="Rechercher un produit..."
-                  />
+                    placeholder="Rechercher un produit..." 
+                    @input="filterProducts"
+                  >
                 </div>
               </div>
 
@@ -182,12 +202,16 @@
                       :src="product.image || '/placeholder-product.jpg'"
                       :alt="product.name"
                       class="product-img"
-                    />
+                    >
                   </div>
                   
                   <div class="product-info">
-                    <h3 class="product-name">{{ product.name }}</h3>
-                    <p class="product-category">{{ product.category }}</p>
+                    <h3 class="product-name">
+                      {{ product.name }}
+                    </h3>
+                    <p class="product-category">
+                      {{ product.category }}
+                    </p>
                     <p class="product-price">
                       À partir de {{ formatCurrency(product.basePrice) }}
                     </p>
@@ -198,10 +222,10 @@
 
                   <div class="product-actions">
                     <Button 
-                      @click="addProductToQuote(product)"
                       variant="primary"
                       size="small"
                       :disabled="isProductInQuote(product.id)"
+                      @click="addProductToQuote(product)"
                     >
                       {{ isProductInQuote(product.id) ? 'Déjà ajouté' : 'Ajouter' }}
                     </Button>
@@ -212,10 +236,10 @@
               <!-- Pagination -->
               <div v-if="totalPages > 1" class="pagination">
                 <Button 
-                  @click="previousPage"
                   :disabled="currentPage === 1"
                   variant="outline"
                   size="small"
+                  @click="previousPage"
                 >
                   Précédent
                 </Button>
@@ -225,10 +249,10 @@
                 </span>
                 
                 <Button 
-                  @click="nextPage"
                   :disabled="currentPage === totalPages"
                   variant="outline"
                   size="small"
+                  @click="nextPage"
                 >
                   Suivant
                 </Button>
@@ -236,13 +260,13 @@
             </div>
 
             <div class="step-actions">
-              <Button @click="previousStep" variant="outline">
+              <Button variant="outline" @click="previousStep">
                 Retour
               </Button>
               <Button 
-                @click="nextStep" 
-                variant="primary"
+                variant="primary" 
                 :disabled="quoteItems.length === 0"
+                @click="nextStep"
               >
                 Configurer les produits ({{ quoteItems.length }})
               </Button>
@@ -251,12 +275,15 @@
 
           <!-- Étape 3: Configuration et calcul -->
           <div v-else-if="currentStep === 2" class="step-panel">
-            <h2 class="step-title">Configuration et devis</h2>
+            <h2 class="step-title">
+              Configuration et devis
+            </h2>
             <p class="step-description">
               Configurez vos produits et obtenez votre devis détaillé
             </p>
 
             <QuoteCalculator
+              ref="calculatorRef"
               :initial-items="quoteItems"
               :customer-type="customerInfo.customerType"
               :auto-calculate="true"
@@ -265,17 +292,16 @@
               @download-quote="downloadQuote"
               @send-quote="sendQuote"
               @save-quote="saveQuote"
-              ref="calculatorRef"
             />
 
             <div class="step-actions">
-              <Button @click="previousStep" variant="outline">
+              <Button variant="outline" @click="previousStep">
                 Retour aux produits
               </Button>
               <Button 
-                @click="nextStep" 
-                variant="primary"
+                variant="primary" 
                 :disabled="!currentCalculation"
+                @click="nextStep"
               >
                 Finaliser le devis
               </Button>
@@ -284,7 +310,9 @@
 
           <!-- Étape 4: Finalisation -->
           <div v-else-if="currentStep === 3" class="step-panel">
-            <h2 class="step-title">Finalisation du devis</h2>
+            <h2 class="step-title">
+              Finalisation du devis
+            </h2>
             <p class="step-description">
               Votre devis est prêt ! Choisissez comment procéder.
             </p>
@@ -292,18 +320,24 @@
             <div v-if="currentCalculation" class="quote-summary-final">
               <!-- Résumé client -->
               <div class="summary-section">
-                <h3 class="summary-title">Informations client</h3>
+                <h3 class="summary-title">
+                  Informations client
+                </h3>
                 <div class="customer-summary">
                   <p><strong>Nom:</strong> {{ customerInfo.firstName }}</p>
                   <p><strong>Email:</strong> {{ customerInfo.email }}</p>
                   <p><strong>Type:</strong> {{ getCustomerTypeLabel(customerInfo.customerType) }}</p>
-                  <p v-if="customerInfo.company"><strong>Organisation:</strong> {{ customerInfo.company }}</p>
+                  <p v-if="customerInfo.company">
+                    <strong>Organisation:</strong> {{ customerInfo.company }}
+                  </p>
                 </div>
               </div>
 
               <!-- Résumé produits -->
               <div class="summary-section">
-                <h3 class="summary-title">Produits commandés</h3>
+                <h3 class="summary-title">
+                  Produits commandés
+                </h3>
                 <div class="products-summary">
                   <div 
                     v-for="item in quoteItems"
@@ -344,19 +378,19 @@
               <!-- Actions finales -->
               <div class="final-actions">
                 <div class="action-grid">
-                  <Button @click="downloadPDF" variant="primary" class="action-btn">
+                  <Button variant="primary" class="action-btn" @click="downloadPDF">
                     📄 Télécharger le devis PDF
                   </Button>
                   
-                  <Button @click="sendByEmail" variant="secondary" class="action-btn">
+                  <Button variant="secondary" class="action-btn" @click="sendByEmail">
                     ✉️ Envoyer par email
                   </Button>
                   
-                  <Button @click="startPreorder" variant="outline" class="action-btn">
+                  <Button variant="outline" class="action-btn" @click="startPreorder">
                     🛒 Passer la pré-commande
                   </Button>
                   
-                  <Button @click="requestMeeting" variant="outline" class="action-btn">
+                  <Button variant="outline" class="action-btn" @click="requestMeeting">
                     📞 Demander un rendez-vous
                   </Button>
                 </div>
@@ -375,10 +409,10 @@
             </div>
 
             <div class="step-actions">
-              <Button @click="previousStep" variant="outline">
+              <Button variant="outline" @click="previousStep">
                 Modifier le devis
               </Button>
-              <Button @click="startNewQuote" variant="secondary">
+              <Button variant="secondary" @click="startNewQuote">
                 Nouveau devis
               </Button>
             </div>
@@ -390,6 +424,7 @@
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue'
 import { Button, Card, Input } from '@ns2po/ui'
 import type { CustomerInfo, Product, QuoteItem, QuoteCalculation } from '@ns2po/types'
 

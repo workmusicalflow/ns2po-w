@@ -3,6 +3,7 @@
  * Upload, transformation et gestion d'images
  */
 
+import { ref, readonly } from 'vue'
 import type { CloudinaryUploadResult, CloudinaryTransformOptions } from '../utils/cloudinary'
 import { buildCloudinaryUrl, cloudinaryPresets } from '../utils/cloudinary'
 

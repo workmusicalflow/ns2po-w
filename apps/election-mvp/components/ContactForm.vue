@@ -3,30 +3,48 @@
     <Card class="contact-form-card">
       <template #header>
         <div class="form-header">
-          <h2 class="form-title">{{ getFormTitle() }}</h2>
-          <p class="form-description">{{ getFormDescription() }}</p>
+          <h2 class="form-title">
+            {{ getFormTitle() }}
+          </h2>
+          <p class="form-description">
+            {{ getFormDescription() }}
+          </p>
         </div>
       </template>
 
-      <form @submit.prevent="handleSubmit" class="contact-form-content">
+      <form class="contact-form-content" @submit.prevent="handleSubmit">
         <!-- Type de contact -->
         <div class="form-section">
           <div class="form-group">
             <label class="form-label">Type de demande *</label>
-            <select v-model="formData.type" @change="onTypeChange" class="form-select" required>
-              <option value="">Sélectionner</option>
-              <option value="quote">Demande de devis</option>
-              <option value="preorder">Pré-commande</option>
-              <option value="custom">Projet personnalisé</option>
-              <option value="support">Support/Question</option>
-              <option value="meeting">Demande de rendez-vous</option>
+            <select v-model="formData.type" class="form-select" required @change="onTypeChange">
+              <option value="">
+                Sélectionner
+              </option>
+              <option value="quote">
+                Demande de devis
+              </option>
+              <option value="preorder">
+                Pré-commande
+              </option>
+              <option value="custom">
+                Projet personnalisé
+              </option>
+              <option value="support">
+                Support/Question
+              </option>
+              <option value="meeting">
+                Demande de rendez-vous
+              </option>
             </select>
           </div>
         </div>
 
         <!-- Informations client -->
         <div class="form-section">
-          <h3 class="section-title">Vos informations</h3>
+          <h3 class="section-title">
+            Vos informations
+          </h3>
           
           <div class="form-grid">
             <div class="form-group">
@@ -38,7 +56,7 @@
                 :class="{ 'error': hasFieldError('customer.firstName') }"
                 placeholder="Votre prénom"
                 required
-              />
+              >
               <div v-if="hasFieldError('customer.firstName')" class="field-error">
                 {{ getFieldError('customer.firstName') }}
               </div>
@@ -53,7 +71,7 @@
                 :class="{ 'error': hasFieldError('customer.lastName') }"
                 placeholder="Votre nom"
                 required
-              />
+              >
               <div v-if="hasFieldError('customer.lastName')" class="field-error">
                 {{ getFieldError('customer.lastName') }}
               </div>
@@ -68,7 +86,7 @@
                 :class="{ 'error': hasFieldError('customer.email') }"
                 placeholder="votre@email.com"
                 required
-              />
+              >
               <div v-if="hasFieldError('customer.email')" class="field-error">
                 {{ getFieldError('customer.email') }}
               </div>
@@ -83,7 +101,7 @@
                 :class="{ 'error': hasFieldError('customer.phone') }"
                 placeholder="+225 XX XX XX XX"
                 required
-              />
+              >
               <div v-if="hasFieldError('customer.phone')" class="field-error">
                 {{ getFieldError('customer.phone') }}
               </div>
@@ -92,21 +110,29 @@
             <div class="form-group">
               <label class="form-label">Type de client</label>
               <select v-model="formData.customer.customerType" class="form-select">
-                <option :value="undefined">Sélectionner</option>
-                <option value="individual">Particulier</option>
-                <option value="party">Parti politique</option>
-                <option value="organization">Organisation</option>
+                <option :value="undefined">
+                  Sélectionner
+                </option>
+                <option value="individual">
+                  Particulier
+                </option>
+                <option value="party">
+                  Parti politique
+                </option>
+                <option value="organization">
+                  Organisation
+                </option>
               </select>
             </div>
 
-            <div class="form-group" v-if="formData.customer.customerType !== 'individual'">
+            <div v-if="formData.customer.customerType !== 'individual'" class="form-group">
               <label class="form-label">Organisation/Parti</label>
               <input 
                 v-model="formData.customer.company"
                 type="text" 
                 class="form-input"
                 placeholder="Nom de votre organisation"
-              />
+              >
             </div>
 
             <div class="form-group">
@@ -116,14 +142,16 @@
                 type="text" 
                 class="form-input"
                 placeholder="Abidjan, Bouaké, etc."
-              />
+              >
             </div>
           </div>
         </div>
 
         <!-- Détails de la demande -->
         <div class="form-section">
-          <h3 class="section-title">Détails de votre demande</h3>
+          <h3 class="section-title">
+            Détails de votre demande
+          </h3>
           
           <div class="form-group">
             <label class="form-label">Sujet *</label>
@@ -134,7 +162,7 @@
               :class="{ 'error': hasFieldError('subject') }"
               :placeholder="getSubjectPlaceholder()"
               required
-            />
+            >
             <div v-if="hasFieldError('subject')" class="field-error">
               {{ getFieldError('subject') }}
             </div>
@@ -149,7 +177,7 @@
               :placeholder="getMessagePlaceholder()"
               rows="6"
               required
-            ></textarea>
+            />
             <div v-if="hasFieldError('message')" class="field-error">
               {{ getFieldError('message') }}
             </div>
@@ -161,9 +189,15 @@
           <div class="form-group">
             <label class="form-label">Priorité</label>
             <select v-model="formData.priority" class="form-select">
-              <option value="normal">Normale</option>
-              <option value="high">Élevée</option>
-              <option value="urgent">Urgente</option>
+              <option value="normal">
+                Normale
+              </option>
+              <option value="high">
+                Élevée
+              </option>
+              <option value="urgent">
+                Urgente
+              </option>
             </select>
           </div>
 
@@ -171,15 +205,15 @@
             <label class="form-label">Méthode de contact préférée</label>
             <div class="radio-group">
               <label class="radio-option">
-                <input type="radio" v-model="formData.preferredContactMethod" value="email" />
+                <input v-model="formData.preferredContactMethod" type="radio" value="email">
                 <span class="radio-label">📧 Email</span>
               </label>
               <label class="radio-option">
-                <input type="radio" v-model="formData.preferredContactMethod" value="phone" />
+                <input v-model="formData.preferredContactMethod" type="radio" value="phone">
                 <span class="radio-label">📞 Téléphone</span>
               </label>
               <label class="radio-option">
-                <input type="radio" v-model="formData.preferredContactMethod" value="whatsapp" />
+                <input v-model="formData.preferredContactMethod" type="radio" value="whatsapp">
                 <span class="radio-label">💬 WhatsApp</span>
               </label>
             </div>
@@ -188,7 +222,9 @@
 
         <!-- Champs spécifiques selon le type -->
         <div v-if="formData.type === 'quote'" class="form-section">
-          <h3 class="section-title">Informations devis</h3>
+          <h3 class="section-title">
+            Informations devis
+          </h3>
           <div class="form-group">
             <label class="form-label">Quantité estimée</label>
             <input 
@@ -197,22 +233,34 @@
               class="form-input"
               placeholder="Nombre d'articles souhaités"
               min="1"
-            />
+            >
           </div>
           <div class="form-group">
             <label class="form-label">Budget approximatif</label>
             <select v-model="additionalData.budgetRange" class="form-select">
-              <option value="">À discuter</option>
-              <option value="under_100k">Moins de 100,000 FCFA</option>
-              <option value="100k_500k">100,000 - 500,000 FCFA</option>
-              <option value="500k_1m">500,000 - 1,000,000 FCFA</option>
-              <option value="1m_plus">Plus de 1,000,000 FCFA</option>
+              <option value="">
+                À discuter
+              </option>
+              <option value="under_100k">
+                Moins de 100,000 FCFA
+              </option>
+              <option value="100k_500k">
+                100,000 - 500,000 FCFA
+              </option>
+              <option value="500k_1m">
+                500,000 - 1,000,000 FCFA
+              </option>
+              <option value="1m_plus">
+                Plus de 1,000,000 FCFA
+              </option>
             </select>
           </div>
         </div>
 
         <div v-if="formData.type === 'meeting'" class="form-section">
-          <h3 class="section-title">Préférences de rendez-vous</h3>
+          <h3 class="section-title">
+            Préférences de rendez-vous
+          </h3>
           <div class="form-group">
             <label class="form-label">Date souhaitée 1 *</label>
             <input 
@@ -221,7 +269,7 @@
               class="form-input"
               :min="minDate"
               required
-            />
+            >
           </div>
           <div class="form-group">
             <label class="form-label">Date alternative (optionnel)</label>
@@ -230,29 +278,37 @@
               type="date" 
               class="form-input"
               :min="minDate"
-            />
+            >
           </div>
           <div class="form-group">
             <label class="form-label">Créneau horaire préféré</label>
             <select v-model="additionalData.preferredTimeSlot" class="form-select">
-              <option value="morning">Matinée (8h-12h)</option>
-              <option value="afternoon">Après-midi (14h-17h)</option>
-              <option value="evening">Soirée (17h-19h)</option>
+              <option value="morning">
+                Matinée (8h-12h)
+              </option>
+              <option value="afternoon">
+                Après-midi (14h-17h)
+              </option>
+              <option value="evening">
+                Soirée (17h-19h)
+              </option>
             </select>
           </div>
         </div>
 
         <!-- Pièces jointes -->
         <div class="form-section">
-          <h3 class="section-title">Pièces jointes (optionnel)</h3>
+          <h3 class="section-title">
+            Pièces jointes (optionnel)
+          </h3>
           <CloudinaryUpload
             v-if="formData.type === 'custom'"
-            @upload-success="onFileUploaded"
-            @upload-error="onUploadError"
             :multiple="true"
             :max-files="5"
             accept="image/*,.pdf,.doc,.docx"
             class="file-upload"
+            @upload-success="onFileUploaded"
+            @upload-error="onUploadError"
           />
           <div v-else class="upload-placeholder">
             <p>Les pièces jointes seront disponibles pour les projets personnalisés</p>
@@ -264,8 +320,8 @@
           <Button 
             type="button" 
             variant="outline" 
-            @click="resetForm"
             :disabled="isSubmitting"
+            @click="resetForm"
           >
             Réinitialiser
           </Button>
@@ -288,11 +344,15 @@
         <!-- Message de succès -->
         <div v-if="submitSuccess" class="form-success">
           <div class="success-content">
-            <div class="success-icon">✅</div>
+            <div class="success-icon">
+              ✅
+            </div>
             <div class="success-message">
               <h4>{{ submitSuccess.message }}</h4>
               <ul v-if="submitSuccess.nextSteps">
-                <li v-for="step in submitSuccess.nextSteps" :key="step">{{ step }}</li>
+                <li v-for="step in submitSuccess.nextSteps" :key="step">
+                  {{ step }}
+                </li>
               </ul>
               <p v-if="submitSuccess.estimatedResponseTime" class="response-time">
                 <strong>Délai de réponse estimé:</strong> {{ submitSuccess.estimatedResponseTime }}
@@ -306,7 +366,9 @@
 </template>
 
 <script setup lang="ts">
+import { ref, computed, onMounted } from 'vue'
 import { Button, Card } from '@ns2po/ui'
+import { useContactForm } from '../composables/useContactForm'
 import type { ContactFormData, ContactType } from '@ns2po/types'
 import CloudinaryUpload from './CloudinaryUpload.vue'
 

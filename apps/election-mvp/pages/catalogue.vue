@@ -22,7 +22,7 @@
               class="w-full"
             />
           </div>
-          <Button @click="resetFilters" variant="outline">
+          <Button variant="outline" @click="resetFilters">
             Réinitialiser
           </Button>
         </div>
@@ -39,7 +39,9 @@
               v-model="selectedCategory"
               class="w-full border border-gray-300 rounded-md px-3 py-2"
             >
-              <option value="">Toutes catégories</option>
+              <option value="">
+                Toutes catégories
+              </option>
               <option 
                 v-for="category in activeCategories" 
                 :key="category.id"
@@ -76,21 +78,27 @@
 
       <!-- Error Message -->
       <div v-if="error" class="mb-8 p-4 bg-red-50 border border-red-200 rounded-lg">
-        <p class="text-red-700">{{ error }}</p>
-        <Button @click="loadProducts" variant="outline" size="small" class="mt-2">
+        <p class="text-red-700">
+          {{ error }}
+        </p>
+        <Button variant="outline" size="small" class="mt-2" @click="loadProducts">
           Réessayer
         </Button>
       </div>
 
       <!-- Products Grid -->
       <div v-if="loading" class="text-center py-12">
-        <div class="inline-block w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-        <p class="mt-4 text-gray-600">Chargement des produits...</p>
+        <div class="inline-block w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
+        <p class="mt-4 text-gray-600">
+          Chargement des produits...
+        </p>
       </div>
 
       <div v-else-if="filteredProducts.length === 0 && !loading" class="text-center py-12">
-        <p class="text-gray-600 text-lg">Aucun produit trouvé avec ces critères</p>
-        <Button @click="resetFilters" variant="outline" class="mt-4">
+        <p class="text-gray-600 text-lg">
+          Aucun produit trouvé avec ces critères
+        </p>
+        <Button variant="outline" class="mt-4" @click="resetFilters">
           Voir tous les produits
         </Button>
       </div>
@@ -109,15 +117,21 @@
                 :src="product.image"
                 :alt="product.name"
                 class="w-full h-full object-cover rounded-lg"
-              />
-              <div v-else class="text-gray-400 text-4xl">📦</div>
+              >
+              <div v-else class="text-gray-400 text-4xl">
+                📦
+              </div>
             </div>
           </template>
 
           <div class="space-y-3">
             <div>
-              <h3 class="font-semibold text-gray-900">{{ product.name }}</h3>
-              <p class="text-sm text-gray-600">{{ product.category }}</p>
+              <h3 class="font-semibold text-gray-900">
+                {{ product.name }}
+              </h3>
+              <p class="text-sm text-gray-600">
+                {{ product.category }}
+              </p>
             </div>
             
             <p class="text-sm text-gray-700 line-clamp-2">
@@ -146,8 +160,8 @@
 
           <template #footer>
             <Button 
-              @click="addToQuote(product)"
               class="w-full"
+              @click="addToQuote(product)"
             >
               Ajouter au devis
             </Button>
@@ -174,8 +188,10 @@
 </template>
 
 <script setup lang="ts">
+import { ref, computed, onMounted } from 'vue'
 import { Button, Card, Input } from '@ns2po/ui'
 import type { Product } from '@ns2po/types'
+import { useProducts } from '../composables/useProducts'
 
 useHead({
   title: 'Catalogue - NS2PO Élections',

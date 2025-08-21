@@ -2,7 +2,9 @@
   <div class="quote-calculator">
     <!-- En-tête du calculateur -->
     <div class="calculator-header">
-      <h2 class="calculator-title">Calculateur de devis</h2>
+      <h2 class="calculator-title">
+        Calculateur de devis
+      </h2>
       <p class="calculator-subtitle">
         Configurez vos produits et obtenez un devis instantané
       </p>
@@ -11,17 +13,21 @@
     <!-- Liste des produits sélectionnés -->
     <div class="calculator-content">
       <div class="products-section">
-        <h3 class="section-title">Produits sélectionnés</h3>
+        <h3 class="section-title">
+          Produits sélectionnés
+        </h3>
         
         <div v-if="items.length === 0" class="empty-state">
           <div class="empty-icon">
             <svg viewBox="0 0 24 24" fill="none" class="w-12 h-12">
-              <rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="2"/>
-              <path d="M9 9l6 6m0-6l-6 6" stroke="currentColor" stroke-width="2"/>
+              <rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="2" />
+              <path d="M9 9l6 6m0-6l-6 6" stroke="currentColor" stroke-width="2" />
             </svg>
           </div>
-          <p class="empty-text">Aucun produit sélectionné</p>
-          <Button @click="$emit('add-product')" variant="primary">
+          <p class="empty-text">
+            Aucun produit sélectionné
+          </p>
+          <Button variant="primary" @click="$emit('add-product')">
             Ajouter un produit
           </Button>
         </div>
@@ -35,14 +41,18 @@
             <!-- Produit header -->
             <div class="product-header">
               <div class="product-info">
-                <h4 class="product-name">{{ item.product?.name || 'Produit inconnu' }}</h4>
-                <p class="product-category">{{ item.product?.category || '' }}</p>
+                <h4 class="product-name">
+                  {{ item.product?.name || 'Produit inconnu' }}
+                </h4>
+                <p class="product-category">
+                  {{ item.product?.category || '' }}
+                </p>
               </div>
               
               <Button 
-                @click="removeItem(index)"
                 variant="danger"
                 size="small"
+                @click="removeItem(index)"
               >
                 Supprimer
               </Button>
@@ -55,22 +65,22 @@
                 <label class="config-label">Quantité</label>
                 <div class="quantity-control">
                   <button 
-                    @click="updateQuantity(index, item.quantity - 1)"
                     :disabled="item.quantity <= 1"
                     class="quantity-btn"
+                    @click="updateQuantity(index, item.quantity - 1)"
                   >
                     -
                   </button>
                   <input 
                     v-model.number="item.quantity"
-                    @input="updateQuantity(index, item.quantity)"
                     type="number"
                     min="1"
                     class="quantity-input"
-                  />
+                    @input="updateQuantity(index, item.quantity)"
+                  >
                   <button 
-                    @click="updateQuantity(index, item.quantity + 1)"
                     class="quantity-btn"
+                    @click="updateQuantity(index, item.quantity + 1)"
                   >
                     +
                   </button>
@@ -94,10 +104,12 @@
                     <!-- Type couleur -->
                     <select 
                       v-if="option.type === 'color'"
-                      @change="updateCustomization(index, option.id, $event)"
                       class="option-select"
+                      @change="updateCustomization(index, option.id, $event)"
                     >
-                      <option value="">Choisir une couleur</option>
+                      <option value="">
+                        Choisir une couleur
+                      </option>
                       <option 
                         v-for="choice in option.options"
                         :key="choice"
@@ -113,11 +125,11 @@
                     <!-- Type texte -->
                     <input 
                       v-else-if="option.type === 'text'"
-                      @input="updateCustomizationText(index, option.id, $event)"
                       type="text"
                       :placeholder="`Votre ${option.name.toLowerCase()}`"
                       class="option-input"
-                    />
+                      @input="updateCustomizationText(index, option.id, $event)"
+                    >
 
                     <!-- Type logo -->
                     <div v-else-if="option.type === 'logo'" class="logo-upload">
@@ -171,7 +183,7 @@
 
           <!-- Bouton ajouter produit -->
           <div class="add-product-section">
-            <Button @click="$emit('add-product')" variant="outline">
+            <Button variant="outline" @click="$emit('add-product')">
               + Ajouter un autre produit
             </Button>
           </div>
@@ -180,12 +192,14 @@
 
       <!-- Résumé du devis -->
       <div v-if="items.length > 0" class="quote-summary">
-        <h3 class="section-title">Résumé du devis</h3>
+        <h3 class="section-title">
+          Résumé du devis
+        </h3>
         
         <div class="summary-content">
           <!-- Calcul en cours -->
           <div v-if="isCalculating" class="calculating">
-            <div class="spinner"></div>
+            <div class="spinner" />
             <p>Calcul en cours...</p>
           </div>
 
@@ -234,13 +248,13 @@
 
             <!-- Actions -->
             <div class="quote-actions">
-              <Button @click="downloadQuote" variant="primary">
+              <Button variant="primary" @click="downloadQuote">
                 Télécharger le devis
               </Button>
-              <Button @click="sendQuote" variant="secondary">
+              <Button variant="secondary" @click="sendQuote">
                 Envoyer par email
               </Button>
-              <Button @click="saveQuote" variant="outline">
+              <Button variant="outline" @click="saveQuote">
                 Sauvegarder
               </Button>
             </div>
@@ -272,8 +286,10 @@
 </template>
 
 <script setup lang="ts">
+import { ref, watch, onMounted } from 'vue'
 import { useDebounceFn } from '@vueuse/core'
 import { Button } from '@ns2po/ui'
+import { useQuoteCalculator } from '../composables/useQuoteCalculator'
 import type { 
   QuoteItem, 
   QuoteCalculation, 

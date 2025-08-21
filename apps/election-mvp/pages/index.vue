@@ -16,8 +16,12 @@
       <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
         <Card class="text-center" hoverable>
           <template #header>
-            <div class="text-blue-600 text-4xl mb-2">👕</div>
-            <h3 class="text-xl font-semibold">Textiles</h3>
+            <div class="text-blue-600 text-4xl mb-2">
+              👕
+            </div>
+            <h3 class="text-xl font-semibold">
+              Textiles
+            </h3>
           </template>
           <p class="text-gray-600">
             T-shirts, casquettes, polos personnalisés avec vos couleurs et logos
@@ -31,8 +35,12 @@
 
         <Card class="text-center" hoverable>
           <template #header>
-            <div class="text-green-600 text-4xl mb-2">🎁</div>
-            <h3 class="text-xl font-semibold">Gadgets</h3>
+            <div class="text-green-600 text-4xl mb-2">
+              🎁
+            </div>
+            <h3 class="text-xl font-semibold">
+              Gadgets
+            </h3>
           </template>
           <p class="text-gray-600">
             Objets promotionnels, goodies et accessoires de campagne
@@ -46,8 +54,12 @@
 
         <Card class="text-center" hoverable>
           <template #header>
-            <div class="text-orange-600 text-4xl mb-2">🦺</div>
-            <h3 class="text-xl font-semibold">EPI</h3>
+            <div class="text-orange-600 text-4xl mb-2">
+              🦺
+            </div>
+            <h3 class="text-xl font-semibold">
+              EPI
+            </h3>
           </template>
           <p class="text-gray-600">
             Équipements de protection personnalisés pour vos événements

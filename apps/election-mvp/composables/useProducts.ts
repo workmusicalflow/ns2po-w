@@ -3,6 +3,7 @@
  * Fournit une interface reactive pour les données Airtable
  */
 
+import { ref, computed, readonly } from 'vue'
 import type { Product, Category, PriceRule } from '@ns2po/types'
 
 export const useProducts = () => {
