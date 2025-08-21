@@ -10,7 +10,7 @@
     "preview": "nuxt preview",
     "prepare": "nuxt prepare",
     "lint": "eslint .",
-    "type-check": "nuxt typecheck",
+    "type-check": "nuxt prepare && vue-tsc --noEmit",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage"
   },

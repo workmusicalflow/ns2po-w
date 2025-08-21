@@ -1,16 +1,20 @@
 {
-  "extends": "../../tsconfig.json",
+  "extends": "./.nuxt/tsconfig.json",
   "compilerOptions": {
     "jsx": "preserve",
-    "types": ["node"]
+    "types": ["node"],
+    "skipLibCheck": true,
+    "paths": {
+      "@ns2po/types": ["../../packages/types/src/index.ts"],
+      "@ns2po/ui": ["../../packages/ui/src/index.ts"],
+      "@ns2po/composables": ["../../packages/composables/src/index.ts"],
+      "@ns2po/config": ["../../packages/config/src/index.ts"],
+      "@ns2po/database": ["../../packages/database/src/index.ts"]
+    }
   },
   "include": [
     "**/*",
-    ".nuxt/nuxt.d.ts"
-  ],
-  "exclude": [
-    "dist",
-    "node_modules",
-    ".output"
+    ".nuxt/nuxt.d.ts",
+    "types/**/*"
   ]
 }
