@@ -440,12 +440,11 @@ const preorderData = ref<PreorderFormData>({
     firstName: '',
     lastName: '',
     email: '',
-    phone: '',
-    customerType: '',
+    phone: undefined,
+    customerType: undefined,
     company: '',
     address: {
-      line1: '',
-      line2: '',
+      street: '',
       city: '',
       region: '',
       postalCode: '',
@@ -467,8 +466,7 @@ const preorderData = ref<PreorderFormData>({
   deliveryInfo: {
     method: 'pickup',
     address: {
-      line1: '',
-      line2: '',
+      street: '',
       city: '',
       region: '',
       postalCode: '',
@@ -510,7 +508,7 @@ const minDeliveryDate = computed(() => {
 const isFormValid = computed(() => {
   return preorderData.value.customer.firstName.trim() &&
          preorderData.value.customer.email.trim() &&
-         preorderData.value.customer.phone.trim() &&
+         (preorderData.value.customer.phone?.trim() || false) &&
          preorderData.value.timeline.requestedDelivery &&
          preorderData.value.paymentMethod &&
          preorderData.value.agreedToTerms &&
@@ -526,7 +524,7 @@ const hasFieldError = (fieldName: string): boolean => {
 
 const getFieldError = (fieldName: string): string => {
   const errors = getFieldErrors(fieldName)
-  return errors.length > 0 ? errors[0].message : ''
+  return errors.length > 0 ? errors[0]?.message || '' : ''
 }
 
 const onDeliveryMethodChange = () => {

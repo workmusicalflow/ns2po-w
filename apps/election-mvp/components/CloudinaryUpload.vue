@@ -257,8 +257,9 @@ const handleFile = async (file: File) => {
 
   } catch (err: any) {
     isUploading.value = false
-    error.value = err.message || 'Erreur lors de l\'upload'
-    emit('upload:error', error.value)
+    const errorMessage = err.message || 'Erreur lors de l\'upload'
+    error.value = errorMessage
+    emit('upload:error', errorMessage)
     console.error('Upload error:', err)
   }
 }

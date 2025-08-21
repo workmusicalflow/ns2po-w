@@ -92,7 +92,7 @@
             <div class="form-group">
               <label class="form-label">Type de client</label>
               <select v-model="formData.customer.customerType" class="form-select">
-                <option value="">Sélectionner</option>
+                <option :value="undefined">Sélectionner</option>
                 <option value="individual">Particulier</option>
                 <option value="party">Parti politique</option>
                 <option value="organization">Organisation</option>
@@ -112,7 +112,7 @@
             <div class="form-group">
               <label class="form-label">Ville</label>
               <input 
-                v-model="formData.customer.address.city"
+                v-model="formData.customer.address?.city"
                 type="text" 
                 class="form-input"
                 placeholder="Abidjan, Bouaké, etc."
@@ -338,11 +338,11 @@ const formData = ref<ContactFormData>({
     firstName: '',
     lastName: '',
     email: '',
-    phone: '',
-    customerType: '',
+    phone: undefined,
+    customerType: undefined,
     company: '',
     address: {
-      line1: '',
+      street: '',
       line2: '',
       city: '',
       region: '',
@@ -380,7 +380,7 @@ const isFormValid = computed(() => {
   return formData.value.customer.firstName.trim() &&
          formData.value.customer.lastName.trim() &&
          formData.value.customer.email.trim() &&
-         formData.value.customer.phone.trim() &&
+         formData.value.customer.phone?.trim() &&
          formData.value.subject.trim() &&
          formData.value.message.trim().length >= 10
 })
@@ -453,7 +453,7 @@ const hasFieldError = (fieldName: string): boolean => {
 
 const getFieldError = (fieldName: string): string => {
   const errors = getFieldErrors(fieldName)
-  return errors.length > 0 ? errors[0].message : ''
+  return errors.length > 0 ? errors[0]?.message || '' : ''
 }
 
 const onFileUploaded = (file: any) => {
@@ -509,11 +509,11 @@ const resetForm = () => {
       firstName: '',
       lastName: '',
       email: '',
-      phone: '',
-      customerType: '',
+      phone: undefined,
+      customerType: undefined,
       company: '',
       address: {
-        line1: '',
+        street: '',
         line2: '',
         city: '',
         region: '',

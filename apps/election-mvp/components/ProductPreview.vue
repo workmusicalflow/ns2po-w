@@ -275,7 +275,7 @@ const updatePreview = async () => {
     // Appliquer les couleurs (effet overlay)
     if (customization.value.colors?.length) {
       const primaryColor = customization.value.colors[0]
-      const colorHex = getColorHex(primaryColor)
+      const colorHex = primaryColor ? getColorHex(primaryColor) : '#000000'
       
       ctx.globalCompositeOperation = 'multiply'
       ctx.fillStyle = colorHex

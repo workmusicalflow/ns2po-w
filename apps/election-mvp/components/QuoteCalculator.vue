@@ -272,6 +272,7 @@
 </template>
 
 <script setup lang="ts">
+import { useDebounceFn } from '@vueuse/core'
 import { Button } from '@ns2po/ui'
 import type { 
   QuoteItem, 

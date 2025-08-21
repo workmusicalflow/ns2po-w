@@ -15,12 +15,12 @@ export interface CustomerInfo {
 }
 
 export interface CustomerAddress {
-  line1: string
+  street: string
   line2?: string
   city: string
-  region?: string
+  region: string
   postalCode?: string
-  country?: string
+  country: string
 }
 
 export type CustomerType = 'individual' | 'party' | 'candidate' | 'organization'

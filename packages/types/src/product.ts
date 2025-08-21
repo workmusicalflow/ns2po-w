@@ -68,6 +68,15 @@ export interface Product {
   readonly image?: string
   readonly tags: readonly string[]
   readonly isActive: boolean
+  readonly customizationOptions?: readonly CustomizationOption[]
+}
+
+export interface CustomizationOption {
+  readonly id: string
+  readonly name: string
+  readonly type: 'color' | 'text' | 'logo' | 'position'
+  readonly values?: readonly string[]
+  readonly price?: number
 }
 
 export interface Category {
