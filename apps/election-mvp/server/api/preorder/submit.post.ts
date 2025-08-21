@@ -49,7 +49,7 @@ export default defineEventHandler(async (event) => {
         lastName: body.customer.lastName,
         phone: body.customer.phone,
         company: body.customer.company,
-        addressLine1: body.customer.address?.line1,
+        addressLine1: body.customer.address?.street,
         city: body.customer.address?.city,
         customerType: body.customer.customerType || 'individual'
       })

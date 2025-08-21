@@ -326,9 +326,10 @@ export class CustomersService {
       phone: dbCustomer.phone || '',
       company: dbCustomer.company || '',
       address: {
-        line1: dbCustomer.address_line1 || '',
+        street: dbCustomer.address_line1 || '',
         line2: dbCustomer.address_line2 || '',
         city: dbCustomer.city || '',
+        region: '', // Région non stockée dans la DB actuelle
         postalCode: dbCustomer.postal_code || '',
         country: dbCustomer.country
       },

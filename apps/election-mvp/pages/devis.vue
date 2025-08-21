@@ -424,7 +424,7 @@ const customerInfo = ref<Partial<CustomerInfo>>({
   company: '',
   customerType: undefined,
   address: {
-    line1: '',
+    street: '',
     city: '',
     country: 'CI'
   }
@@ -565,7 +565,7 @@ const startNewQuote = () => {
     company: '',
     customerType: undefined,
     address: {
-      line1: '',
+      street: '',
       city: '',
       country: 'CI'
     }
