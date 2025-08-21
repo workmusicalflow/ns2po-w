@@ -19,7 +19,7 @@ import { computed } from 'vue'
 import type { CardProps } from '@ns2po/types'
 import { CardVariant, CardPadding } from '@ns2po/types'
 
-interface Props extends CardProps {
+type Props = CardProps & {
   class?: string
 }
 

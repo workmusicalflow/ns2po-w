@@ -36,7 +36,7 @@ import { computed } from 'vue'
 import type { InputProps } from '@ns2po/types'
 import { InputType } from '@ns2po/types'
 
-interface Props extends InputProps {
+type Props = InputProps & {
   modelValue?: string
   label?: string
   error?: string

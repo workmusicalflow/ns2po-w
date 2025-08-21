@@ -14,7 +14,7 @@ import { computed } from 'vue'
 import type { ButtonProps } from '@ns2po/types'
 import { ButtonVariant, ButtonSize } from '@ns2po/types'
 
-interface Props extends ButtonProps {
+type Props = ButtonProps & {
   class?: string
 }
 

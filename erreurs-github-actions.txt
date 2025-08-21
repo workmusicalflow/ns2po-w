@@ -1,0 +1,77 @@
+@ns2po/ui:type-check
+cache miss, executing 41a75593c31b64a0
+
+> @ns2po/ui@0.1.0 type-check /home/runner/work/ns2po-w/ns2po-w/packages/ui
+> vue-tsc --noEmit
+
+Error: src/components/Button.vue(4,16): error TS2339: Property 'disabled' does not exist on type 'CreateComponentPublicInstanceWithMixins<ToResolvedProps<Props, { click: (event: MouseEvent) => any; }>, { buttonClasses: ComputedRef<(string | { 'btn--disabled': any; 'btn--loading': any; })[]>; }, ... 23 more ..., {}>'.
+Error: src/components/Button.vue(4,28): error TS2339: Property 'loading' does not exist on type 'CreateComponentPublicInstanceWithMixins<ToResolvedProps<Props, { click: (event: MouseEvent) => any; }>, { buttonClasses: ComputedRef<(string | { 'btn--disabled': any; 'btn--loading': any; })[]>; }, ... 23 more ..., {}>'.
+Error: src/components/Button.vue(7,17): error TS2339: Property 'loading' does not exist on type 'CreateComponentPublicInstanceWithMixins<ToResolvedProps<Props, { click: (event: MouseEvent) => any; }>, { buttonClasses: ComputedRef<(string | { 'btn--disabled': any; 'btn--loading': any; })[]>; }, ... 23 more ..., {}>'.
+Error: src/components/Button.vue(14,34): error TS6305: Output file '/home/runner/work/ns2po-w/ns2po-w/packages/types/dist/src/index.d.ts' has not been built from source file '/home/runner/work/ns2po-w/ns2po-w/packages/types/src/index.ts'.
+Error: @ns2po/ui#type-check: command (/home/runner/work/ns2po-w/ns2po-w/packages/ui) /home/runner/setup-pnpm/node_modules/.bin/pnpm run type-check exited (1)
+Error: src/components/Button.vue(15,43): error TS6305: Output file '/home/runner/work/ns2po-w/ns2po-w/packages/types/dist/src/index.d.ts' has not been built from source file '/home/runner/work/ns2po-w/ns2po-w/packages/types/src/index.ts'.
+Error: src/components/Button.vue(22,3): error TS2353: Object literal may only specify known properties, and 'variant' does not exist in type 'InferDefaults<LooseRequired<Props>>'.
+Error: src/components/Button.vue(34,17): error TS2339: Property 'variant' does not exist on type 'Readonly<MappedOmit<LooseRequired<Props>, "class">> & { readonly class: string; } & {}'.
+Error: src/components/Button.vue(35,17): error TS2339: Property 'size' does not exist on type 'Readonly<MappedOmit<LooseRequired<Props>, "class">> & { readonly class: string; } & {}'.
+Error: src/components/Button.vue(37,28): error TS2339: Property 'disabled' does not exist on type 'Readonly<MappedOmit<LooseRequired<Props>, "class">> & { readonly class: string; } & {}'.
+Error: src/components/Button.vue(38,27): error TS2339: Property 'loading' does not exist on type 'Readonly<MappedOmit<LooseRequired<Props>, "class">> & { readonly class: string; } & {}'.
+Error: src/components/Card.vue(19,32): error TS6305: Output file '/home/runner/work/ns2po-w/ns2po-w/packages/types/dist/src/index.d.ts' has not been built from source file '/home/runner/work/ns2po-w/ns2po-w/packages/types/src/index.ts'.
+Error: src/components/Card.vue(20,42): error TS6305: Output file '/home/runner/work/ns2po-w/ns2po-w/packages/types/dist/src/index.d.ts' has not been built from source file '/home/runner/work/ns2po-w/ns2po-w/packages/types/src/index.ts'.
+Error: src/components/Card.vue(27,3): error TS2353: Object literal may only specify known properties, and 'variant' does not exist in type 'InferDefaults<LooseRequired<Props>>'.
+Error: src/components/Card.vue(36,18): error TS2339: Property 'variant' does not exist on type 'Readonly<MappedOmit<LooseRequired<Props>, "class">> & { readonly class: string; } & {}'.
+Error: src/components/Card.vue(37,26): error TS2339: Property 'padding' does not exist on type 'Readonly<MappedOmit<LooseRequired<Props>, "class">> & { readonly class: string; } & {}'.
+Error: src/components/Card.vue(39,27): error TS2339: Property 'shadow' does not exist on type 'Readonly<MappedOmit<LooseRequired<Props>, "class">> & { readonly class: string; } & {}'.
+Error: src/components/Card.vue(40,29): error TS2339: Property 'bordered' does not exist on type 'Readonly<MappedOmit<LooseRequired<Props>, "class">> & { readonly class: string; } & {}'.
+Error: src/components/Card.vue(41,28): error TS2339: Property 'rounded' does not exist on type 'Readonly<MappedOmit<LooseRequired<Props>, "class">> & { readonly class: string; } & {}'.
+Error: src/components/Card.vue(42,30): error TS2339: Property 'hoverable' does not exist on type 'Readonly<MappedOmit<LooseRequired<Props>, "class">> & { readonly class: string; } & {}'.
+Error: src/components/Input.vue(5,19): error TS2339: Property 'required' does not exist on type 'CreateComponentPublicInstanceWithMixins<ToResolvedProps<Props, { "update:modelValue": (value: string) => any; blur: (event: FocusEvent) => any; focus: (event: FocusEvent) => any; }>, ... 24 more ..., {}>'.
+Error: src/components/Input.vue(12,16): error TS2339: Property 'type' does not exist on type 'CreateComponentPublicInstanceWithMixins<ToResolvedProps<Props, { "update:modelValue": (value: string) => any; blur: (event: FocusEvent) => any; focus: (event: FocusEvent) => any; }>, ... 24 more ..., {}>'.
+Error: src/components/Input.vue(13,23): error TS2339: Property 'placeholder' does not exist on type 'CreateComponentPublicInstanceWithMixins<ToResolvedProps<Props, { "update:modelValue": (value: string) => any; blur: (event: FocusEvent) => any; focus: (event: FocusEvent) => any; }>, ... 24 more ..., {}>'.
+Error: src/components/Input.vue(14,20): error TS2339: Property 'disabled' does not exist on type 'CreateComponentPublicInstanceWithMixins<ToResolvedProps<Props, { "update:modelValue": (value: string) => any; blur: (event: FocusEvent) => any; focus: (event: FocusEvent) => any; }>, ... 24 more ..., {}>'.
+Error: src/components/Input.vue(15,20): error TS2339: Property 'readonly' does not exist on type 'CreateComponentPublicInstanceWithMixins<ToResolvedProps<Props, { "update:modelValue": (value: string) => any; blur: (event: FocusEvent) => any; focus: (event: FocusEvent) => any; }>, ... 24 more ..., {}>'.
+Error: src/components/Input.vue(36,33): error TS6305: Output file '/home/runner/work/ns2po-w/ns2po-w/packages/types/dist/src/index.d.ts' has not been built from source file '/home/runner/work/ns2po-w/ns2po-w/packages/types/src/index.ts'.
+Error: src/components/Input.vue(37,27): error TS6305: Output file '/home/runner/work/ns2po-w/ns2po-w/packages/types/dist/src/index.d.ts' has not been built from source file '/home/runner/work/ns2po-w/ns2po-w/packages/types/src/index.ts'.
+Error: src/components/Input.vue(48,3): error TS2353: Object literal may only specify known properties, and 'type' does not exist in type 'InferDefaults<LooseRequired<Props>>'.
+Error: src/components/Input.vue(61,9): error TS2339: Property 'id' does not exist on type 'Readonly<MappedOmit<LooseRequired<Props>, keyof Props>> & { readonly modelValue: string; readonly label: string; readonly error: string; readonly hint: string; readonly class: string; } & {}'.
+Error: src/components/Input.vue(68,30): error TS2339: Property 'disabled' does not exist on type 'Readonly<MappedOmit<LooseRequired<Props>, keyof Props>> & { readonly modelValue: string; readonly label: string; readonly error: string; readonly hint: string; readonly class: string; } & {}'.
+Error: src/components/Input.vue(69,30): error TS2339: Property 'readonly' does not exist on type 'Readonly<MappedOmit<LooseRequired<Props>, keyof Props>> & { readonly modelValue: string; readonly label: string; readonly error: string; readonly hint: string; readonly class: string; } & {}'.
+Error: src/components/Table.vue(3,16): error TS2339: Property 'loading' does not exist on type 'CreateComponentPublicInstanceWithMixins<ToResolvedProps<Props, { sort: (column: string, order: SortOrder) => any; pageChange: (page: number) => any; }>, { Button: __VLS_WithSlots<DefineComponent<Props, {}, {}, {}, {}, ComponentOptionsMixin, ... 13 more ..., any>, { ...; }>; ... 11 more ...; endItem: ComputedRef<...>...'.
+Error: src/components/Table.vue(12,30): error TS2339: Property 'columns' does not exist on type 'CreateComponentPublicInstanceWithMixins<ToResolvedProps<Props, { sort: (column: string, order: SortOrder) => any; pageChange: (page: number) => any; }>, { Button: __VLS_WithSlots<DefineComponent<Props, {}, {}, {}, {}, ComponentOptionsMixin, ... 13 more ..., any>, { ...; }>; ... 11 more ...; endItem: ComputedRef<...>...'.
+Error: src/components/Table.vue(36,36): error TS2551: Property 'data' does not exist on type 'CreateComponentPublicInstanceWithMixins<ToResolvedProps<Props, { sort: (column: string, order: SortOrder) => any; pageChange: (page: number) => any; }>, { Button: __VLS_WithSlots<DefineComponent<Props, {}, {}, {}, {}, ComponentOptionsMixin, ... 13 more ..., any>, { ...; }>; ... 11 more ...; endItem: ComputedRef<...>...'. Did you mean '$data'?
+Error: src/components/Table.vue(38,30): error TS2339: Property 'columns' does not exist on type 'CreateComponentPublicInstanceWithMixins<ToResolvedProps<Props, { sort: (column: string, order: SortOrder) => any; pageChange: (page: number) => any; }>, { Button: __VLS_WithSlots<DefineComponent<Props, {}, {}, {}, {}, ComponentOptionsMixin, ... 13 more ..., any>, { ...; }>; ... 11 more ...; endItem: ComputedRef<...>...'.
+Error: src/components/Table.vue(56,16): error TS2339: Property 'pagination' does not exist on type 'CreateComponentPublicInstanceWithMixins<ToResolvedProps<Props, { sort: (column: string, order: SortOrder) => any; pageChange: (page: number) => any; }>, { Button: __VLS_WithSlots<DefineComponent<Props, {}, {}, {}, {}, ComponentOptionsMixin, ... 13 more ..., any>, { ...; }>; ... 11 more ...; endItem: ComputedRef<...>...'.
+Error: src/components/Table.vue(58,56): error TS2339: Property 'pagination' does not exist on type 'CreateComponentPublicInstanceWithMixins<ToResolvedProps<Props, { sort: (column: string, order: SortOrder) => any; pageChange: (page: number) => any; }>, { Button: __VLS_WithSlots<DefineComponent<Props, {}, {}, {}, {}, ComponentOptionsMixin, ... 13 more ..., any>, { ...; }>; ... 11 more ...; endItem: ComputedRef<...>...'.
+Error: src/components/Table.vue(65,23): error TS2339: Property 'pagination' does not exist on type 'CreateComponentPublicInstanceWithMixins<ToResolvedProps<Props, { sort: (column: string, order: SortOrder) => any; pageChange: (page: number) => any; }>, { Button: __VLS_WithSlots<DefineComponent<Props, {}, {}, {}, {}, ComponentOptionsMixin, ... 13 more ..., any>, { ...; }>; ... 11 more ...; endItem: ComputedRef<...>...'.
+Error: src/components/Table.vue(66,29): error TS2339: Property 'pagination' does not exist on type 'CreateComponentPublicInstanceWithMixins<ToResolvedProps<Props, { sort: (column: string, order: SortOrder) => any; pageChange: (page: number) => any; }>, { Button: __VLS_WithSlots<DefineComponent<Props, {}, {}, {}, {}, ComponentOptionsMixin, ... 13 more ..., any>, { ...; }>; ... 11 more ...; endItem: ComputedRef<...>...'.
+Error: src/components/Table.vue(72,19): error TS2339: Property 'pagination' does not exist on type 'CreateComponentPublicInstanceWithMixins<ToResolvedProps<Props, { sort: (column: string, order: SortOrder) => any; pageChange: (page: number) => any; }>, { Button: __VLS_WithSlots<DefineComponent<Props, {}, {}, {}, {}, ComponentOptionsMixin, ... 13 more ..., any>, { ...; }>; ... 11 more ...; endItem: ComputedRef<...>...'.
+Error: src/components/Table.vue(78,23): error TS2339: Property 'pagination' does not exist on type 'CreateComponentPublicInstanceWithMixins<ToResolvedProps<Props, { sort: (column: string, order: SortOrder) => any; pageChange: (page: number) => any; }>, { Button: __VLS_WithSlots<DefineComponent<Props, {}, {}, {}, {}, ComponentOptionsMixin, ... 13 more ..., any>, { ...; }>; ... 11 more ...; endItem: ComputedRef<...>...'.
+Error: src/components/Table.vue(79,29): error TS2339: Property 'pagination' does not exist on type 'CreateComponentPublicInstanceWithMixins<ToResolvedProps<Props, { sort: (column: string, order: SortOrder) => any; pageChange: (page: number) => any; }>, { Button: __VLS_WithSlots<DefineComponent<Props, {}, {}, {}, {}, ComponentOptionsMixin, ... 13 more ..., any>, { ...; }>; ... 11 more ...; endItem: ComputedRef<...>...'.
+Error: src/components/Table.vue(90,44): error TS6305: Output file '/home/runner/work/ns2po-w/ns2po-w/packages/types/dist/src/index.d.ts' has not been built from source file '/home/runner/work/ns2po-w/ns2po-w/packages/types/src/index.ts'.
+Error: src/components/Table.vue(177,14): error TS2339: Property 'pagination' does not exist on type 'DefineProps<LooseRequired<Props>, never>'.
+Error: src/components/Table.vue(177,42): error TS2339: Property 'pagination' does not exist on type 'DefineProps<LooseRequired<Props>, never>'.
+Error: src/components/Table.vue(178,26): error TS2339: Property 'pagination' does not exist on type 'DefineProps<LooseRequired<Props>, never>'.
+Error: src/components/Table.vue(178,51): error TS2339: Property 'pagination' does not exist on type 'DefineProps<LooseRequired<Props>, never>'.
+Error: src/components/Table.vue(182,14): error TS2339: Property 'pagination' does not exist on type 'DefineProps<LooseRequired<Props>, never>'.
+Error: src/components/Table.vue(182,41): error TS2339: Property 'pagination' does not exist on type 'DefineProps<LooseRequired<Props>, never>'.
+Error: src/components/Table.vue(182,71): error TS2339: Property 'data' does not exist on type 'DefineProps<LooseRequired<Props>, never>'.
+Error: src/components/Table.vue(183,17): error TS2339: Property 'pagination' does not exist on type 'DefineProps<LooseRequired<Props>, never>'.
+Error: src/components/Table.vue(183,46): error TS2339: Property 'pagination' does not exist on type 'DefineProps<LooseRequired<Props>, never>'.
+Error: src/components/Table.vue(187,14): error TS2339: Property 'pagination' does not exist on type 'DefineProps<LooseRequired<Props>, never>'.
+Error: src/components/Table.vue(187,41): error TS2339: Property 'pagination' does not exist on type 'DefineProps<LooseRequired<Props>, never>'.
+Error: src/components/Table.vue(187,72): error TS2339: Property 'pagination' does not exist on type 'DefineProps<LooseRequired<Props>, never>'.
+Error: src/components/Table.vue(187,104): error TS2339: Property 'data' does not exist on type 'DefineProps<LooseRequired<Props>, never>'.
+Error: src/components/Table.vue(188,25): error TS2339: Property 'pagination' does not exist on type 'DefineProps<LooseRequired<Props>, never>'.
+Error: src/components/Table.vue(188,49): error TS2339: Property 'pagination' does not exist on type 'DefineProps<LooseRequired<Props>, never>'.
+Error: src/components/Table.vue(188,76): error TS2339: Property 'pagination' does not exist on type 'DefineProps<LooseRequired<Props>, never>'.
+Error: src/index.ts(24,8): error TS6305: Output file '/home/runner/work/ns2po-w/ns2po-w/packages/types/dist/src/index.d.ts' has not been built from source file '/home/runner/work/ns2po-w/ns2po-w/packages/types/src/index.ts'.
+ ELIFECYCLE  Command failed with exit code 2.
+Error:  command finished with error: command (/home/runner/work/ns2po-w/ns2po-w/packages/ui) /home/runner/setup-pnpm/node_modules/.bin/pnpm run type-check exited (1)
+
+ Tasks:    3 successful, 4 total
+Cached:    0 cached, 4 total
+  Time:    3.963s 
+Failed:    @ns2po/ui#type-check
+
+ ERROR  run failed: command  exited (1)
+ ELIFECYCLE  Command failed with exit code 1.
+Error: Process completed with exit code 1.

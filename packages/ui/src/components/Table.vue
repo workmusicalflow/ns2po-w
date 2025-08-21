@@ -115,7 +115,7 @@ const ChevronDownIcon = () => h('svg', {
   })
 ])
 
-interface Props extends TableProps<any> {
+type Props = TableProps<any> & {
   class?: string
 }
 
