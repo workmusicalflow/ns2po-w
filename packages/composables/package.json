@@ -12,7 +12,7 @@
     }
   },
   "scripts": {
-    "build": "vue-tsc && vite build",
+    "build": "tsc",
     "dev": "vite",
     "lint": "eslint .",
     "type-check": "vue-tsc --noEmit",
