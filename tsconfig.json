@@ -1,0 +1,37 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "composite": true,
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedSideEffectImports": true,
+    "skipLibCheck": true,
+    "baseUrl": ".",
+    "paths": {
+      "@ns2po/ui": ["./packages/ui/src"],
+      "@ns2po/ui/*": ["./packages/ui/src/*"],
+      "@ns2po/types": ["./packages/types/src"],
+      "@ns2po/types/*": ["./packages/types/src/*"],
+      "@ns2po/config": ["./packages/config/src"],
+      "@ns2po/config/*": ["./packages/config/src/*"],
+      "@ns2po/composables": ["./packages/composables/src"],
+      "@ns2po/composables/*": ["./packages/composables/src/*"]
+    }
+  },
+  "references": [
+    { "path": "./apps/election-mvp" },
+    { "path": "./packages/ui" },
+    { "path": "./packages/types" },
+    { "path": "./packages/config" },
+    { "path": "./packages/composables" }
+  ]
+}

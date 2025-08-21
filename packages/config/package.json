@@ -1,0 +1,25 @@
+{
+  "name": "@ns2po/config",
+  "version": "0.1.0",
+  "description": "NS2PO Config - Configurations partagées (ESLint, TypeScript, Tailwind)",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    "./eslint": "./eslint.config.js",
+    "./typescript": "./tsconfig.json",
+    "./tailwind": "./tailwind.config.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "lint": "eslint .",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@ns2po/types": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  }
+}

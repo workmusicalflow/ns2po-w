@@ -1,0 +1,23 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "composite": true,
+    "jsx": "preserve",
+    "types": ["node"]
+  },
+  "include": [
+    "**/*",
+    ".nuxt/nuxt.d.ts"
+  ],
+  "exclude": [
+    "dist",
+    "node_modules",
+    ".output"
+  ],
+  "references": [
+    { "path": "../../packages/types" },
+    { "path": "../../packages/ui" },
+    { "path": "../../packages/config" },
+    { "path": "../../packages/composables" }
+  ]
+}

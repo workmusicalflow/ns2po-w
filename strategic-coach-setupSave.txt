@@ -1,0 +1,1 @@
+/hooks set UserPromptSubmit /chemin/absolu/vers/votre/projet/.claude/hooks/strategic-coach.sh

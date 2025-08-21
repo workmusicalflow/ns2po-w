@@ -1,0 +1,8 @@
+{
+  "projectRoot": "/Users/ns2poportable/Desktop/ns2po-w",
+  "docsPath": "/Users/ns2poportable/Desktop/ns2po-w/README.md",
+  "docStyleGuide": "Style de documentation pour NS2PO Election MVP:\n- Ton professionnel et accessible\n- Format Markdown avec structure claire\n- Sections: Vue d'ensemble, Installation, Configuration, Utilisation, API, Déploiement\n- Code examples en français avec commentaires explicatifs\n- Mise à jour automatique des changements techniques importants\n- Focus sur les guides pratiques pour l'équipe de développement\n- Inclure les variables d'environnement et configurations nécessaires",
+  "autoCommit": false,
+  "initialized": "2025-08-21T00:46:58.196Z",
+  "configFile": "/Users/ns2poportable/Desktop/ns2po-w/.docusync-ai.json"
+}

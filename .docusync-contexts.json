@@ -1,0 +1,39 @@
+[
+  [
+    "1ed5ac829d19dc93",
+    {
+      "id": "1ed5ac829d19dc93",
+      "timestamp": "2025-08-21T00:47:15.061Z",
+      "changedFiles": [
+        "/Users/ns2poportable/Desktop/ns2po-w/apps/election-mvp/components/ContactForm.vue",
+        "/Users/ns2poportable/Desktop/ns2po-w/apps/election-mvp/components/PreorderForm.vue",
+        "/Users/ns2poportable/Desktop/ns2po-w/apps/election-mvp/composables/useContactForm.ts",
+        "/Users/ns2poportable/Desktop/ns2po-w/apps/election-mvp/composables/useCloudinary.ts",
+        "/Users/ns2poportable/Desktop/ns2po-w/apps/election-mvp/composables/useQuoteCalculator.ts",
+        "/Users/ns2poportable/Desktop/ns2po-w/apps/election-mvp/server/api/contact/submit.post.ts",
+        "/Users/ns2poportable/Desktop/ns2po-w/apps/election-mvp/server/api/preorder/submit.post.ts",
+        "/Users/ns2poportable/Desktop/ns2po-w/apps/election-mvp/server/api/custom-request/submit.post.ts",
+        "/Users/ns2poportable/Desktop/ns2po-w/apps/election-mvp/server/api/meeting/request.post.ts",
+        "/Users/ns2poportable/Desktop/ns2po-w/apps/election-mvp/pages/contact.vue",
+        "/Users/ns2poportable/Desktop/ns2po-w/apps/election-mvp/pages/devis.vue",
+        "/Users/ns2poportable/Desktop/ns2po-w/packages/types/src/contact.ts",
+        "/Users/ns2poportable/Desktop/ns2po-w/packages/types/src/quote.ts",
+        "/Users/ns2poportable/Desktop/ns2po-w/packages/types/src/cloudinary.ts"
+      ],
+      "changeSummary": "Sprint 1 MVP - Implémentation complète du système de contact et devis\n\nFonctionnalités majeures développées:\n1. Système de contact multi-types (devis, pré-commande, sur-mesure, RDV)\n2. Calculateur de devis en temps réel avec règles de pricing avancées\n3. Intégration Cloudinary pour upload et gestion d'images\n4. API Routes Nuxt pour traitement des formulaires\n5. Composants Vue réutilisables avec validation TypeScript stricte\n6. Interface utilisateur responsive avec Tailwind CSS\n7. Gestion des paiements (Mobile Money, Virement, Espèces)\n8. Système de prévisualisation et personnalisation de produits\n\nTechnologies utilisées:\n- Nuxt.js 3 avec composition API\n- TypeScript strict avec interfaces complètes\n- Tailwind CSS pour l'interface\n- Cloudinary SDK pour les médias\n- Architecture monorepo avec Turborepo\n- Validation côté client et serveur",
+      "relatedIssue": "NS2PO-MVP-SPRINT-1",
+      "changeType": "feature",
+      "impactAnalysis": {
+        "summary": "Nouvelle fonctionnalité - documentation requise",
+        "suggestions": [
+          "Mettre à jour le README avec la nouvelle fonctionnalité",
+          "Ajouter/mettre à jour la documentation API si applicable",
+          "Créer une entrée de changelog",
+          "Mettre à jour la documentation API"
+        ]
+      },
+      "documentationStatus": "pending",
+      "suggestedSections": []
+    }
+  ]
+]
