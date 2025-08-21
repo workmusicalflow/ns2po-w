@@ -22,7 +22,7 @@
       "dependsOn": ["^lint"]
     },
     "type-check": {
-      "dependsOn": ["^type-check", "prepare"],
+      "dependsOn": ["^build", "prepare"],
       "inputs": ["**/*.ts", "**/*.vue", "tsconfig*.json", "package.json"],
       "outputs": []
     },
