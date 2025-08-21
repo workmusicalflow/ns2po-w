@@ -3,7 +3,8 @@
  */
 
 import type { PreorderFormData, PreorderSubmissionResponse } from '@ns2po/types'
-import { createTursoClient, CustomersService, OrdersService, PaymentInstructionsService, generateId, formatDateForDB, stringifyForDB, generateTrackingReference, generateTrackingUrl } from '@ns2po/database'
+import { createTursoClient, CustomersService, OrdersService, PaymentInstructionsService, generateTrackingReference, generateTrackingUrl } from '@ns2po/database'
+import { sendOrderNotification, sendCustomerConfirmation } from '../../../server/utils/email'
 
 export default defineEventHandler(async (event) => {
   try {
@@ -102,6 +103,32 @@ export default defineEventHandler(async (event) => {
     // Générer l'URL de suivi
     const trackingUrl = generateTrackingUrl(preorderId)
 
+    // Envoyer notification email à l'équipe NS2PO et confirmation au client
+    const notificationData = {
+      reference: preorderId,
+      customerName: `${customer.first_name} ${customer.last_name}`,
+      customerEmail: customer.email,
+      type: 'preorder' as const,
+      subject: `Pré-commande ${preorderId}`,
+      message: `Nouvelle pré-commande pour ${body.items.length} article(s). Montant total: ${totalAmount} FCFA`,
+      orderDetails: {
+        items: body.items,
+        totalAmount,
+        depositAmount,
+        paymentMethod: 'commercial_contact',
+        estimatedDelivery
+      }
+    }
+    
+    try {
+      await sendOrderNotification(notificationData)
+      await sendCustomerConfirmation(notificationData)
+      console.log('✅ Emails envoyés avec succès pour pré-commande:', preorderId)
+    } catch (emailError) {
+      console.error('⚠️ Erreur envoi emails pour pré-commande:', preorderId, emailError)
+      // Ne pas faire échouer la requête si l'email échoue
+    }
+
     const response: PreorderSubmissionResponse = {
       success: true,
       preorderId: order.id,
@@ -152,90 +179,6 @@ export default defineEventHandler(async (event) => {
   }
 })
 
-/**
- * Génère les instructions de paiement selon la méthode
- */
-function generatePaymentInstructions(method: string, amount: number, reference: string) {
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('fr-CI', {
-      style: 'currency',
-      currency: 'XOF',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0
-    }).format(amount)
-  }
-
-  const baseInstructions = {
-    method,
-    amount,
-    reference,
-    dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
-    details: {
-      instructions: [] as string[],
-      bankAccount: undefined as string | undefined,
-      mobileMoneyNumber: undefined as string | undefined
-    }
-  }
-
-  switch (method) {
-    case 'bank_transfer':
-      baseInstructions.details = {
-        ...baseInstructions.details,
-        bankAccount: 'CI05 CI123 45678 90123456789 01',
-        instructions: [
-          'Effectuez un virement bancaire sur notre compte :',
-          'Banque: UBA Côte d\'Ivoire',
-          'Titulaire: NS2PO SARL',
-          'Compte: CI05 CI123 45678 90123456789 01',
-          'Référence obligatoire: ' + reference,
-          'Montant exact: ' + formatCurrency(amount),
-          'Envoyez le reçu par email ou WhatsApp'
-        ]
-      }
-      break
-    
-    case 'mobile_money':
-      baseInstructions.details = {
-        ...baseInstructions.details,
-        mobileMoneyNumber: '+225 07 XX XX XX XX',
-        instructions: [
-          'Envoyez le montant via Mobile Money :',
-          'Numéro marchand: +225 07 XX XX XX XX',
-          'Nom: NS2PO',
-          'Montant exact: ' + formatCurrency(amount),
-          'Référence: ' + reference,
-          'Opérateurs acceptés: Orange Money, MTN Money, Moov Money',
-          'Conservez le SMS de confirmation et envoyez-nous une capture'
-        ]
-      }
-      break
-    
-    case 'cash':
-      baseInstructions.details = {
-        ...baseInstructions.details,
-        instructions: [
-          'Apportez le montant en espèces à nos bureaux :',
-          'Adresse: Zone 4, Rue K55, Marcory - Abidjan',
-          'Heures d\'ouverture: Lundi-Vendredi 8h-17h, Samedi 8h-12h',
-          'Référence à mentionner: ' + reference,
-          'Montant exact: ' + formatCurrency(amount),
-          'Demandez un reçu officiel',
-          'Parking disponible sur place'
-        ]
-      }
-      break
-    
-    default:
-      baseInstructions.details.instructions = [
-        'Contactez-nous pour les instructions de paiement',
-        'Email: contact@ns2po.ci',
-        'Téléphone: +225 07 XX XX XX XX',
-        'Référence: ' + reference
-      ]
-  }
-
-  return baseInstructions
-}
 
 /**
  * Calcule la date de livraison estimée

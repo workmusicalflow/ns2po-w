@@ -3,6 +3,7 @@
  */
 
 import type { MeetingRequestFormData } from '@ns2po/types'
+import { sendOrderNotification, sendCustomerConfirmation } from '../../../server/utils/email'
 
 export default defineEventHandler(async (event) => {
   try {
@@ -27,12 +28,12 @@ export default defineEventHandler(async (event) => {
     const meetingId = `MEET_${Date.now()}_${Math.random().toString(36).substr(2, 9).toUpperCase()}`
 
     // TODO: Sauvegarder en base de données (Turso)
-    const meetingData = {
-      id: meetingId,
-      ...body,
-      status: 'requested' as const,
-      createdAt: new Date().toISOString()
-    }
+    // const meetingData = {
+    //   id: meetingId,
+    //   ...body,
+    //   status: 'requested' as const,
+    //   createdAt: new Date().toISOString()
+    // }
 
     console.log('Demande de rendez-vous reçue:', {
       id: meetingId,
@@ -43,12 +44,6 @@ export default defineEventHandler(async (event) => {
 
     // TODO: Sauvegarder en base
     // await saveMeetingRequest(meetingData)
-
-    // TODO: Notification équipe commerciale
-    // await notifySalesTeam(meetingData)
-
-    // TODO: Auto-répondeur client
-    // await sendMeetingRequestConfirmation(meetingData)
 
     // Formatage des créneaux proposés
     const formattedSlots = body.preferredDates.map((date, index) => {
@@ -61,6 +56,25 @@ export default defineEventHandler(async (event) => {
         day: 'numeric'
       })} - ${getTimeSlotLabel(timeSlot)}`
     })
+
+    // Envoyer notification email à l'équipe NS2PO et confirmation au client
+    const notificationData = {
+      reference: meetingId,
+      customerName: `${body.customer.firstName} ${body.customer.lastName}`,
+      customerEmail: body.customer.email,
+      type: 'meeting' as const,
+      subject: `Demande de rendez-vous - ${body.purpose}`,
+      message: `Type: ${body.meetingType}\nObjectif: ${body.purpose}\n\nCréneaux proposés:\n${formattedSlots.join('\n')}`
+    }
+    
+    try {
+      await sendOrderNotification(notificationData)
+      await sendCustomerConfirmation(notificationData)
+      console.log('✅ Emails envoyés avec succès pour demande RDV:', meetingId)
+    } catch (emailError) {
+      console.error('⚠️ Erreur envoi emails pour demande RDV:', meetingId, emailError)
+      // Ne pas faire échouer la requête si l'email échoue
+    }
 
     return {
       success: true,
