@@ -5,11 +5,13 @@ import pluginVue from 'eslint-plugin-vue'
 import vueParser from 'vue-eslint-parser'
 
 export default [
+  {
+    ignores: ['dist/**', 'node_modules/**', '*.d.ts']
+  },
   js.configs.recommended,
   ...pluginVue.configs['flat/recommended'],
   {
     files: ['src/**/*.ts', 'src/**/*.vue'],
-    ignores: ['dist/**', 'node_modules/**'],
     languageOptions: {
       parser: vueParser,
       parserOptions: {
