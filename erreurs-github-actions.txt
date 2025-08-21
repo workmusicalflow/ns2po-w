@@ -1,27 +1,64 @@
-• Packages in scope: @ns2po/composables, @ns2po/config, @ns2po/database, @ns2po/election-mvp, @ns2po/types, @ns2po/ui
-• Running type-check in 6 packages
-• Remote caching disabled
-@ns2po/types:type-check
-@ns2po/types:build
-@ns2po/config:build
-cache miss, executing f5dddc627b6be8dd
+@ns2po/election-mvp:type-check
+cache miss, executing ca357b6215a3352d
 
-> @ns2po/config@0.1.0 build /home/runner/work/ns2po-w/ns2po-w/packages/config
-> tsc
+> @ns2po/election-mvp@0.1.0 type-check /home/runner/work/ns2po-w/ns2po-w/apps/election-mvp
+> nuxt typecheck
 
-Error: tsconfig.json(3,3): error TS5096: Option 'allowImportingTsExtensions' can only be used when either 'noEmit' or 'emitDeclarationOnly' is set.
- ELIFECYCLE  Command failed with exit code 2.
-Error:  command finished with error: command (/home/runner/work/ns2po-w/ns2po-w/packages/config) /home/runner/setup-pnpm/node_modules/.bin/pnpm run build exited (1)
-@ns2po/config:type-check
-@ns2po/composables:build
-@ns2po/ui:build
-@ns2po/ui:type-check
-@ns2po/composables:type-check
+Error:  Cannot find native binding. npm has a bug related to optional dependencies (https://github.com/npm/cli/issues/4828). Please try `npm i` again after removing both package-lock.json and node_modules directory.
+  at Object.<anonymous> (/home/runner/work/ns2po-w/ns2po-w/node_modules/.pnpm/oxc-parser@0.80.0/node_modules/oxc-parser/bindings.js:393:11)
+  at Module._compile (node:internal/modules/cjs/loader:1364:14)
+  at Module._extensions..js (node:internal/modules/cjs/loader:1422:10)
+Error: @ns2po/election-mvp#type-check: command (/home/runner/work/ns2po-w/ns2po-w/apps/election-mvp) /home/runner/setup-pnpm/node_modules/.bin/pnpm run type-check exited (1)
+  at Module.load (node:internal/modules/cjs/loader:1203:32)
+  at Module._load (node:internal/modules/cjs/loader:1019:12)
+  at Module.require (node:internal/modules/cjs/loader:1231:19)
+  at require (node:internal/modules/helpers:177:18)
+  at Object.<anonymous> (/home/runner/work/ns2po-w/ns2po-w/node_modules/.pnpm/oxc-parser@0.80.0/node_modules/oxc-parser/index.js:3:18)
+  at Module._compile (node:internal/modules/cjs/loader:1364:14)
+  at Module._extensions..js (node:internal/modules/cjs/loader:1422:10)
 
- Tasks:    2 successful, 8 total
-Cached:    0 cached, 8 total
-  Time:    3.185s 
-Failed:    @ns2po/config#build
+  [cause]: [ { Error: Cannot find module './parser.linux-x64-gnu.node'
+  Require stack:
+  - /home/runner/work/ns2po-w/ns2po-w/node_modules/.pnpm/oxc-parser@0.80.0/node_modules/oxc-parser/bindings.js
+      at Module._resolveFilename (node:internal/modules/cjs/loader:1140:15)
+      at Module._load (node:internal/modules/cjs/loader:981:27)
+      at Module.require (node:internal/modules/cjs/loader:1231:19)
+      at require (node:internal/modules/helpers:177:18)
+      at requireNative (/home/runner/work/ns2po-w/ns2po-w/node_modules/.pnpm/oxc-parser@0.80.0/node_modules/oxc-parser/bindings.js:213:18)
+      at Object.<anonymous> (/home/runner/work/ns2po-w/ns2po-w/node_modules/.pnpm/oxc-parser@0.80.0/node_modules/oxc-parser/bindings.js:362:17)
+      at Module._compile (node:internal/modules/cjs/loader:1364:14)
+      at Module._extensions..js (node:internal/modules/cjs/loader:1422:10)
+      at Module.load (node:internal/modules/cjs/loader:1203:32)
+      at Module._load (node:internal/modules/cjs/loader:1019:12)
+    code: 'MODULE_NOT_FOUND',
+    requireStack:
+     [ '/home/runner/work/ns2po-w/ns2po-w/node_modules/.pnpm/oxc-parser@0.80.0/node_modules/oxc-parser/bindings.js' ] },
+  { Error: Cannot find module '@oxc-parser/binding-linux-x64-gnu'
+  Require stack:
+  - /home/runner/work/ns2po-w/ns2po-w/node_modules/.pnpm/oxc-parser@0.80.0/node_modules/oxc-parser/bindings.js
+      at Module._resolveFilename (node:internal/modules/cjs/loader:1140:15)
+      at Module._load (node:internal/modules/cjs/loader:981:27)
+      at Module.require (node:internal/modules/cjs/loader:1231:19)
+      at require (node:internal/modules/helpers:177:18)
+      at requireNative (/home/runner/work/ns2po-w/ns2po-w/node_modules/.pnpm/oxc-parser@0.80.0/node_modules/oxc-parser/bindings.js:218:18)
+      at Object.<anonymous> (/home/runner/work/ns2po-w/ns2po-w/node_modules/.pnpm/oxc-parser@0.80.0/node_modules/oxc-parser/bindings.js:362:17)
+      at Module._compile (node:internal/modules/cjs/loader:1364:14)
+      at Module._extensions..js (node:internal/modules/cjs/loader:1422:10)
+      at Module.load (node:internal/modules/cjs/loader:1203:32)
+      at Module._load (node:internal/modules/cjs/loader:1019:12)
+    code: 'MODULE_NOT_FOUND',
+    requireStack:
+     [ '/home/runner/work/ns2po-w/ns2po-w/node_modules/.pnpm/oxc-parser@0.80.0/node_modules/oxc-parser/bindings.js' ] } ]
+ 
+
+Error:  Cannot find native binding. npm has a bug related to optional dependencies (https://github.com/npm/cli/issues/4828). Please try `npm i` again after removing both package-lock.json and node_modules directory.
+ ELIFECYCLE  Command failed with exit code 1.
+Error:  command finished with error: command (/home/runner/work/ns2po-w/ns2po-w/apps/election-mvp) /home/runner/setup-pnpm/node_modules/.bin/pnpm run type-check exited (1)
+
+ Tasks:    8 successful, 9 total
+Cached:    0 cached, 9 total
+  Time:    8.683s 
+Failed:    @ns2po/election-mvp#type-check
 
  ERROR  run failed: command  exited (1)
  ELIFECYCLE  Command failed with exit code 1.

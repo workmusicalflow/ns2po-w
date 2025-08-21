@@ -4,7 +4,7 @@ export default defineNuxtConfig({
   // TypeScript configuration
   typescript: {
     strict: true,
-    typeCheck: true
+    typeCheck: false  // Désactivé pour éviter oxc-parser en CI, utilise vue-tsc
   },
 
   // CSS framework - will add Tailwind later

@@ -9,7 +9,7 @@
     "build": "nuxt build",
     "preview": "nuxt preview",
     "lint": "eslint .",
-    "type-check": "nuxt typecheck",
+    "type-check": "vue-tsc --noEmit --skipLibCheck",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage"
   },
