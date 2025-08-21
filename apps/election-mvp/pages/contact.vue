@@ -209,8 +209,8 @@
 
 <script setup lang="ts">
 import { Card } from '@ns2po/ui'
-import ContactForm from '~/components/ContactForm.vue'
-import type { ContactFormSubmissionResponse } from '@ns2po/types'
+import ContactForm from '../components/ContactForm.vue'
+import type { ContactSubmissionResponse } from '@ns2po/types'
 
 useHead({
   title: 'Contact - NS2PO Élections',
@@ -227,14 +227,14 @@ useHead({
 })
 
 // Success toast notification
-const { $toast } = useNuxtApp()
+const { $toast } = useNuxtApp() as { $toast?: { success: Function; error: Function } }
 
 // Handle form submission success
-const onFormSubmitted = (response: ContactFormSubmissionResponse) => {
+const onFormSubmitted = (response: ContactSubmissionResponse) => {
   try {
     if (response.success) {
       // Show success message
-      const message = response.data?.message || 'Votre message a été envoyé avec succès!'
+      const message = response.message || 'Votre message a été envoyé avec succès!'
       
       // Show toast notification if available, otherwise use alert
       if ($toast && typeof $toast.success === 'function') {
@@ -245,15 +245,14 @@ const onFormSubmitted = (response: ContactFormSubmissionResponse) => {
 
       // Log for analytics
       console.log('Contact form submitted successfully:', {
-        contactId: response.data?.contactId,
-        type: response.data?.type || 'general',
+        contactId: response.contactId,
         timestamp: new Date().toISOString()
       })
 
       // Scroll to top to show success message
       window.scrollTo({ top: 0, behavior: 'smooth' })
     } else {
-      throw new Error(response.error || 'Erreur lors de l\'envoi')
+      throw new Error('Erreur lors de l\'envoi')
     }
   } catch (error) {
     console.error('Error handling form submission:', error)

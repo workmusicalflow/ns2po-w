@@ -87,7 +87,7 @@
                     <div class="flex items-center space-x-2">
                       <span class="text-xs font-medium text-gray-600">Thumbnail:</span>
                       <button 
-                        @click="copyToClipboard(upload.thumbnail)"
+                        @click="copyToClipboard(upload.thumbnail || '')"
                         class="text-xs text-blue-600 hover:text-blue-800 truncate max-w-xs"
                       >
                         URL thumbnail
@@ -123,13 +123,13 @@
           >
             <div class="mb-2">
               <img 
-                :src="transform.url" 
+                :src="transform?.url || ''" 
                 :alt="`Transform ${name}`"
                 class="w-full h-32 object-cover rounded-lg border"
               />
             </div>
-            <h3 class="text-sm font-medium text-gray-700">{{ transform.label }}</h3>
-            <p class="text-xs text-gray-500">{{ transform.description }}</p>
+            <h3 class="text-sm font-medium text-gray-700">{{ transform?.label || '' }}</h3>
+            <p class="text-xs text-gray-500">{{ transform?.description || '' }}</p>
           </div>
         </div>
       </div>
@@ -149,7 +149,7 @@
 </template>
 
 <script setup lang="ts">
-import type { CloudinaryUploadResult } from '~/utils/cloudinary'
+import type { CloudinaryUploadResult } from '@ns2po/types'
 
 // Utilisation du head pour le titre de la page
 useHead({
@@ -157,7 +157,7 @@ useHead({
 })
 
 // État local
-const selectedPreset = ref('default')
+const selectedPreset = ref<'logo' | 'product' | 'gallery' | 'avatar' | 'default'>('default')
 const uploadHistory = ref<Array<CloudinaryUploadResult & { thumbnail?: string; preview?: string }>>([])
 const lastUpload = ref<CloudinaryUploadResult | null>(null)
 const notification = ref({
@@ -216,7 +216,7 @@ const handleUploadStart = () => {
 }
 
 const removeFromHistory = (publicId: string) => {
-  uploadHistory.value = uploadHistory.value.filter(upload => upload.public_id !== publicId)
+  uploadHistory.value = uploadHistory.value.filter((upload: CloudinaryUploadResult & { thumbnail?: string; preview?: string }) => upload.public_id !== publicId)
   
   if (lastUpload.value?.public_id === publicId) {
     lastUpload.value = uploadHistory.value[0] || null

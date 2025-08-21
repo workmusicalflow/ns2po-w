@@ -2,40 +2,8 @@
  * API Route pour récupérer les informations de suivi d'une commande
  */
 
-import type { CustomerInfo } from '@ns2po/types'
+import type { CustomerInfo, OrderTrackingInfo, TrackingTimelineEvent } from '@ns2po/types'
 import { createTursoClient, OrdersService, CustomersService, isValidTrackingReference, parseTrackingReference } from '@ns2po/database'
-
-export interface OrderTrackingInfo {
-  success: boolean
-  trackingReference: string
-  order?: {
-    id: string
-    status: string
-    paymentStatus: string
-    items: any[]
-    totalAmount: number
-    createdAt: string
-    estimatedDeliveryDate?: string
-    actualDeliveryDate?: string
-    notes?: string
-  }
-  customer?: {
-    firstName: string
-    lastName: string
-    email: string
-    phone?: string
-  }
-  timeline?: TrackingTimelineEvent[]
-  error?: string
-}
-
-export interface TrackingTimelineEvent {
-  date: string
-  title: string
-  description: string
-  status: 'completed' | 'current' | 'pending'
-  icon: string
-}
 
 export default defineEventHandler(async (event) => {
   try {

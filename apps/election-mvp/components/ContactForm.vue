@@ -112,7 +112,7 @@
             <div class="form-group">
               <label class="form-label">Ville</label>
               <input 
-                v-model="formData.customer.address?.city"
+                v-model="formData.customer.address.city"
                 type="text" 
                 class="form-input"
                 placeholder="Abidjan, Bouaké, etc."

@@ -70,7 +70,7 @@
 </template>
 
 <script setup lang="ts">
-import ProductPreview from '~/components/ProductPreview.vue'
+import ProductPreview from '../../components/ProductPreview.vue'
 import type { Product, ProductCustomization } from '@ns2po/types'
 
 // Configuration de la page
@@ -120,7 +120,7 @@ const demoProducts: Product[] = [
 ]
 
 // État local
-const selectedProduct = ref<Product | null>(demoProducts[0])
+const selectedProduct = ref<Product | null>(demoProducts[0] || null)
 const customizationData = ref<ProductCustomization | null>(null)
 
 // Méthodes

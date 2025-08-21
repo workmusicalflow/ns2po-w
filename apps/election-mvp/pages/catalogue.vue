@@ -175,6 +175,7 @@
 
 <script setup lang="ts">
 import { Button, Card, Input } from '@ns2po/ui'
+import type { Product } from '@ns2po/types'
 
 useHead({
   title: 'Catalogue - NS2PO Élections',
@@ -242,7 +243,7 @@ const resetFilters = () => {
   searchQuery.value = ''
 }
 
-const addToQuote = (product) => {
+const addToQuote = (product: Product) => {
   // TODO: Intégrer avec le store Pinia pour le panier
   console.log('Produit ajouté au devis:', product)
   // Naviguer vers la page de devis avec le produit pré-sélectionné

@@ -36,7 +36,7 @@
             <div class="product-header">
               <div class="product-info">
                 <h4 class="product-name">{{ item.product?.name || 'Produit inconnu' }}</h4>
-                <p class="product-category">{{ item.product?.category?.name || '' }}</p>
+                <p class="product-category">{{ item.product?.category || '' }}</p>
               </div>
               
               <Button 
@@ -100,12 +100,12 @@
                       <option value="">Choisir une couleur</option>
                       <option 
                         v-for="choice in option.options"
-                        :key="choice.id"
-                        :value="choice.id"
+                        :key="choice"
+                        :value="choice"
                       >
-                        {{ choice.name }}
-                        <span v-if="choice.priceModifier !== 0">
-                          ({{ choice.priceModifier > 0 ? '+' : '' }}{{ formatCurrency(choice.priceModifier) }})
+                        {{ choice }}
+                        <span v-if="option.priceModifier !== undefined && option.priceModifier !== 0">
+                          ({{ option.priceModifier > 0 ? '+' : '' }}{{ formatCurrency(option.priceModifier) }})
                         </span>
                       </option>
                     </select>
@@ -284,7 +284,7 @@ import type {
 
 interface Props {
   initialItems?: QuoteItem[]
-  customerType?: 'individual' | 'party' | 'organization'
+  customerType?: 'individual' | 'party' | 'candidate' | 'organization'
   autoCalculate?: boolean
 }
 
@@ -345,7 +345,7 @@ const removeItem = (index: number) => {
 }
 
 const updateQuantity = (index: number, newQuantity: number) => {
-  if (newQuantity >= 1) {
+  if (newQuantity >= 1 && items.value[index]) {
     items.value[index].quantity = newQuantity
   }
 }
@@ -354,12 +354,15 @@ const updateCustomization = (itemIndex: number, optionId: string, event: Event) 
   const target = event.target as HTMLSelectElement
   const choiceId = target.value
   
-  if (!items.value[itemIndex].customizations) {
-    items.value[itemIndex].customizations = []
+  const item = items.value[itemIndex]
+  if (!item) return
+  
+  if (!item.customizations) {
+    item.customizations = []
   }
 
   // Remplacer ou ajouter la personnalisation
-  const existingIndex = items.value[itemIndex].customizations.findIndex(c => c.optionId === optionId)
+  const existingIndex = item.customizations.findIndex(c => c.optionId === optionId)
   
   if (choiceId) {
     const customization: ItemCustomization = {
@@ -369,12 +372,12 @@ const updateCustomization = (itemIndex: number, optionId: string, event: Event) 
     }
 
     if (existingIndex >= 0) {
-      items.value[itemIndex].customizations[existingIndex] = customization
+      item.customizations[existingIndex] = customization
     } else {
-      items.value[itemIndex].customizations.push(customization)
+      item.customizations.push(customization)
     }
   } else if (existingIndex >= 0) {
-    items.value[itemIndex].customizations.splice(existingIndex, 1)
+    item.customizations.splice(existingIndex, 1)
   }
 }
 
@@ -382,11 +385,14 @@ const updateCustomizationText = (itemIndex: number, optionId: string, event: Eve
   const target = event.target as HTMLInputElement
   const value = target.value
   
-  if (!items.value[itemIndex].customizations) {
-    items.value[itemIndex].customizations = []
+  const item = items.value[itemIndex]
+  if (!item) return
+  
+  if (!item.customizations) {
+    item.customizations = []
   }
 
-  const existingIndex = items.value[itemIndex].customizations.findIndex(c => c.optionId === optionId)
+  const existingIndex = item.customizations.findIndex(c => c.optionId === optionId)
   
   if (value.trim()) {
     const customization: ItemCustomization = {
@@ -397,21 +403,24 @@ const updateCustomizationText = (itemIndex: number, optionId: string, event: Eve
     }
 
     if (existingIndex >= 0) {
-      items.value[itemIndex].customizations[existingIndex] = customization
+      item.customizations[existingIndex] = customization
     } else {
-      items.value[itemIndex].customizations.push(customization)
+      item.customizations.push(customization)
     }
   } else if (existingIndex >= 0) {
-    items.value[itemIndex].customizations.splice(existingIndex, 1)
+    item.customizations.splice(existingIndex, 1)
   }
 }
 
 const updateCustomizationLogo = (itemIndex: number, optionId: string, result: CloudinaryUploadResult) => {
-  if (!items.value[itemIndex].customizations) {
-    items.value[itemIndex].customizations = []
+  const item = items.value[itemIndex]
+  if (!item) return
+  
+  if (!item.customizations) {
+    item.customizations = []
   }
 
-  const existingIndex = items.value[itemIndex].customizations.findIndex(c => c.optionId === optionId)
+  const existingIndex = item.customizations.findIndex(c => c.optionId === optionId)
   
   const customization: ItemCustomization = {
     optionId,
@@ -421,14 +430,16 @@ const updateCustomizationLogo = (itemIndex: number, optionId: string, result: Cl
   }
 
   if (existingIndex >= 0) {
-    items.value[itemIndex].customizations[existingIndex] = customization
+    item.customizations[existingIndex] = customization
   } else {
-    items.value[itemIndex].customizations.push(customization)
+    item.customizations.push(customization)
   }
 }
 
 const getCustomizationPrice = (itemIndex: number, optionId: string, choiceId: string): number => {
   const item = items.value[itemIndex]
+  if (!item) return 0
+  
   const option = item.product?.customizationOptions?.find(o => o.id === optionId)
   
   if (!option) return 0
@@ -437,8 +448,8 @@ const getCustomizationPrice = (itemIndex: number, optionId: string, choiceId: st
     return option.priceModifier || 0
   }
 
-  const choice = option.options.find(c => c.id === choiceId)
-  return choice?.priceModifier || 0
+  // Pour les options avec values, utiliser le prix base de l'option
+  return option.price || 0
 }
 
 // Calcul en temps réel pour un item

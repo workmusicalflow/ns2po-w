@@ -8,7 +8,7 @@
     <div class="input-container">
       <input
         :id="inputId"
-        v-model="modelValue"
+        :value="modelValue"
         :type="type"
         :placeholder="placeholder"
         :disabled="disabled"

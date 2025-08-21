@@ -77,6 +77,9 @@ export interface CustomizationOption {
   readonly type: 'color' | 'text' | 'logo' | 'position'
   readonly values?: readonly string[]
   readonly price?: number
+  readonly required?: boolean
+  readonly options?: readonly string[]
+  readonly priceModifier?: number
 }
 
 export interface Category {

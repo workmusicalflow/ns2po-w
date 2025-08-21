@@ -70,6 +70,7 @@
                     <option value="">Sélectionner</option>
                     <option value="individual">Particulier</option>
                     <option value="party">Parti politique</option>
+                    <option value="candidate">Candidat</option>
                     <option value="organization">Organisation</option>
                   </select>
                 </div>
@@ -120,7 +121,7 @@
                 <div class="form-group">
                   <label class="form-label">Ville</label>
                   <input 
-                    v-model="customerInfo.address.city"
+                    v-model="customerInfo.address!.city"
                     type="text" 
                     class="form-input" 
                     placeholder="Abidjan, Bouaké, etc."
@@ -426,6 +427,7 @@ const customerInfo = ref<Partial<CustomerInfo>>({
   address: {
     street: '',
     city: '',
+    region: '',
     country: 'CI'
   }
 })
@@ -567,6 +569,7 @@ const startNewQuote = () => {
     address: {
       street: '',
       city: '',
+      region: '',
       country: 'CI'
     }
   }

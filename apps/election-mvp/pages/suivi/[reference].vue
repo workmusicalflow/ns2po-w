@@ -135,7 +135,7 @@
                 ]">
                   {{ event.icon }}
                 </div>
-                <div v-if="index < trackingData.timeline.length - 1" 
+                <div v-if="index < (trackingData.timeline?.length || 0) - 1" 
                      :class="[
                        'w-0.5 h-8 mt-2',
                        event.status === 'completed' ? 'bg-green-300' : 'bg-gray-200'
@@ -237,7 +237,7 @@
 </template>
 
 <script setup lang="ts">
-import type { OrderTrackingInfo } from '~/server/api/tracking/[reference].get'
+import type { OrderTrackingInfo } from '@ns2po/types'
 
 // Récupérer la référence depuis l'URL
 const route = useRoute()
