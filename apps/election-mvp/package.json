@@ -9,7 +9,7 @@
     "build": "nuxt build",
     "preview": "nuxt preview",
     "lint": "eslint .",
-    "type-check": "vue-tsc --noEmit --skipLibCheck",
+    "type-check": "tsc --noEmit --skipLibCheck",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage"
   },
@@ -28,6 +28,7 @@
   },
   "devDependencies": {
     "@nuxt/devtools": "latest",
+    "@types/node": "^24.3.0",
     "@vitest/coverage-v8": "^1.6.0",
     "typescript": "^5.0.0",
     "vitest": "^1.6.0",
