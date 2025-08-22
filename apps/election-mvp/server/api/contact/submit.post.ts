@@ -4,6 +4,7 @@
 
 import type { ContactFormData, ContactSubmissionResponse } from '@ns2po/types'
 import { createTursoClient, generateId, formatDateForDB, stringifyForDB } from '@ns2po/database'
+import { sendOrderNotification, sendCustomerConfirmation } from '../../../server/utils/email'
 
 export default defineEventHandler(async (event) => {
   try {
@@ -54,11 +55,24 @@ export default defineEventHandler(async (event) => {
       subject: body.subject
     })
 
-    // TODO: Envoyer notification email
-    // await sendContactNotification(contactData)
-
-    // TODO: Auto-répondeur client
-    // await sendAutoResponse(contactData)
+    // Envoyer notification email à l'équipe NS2PO
+    const notificationData = {
+      reference: contactId,
+      customerName: `${body.customer.firstName} ${body.customer.lastName}`,
+      customerEmail: body.customer.email,
+      type: body.type as any,
+      subject: body.subject,
+      message: body.message
+    }
+    
+    try {
+      await sendOrderNotification(notificationData)
+      await sendCustomerConfirmation(notificationData)
+      console.log('✅ Emails envoyés avec succès pour contact:', contactId)
+    } catch (emailError) {
+      console.error('⚠️ Erreur envoi emails pour contact:', contactId, emailError)
+      // Ne pas faire échouer la requête si l'email échoue
+    }
 
     const response: ContactSubmissionResponse = {
       success: true,

@@ -18,19 +18,29 @@ export default defineNuxtConfig({
   // Runtime config for environment variables
   runtimeConfig: {
     // Private keys (only available on server-side)
-    tursoUrl: process.env.TURSO_DATABASE_URL,
-    tursoAuthToken: process.env.TURSO_AUTH_TOKEN,
+    turso: {
+      databaseUrl: process.env.TURSO_DATABASE_URL,
+      authToken: process.env.TURSO_AUTH_TOKEN,
+    },
     cloudinaryCloudName: process.env.CLOUDINARY_CLOUD_NAME,
     cloudinaryApiKey: process.env.CLOUDINARY_API_KEY,
     cloudinaryApiSecret: process.env.CLOUDINARY_API_SECRET,
     airtableApiKey: process.env.AIRTABLE_API_KEY,
     airtableBaseId: process.env.AIRTABLE_BASE_ID,
     
+    // SMTP Configuration
+    smtpHost: process.env.SMTP_HOST,
+    smtpPort: process.env.SMTP_PORT,
+    smtpUsername: process.env.SMTP_USERNAME,
+    smtpPassword: process.env.SMTP_PASSWORD,
+    smtpSecure: process.env.SMTP_SECURE,
+    
     // Public keys (exposed to client-side)
     public: {
       appName: 'NS2PO Election MVP',
       version: '0.1.0',
-      cloudinaryCloudName: process.env.CLOUDINARY_CLOUD_NAME
+      cloudinaryCloudName: process.env.CLOUDINARY_CLOUD_NAME,
+      siteUrl: process.env.NUXT_PUBLIC_SITE_URL || 'http://localhost:3000'
     }
   },
 

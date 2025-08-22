@@ -4,6 +4,7 @@
 
 import type { MeetingRequestFormData } from '@ns2po/types'
 import { sendOrderNotification, sendCustomerConfirmation } from '../../../server/utils/email'
+import { saveMeetingRequest } from '../../../server/utils/database'
 
 export default defineEventHandler(async (event) => {
   try {
@@ -25,15 +26,18 @@ export default defineEventHandler(async (event) => {
     }
 
     // Génération d'un ID unique
-    const meetingId = `MEET_${Date.now()}_${Math.random().toString(36).substr(2, 9).toUpperCase()}`
+    const meetingId = `MEET_${Date.now()}_${Math.random().toString(36).substring(2, 9).toUpperCase()}`
 
-    // TODO: Sauvegarder en base de données (Turso)
-    // const meetingData = {
-    //   id: meetingId,
-    //   ...body,
-    //   status: 'requested' as const,
-    //   createdAt: new Date().toISOString()
-    // }
+    // Sauvegarder en base de données
+    const meetingData = {
+      id: meetingId,
+      customer: body.customer,
+      meetingType: body.meetingType,
+      preferredDate: body.preferredDates[0], // Premier créneau proposé
+      preferredTime: body.preferredTimes?.[0],
+      message: body.purpose,
+      participants: body.customer?.company ? 2 : 1 // Estimation du nombre de participants
+    }
 
     console.log('Demande de rendez-vous reçue:', {
       id: meetingId,
@@ -42,8 +46,14 @@ export default defineEventHandler(async (event) => {
       dates: body.preferredDates
     })
 
-    // TODO: Sauvegarder en base
-    // await saveMeetingRequest(meetingData)
+    // Sauvegarder en base
+    try {
+      await saveMeetingRequest(meetingData)
+      console.log('✅ Demande de rendez-vous sauvegardée en base de données:', meetingId)
+    } catch (dbError) {
+      console.error('⚠️ Erreur sauvegarde base de données:', dbError)
+      // Ne pas faire échouer la requête si la base de données n'est pas disponible
+    }
 
     // Formatage des créneaux proposés
     const formattedSlots = body.preferredDates.map((date, index) => {

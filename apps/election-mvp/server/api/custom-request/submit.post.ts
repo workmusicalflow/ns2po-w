@@ -4,6 +4,7 @@
 
 import type { CustomRequestFormData } from '@ns2po/types'
 import { sendOrderNotification, sendCustomerConfirmation } from '../../../server/utils/email'
+import { saveCustomRequest } from '../../../server/utils/database'
 
 export default defineEventHandler(async (event) => {
   try {
@@ -18,15 +19,18 @@ export default defineEventHandler(async (event) => {
     }
 
     // Génération d'un ID unique
-    const requestId = `CUSTOM_${Date.now()}_${Math.random().toString(36).substr(2, 9).toUpperCase()}`
+    const requestId = `CUSTOM_${Date.now()}_${Math.random().toString(36).substring(2, 9).toUpperCase()}`
 
-    // TODO: Sauvegarder en base de données (Turso)
-    // const requestData = {
-    //   id: requestId,
-    //   ...body,
-    //   status: 'new' as const,
-    //   createdAt: new Date().toISOString()
-    // }
+    // Sauvegarder en base de données
+    const requestData = {
+      id: requestId,
+      customer: body.customer,
+      projectType: body.projectType,
+      budget: body.budget,
+      deadline: body.deadline,
+      description: body.description,
+      attachments: body.attachments
+    }
 
     console.log('Demande personnalisée reçue:', {
       id: requestId,
@@ -35,8 +39,14 @@ export default defineEventHandler(async (event) => {
       budget: body.budget
     })
 
-    // TODO: Sauvegarder en base
-    // await saveCustomRequest(requestData)
+    // Sauvegarder en base
+    try {
+      await saveCustomRequest(requestData)
+      console.log('✅ Demande sauvegardée en base de données:', requestId)
+    } catch (dbError) {
+      console.error('⚠️ Erreur sauvegarde base de données:', dbError)
+      // Ne pas faire échouer la requête si la base de données n'est pas disponible
+    }
 
     // Envoyer notification email à l'équipe NS2PO et confirmation au client
     const notificationData = {
