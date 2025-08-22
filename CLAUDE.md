@@ -372,3 +372,59 @@ node scripts/sync-performance.mjs health   # État de santé de la sync
 - **Airtable** : Source de vérité (produits, catégories, règles prix)
 - **Turso** : Cache performant + données métier (clients, commandes)  
 - **Cloudinary** : Assets optimisés avec transformations automatiques
+
+## 🔍 Monitoring SonarCloud
+
+### Configuration Projet SonarCloud
+- **Projet** : `workmusicalflow_ns2po-w`
+- **Organisation** : `workmusicalflow`
+- **Token d'accès** : `e2f7e9976d2bfce91c1eb6de29b1118835d88884`
+
+### 📊 Récupération des Issues SonarCloud
+
+```bash
+# Récupérer toutes les issues du projet
+curl -H "Authorization: Bearer e2f7e9976d2bfce91c1eb6de29b1118835d88884" \
+  "https://sonarcloud.io/api/issues/search?componentKeys=workmusicalflow_ns2po-w&organization=workmusicalflow&ps=500"
+
+# Statut de la Quality Gate
+curl -H "Authorization: Bearer e2f7e9976d2bfce91c1eb6de29b1118835d88884" \
+  "https://sonarcloud.io/api/qualitygates/project_status?projectKey=workmusicalflow_ns2po-w"
+
+# Métriques détaillées du projet
+curl -H "Authorization: Bearer e2f7e9976d2bfce91c1eb6de29b1118835d88884" \
+  "https://sonarcloud.io/api/measures/component?component=workmusicalflow_ns2po-w&metricKeys=alert_status,bugs,vulnerabilities,security_hotspots,code_smells,coverage,duplicated_lines_density,ncloc,complexity,cognitive_complexity,reliability_rating,security_rating,sqale_rating"
+```
+
+### 🎯 Analyse des Retours SonarCloud
+
+**Métriques clés à surveiller** :
+- `alert_status` : Statut global de la Quality Gate (OK/ERROR)
+- `bugs` : Nombre de bugs détectés
+- `vulnerabilities` : Vulnérabilités de sécurité
+- `security_hotspots` : Points chauds de sécurité à revoir
+- `code_smells` : Problèmes de maintenabilité
+- `coverage` : Couverture de tests (%)
+- `reliability_rating` : Note de fiabilité (1=A, 2=B, 3=C, 4=D, 5=E)
+- `security_rating` : Note de sécurité (1=A, 2=B, 3=C, 4=D, 5=E)
+- `sqale_rating` : Note de maintenabilité (1=A, 2=B, 3=C, 4=D, 5=E)
+
+**Conditions Quality Gate** :
+- `new_reliability_rating` : ≤ 1 (A) pour nouveau code
+- `new_security_rating` : ≤ 1 (A) pour nouveau code  
+- `new_maintainability_rating` : ≤ 1 (A) pour nouveau code
+- `new_coverage` : ≥ 80% pour nouveau code
+- `new_duplicated_lines_density` : ≤ 3% pour nouveau code
+- `new_security_hotspots_reviewed` : 100% pour nouveau code
+
+**Types d'issues par priorité** :
+1. **CRITICAL/BLOCKER** : Problèmes bloquants (vulnérabilités critiques)
+2. **MAJOR** : Problèmes importants (bugs, accessibilité)
+3. **MINOR** : Améliorations (code smells, optimisations)
+4. **INFO** : Informations (TODO, commentaires)
+
+**Focus sécurité MVP** :
+- Vulnérabilités dans les uploads de fichiers
+- Validation des entrées utilisateur
+- Protection contre les injections (SQL, XSS)
+- Gestion sécurisée des tokens et secrets

@@ -42,7 +42,10 @@ export default defineEventHandler(async (event) => {
     const form = formidable({
       maxFileSize: 10 * 1024 * 1024, // 10 MB
       allowEmptyFiles: false,
-      multiples: false
+      multiples: false,
+      uploadDir: '/tmp',
+      keepExtensions: false,
+      filename: () => `upload_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
     })
 
     const [fields, files] = await new Promise<[Fields, Files]>((resolve, reject) => {
@@ -86,7 +89,7 @@ export default defineEventHandler(async (event) => {
       .toLowerCase()
       .replace(/[^a-z0-9-]/g, '-')
       .replace(/-+/g, '-')
-      .replace(/^-|-$/g, '')
+      .replace(/^-+|-+$/g, '')
 
     const publicId = `ns2po-assets/${category.toLowerCase().replace(/\s+/g, '-')}/${cleanName}-${timestamp}`
 

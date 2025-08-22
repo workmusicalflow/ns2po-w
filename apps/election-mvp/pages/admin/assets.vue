@@ -9,7 +9,13 @@
           </h1>
           <p class="mt-1 text-sm text-gray-500">
             Interface simplifiée pour gérer les assets visuels - 
-            <a href="https://airtable.com/apprQLdnVwlbfnioT" target="_blank" class="text-blue-600 hover:text-blue-800">
+            <a 
+              href="https://airtable.com/apprQLdnVwlbfnioT" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              class="text-blue-600 hover:text-blue-800"
+              aria-label="Ouvrir le tableau Airtable dans un nouvel onglet"
+            >
               Voir dans Airtable ↗
             </a>
           </p>
@@ -19,8 +25,16 @@
             :disabled="syncing"
             class="ml-3 inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
             @click="syncWithAirtable"
+            :aria-label="syncing ? 'Synchronisation en cours avec Airtable' : 'Synchroniser avec Airtable'"
           >
-            <svg class="w-4 h-4 mr-2" :class="{ 'animate-spin': syncing }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg 
+              class="w-4 h-4 mr-2" 
+              :class="{ 'animate-spin': syncing }" 
+              fill="none" 
+              stroke="currentColor" 
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+            >
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
             </svg>
             {{ syncing ? 'Synchronisation...' : 'Sync Airtable' }}
@@ -124,8 +138,13 @@
         <div class="px-6 py-4">
           <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label class="block text-sm font-medium text-gray-700">Catégorie</label>
-              <select v-model="filters.category" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+              <label for="category-filter" class="block text-sm font-medium text-gray-700">Catégorie</label>
+              <select 
+                id="category-filter"
+                v-model="filters.category" 
+                class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                aria-describedby="category-filter-description"
+              >
                 <option value="">
                   Toutes
                 </option>
@@ -135,8 +154,13 @@
               </select>
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-700">Statut</label>
-              <select v-model="filters.status" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+              <label for="status-filter" class="block text-sm font-medium text-gray-700">Statut</label>
+              <select 
+                id="status-filter"
+                v-model="filters.status" 
+                class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                aria-describedby="status-filter-description"
+              >
                 <option value="">
                   Tous
                 </option>
@@ -155,13 +179,27 @@
               </select>
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-700">Recherche</label>
+              <label for="search-filter" class="block text-sm font-medium text-gray-700">Recherche</label>
               <input 
+                id="search-filter"
                 v-model="filters.search" 
                 type="text" 
                 placeholder="Nom ou tags..."
                 class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                aria-describedby="search-filter-description"
               >
+            </div>
+          </div>
+          <!-- Hidden descriptions for screen readers -->
+          <div class="sr-only">
+            <div id="category-filter-description">
+              Filtrer les assets par catégorie. Sélectionnez "Toutes" pour voir tous les assets.
+            </div>
+            <div id="status-filter-description">
+              Filtrer les assets par statut. Sélectionnez "Tous" pour voir tous les statuts.
+            </div>
+            <div id="search-filter-description">
+              Rechercher dans les noms d'assets, tags ou notes. La recherche est insensible à la casse.
             </div>
           </div>
         </div>
@@ -169,25 +207,25 @@
 
       <!-- Assets Table -->
       <div class="bg-white shadow rounded-lg overflow-hidden">
-        <table class="min-w-full divide-y divide-gray-200">
+        <table class="min-w-full divide-y divide-gray-200" role="table" aria-label="Tableau des assets NS2PO">
           <thead class="bg-gray-50">
             <tr>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Asset
               </th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Catégorie
               </th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Statut
               </th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Dimensions
               </th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Modifié
               </th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Actions
               </th>
             </tr>
@@ -200,11 +238,12 @@
                     <img 
                       v-if="asset.fields.CloudinaryURL" 
                       :src="asset.fields.CloudinaryURL + '?w=48&h=48&c_fill'" 
-                      :alt="asset.fields.AssetName"
+                      :alt="`Image de l'asset ${asset.fields.AssetName || 'sans nom'}`"
                       class="h-12 w-12 rounded-lg object-cover shadow-sm"
+                      loading="lazy"
                     >
-                    <div v-else class="h-12 w-12 rounded-lg bg-gray-200 flex items-center justify-center">
-                      <span class="text-gray-400 text-xs">📄</span>
+                    <div v-else class="h-12 w-12 rounded-lg bg-gray-200 flex items-center justify-center" aria-label="Aucune image disponible">
+                      <span class="text-gray-400 text-xs" aria-hidden="true">📄</span>
                     </div>
                   </div>
                   <div class="ml-4">
@@ -244,13 +283,16 @@
                   v-if="asset.fields.CloudinaryURL" 
                   :href="asset.fields.CloudinaryURL" 
                   target="_blank"
+                  rel="noopener noreferrer"
                   class="text-blue-600 hover:text-blue-900 mr-4"
+                  :aria-label="`Voir l'asset ${asset.fields.AssetName} dans un nouvel onglet`"
                 >
                   Voir
                 </a>
                 <button 
                   class="text-green-600 hover:text-green-900"
                   @click="openInAirtable(asset.id)"
+                  :aria-label="`Modifier l'asset ${asset.fields.AssetName} dans Airtable`"
                 >
                   Modifier
                 </button>
@@ -262,7 +304,13 @@
         <!-- Empty State -->
         <div v-if="filteredAssets.length === 0" class="text-center py-12">
           <div class="text-gray-500">
-            <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+            <svg 
+              class="mx-auto h-12 w-12 text-gray-400" 
+              stroke="currentColor" 
+              fill="none" 
+              viewBox="0 0 48 48"
+              aria-hidden="true"
+            >
               <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
             </svg>
             <h3 class="mt-2 text-sm font-medium text-gray-900">
@@ -284,10 +332,12 @@
           <a 
             href="https://airtable.com/apprQLdnVwlbfnioT/tbla8baaBOSTBRtEM/viwz6z96bAPQThPxF"
             target="_blank"
+            rel="noopener noreferrer"
             class="flex items-center p-4 border border-gray-300 rounded-lg hover:border-blue-500 hover:shadow-md transition-all"
+            aria-label="Ouvrir le dashboard Airtable avec vue complète de tous les assets"
           >
             <div class="flex-shrink-0">
-              <span class="text-2xl">📊</span>
+              <span class="text-2xl" aria-hidden="true">📊</span>
             </div>
             <div class="ml-3">
               <h4 class="text-sm font-medium text-gray-900">Dashboard Airtable</h4>
@@ -298,10 +348,12 @@
           <a 
             href="https://airtable.com/apprQLdnVwlbfnioT/tblu9ymi5efOHcwFj"
             target="_blank"
+            rel="noopener noreferrer"
             class="flex items-center p-4 border border-gray-300 rounded-lg hover:border-green-500 hover:shadow-md transition-all"
+            aria-label="Ouvrir la configuration des vues Airtable pour personnaliser l'affichage"
           >
             <div class="flex-shrink-0">
-              <span class="text-2xl">🎨</span>
+              <span class="text-2xl" aria-hidden="true">🎨</span>
             </div>
             <div class="ml-3">
               <h4 class="text-sm font-medium text-gray-900">Config des Vues</h4>
@@ -312,9 +364,10 @@
           <NuxtLink 
             to="/admin/assets/upload"
             class="flex items-center p-4 border border-gray-300 rounded-lg hover:border-blue-500 hover:shadow-md transition-all"
+            aria-label="Aller vers la page d'upload pour ajouter de nouveaux assets"
           >
             <div class="flex-shrink-0">
-              <span class="text-2xl">⬆️</span>
+              <span class="text-2xl" aria-hidden="true">⬆️</span>
             </div>
             <div class="ml-3">
               <h4 class="text-sm font-medium text-gray-900">
@@ -333,12 +386,18 @@
     <div
       v-if="notification.show" 
       class="fixed inset-0 flex items-end justify-center px-4 py-6 pointer-events-none sm:p-6 sm:items-start sm:justify-end"
+      role="alert"
+      aria-live="polite"
+      aria-atomic="true"
     >
       <div class="max-w-sm w-full bg-white shadow-lg rounded-lg pointer-events-auto ring-1 ring-black ring-opacity-5 overflow-hidden">
         <div class="p-4">
           <div class="flex items-start">
             <div class="flex-shrink-0">
-              <span :class="notification.type === 'success' ? 'text-green-400' : 'text-red-400'">
+              <span 
+                :class="notification.type === 'success' ? 'text-green-400' : 'text-red-400'"
+                aria-hidden="true"
+              >
                 {{ notification.type === 'success' ? '✅' : '❌' }}
               </span>
             </div>
