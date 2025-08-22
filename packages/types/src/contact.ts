@@ -2,7 +2,7 @@
  * Types pour les formulaires de contact et pré-commandes NS2PO Election MVP
  */
 
-import type { QuoteRequest } from './quote'
+// import type { QuoteRequest } from './quote' // Unused import
 import type { CustomerInfo } from './user'
 
 // === TYPES DE CONTACT ===
@@ -161,7 +161,7 @@ export interface FormValidationRule {
   minLength?: number
   maxLength?: number
   pattern?: string
-  customValidator?: (value: any) => boolean
+  customValidator?: (value: unknown) => boolean
   errorMessage: string
 }
 

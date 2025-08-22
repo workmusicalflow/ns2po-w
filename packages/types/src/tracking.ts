@@ -9,7 +9,7 @@ export interface OrderTrackingInfo {
     id: string
     status: string
     paymentStatus: string
-    items: any[]
+    items: unknown[]
     totalAmount: number
     createdAt: string
     estimatedDeliveryDate?: string

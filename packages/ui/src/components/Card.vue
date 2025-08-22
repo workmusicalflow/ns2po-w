@@ -1,14 +1,22 @@
 <template>
   <div :class="cardClasses">
-    <div v-if="$slots.header" class="card-header">
+    <div 
+      v-if="$slots.header" 
+      class="card-header"
+    >
       <slot name="header" />
     </div>
     
-    <div class="card-body">
+    <div 
+      class="card-body"
+    >
       <slot />
     </div>
     
-    <div v-if="$slots.footer" class="card-footer">
+    <div 
+      v-if="$slots.footer" 
+      class="card-footer"
+    >
       <slot name="footer" />
     </div>
   </div>
@@ -28,7 +36,8 @@ const props = withDefaults(defineProps<Props>(), {
   padding: 'medium' as CardPadding,
   shadow: true,
   bordered: true,
-  rounded: true
+  rounded: true,
+  class: undefined
 })
 
 const cardClasses = computed(() => [

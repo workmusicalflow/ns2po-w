@@ -2,7 +2,7 @@
  * Types pour le système de devis NS2PO Election MVP
  */
 
-import type { Product, ProductCategory } from './product'
+import type { Product } from './product'
 import type { CustomerInfo } from './user'
 
 // === DEVIS ===
@@ -109,7 +109,7 @@ export interface PriceRule {
 export interface PriceCondition {
   field: string
   operator: 'gt' | 'gte' | 'lt' | 'lte' | 'eq' | 'in'
-  value: any
+  value: unknown
 }
 
 // === CONFIGURATION ===

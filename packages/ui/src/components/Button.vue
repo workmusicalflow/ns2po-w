@@ -4,7 +4,10 @@
     :disabled="disabled || loading"
     @click="$emit('click', $event)"
   >
-    <span v-if="loading" class="spinner" />
+    <span 
+      v-if="loading" 
+      class="spinner" 
+    />
     <slot />
   </button>
 </template>
@@ -22,7 +25,8 @@ const props = withDefaults(defineProps<Props>(), {
   variant: 'primary' as ButtonVariant,
   size: 'medium' as ButtonSize,
   disabled: false,
-  loading: false
+  loading: false,
+  class: undefined
 })
 
 defineEmits<{

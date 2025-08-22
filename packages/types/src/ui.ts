@@ -38,8 +38,8 @@ export interface TableColumn<T = unknown> {
   readonly width?: string
   readonly align?: 'left' | 'center' | 'right'
   readonly render?: (value: unknown, row: T) => string
-  readonly component?: any
-  readonly componentProps?: (value: unknown, row: T) => Record<string, any>
+  readonly component?: unknown
+  readonly componentProps?: (value: unknown, row: T) => Record<string, unknown>
 }
 
 export interface TableProps<T = unknown> {
