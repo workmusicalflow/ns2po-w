@@ -2,6 +2,16 @@
  * Types pour le suivi des commandes
  */
 
+export interface OrderTrackingItem {
+  productId: string
+  productName: string
+  quantity: number
+  unitPrice: number
+  totalPrice: number
+  customizations?: string[]
+  specifications?: string
+}
+
 export interface OrderTrackingInfo {
   success: boolean
   trackingReference: string
@@ -9,7 +19,7 @@ export interface OrderTrackingInfo {
     id: string
     status: string
     paymentStatus: string
-    items: unknown[]
+    items: OrderTrackingItem[]
     totalAmount: number
     createdAt: string
     estimatedDeliveryDate?: string
