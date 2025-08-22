@@ -230,7 +230,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import type { OrderTrackingInfo } from '@ns2po/types'
+import type { OrderTrackingInfo, OrderTrackingItem } from '@ns2po/types'
 
 // Récupérer la référence depuis l'URL
 const route = useRoute()
