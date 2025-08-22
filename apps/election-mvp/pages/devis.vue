@@ -426,7 +426,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { Button } from '@ns2po/ui'
-import type { CustomerInfo, Product, QuoteItem, QuoteCalculation } from '@ns2po/types'
+import type { CustomerInfo, Product, QuoteItem, QuoteCalculation, Category } from '@ns2po/types'
 
 // Import du composant QuoteCalculator (sera créé si nécessaire)
 // import QuoteCalculator from '~/components/QuoteCalculator.vue'
@@ -468,7 +468,7 @@ const customerInfo = ref<Partial<CustomerInfo>>({
 })
 
 // État des produits
-const categories = ref<any[]>([])
+const categories = ref<Category[]>([])
 const filteredProducts = ref<Product[]>([])
 const selectedCategory = ref('')
 const searchQuery = ref('')

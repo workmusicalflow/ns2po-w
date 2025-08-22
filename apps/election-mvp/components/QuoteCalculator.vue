@@ -387,7 +387,7 @@ const updateCustomization = (itemIndex: number, optionId: string, event: Event) 
     const customization: ItemCustomization = {
       optionId,
       choiceId,
-      priceModifier: getCustomizationPrice(itemIndex, optionId, choiceId)
+      priceModifier: getCustomizationPrice(itemIndex, optionId)
     }
 
     if (existingIndex >= 0) {
@@ -418,7 +418,7 @@ const updateCustomizationText = (itemIndex: number, optionId: string, event: Eve
       optionId,
       choiceId: 'text',
       customValue: value,
-      priceModifier: getCustomizationPrice(itemIndex, optionId, 'text')
+      priceModifier: getCustomizationPrice(itemIndex, optionId)
     }
 
     if (existingIndex >= 0) {
@@ -445,7 +445,7 @@ const updateCustomizationLogo = (itemIndex: number, optionId: string, result: Cl
     optionId,
     choiceId: 'logo',
     customValue: result.secure_url,
-    priceModifier: getCustomizationPrice(itemIndex, optionId, 'logo')
+    priceModifier: getCustomizationPrice(itemIndex, optionId)
   }
 
   if (existingIndex >= 0) {
