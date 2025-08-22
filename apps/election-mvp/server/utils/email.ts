@@ -6,6 +6,31 @@
 import nodemailer from 'nodemailer'
 import type { Transporter } from 'nodemailer'
 
+/**
+ * Supprime les balises HTML de manière sécurisée pour éviter les attaques ReDoS
+ * Utilise une approche par passes multiples recommandée par SonarCloud
+ */
+function stripHtmlTags(html: string): string {
+  if (!html) return ''
+  
+  // Limiter la taille de l'entrée pour éviter les attaques DoS
+  const maxLength = 10000
+  const truncatedHtml = html.length > maxLength ? html.substring(0, maxLength) : html
+  
+  // Approche sécurisée : remplacer d'abord les balises communes
+  return truncatedHtml
+    .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '') // Supprimer scripts
+    .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '') // Supprimer styles
+    .replace(/<[^>]{1,200}>/g, '') // Balises limitées à 200 caractères max
+    .replace(/&nbsp;/g, ' ') // Espaces insécables
+    .replace(/&amp;/g, '&') // Entités HTML
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .trim()
+}
+
 interface EmailOptions {
   to: string
   subject: string
@@ -74,7 +99,7 @@ export async function sendEmail(options: EmailOptions): Promise<boolean> {
       to: options.to,
       subject: options.subject,
       html: options.html,
-      text: options.text || options.html.replace(/<[^>]*>/g, '') // Fallback text
+      text: options.text || stripHtmlTags(options.html) // Fallback text sécurisé
     }
 
     const result = await transport.sendMail(mailOptions)
