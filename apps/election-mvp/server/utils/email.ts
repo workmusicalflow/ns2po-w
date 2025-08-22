@@ -47,7 +47,7 @@ function createTransporter(): Transporter {
   
   transporter = nodemailer.createTransport({
     host: config.smtpHost,
-    port: parseInt(config.smtpPort || '587'),
+    port: parseInt(config.smtpPort as string || '587'),
     secure: config.smtpSecure === 'true', // true pour SSL (port 465), false pour TLS (port 587)
     auth: {
       user: config.smtpUsername,
