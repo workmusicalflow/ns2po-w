@@ -166,7 +166,7 @@ export async function updateAsset(publicId, newFilePath, options = {}) {
  * @param {Object} options - Options de synchronisation
  * @returns {Promise<Object>} Résultats de la synchronisation
  */
-export async function syncAssets(options = {}) {
+export async function syncAssets() {
   const startTime = Date.now();
 
   try {
@@ -226,7 +226,7 @@ async function main() {
         await removeAsset(filePath, options);
         break;
 
-      case 'update':
+      case 'update': {
         const publicId = filePath;
         const newFile = process.argv[4];
         if (!publicId || !newFile) {
@@ -234,6 +234,7 @@ async function main() {
         }
         await updateAsset(publicId, newFile, options);
         break;
+      }
 
       case 'sync':
         await syncAssets(options);

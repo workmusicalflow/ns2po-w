@@ -8,7 +8,6 @@ import type {
   PreorderFormData,
   CustomRequestFormData,
   MeetingRequestFormData,
-  ContactType,
   FormValidationResult,
   FormFieldError,
   ContactSubmissionResponse,
@@ -18,7 +17,7 @@ import type {
 export const useContactForm = () => {
   // État réactif
   const isSubmitting = ref(false)
-  const lastSubmission = ref<any>(null)
+  const lastSubmission = ref<ContactSubmissionResponse | PreorderSubmissionResponse | null>(null)
   const validationErrors = ref<FormFieldError[]>([])
 
   /**
@@ -150,7 +149,7 @@ export const useContactForm = () => {
   /**
    * Valide les informations client
    */
-  const validateCustomerInfo = (customer: any): FormValidationResult => {
+  const validateCustomerInfo = (customer: unknown): FormValidationResult => {
     const errors: FormFieldError[] = []
 
     if (!customer) {
@@ -218,7 +217,7 @@ export const useContactForm = () => {
       const response = await $fetch('/api/contact/submit', {
         method: 'POST',
         body: payload
-      }) as any
+      }) as ContactSubmissionResponse
 
       lastSubmission.value = response.data
 
@@ -234,7 +233,7 @@ export const useContactForm = () => {
         estimatedResponseTime: '24 heures'
       }
 
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Erreur soumission contact:', error)
       throw new Error(error.message || 'Erreur lors de l\'envoi du message')
     } finally {
@@ -300,7 +299,7 @@ export const useContactForm = () => {
         estimatedDelivery: calculateEstimatedDelivery(formData.timeline?.estimatedProduction || 7)
       }
 
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Erreur soumission pré-commande:', error)
       throw new Error(error.message || 'Erreur lors de l\'enregistrement de la pré-commande')
     } finally {

@@ -329,3 +329,46 @@ https://github.com/workmusicalflow/ns2po-w.git
   ```bash
   cd /Users/ns2poportable/Desktop/ns2po-w/apps/election-mvp && pnpm exec tsc --noEmit
   ```
+
+- vous avez un mcp à votre disposition pour intéragir avec github pour les github actions : `mcp__github-actions-mcp`
+
+### 🔧 Scripts de Maintenance et Interfaces Admin
+
+**Gestion des Assets** :
+```bash
+# CLI complet de gestion des assets (Cloudinary, Airtable, Turso)
+node scripts/asset-manager.mjs <command> [options]
+
+# Commandes disponibles :
+node scripts/asset-manager.mjs add <file-path>        # Upload asset
+node scripts/asset-manager.mjs remove <public-id>    # Supprimer asset  
+node scripts/asset-manager.mjs sync                  # Synchronisation complète
+```
+
+**Synchronisation Performance** :
+```bash
+# Scripts optimisés pour la sync Airtable ↔ Turso
+node scripts/sync-performance.mjs <command>
+
+# Commandes disponibles :
+node scripts/sync-performance.mjs diff     # Sync différentielle (rapide)
+node scripts/sync-performance.mjs full     # Sync complète
+node scripts/sync-performance.mjs health   # État de santé de la sync
+```
+
+**Interface Admin** :
+- `/admin/assets` : Gestion visuelle des assets avec preview et métriques
+- `/admin/assets/upload` : Interface d'upload avec drag & drop et validation
+- Convention de nommage : `[type]-[description]-[variant].[ext]`
+- Validation automatique : formats, taille, optimisation Cloudinary
+
+**Composables Métier** :
+- `useQuoteCalculator()` : Calcul de devis avec remises volume/client
+- `useContactForm()` : Validation et soumission formulaires
+- `useProducts()` : Interface Airtable pour le catalogue
+- `useDatabase()` : Services Turso (clients, commandes, paiements)
+
+**Architecture de Données** :
+- **Airtable** : Source de vérité (produits, catégories, règles prix)
+- **Turso** : Cache performant + données métier (clients, commandes)  
+- **Cloudinary** : Assets optimisés avec transformations automatiques

@@ -7,7 +7,7 @@
 
 import Airtable from 'airtable';
 import { createClient } from '@libsql/client';
-import { invalidateAsset, invalidateBatch } from './lib/cache-invalidation.js';
+import { invalidateBatch } from './lib/cache-invalidation.js';
 
 // Configuration avec vérifications d'environnement
 let airtable = null;
@@ -416,8 +416,7 @@ export async function checkSyncHealth() {
 /**
  * Génère un rapport de synchronisation complet
  */
-export async function generateSyncReport(options = {}) {
-  const { includeDetails = false } = options;
+export async function generateSyncReport() {
   
   try {
     const health = await getSyncHealth();
@@ -542,23 +541,26 @@ async function main() {
   
   try {
     switch (command) {
-      case 'diff':
+      case 'diff': {
         const diffResult = await syncDifferential(options);
         console.log('📊 Résultat:', diffResult);
         break;
+      }
         
-      case 'full':
+      case 'full': {
         const fullResult = await syncFull(options);
         console.log('📊 Résultat:', fullResult);
         break;
+      }
         
-      case 'health':
+      case 'health': {
         const health = await getSyncHealth();
         console.log('🏥 Santé de la synchronisation:');
         console.log(`   Score: ${health.health_score}/100`);
         console.log(`   Assets obsolètes: ${health.stale_assets}`);
         console.log(`   Dernières syncs:`, health.recent_syncs?.slice(0, 3));
         break;
+      }
         
       default:
         console.log(`

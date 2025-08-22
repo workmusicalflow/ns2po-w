@@ -156,7 +156,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, nextTick, watch, onMounted, h } from 'vue'
+import { ref, nextTick, watch, onMounted } from 'vue'
 import { Button } from '@ns2po/ui'
 import CloudinaryUpload from './CloudinaryUpload.vue'
 import type { 

@@ -35,11 +35,11 @@
         <div class="p-6">
           <!-- Drop Zone -->
           <div 
+            :class="isDragging ? 'border-blue-500 bg-blue-50' : 'border-gray-300'"
+            class="border-2 border-dashed rounded-lg p-8 text-center transition-colors"
             @drop="handleDrop"
             @dragover.prevent
             @dragenter.prevent
-            :class="isDragging ? 'border-blue-500 bg-blue-50' : 'border-gray-300'"
-            class="border-2 border-dashed rounded-lg p-8 text-center transition-colors"
           >
             <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
               <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
@@ -95,14 +95,30 @@
                       v-model="file.category" 
                       class="text-xs border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500"
                     >
-                      <option value="">Catégorie...</option>
-                      <option value="Produits - Textiles">Produits - Textiles</option>
-                      <option value="Produits - Gadgets">Produits - Gadgets</option>
-                      <option value="Produits - EPI">Produits - EPI</option>
-                      <option value="Logos - Clients">Logos - Clients</option>
-                      <option value="Logos - Marque NS2PO">Logos - Marque NS2PO</option>
-                      <option value="Backgrounds - Élections">Backgrounds - Élections</option>
-                      <option value="Hero - Banners">Hero - Banners</option>
+                      <option value="">
+                        Catégorie...
+                      </option>
+                      <option value="Produits - Textiles">
+                        Produits - Textiles
+                      </option>
+                      <option value="Produits - Gadgets">
+                        Produits - Gadgets
+                      </option>
+                      <option value="Produits - EPI">
+                        Produits - EPI
+                      </option>
+                      <option value="Logos - Clients">
+                        Logos - Clients
+                      </option>
+                      <option value="Logos - Marque NS2PO">
+                        Logos - Marque NS2PO
+                      </option>
+                      <option value="Backgrounds - Élections">
+                        Backgrounds - Élections
+                      </option>
+                      <option value="Hero - Banners">
+                        Hero - Banners
+                      </option>
                     </select>
                   </div>
 
@@ -110,8 +126,8 @@
                   <div class="mr-4">
                     <span v-if="file.uploading" class="text-xs text-blue-600">
                       <svg class="animate-spin -ml-1 mr-1 h-3 w-3 text-blue-600 inline" fill="none" viewBox="0 0 24 24">
-                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                       </svg>
                       Upload...
                     </span>
@@ -125,8 +141,8 @@
 
                   <!-- Supprimer -->
                   <button 
-                    @click="removeFile(index)"
                     class="text-red-600 hover:text-red-800 text-sm"
+                    @click="removeFile(index)"
                   >
                     Supprimer
                   </button>
@@ -138,15 +154,15 @@
           <!-- Actions -->
           <div v-if="selectedFiles.length > 0" class="mt-6 flex justify-end space-x-4">
             <button 
-              @click="selectedFiles = []"
               class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
+              @click="selectedFiles = []"
             >
               Tout effacer
             </button>
             <button 
-              @click="uploadAllFiles"
               :disabled="uploading || selectedFiles.every(f => f.uploaded)"
               class="px-4 py-2 bg-blue-600 border border-transparent rounded-md text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+              @click="uploadAllFiles"
             >
               {{ uploading ? 'Upload en cours...' : 'Uploader tous les fichiers' }}
             </button>
@@ -161,7 +177,9 @@
         </h3>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
           <div>
-            <h4 class="font-medium text-blue-800 mb-2">Produits Textiles</h4>
+            <h4 class="font-medium text-blue-800 mb-2">
+              Produits Textiles
+            </h4>
             <ul class="text-blue-700 space-y-1">
               <li><code>textile-polo-blanc-ns2po.png</code></li>
               <li><code>textile-tshirt-noir-logo-pdci.jpg</code></li>
@@ -169,7 +187,9 @@
             </ul>
           </div>
           <div>
-            <h4 class="font-medium text-blue-800 mb-2">Gadgets</h4>
+            <h4 class="font-medium text-blue-800 mb-2">
+              Gadgets
+            </h4>
             <ul class="text-blue-700 space-y-1">
               <li><code>gadget-usb-logo-parti.png</code></li>
               <li><code>gadget-stylo-bleu-campagne.jpg</code></li>
@@ -177,7 +197,9 @@
             </ul>
           </div>
           <div>
-            <h4 class="font-medium text-blue-800 mb-2">Logos Clients</h4>
+            <h4 class="font-medium text-blue-800 mb-2">
+              Logos Clients
+            </h4>
             <ul class="text-blue-700 space-y-1">
               <li><code>logo-pdci-officiel-couleur.svg</code></li>
               <li><code>logo-client-rhdp-noir.png</code></li>
@@ -185,7 +207,9 @@
             </ul>
           </div>
           <div>
-            <h4 class="font-medium text-blue-800 mb-2">Backgrounds</h4>
+            <h4 class="font-medium text-blue-800 mb-2">
+              Backgrounds
+            </h4>
             <ul class="text-blue-700 space-y-1">
               <li><code>bg-election-orange-moderne.jpg</code></li>
               <li><code>bg-campagne-bleu-drapeau.png</code></li>
@@ -197,8 +221,10 @@
     </div>
 
     <!-- Toast Notification -->
-    <div v-if="notification.show" 
-         class="fixed inset-0 flex items-end justify-center px-4 py-6 pointer-events-none sm:p-6 sm:items-start sm:justify-end">
+    <div
+      v-if="notification.show" 
+      class="fixed inset-0 flex items-end justify-center px-4 py-6 pointer-events-none sm:p-6 sm:items-start sm:justify-end"
+    >
       <div class="max-w-sm w-full bg-white shadow-lg rounded-lg pointer-events-auto ring-1 ring-black ring-opacity-5 overflow-hidden">
         <div class="p-4">
           <div class="flex items-start">
@@ -208,8 +234,12 @@
               </span>
             </div>
             <div class="ml-3 w-0 flex-1 pt-0.5">
-              <p class="text-sm font-medium text-gray-900">{{ notification.title }}</p>
-              <p class="mt-1 text-sm text-gray-500">{{ notification.message }}</p>
+              <p class="text-sm font-medium text-gray-900">
+                {{ notification.title }}
+              </p>
+              <p class="mt-1 text-sm text-gray-500">
+                {{ notification.message }}
+              </p>
             </div>
           </div>
         </div>
@@ -219,6 +249,8 @@
 </template>
 
 <script setup>
+import { ref, onMounted, onBeforeUnmount } from 'vue'
+
 definePageMeta({
   title: 'Upload Assets NS2PO',
   description: 'Interface d\'upload pour nouveaux assets'

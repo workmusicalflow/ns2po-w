@@ -115,7 +115,7 @@ export const useQuoteCalculator = (options: Partial<QuoteCalculatorOptions> = {}
         }
       }
 
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Erreur calcul devis:', error)
       throw error
     } finally {
@@ -401,7 +401,7 @@ export const useQuoteCalculator = (options: Partial<QuoteCalculatorOptions> = {}
   const calculateProductPrice = (
     basePrice: number, 
     quantity: number, 
-    customizations: any[] = []
+    customizations: unknown[] = []
   ) => {
     const customizationsCost = customizations.reduce((sum, c) => sum + (c.priceModifier || 0), 0)
     const quantityRules = applyQuantityRules(quantity, basePrice)

@@ -16,12 +16,12 @@
         </div>
         <div class="mt-4 flex md:mt-0 md:ml-4">
           <button 
-            @click="syncWithAirtable"
             :disabled="syncing"
             class="ml-3 inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+            @click="syncWithAirtable"
           >
             <svg class="w-4 h-4 mr-2" :class="{ 'animate-spin': syncing }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
             </svg>
             {{ syncing ? 'Synchronisation...' : 'Sync Airtable' }}
           </button>
@@ -40,8 +40,12 @@
               </div>
               <div class="ml-5 w-0 flex-1">
                 <dl>
-                  <dt class="text-sm font-medium text-gray-500 truncate">Assets Actifs</dt>
-                  <dd class="text-lg font-medium text-gray-900">{{ stats.active }}</dd>
+                  <dt class="text-sm font-medium text-gray-500 truncate">
+                    Assets Actifs
+                  </dt>
+                  <dd class="text-lg font-medium text-gray-900">
+                    {{ stats.active }}
+                  </dd>
                 </dl>
               </div>
             </div>
@@ -58,8 +62,12 @@
               </div>
               <div class="ml-5 w-0 flex-1">
                 <dl>
-                  <dt class="text-sm font-medium text-gray-500 truncate">En Traitement</dt>
-                  <dd class="text-lg font-medium text-gray-900">{{ stats.processing }}</dd>
+                  <dt class="text-sm font-medium text-gray-500 truncate">
+                    En Traitement
+                  </dt>
+                  <dd class="text-lg font-medium text-gray-900">
+                    {{ stats.processing }}
+                  </dd>
                 </dl>
               </div>
             </div>
@@ -76,8 +84,12 @@
               </div>
               <div class="ml-5 w-0 flex-1">
                 <dl>
-                  <dt class="text-sm font-medium text-gray-500 truncate">Brouillons</dt>
-                  <dd class="text-lg font-medium text-gray-900">{{ stats.draft }}</dd>
+                  <dt class="text-sm font-medium text-gray-500 truncate">
+                    Brouillons
+                  </dt>
+                  <dd class="text-lg font-medium text-gray-900">
+                    {{ stats.draft }}
+                  </dd>
                 </dl>
               </div>
             </div>
@@ -94,8 +106,12 @@
               </div>
               <div class="ml-5 w-0 flex-1">
                 <dl>
-                  <dt class="text-sm font-medium text-gray-500 truncate">Archivés</dt>
-                  <dd class="text-lg font-medium text-gray-900">{{ stats.archived }}</dd>
+                  <dt class="text-sm font-medium text-gray-500 truncate">
+                    Archivés
+                  </dt>
+                  <dd class="text-lg font-medium text-gray-900">
+                    {{ stats.archived }}
+                  </dd>
                 </dl>
               </div>
             </div>
@@ -110,18 +126,32 @@
             <div>
               <label class="block text-sm font-medium text-gray-700">Catégorie</label>
               <select v-model="filters.category" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                <option value="">Toutes</option>
-                <option v-for="cat in categories" :key="cat" :value="cat">{{ cat }}</option>
+                <option value="">
+                  Toutes
+                </option>
+                <option v-for="cat in categories" :key="cat" :value="cat">
+                  {{ cat }}
+                </option>
               </select>
             </div>
             <div>
               <label class="block text-sm font-medium text-gray-700">Statut</label>
               <select v-model="filters.status" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                <option value="">Tous</option>
-                <option value="✅ Active">✅ Active</option>
-                <option value="🔄 Processing">🔄 Processing</option>
-                <option value="📄 Draft">📄 Draft</option>
-                <option value="🗄 Archived">🗄 Archived</option>
+                <option value="">
+                  Tous
+                </option>
+                <option value="✅ Active">
+                  ✅ Active
+                </option>
+                <option value="🔄 Processing">
+                  🔄 Processing
+                </option>
+                <option value="📄 Draft">
+                  📄 Draft
+                </option>
+                <option value="🗄 Archived">
+                  🗄 Archived
+                </option>
               </select>
             </div>
             <div>
@@ -188,12 +218,18 @@
                 </div>
               </td>
               <td class="px-6 py-4 whitespace-nowrap">
-                <div class="text-sm text-gray-900">{{ asset.fields.Category }}</div>
-                <div class="text-sm text-gray-500">{{ asset.fields.Subcategory }}</div>
+                <div class="text-sm text-gray-900">
+                  {{ asset.fields.Category }}
+                </div>
+                <div class="text-sm text-gray-500">
+                  {{ asset.fields.Subcategory }}
+                </div>
               </td>
               <td class="px-6 py-4 whitespace-nowrap">
-                <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full"
-                      :class="getStatusClass(asset.fields.Status)">
+                <span
+                  class="inline-flex px-2 py-1 text-xs font-semibold rounded-full"
+                  :class="getStatusClass(asset.fields.Status)"
+                >
                   {{ asset.fields.Status }}
                 </span>
               </td>
@@ -213,8 +249,8 @@
                   Voir
                 </a>
                 <button 
-                  @click="openInAirtable(asset.id)"
                   class="text-green-600 hover:text-green-900"
+                  @click="openInAirtable(asset.id)"
                 >
                   Modifier
                 </button>
@@ -229,7 +265,9 @@
             <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
               <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
             </svg>
-            <h3 class="mt-2 text-sm font-medium text-gray-900">Aucun asset trouvé</h3>
+            <h3 class="mt-2 text-sm font-medium text-gray-900">
+              Aucun asset trouvé
+            </h3>
             <p class="mt-1 text-sm text-gray-500">
               {{ assets.length === 0 ? 'Lancez une synchronisation avec Airtable' : 'Modifiez vos filtres de recherche' }}
             </p>
@@ -239,7 +277,9 @@
 
       <!-- Quick Actions -->
       <div class="mt-8 bg-white shadow rounded-lg p-6">
-        <h3 class="text-lg font-medium text-gray-900 mb-4">🚀 Actions Rapides</h3>
+        <h3 class="text-lg font-medium text-gray-900 mb-4">
+          🚀 Actions Rapides
+        </h3>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
           <a 
             href="https://airtable.com/apprQLdnVwlbfnioT/tbla8baaBOSTBRtEM/viwz6z96bAPQThPxF"
@@ -277,8 +317,12 @@
               <span class="text-2xl">⬆️</span>
             </div>
             <div class="ml-3">
-              <h4 class="text-sm font-medium text-gray-900">Upload Assets</h4>
-              <p class="text-sm text-gray-500">Ajouter nouveaux fichiers</p>
+              <h4 class="text-sm font-medium text-gray-900">
+                Upload Assets
+              </h4>
+              <p class="text-sm text-gray-500">
+                Ajouter nouveaux fichiers
+              </p>
             </div>
           </NuxtLink>
         </div>
@@ -286,8 +330,10 @@
     </div>
 
     <!-- Toast Notification -->
-    <div v-if="notification.show" 
-         class="fixed inset-0 flex items-end justify-center px-4 py-6 pointer-events-none sm:p-6 sm:items-start sm:justify-end">
+    <div
+      v-if="notification.show" 
+      class="fixed inset-0 flex items-end justify-center px-4 py-6 pointer-events-none sm:p-6 sm:items-start sm:justify-end"
+    >
       <div class="max-w-sm w-full bg-white shadow-lg rounded-lg pointer-events-auto ring-1 ring-black ring-opacity-5 overflow-hidden">
         <div class="p-4">
           <div class="flex items-start">
@@ -297,8 +343,12 @@
               </span>
             </div>
             <div class="ml-3 w-0 flex-1 pt-0.5">
-              <p class="text-sm font-medium text-gray-900">{{ notification.title }}</p>
-              <p class="mt-1 text-sm text-gray-500">{{ notification.message }}</p>
+              <p class="text-sm font-medium text-gray-900">
+                {{ notification.title }}
+              </p>
+              <p class="mt-1 text-sm text-gray-500">
+                {{ notification.message }}
+              </p>
             </div>
           </div>
         </div>
@@ -308,6 +358,8 @@
 </template>
 
 <script setup>
+import { ref, computed, onMounted } from 'vue'
+
 definePageMeta({
   title: 'Gestion Assets NS2PO',
   description: 'Interface d\'administration pour gérer les assets visuels'

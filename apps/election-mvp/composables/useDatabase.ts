@@ -55,7 +55,7 @@ export const useCustomers = () => {
   const { customers } = useDatabase()
   
   return {
-    async createCustomer(data: any) {
+    async createCustomer(data: unknown) {
       return await customers.create(data)
     },
     
@@ -67,11 +67,11 @@ export const useCustomers = () => {
       return await customers.findById(id)
     },
     
-    async listCustomers(options?: any) {
+    async listCustomers(options?: unknown) {
       return await customers.list(options)
     },
     
-    async updateCustomer(id: string, data: any) {
+    async updateCustomer(id: string, data: unknown) {
       return await customers.update(id, data)
     }
   }
@@ -84,7 +84,7 @@ export const useOrders = () => {
   const { orders } = useDatabase()
   
   return {
-    async createOrder(data: any) {
+    async createOrder(data: unknown) {
       return await orders.create(data)
     },
     
@@ -92,15 +92,15 @@ export const useOrders = () => {
       return await orders.findById(id)
     },
     
-    async listOrders(options?: any) {
+    async listOrders(options?: unknown) {
       return await orders.list(options)
     },
     
-    async updateOrderStatus(id: string, status: any, notes?: string) {
+    async updateOrderStatus(id: string, status: string, notes?: string) {
       return await orders.updateStatus(id, status, notes)
     },
     
-    async updatePaymentStatus(id: string, status: any, reference?: string) {
+    async updatePaymentStatus(id: string, status: string, reference?: string) {
       return await orders.updatePaymentStatus(id, status, reference)
     },
     
@@ -117,7 +117,7 @@ export const usePaymentInstructions = () => {
   const { paymentInstructions } = useDatabase()
   
   return {
-    async createInstructionsForOrder(orderId: string, amount: number, type?: any) {
+    async createInstructionsForOrder(orderId: string, amount: number, type?: string) {
       return await paymentInstructions.createForOrder(orderId, amount, type)
     },
     
@@ -125,7 +125,7 @@ export const usePaymentInstructions = () => {
       return await paymentInstructions.getByOrderId(orderId)
     },
     
-    async updateInstructionsStatus(id: string, status: any) {
+    async updateInstructionsStatus(id: string, status: string) {
       return await paymentInstructions.updateStatus(id, status)
     },
     
