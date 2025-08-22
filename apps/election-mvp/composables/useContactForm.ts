@@ -161,7 +161,10 @@ export const useContactForm = () => {
       return { isValid: false, errors }
     }
 
-    if (!customer.firstName?.trim()) {
+    // Type guard pour customer
+    const customerData = customer as Record<string, unknown>
+
+    if (!customerData.firstName || typeof customerData.firstName !== 'string' || !customerData.firstName.trim()) {
       errors.push({
         field: 'customer.firstName',
         message: 'Le nom est obligatoire',
@@ -169,7 +172,7 @@ export const useContactForm = () => {
       })
     }
 
-    if (!customer.email?.trim()) {
+    if (!customerData.email || typeof customerData.email !== 'string' || !customerData.email.trim()) {
       errors.push({
         field: 'customer.email',
         message: 'L\'email est obligatoire',
@@ -177,7 +180,7 @@ export const useContactForm = () => {
       })
     }
 
-    if (!customer.phone?.trim()) {
+    if (!customerData.phone || typeof customerData.phone !== 'string' || !customerData.phone.trim()) {
       errors.push({
         field: 'customer.phone',
         message: 'Le téléphone est obligatoire',
@@ -217,11 +220,9 @@ export const useContactForm = () => {
       const response = await $fetch('/api/contact/submit', {
         method: 'POST',
         body: payload
-      }) as ContactSubmissionResponse
+      }) as { success: boolean; data: { id: string } }
 
-      lastSubmission.value = response.data
-
-      return {
+      const result: ContactSubmissionResponse = {
         success: true,
         contactId: response.data.id,
         message: 'Votre message a été envoyé avec succès!',
@@ -233,9 +234,13 @@ export const useContactForm = () => {
         estimatedResponseTime: '24 heures'
       }
 
+      lastSubmission.value = result
+      return result
+
     } catch (error: unknown) {
       console.error('Erreur soumission contact:', error)
-      throw new Error(error.message || 'Erreur lors de l\'envoi du message')
+      const errorMessage = error instanceof Error ? error.message : 'Erreur lors de l\'envoi du message'
+      throw new Error(errorMessage)
     } finally {
       isSubmitting.value = false
     }
@@ -301,7 +306,8 @@ export const useContactForm = () => {
 
     } catch (error: unknown) {
       console.error('Erreur soumission pré-commande:', error)
-      throw new Error(error.message || 'Erreur lors de l\'enregistrement de la pré-commande')
+      const errorMessage = error instanceof Error ? error.message : 'Erreur lors de l\'enregistrement de la pré-commande'
+      throw new Error(errorMessage)
     } finally {
       isSubmitting.value = false
     }

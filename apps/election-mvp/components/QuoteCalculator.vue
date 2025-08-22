@@ -343,7 +343,12 @@ const debouncedCalculate = useDebounceFn(async () => {
   try {
     const result = await calculateQuote({
       items: items.value,
-      customer: { customerType: props.customerType }
+      customer: props.customerType ? {
+        email: '',
+        firstName: '',
+        lastName: '',
+        customerType: props.customerType
+      } : undefined
     })
     
     calculation.value = result.calculation
@@ -450,7 +455,7 @@ const updateCustomizationLogo = (itemIndex: number, optionId: string, result: Cl
   }
 }
 
-const getCustomizationPrice = (itemIndex: number, optionId: string): number => {
+const getCustomizationPrice = (itemIndex: number, optionId: string, choiceId?: string): number => {
   const item = items.value[itemIndex]
   if (!item) return 0
   

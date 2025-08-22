@@ -401,9 +401,9 @@ export const useQuoteCalculator = (options: Partial<QuoteCalculatorOptions> = {}
   const calculateProductPrice = (
     basePrice: number, 
     quantity: number, 
-    customizations: unknown[] = []
+    customizations: Array<{ priceModifier?: number }> = []
   ) => {
-    const customizationsCost = customizations.reduce((sum, c) => sum + (c.priceModifier || 0), 0)
+    const customizationsCost = customizations.reduce((sum, c) => sum + (c?.priceModifier || 0), 0)
     const quantityRules = applyQuantityRules(quantity, basePrice)
     const ruleModifier = quantityRules.reduce((sum, rule) => sum + rule.modifier, 0)
     

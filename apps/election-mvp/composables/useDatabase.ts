@@ -3,7 +3,17 @@
  */
 
 import { createTursoClient, CustomersService, OrdersService, PaymentInstructionsService } from '@ns2po/database'
-import type { TursoClient } from '@ns2po/database'
+import type { 
+  TursoClient, 
+  CreateCustomerData, 
+  CreateOrderData, 
+  QueryOptions
+} from '@ns2po/database'
+import type { 
+  CustomerType, 
+  PreorderStatus, 
+  PaymentStatus 
+} from '@ns2po/types'
 
 // Singleton pour la connexion DB
 let dbClient: TursoClient | null = null
@@ -55,7 +65,7 @@ export const useCustomers = () => {
   const { customers } = useDatabase()
   
   return {
-    async createCustomer(data: unknown) {
+    async createCustomer(data: CreateCustomerData) {
       return await customers.create(data)
     },
     
@@ -67,11 +77,11 @@ export const useCustomers = () => {
       return await customers.findById(id)
     },
     
-    async listCustomers(options?: unknown) {
+    async listCustomers(options?: QueryOptions & { customerType?: CustomerType; isVerified?: boolean; search?: string }) {
       return await customers.list(options)
     },
     
-    async updateCustomer(id: string, data: unknown) {
+    async updateCustomer(id: string, data: Partial<CreateCustomerData>) {
       return await customers.update(id, data)
     }
   }
@@ -84,7 +94,7 @@ export const useOrders = () => {
   const { orders } = useDatabase()
   
   return {
-    async createOrder(data: unknown) {
+    async createOrder(data: CreateOrderData) {
       return await orders.create(data)
     },
     
@@ -92,15 +102,15 @@ export const useOrders = () => {
       return await orders.findById(id)
     },
     
-    async listOrders(options?: unknown) {
+    async listOrders(options?: QueryOptions & { customerId?: string; status?: PreorderStatus; paymentStatus?: PaymentStatus; dateFrom?: Date; dateTo?: Date }) {
       return await orders.list(options)
     },
     
-    async updateOrderStatus(id: string, status: string, notes?: string) {
+    async updateOrderStatus(id: string, status: PreorderStatus, notes?: string) {
       return await orders.updateStatus(id, status, notes)
     },
     
-    async updatePaymentStatus(id: string, status: string, reference?: string) {
+    async updatePaymentStatus(id: string, status: PaymentStatus, reference?: string) {
       return await orders.updatePaymentStatus(id, status, reference)
     },
     
@@ -117,7 +127,7 @@ export const usePaymentInstructions = () => {
   const { paymentInstructions } = useDatabase()
   
   return {
-    async createInstructionsForOrder(orderId: string, amount: number, type?: string) {
+    async createInstructionsForOrder(orderId: string, amount: number, type?: 'bank_transfer' | 'mobile_money' | 'cash' | 'commercial_contact') {
       return await paymentInstructions.createForOrder(orderId, amount, type)
     },
     
@@ -125,7 +135,7 @@ export const usePaymentInstructions = () => {
       return await paymentInstructions.getByOrderId(orderId)
     },
     
-    async updateInstructionsStatus(id: string, status: string) {
+    async updateInstructionsStatus(id: string, status: 'expired' | 'confirmed' | 'completed' | 'sent') {
       return await paymentInstructions.updateStatus(id, status)
     },
     

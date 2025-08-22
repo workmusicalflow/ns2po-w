@@ -483,10 +483,10 @@ const preorderData = ref<PreorderFormData>({
     productId: item.productId,
     productName: item.product?.name || '',
     quantity: item.quantity,
-    unitPrice: item.unitPrice,
+    unitPrice: item.product?.basePrice || 0,
     customizations: item.customizations?.map(c => c.customValue || '') || [],
-    totalPrice: item.totalPrice,
-    specifications: item.notes
+    totalPrice: (item.product?.basePrice || 0) * item.quantity,
+    specifications: ''
   })),
   totalAmount: props.totalAmount,
   paymentMethod: 'mobile_money',
