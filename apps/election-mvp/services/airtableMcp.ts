@@ -6,7 +6,6 @@
 import type { 
   Product,
   Category,
-  ProductPriceRule,
   QuoteRequest,
   CustomerInfo
 } from '@ns2po/types'

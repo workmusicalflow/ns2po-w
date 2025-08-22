@@ -8,19 +8,26 @@
       
       <!-- Upload du logo -->
       <div class="customization-section">
-        <label class="section-label">Logo</label>
+        <label for="logoUpload" class="section-label">Logo</label>
         <CloudinaryUpload
+          id="logoUpload"
           preset="logo"
           folder="logos"
           @upload:success="handleLogoUpload"
           @upload:error="handleUploadError"
         />
+        
+        <!-- Error message -->
+        <div v-if="uploadError" class="error-message" role="alert">
+          {{ uploadError }}
+        </div>
       </div>
 
       <!-- Texte personnalisé -->
       <div class="customization-section">
-        <label class="section-label">Texte personnalisé</label>
+        <label for="customText" class="section-label">Texte personnalisé</label>
         <input
+          id="customText"
           v-model="customization.text"
           type="text"
           placeholder="Votre texte ici..."
@@ -31,8 +38,9 @@
 
       <!-- Position -->
       <div class="customization-section">
-        <label class="section-label">Position</label>
-        <div class="position-grid">
+        <fieldset>
+          <legend class="section-label">Position</legend>
+          <div class="position-grid">
           <button
             v-for="position in availablePositions"
             :key="position.value"
@@ -47,13 +55,15 @@
             </div>
             <span>{{ position.label }}</span>
           </button>
-        </div>
+          </div>
+        </fieldset>
       </div>
 
       <!-- Couleurs -->
       <div class="customization-section">
-        <label class="section-label">Couleurs</label>
-        <div class="color-grid">
+        <fieldset>
+          <legend class="section-label">Couleurs</legend>
+          <div class="color-grid">
           <button
             v-for="color in availableColors"
             :key="color.value"
@@ -69,7 +79,8 @@
               <path d="M20.285 2l-11.285 11.567-5.286-5.011-3.714 3.716 9 8.728 15-15.285z" fill="white" />
             </svg>
           </button>
-        </div>
+          </div>
+        </fieldset>
       </div>
     </div>
 
@@ -212,9 +223,16 @@ const handleLogoUpload = (result: CloudinaryUploadResult) => {
   emitChange()
 }
 
+const uploadError = ref<string | null>(null)
+
 const handleUploadError = (error: string) => {
   console.error('Erreur upload logo:', error)
-  // TODO: Afficher notification d'erreur
+  uploadError.value = 'Erreur lors du téléchargement du logo. Veuillez réessayer.'
+  
+  // Clear error after 5 seconds
+  setTimeout(() => {
+    uploadError.value = null
+  }, 5000)
 }
 
 const toggleColor = (color: string) => {
@@ -495,5 +513,9 @@ const IconShirtChest = () => h('div', { class: 'w-6 h-6 bg-gray-300 rounded flex
 
 .preview-actions {
   @apply flex space-x-3;
+}
+
+.error-message {
+  @apply mt-2 p-3 bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg;
 }
 </style>

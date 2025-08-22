@@ -501,8 +501,8 @@ const previousStep = () => {
 
 // Méthodes de filtrage produits
 const filterProducts = () => {
-  // Simulation du filtrage des produits
-  console.log('Filtrage des produits:', { selectedCategory: selectedCategory.value, searchQuery: searchQuery.value })
+  // Filter products based on category and search query
+  // Implementation would go here when backend filtering is available
 }
 
 const nextPage = () => {
@@ -564,23 +564,23 @@ const getCustomerTypeLabel = (type?: string): string => {
 
 // Actions finales
 const downloadQuote = () => {
-  console.log('Téléchargement du devis')
+  // TODO: Implement quote download functionality
 }
 
 const sendQuote = () => {
-  console.log('Envoi du devis par email')
+  // TODO: Implement quote email sending
 }
 
 const saveQuote = () => {
-  console.log('Sauvegarde du devis')
+  // TODO: Implement quote saving to database
 }
 
 const downloadPDF = () => {
-  console.log('Téléchargement PDF')
+  // TODO: Implement PDF generation and download
 }
 
 const sendByEmail = () => {
-  console.log('Envoi par email')
+  // TODO: Implement email sending functionality
 }
 
 const startPreorder = () => {
@@ -588,7 +588,8 @@ const startPreorder = () => {
 }
 
 const requestMeeting = () => {
-  console.log('Demande de rendez-vous')
+  // TODO: Implement meeting request functionality
+  navigateTo('/contact?type=meeting')
 }
 
 const startNewQuote = () => {

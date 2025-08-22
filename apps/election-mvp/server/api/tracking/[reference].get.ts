@@ -2,8 +2,8 @@
  * API Route pour récupérer les informations de suivi d'une commande
  */
 
-import type { CustomerInfo, OrderTrackingInfo, TrackingTimelineEvent } from '@ns2po/types'
-import { createTursoClient, OrdersService, CustomersService, isValidTrackingReference, parseTrackingReference } from '@ns2po/database'
+import type { OrderTrackingInfo, TrackingTimelineEvent } from '@ns2po/types'
+import { createTursoClient, OrdersService, CustomersService, isValidTrackingReference } from '@ns2po/database'
 
 export default defineEventHandler(async (event) => {
   try {
@@ -203,7 +203,6 @@ function generateOrderTimeline(order: any): TrackingTimelineEvent[] {
  */
 function getFutureEvents(order: any, currentEventCount: number): TrackingTimelineEvent[] {
   const events: TrackingTimelineEvent[] = []
-  const createdDate = new Date(order.created_at)
 
   // Si pas encore en production
   if (order.status === 'pending_payment' || order.status === 'paid' || order.status === 'processing') {

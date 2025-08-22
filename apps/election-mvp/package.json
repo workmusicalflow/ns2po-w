@@ -15,7 +15,9 @@
     "test:coverage": "vitest run --coverage",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
-    "test:e2e:report": "playwright show-report"
+    "test:e2e:report": "playwright show-report",
+    "quality:report": "node scripts/quality-report.js",
+    "quality:check": "npm run lint && npm run type-check && npm run quality:report"
   },
   "dependencies": {
     "@libsql/client": "^0.15.12",

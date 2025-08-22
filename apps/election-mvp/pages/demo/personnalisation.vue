@@ -133,17 +133,17 @@ const customizationData = ref<ProductCustomization | null>(null)
 // Méthodes
 const handleCustomizationChange = (customization: ProductCustomization) => {
   customizationData.value = customization
-  console.log('Personnalisation mise à jour:', customization)
+  // Customization updated in real-time
 }
 
 const handleCustomizationSave = (customization: ProductCustomization) => {
-  console.log('Personnalisation sauvegardée:', customization)
+  // Store customization data
+  customizationData.value = customization
   
-  // Afficher une notification de succès
+  // Show success notification
   alert('Personnalisation sauvegardée avec succès !')
   
-  // En production, on pourrait sauvegarder en base de données
-  // ou rediriger vers la page de devis
+  // In production, could save to database or redirect to quote page
 }
 
 const formatPrice = (price: number): string => {

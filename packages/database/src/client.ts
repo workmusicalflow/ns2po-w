@@ -11,7 +11,7 @@ export interface TursoConfig {
 }
 
 export class TursoClient {
-  private client: Client
+  private readonly client: Client
   private static instance: TursoClient | null = null
 
   constructor(config: TursoConfig) {
@@ -68,7 +68,7 @@ export class TursoClient {
    * Ferme la connexion
    */
   async close(): Promise<void> {
-    await this.client.close()
+    this.client.close()
     TursoClient.instance = null
   }
 
@@ -114,7 +114,7 @@ export function createTursoClient(): TursoClient {
  */
 export function generateId(prefix: string = ''): string {
   const timestamp = Date.now()
-  const random = Math.random().toString(36).substr(2, 9)
+  const random = Math.random().toString(36).substring(2, 11)
   return prefix ? `${prefix}_${timestamp}_${random}`.toUpperCase() : `${timestamp}_${random}`
 }
 

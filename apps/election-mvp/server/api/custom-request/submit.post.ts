@@ -55,7 +55,7 @@ export default defineEventHandler(async (event) => {
       customerEmail: body.customer.email,
       type: 'custom' as const,
       subject: `Demande personnalisée - ${body.projectType}`,
-      message: `Description: ${body.description}\n\nBudget indicatif: ${body.budget ? `${body.budget} FCFA` : 'Non spécifié'}\nDélai souhaité: ${body.deadline || 'Flexible'}\nFichiers joints: ${body.attachments ? body.attachments.length : 0}`
+      message: `Description: ${body.description}\n\nBudget indicatif: ${body.budget ? body.budget + ' FCFA' : 'Non spécifié'}\nDélai souhaité: ${body.deadline || 'Flexible'}\nFichiers joints: ${body.attachments ? body.attachments.length : 0}`
     }
     
     try {

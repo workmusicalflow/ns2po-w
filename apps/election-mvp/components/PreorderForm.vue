@@ -436,7 +436,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { Button, Card } from '@ns2po/ui'
 import { useContactForm } from '../composables/useContactForm'
-import type { PreorderFormData, QuoteItem, PreorderItem } from '@ns2po/types'
+import type { PreorderFormData, QuoteItem } from '@ns2po/types'
 
 // Composables
 const { 

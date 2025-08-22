@@ -260,13 +260,32 @@ const resetFilters = () => {
 }
 
 const addToQuote = (product: Product) => {
-  // TODO: Intégrer avec le store Pinia pour le panier
-  console.log('Produit ajouté au devis:', product)
-  // Naviguer vers la page de devis avec le produit pré-sélectionné
-  navigateTo({
-    path: '/devis',
-    query: { productId: product.id }
-  })
+  // Store the selected product in sessionStorage for quote generation
+  try {
+    sessionStorage.setItem('selectedProduct', JSON.stringify({
+      id: product.id,
+      name: product.name,
+      category: product.category,
+      basePrice: product.basePrice,
+      image: product.image,
+      addedAt: new Date().toISOString()
+    }))
+    
+    console.log('Produit ajouté au devis:', product)
+    
+    // Navigate to quote page with product pre-selected
+    navigateTo({
+      path: '/devis',
+      query: { productId: product.id }
+    })
+  } catch (error) {
+    console.error('Erreur lors de l\'ajout au devis:', error)
+    // Fallback: navigate without storing in sessionStorage
+    navigateTo({
+      path: '/devis',
+      query: { productId: product.id }
+    })
+  }
 }
 
 // Chargement initial

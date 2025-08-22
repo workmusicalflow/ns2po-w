@@ -48,8 +48,9 @@
           
           <div class="form-grid">
             <div class="form-group">
-              <label class="form-label">Prénom *</label>
+              <label for="firstName" class="form-label">Prénom *</label>
               <input 
+                id="firstName"
                 v-model="formData.customer.firstName"
                 type="text" 
                 class="form-input"
@@ -63,8 +64,9 @@
             </div>
 
             <div class="form-group">
-              <label class="form-label">Nom *</label>
+              <label for="lastName" class="form-label">Nom *</label>
               <input 
+                id="lastName"
                 v-model="formData.customer.lastName"
                 type="text" 
                 class="form-input"
