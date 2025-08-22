@@ -97,12 +97,12 @@ export default defineEventHandler(async (event) => {
       }
     }
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Erreur API /cloudinary/upload:', error)
     
     throw createError({
-      statusCode: error.statusCode || 500,
-      statusMessage: error.message || 'Erreur lors de l\'upload'
+      statusCode: (error as { statusCode?: number })?.statusCode || 500,
+      statusMessage: (error as { message?: string })?.message || 'Erreur lors de l\'upload'
     })
   }
 })

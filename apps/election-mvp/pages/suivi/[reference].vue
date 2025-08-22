@@ -119,7 +119,7 @@
           </h3>
           <div class="space-y-4">
             <div
-              v-for="(item, index) in trackingData.order?.items" 
+              v-for="(item, index) in getTypedItems(trackingData.order?.items || [])" 
               :key="index" 
               class="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
             >
@@ -246,6 +246,11 @@ useHead({
 
 // Récupération des données de suivi
 const { data: trackingData, pending, error } = await useFetch<OrderTrackingInfo>(`/api/tracking/${reference.value}`)
+
+// Helper pour typer les items correctement
+const getTypedItems = (items: unknown[]): OrderTrackingItem[] => {
+  return items as OrderTrackingItem[]
+}
 
 // Utilitaires de formatage
 const formatCurrency = (amount: number): string => {

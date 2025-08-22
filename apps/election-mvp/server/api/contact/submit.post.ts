@@ -60,7 +60,7 @@ export default defineEventHandler(async (event) => {
       reference: contactId,
       customerName: `${body.customer.firstName} ${body.customer.lastName}`,
       customerEmail: body.customer.email,
-      type: body.type as any,
+      type: body.type as 'quote' | 'preorder' | 'custom' | 'support' | 'meeting',
       subject: body.subject,
       message: body.message
     }
