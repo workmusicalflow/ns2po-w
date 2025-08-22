@@ -1,0 +1,184 @@
+{
+  "sampleAssets": {
+    "products": [
+      {
+        "filename": "textile-tshirt-001.jpg",
+        "expectedParsing": {
+          "category": "products",
+          "subcategory": "textiles",
+          "type": "tshirt",
+          "number": "001"
+        },
+        "expectedCloudinaryPath": "ns2po/products/textiles",
+        "mockMetadata": {
+          "width": 800,
+          "height": 600,
+          "format": "jpg",
+          "size": 156789
+        }
+      },
+      {
+        "filename": "gadget-powerbank-solar-002.png",
+        "expectedParsing": {
+          "category": "products",
+          "subcategory": "gadgets",
+          "type": "powerbank",
+          "number": "solar-002"
+        },
+        "expectedCloudinaryPath": "ns2po/products/gadgets"
+      },
+      {
+        "filename": "epi-casque-securite-orange.jpg",
+        "expectedParsing": {
+          "category": "products",
+          "subcategory": "epi",
+          "type": "casque",
+          "number": "securite-orange"
+        },
+        "expectedCloudinaryPath": "ns2po/products/epi"
+      }
+    ],
+    "logos": [
+      {
+        "filename": "logo-client-acme-corp.svg",
+        "expectedParsing": {
+          "category": "logos",
+          "subcategory": "client-samples",
+          "type": "client",
+          "number": "acme-corp"
+        },
+        "expectedCloudinaryPath": "ns2po/logos/client-samples"
+      },
+      {
+        "filename": "logo-ns2po-election-2024.svg",
+        "expectedParsing": {
+          "category": "logos",
+          "subcategory": "ns2po-branding",
+          "type": "ns2po",
+          "number": "election-2024"
+        },
+        "expectedCloudinaryPath": "ns2po/logos/ns2po-branding"
+      }
+    ],
+    "backgrounds": [
+      {
+        "filename": "background-election-orange.png",
+        "expectedParsing": {
+          "category": "backgrounds",
+          "subcategory": "election-themes",
+          "type": "election",
+          "number": "orange"
+        },
+        "expectedCloudinaryPath": "ns2po/backgrounds/election-themes"
+      },
+      {
+        "filename": "background-corporate-blue-gradient.jpg",
+        "expectedParsing": {
+          "category": "backgrounds",
+          "subcategory": "corporate-patterns",
+          "type": "corporate",
+          "number": "blue-gradient"
+        },
+        "expectedCloudinaryPath": "ns2po/backgrounds/corporate-patterns"
+      }
+    ],
+    "icons": [
+      {
+        "filename": "icon-ui-arrow-right.svg",
+        "expectedParsing": {
+          "category": "icons",
+          "subcategory": "ui-elements",
+          "type": "ui",
+          "number": "arrow-right"
+        },
+        "expectedCloudinaryPath": "ns2po/icons/ui-elements"
+      },
+      {
+        "filename": "icon-social-facebook.png",
+        "expectedParsing": {
+          "category": "icons",
+          "subcategory": "social-media",
+          "type": "social",
+          "number": "facebook"
+        },
+        "expectedCloudinaryPath": "ns2po/icons/social-media"
+      }
+    ]
+  },
+  "performanceBenchmarks": {
+    "parsing": {
+      "maxTime": 1,
+      "unit": "ms"
+    },
+    "upload": {
+      "maxTime": 5000,
+      "unit": "ms"
+    },
+    "sync": {
+      "maxTime": 3000,
+      "unit": "ms"
+    },
+    "invalidation": {
+      "maxTime": 2000,
+      "unit": "ms"
+    },
+    "completeWorkflow": {
+      "maxTime": 20000,
+      "target": 15000,
+      "unit": "ms"
+    }
+  },
+  "mockResponses": {
+    "cloudinary": {
+      "upload": {
+        "public_id": "ns2po/products/textiles/textile-tshirt-001",
+        "secure_url": "https://res.cloudinary.com/ns2po/image/upload/v1724351234/ns2po/products/textiles/textile-tshirt-001.jpg",
+        "width": 800,
+        "height": 600,
+        "format": "jpg",
+        "bytes": 156789,
+        "created_at": "2024-08-22T10:30:34Z"
+      },
+      "invalidate": {
+        "invalidated": ["ns2po/products/textiles/textile-tshirt-001"],
+        "next_cursor": null
+      }
+    },
+    "airtable": {
+      "record": {
+        "id": "rec123ABC",
+        "fields": {
+          "cloudinary_public_id": "ns2po/products/textiles/textile-tshirt-001",
+          "cloudinary_url": "https://res.cloudinary.com/ns2po/image/upload/v1724351234/ns2po/products/textiles/textile-tshirt-001.jpg",
+          "category": "products",
+          "subcategory": "textiles",
+          "filename": "textile-tshirt-001.jpg",
+          "file_size": 156789,
+          "dimensions": "800x600",
+          "format": "jpg"
+        },
+        "createdTime": "2024-08-22T10:30:45.000Z"
+      }
+    },
+    "turso": {
+      "insert": {
+        "success": true,
+        "recordId": 1,
+        "rowsAffected": 1
+      },
+      "select": {
+        "rows": [
+          {
+            "id": 1,
+            "airtable_id": "rec123ABC",
+            "cloudinary_public_id": "ns2po/products/textiles/textile-tshirt-001",
+            "cloudinary_url": "https://res.cloudinary.com/ns2po/image/upload/v1724351234/ns2po/products/textiles/textile-tshirt-001.jpg",
+            "category": "products",
+            "business_metadata": "{\"subcategory\":\"textiles\",\"type\":\"tshirt\",\"number\":\"001\"}",
+            "last_sync": "2024-08-22T10:30:50.000Z"
+          }
+        ]
+      }
+    }
+  }
+}

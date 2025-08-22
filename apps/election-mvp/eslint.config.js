@@ -69,7 +69,10 @@ export default [
         getRequestHeaders: 'readonly',
         sendRedirect: 'readonly',
         // Nuxt config
-        defineNuxtConfig: 'readonly'
+        defineNuxtConfig: 'readonly',
+        // Node.js globals
+        require: 'readonly',
+        global: 'readonly'
       }
     },
     plugins: {
@@ -85,6 +88,58 @@ export default [
       'vue/no-v-html': 'off',
       'vue/require-default-prop': 'off',
       'vue/max-attributes-per-line': 'off'
+    }
+  },
+  // Configuration spécifique pour les scripts Node.js
+  {
+    files: [
+      'scripts/**/*.{js,mjs}',
+      'scripts/**/*.{js,ts}'
+    ],
+    languageOptions: {
+      globals: {
+        require: 'readonly',
+        process: 'readonly',
+        global: 'readonly',
+        __dirname: 'readonly',
+        __filename: 'readonly',
+        Buffer: 'readonly',
+        console: 'readonly',
+        setTimeout: 'readonly',
+        clearTimeout: 'readonly',
+        setInterval: 'readonly',
+        clearInterval: 'readonly',
+        module: 'readonly',
+        exports: 'readonly'
+      },
+      ecmaVersion: 2022,
+      sourceType: 'module'
+    },
+    rules: {
+      'no-console': 'off'
+    }
+  },
+  // Configuration spécifique pour les tests Vitest
+  {
+    files: [
+      'tests/**/*.{js,ts}',
+      '**/*.test.{js,ts}',
+      '**/*.spec.{js,ts}'
+    ],
+    languageOptions: {
+      globals: {
+        global: 'readonly',
+        Buffer: 'readonly',
+        describe: 'readonly',
+        test: 'readonly',
+        it: 'readonly',
+        expect: 'readonly',
+        beforeAll: 'readonly',
+        afterAll: 'readonly',
+        beforeEach: 'readonly',
+        afterEach: 'readonly',
+        vi: 'readonly'
+      }
     }
   }
 ]
