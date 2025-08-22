@@ -341,65 +341,6 @@ export const useContactForm = () => {
     }
   }
 
-  /**
-   * Génère les détails de paiement selon la méthode
-   */
-  const generatePaymentDetails = (method: string, amount: number, reference: string) => {
-    const details = {
-      instructions: [] as string[]
-    }
-
-    switch (method) {
-      case 'bank_transfer':
-        details.instructions = [
-          'Effectuez un virement bancaire sur notre compte :',
-          'Banque: [NOM_BANQUE]',
-          'Compte: [NUMERO_COMPTE]',
-          'Référence: ' + reference,
-          'Montant: ' + formatCurrency(amount)
-        ]
-        break
-      
-      case 'mobile_money':
-        details.instructions = [
-          'Envoyez le montant via Mobile Money :',
-          'Numéro: [NUMERO_MOBILE_MONEY]',
-          'Montant: ' + formatCurrency(amount),
-          'Référence: ' + reference,
-          'Conservez le reçu de transaction'
-        ]
-        break
-      
-      case 'cash':
-        details.instructions = [
-          'Apportez le montant en espèces à nos bureaux :',
-          'Adresse: [ADRESSE_BUREAU]',
-          'Heures d\'ouverture: Lun-Ven 8h-17h',
-          'Référence: ' + reference,
-          'Montant: ' + formatCurrency(amount)
-        ]
-        break
-    }
-
-    return details
-  }
-
-  /**
-   * Calcule la date de livraison estimée
-   */
-  const calculateEstimatedDelivery = (productionDays: number): string => {
-    const deliveryBuffer = 3 // 3 jours de buffer
-    const totalDays = productionDays + deliveryBuffer
-    const deliveryDate = new Date()
-    deliveryDate.setDate(deliveryDate.getDate() + totalDays)
-    
-    return deliveryDate.toLocaleDateString('fr-FR', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    })
-  }
 
   /**
    * Formate un montant en FCFA

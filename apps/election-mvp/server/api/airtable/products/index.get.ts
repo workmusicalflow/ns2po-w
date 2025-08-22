@@ -3,11 +3,11 @@
  * Récupère tous les produits depuis Airtable via MCP
  */
 
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async (_event) => {
   try {
     // Utiliser le MCP Airtable pour récupérer les produits
-    const baseId = 'apprQLdnVwlbfnioT'
-    const tableId = 'tbldm6u6qQczFxwvC'
+    const _baseId = 'apprQLdnVwlbfnioT'
+    const _tableId = 'tbldm6u6qQczFxwvC'
     
     // Note: Dans un vrai projet, on utiliserait le MCP server-side
     // Pour l'instant, on simule les données basées sur ce qu'on a créé

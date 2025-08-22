@@ -3,7 +3,7 @@
  * Récupère toutes les catégories depuis Airtable via MCP
  */
 
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async (_event) => {
   try {
     // Simulation des catégories créées dans Airtable
     const mockCategories = [

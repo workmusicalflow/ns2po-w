@@ -169,7 +169,7 @@ async function invalidateTursoCache(publicId) {
  */
 export async function invalidateBatch(publicIds, options = {}) {
   const startTime = Date.now();
-  const { batchSize = 10, strategy = 'batch' } = options;
+  const { batchSize: _batchSize = 10, strategy = 'batch' } = options;
   
   const successful = [];
   const failed = [];

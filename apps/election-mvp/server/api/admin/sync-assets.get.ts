@@ -11,7 +11,7 @@ interface AirtableAsset {
   }
 }
 
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async (_event) => {
   try {
     // Import dynamique pour éviter les problèmes de types
     const { getAssetsFromAirtable } = await import('../../../scripts/airtable-integration.mjs')

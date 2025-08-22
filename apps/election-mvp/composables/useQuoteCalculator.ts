@@ -269,7 +269,7 @@ export const useQuoteCalculator = (options: Partial<QuoteCalculatorOptions> = {}
     items: CalculatedItem[],
     discounts: AppliedDiscount[],
     taxAmount: number,
-    totalAmount: number
+    _totalAmount: number
   ): PriceBreakdown[] => {
     const breakdown: PriceBreakdown[] = []
 
