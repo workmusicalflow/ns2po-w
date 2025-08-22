@@ -15,10 +15,7 @@ import type {
   QuoteCalculatorOptions,
   QuoteCalculatorResult,
   ValidationError,
-  TaxConfiguration,
-  DiscountConfiguration,
-  VolumeDiscount,
-  PriceRule
+  VolumeDiscount
 } from '@ns2po/types'
 
 export const useQuoteCalculator = (options: Partial<QuoteCalculatorOptions> = {}) => {

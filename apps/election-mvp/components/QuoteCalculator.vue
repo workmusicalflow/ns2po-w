@@ -455,7 +455,7 @@ const updateCustomizationLogo = (itemIndex: number, optionId: string, result: Cl
   }
 }
 
-const getCustomizationPrice = (itemIndex: number, optionId: string, choiceId?: string): number => {
+const getCustomizationPrice = (itemIndex: number, optionId: string): number => {
   const item = items.value[itemIndex]
   if (!item) return 0
   

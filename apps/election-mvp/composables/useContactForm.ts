@@ -278,31 +278,11 @@ export const useContactForm = () => {
       const response = await $fetch('/api/preorder/submit', {
         method: 'POST',
         body: payload
-      }) as any
+      }) as { success: boolean; data: PreorderSubmissionResponse }
 
       lastSubmission.value = response.data
 
-      return {
-        success: true,
-        preorderId: response.data.id,
-        trackingReference: response.data.trackingReference,
-        trackingUrl: response.data.trackingUrl,
-        message: 'Votre pré-commande a été enregistrée avec succès!',
-        paymentInstructions: {
-          method: formData.paymentMethod,
-          amount: depositAmount,
-          reference: response.data.paymentReference,
-          details: generatePaymentDetails(formData.paymentMethod, depositAmount, response.data.paymentReference),
-          dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString() // 7 jours
-        },
-        nextSteps: [
-          'Effectuez le versement de l\'acompte dans les 7 jours',
-          'Nous confirmerons votre commande après réception du paiement',
-          'La production démarrera dès confirmation',
-          'Vous serez informé(e) des étapes de production'
-        ],
-        estimatedDelivery: calculateEstimatedDelivery(formData.timeline?.estimatedProduction || 7)
-      }
+      return response.data
 
     } catch (error: unknown) {
       console.error('Erreur soumission pré-commande:', error)

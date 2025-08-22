@@ -425,7 +425,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { Button, Card, Input } from '@ns2po/ui'
+import { Button } from '@ns2po/ui'
 import type { CustomerInfo, Product, QuoteItem, QuoteCalculation } from '@ns2po/types'
 
 // Import du composant QuoteCalculator (sera créé si nécessaire)

@@ -4,7 +4,7 @@
  */
 
 import { ref, computed, readonly } from 'vue'
-import type { Product, Category, PriceRule } from '@ns2po/types'
+import type { Product, Category } from '@ns2po/types'
 
 export const useProducts = () => {
   // État reactif
