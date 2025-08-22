@@ -99,13 +99,15 @@ export interface CustomRequestFormData {
   customer: CustomerInfo
   projectType: CustomProjectType
   description: string
-  specifications: CustomSpecification[]
-  budget: BudgetRange
-  timeline: string
+  specifications?: CustomSpecification[]
+  budget?: BudgetRange
+  timeline?: string
+  deadline?: string
   referenceImages?: string[]
   inspirationLinks?: string[]
   additionalRequirements?: string
-  contactPreferences: ContactMethod[]
+  contactPreferences?: ContactMethod[]
+  attachments?: ContactAttachment[]
   status?: CustomRequestStatus
   createdAt?: string
 }

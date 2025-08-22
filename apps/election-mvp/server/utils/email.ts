@@ -46,12 +46,12 @@ function createTransporter(): Transporter {
   const config = useRuntimeConfig()
   
   transporter = nodemailer.createTransport({
-    host: config.smtpHost,
+    host: config.smtpHost as string,
     port: parseInt(config.smtpPort as string || '587'),
     secure: config.smtpSecure === 'true', // true pour SSL (port 465), false pour TLS (port 587)
     auth: {
-      user: config.smtpUsername,
-      pass: config.smtpPassword
+      user: config.smtpUsername as string,
+      pass: config.smtpPassword as string
     },
     tls: {
       rejectUnauthorized: false // Pour éviter les erreurs avec certains certificats
