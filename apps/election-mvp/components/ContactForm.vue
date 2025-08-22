@@ -371,7 +371,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { Button, Card } from '@ns2po/ui'
 import { useContactForm } from '../composables/useContactForm'
-import type { ContactFormData, ContactType } from '@ns2po/types'
+import type { ContactFormData, ContactType, ContactSubmissionResponse } from '@ns2po/types'
 import CloudinaryUpload from './CloudinaryUpload.vue'
 
 // Composables
@@ -430,7 +430,7 @@ const additionalData = ref({
 })
 
 const submitError = ref('')
-const submitSuccess = ref<{ message: string; id?: string } | null>(null)
+const submitSuccess = ref<ContactSubmissionResponse | null>(null)
 
 // Computed
 const minDate = computed(() => {

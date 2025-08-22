@@ -436,7 +436,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { Button, Card } from '@ns2po/ui'
 import { useContactForm } from '../composables/useContactForm'
-import type { PreorderFormData, QuoteItem } from '@ns2po/types'
+import type { PreorderFormData, QuoteItem, PreorderSubmissionResponse } from '@ns2po/types'
 
 // Composables
 const { 
@@ -516,7 +516,7 @@ const preorderData = ref<PreorderFormData>({
 })
 
 const submitError = ref('')
-const submitSuccess = ref<{ message: string; id?: string } | null>(null)
+const submitSuccess = ref<PreorderSubmissionResponse | null>(null)
 const timelineCalculated = ref(false)
 
 // Configuration
