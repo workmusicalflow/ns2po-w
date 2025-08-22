@@ -39,22 +39,24 @@
       <!-- Position -->
       <div class="customization-section">
         <fieldset>
-          <legend class="section-label">Position</legend>
+          <legend class="section-label">
+            Position
+          </legend>
           <div class="position-grid">
-          <button
-            v-for="position in availablePositions"
-            :key="position.value"
-            :class="[
-              'position-btn',
-              { 'position-btn--active': customization.position === position.value }
-            ]"
-            @click="customization.position = position.value"
-          >
-            <div class="position-icon">
-              <component :is="position.icon" />
-            </div>
-            <span>{{ position.label }}</span>
-          </button>
+            <button
+              v-for="position in availablePositions"
+              :key="position.value"
+              :class="[
+                'position-btn',
+                { 'position-btn--active': customization.position === position.value }
+              ]"
+              @click="customization.position = position.value"
+            >
+              <div class="position-icon">
+                <component :is="position.icon" />
+              </div>
+              <span>{{ position.label }}</span>
+            </button>
           </div>
         </fieldset>
       </div>
@@ -62,23 +64,25 @@
       <!-- Couleurs -->
       <div class="customization-section">
         <fieldset>
-          <legend class="section-label">Couleurs</legend>
+          <legend class="section-label">
+            Couleurs
+          </legend>
           <div class="color-grid">
-          <button
-            v-for="color in availableColors"
-            :key="color.value"
-            :class="[
-              'color-btn',
-              { 'color-btn--selected': customization.colors?.includes(color.value) }
-            ]"
-            :style="{ backgroundColor: color.hex }"
-            :title="color.name"
-            @click="toggleColor(color.value)"
-          >
-            <svg v-if="customization.colors?.includes(color.value)" class="color-check" viewBox="0 0 24 24">
-              <path d="M20.285 2l-11.285 11.567-5.286-5.011-3.714 3.716 9 8.728 15-15.285z" fill="white" />
-            </svg>
-          </button>
+            <button
+              v-for="color in availableColors"
+              :key="color.value"
+              :class="[
+                'color-btn',
+                { 'color-btn--selected': customization.colors?.includes(color.value) }
+              ]"
+              :style="{ backgroundColor: color.hex }"
+              :title="color.name"
+              @click="toggleColor(color.value)"
+            >
+              <svg v-if="customization.colors?.includes(color.value)" class="color-check" viewBox="0 0 24 24">
+                <path d="M20.285 2l-11.285 11.567-5.286-5.011-3.714 3.716 9 8.728 15-15.285z" fill="white" />
+              </svg>
+            </button>
           </div>
         </fieldset>
       </div>
@@ -398,11 +402,7 @@ onMounted(() => {
   updatePreview()
 })
 
-// Composants icônes simplifiés (à remplacer par vraies icônes)
-const IconShirtFront = () => h('div', { class: 'w-6 h-6 bg-gray-300 rounded flex items-center justify-center text-xs' }, 'F')
-const IconShirtBack = () => h('div', { class: 'w-6 h-6 bg-gray-300 rounded flex items-center justify-center text-xs' }, 'B')
-const IconShirtSleeve = () => h('div', { class: 'w-6 h-6 bg-gray-300 rounded flex items-center justify-center text-xs' }, 'M')
-const IconShirtChest = () => h('div', { class: 'w-6 h-6 bg-gray-300 rounded flex items-center justify-center text-xs' }, 'P')
+// Note: Icon components removed as they were unused
 </script>
 
 <style scoped>

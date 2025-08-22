@@ -442,8 +442,7 @@ import type { PreorderFormData, QuoteItem } from '@ns2po/types'
 const { 
   submitPreorderForm, 
   validatePreorderForm, 
-  isSubmitting, 
-  validationErrors,
+  isSubmitting,
   getFieldErrors,
   clearValidationErrors,
   formatCurrency 
@@ -517,7 +516,7 @@ const preorderData = ref<PreorderFormData>({
 })
 
 const submitError = ref('')
-const submitSuccess = ref<any>(null)
+const submitSuccess = ref<{ message: string; id?: string } | null>(null)
 const timelineCalculated = ref(false)
 
 // Configuration
@@ -638,8 +637,9 @@ const handleSubmit = async () => {
       emit('success', response.preorderId)
     }
 
-  } catch (error: any) {
-    submitError.value = error.message || 'Une erreur est survenue lors de la pré-commande'
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Une erreur est survenue lors de la pré-commande'
+    submitError.value = errorMessage
   }
 }
 

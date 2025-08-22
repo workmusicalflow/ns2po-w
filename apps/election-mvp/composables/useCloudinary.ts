@@ -70,8 +70,9 @@ export const useCloudinary = () => {
       
       return response.data
 
-    } catch (error: any) {
-      uploadError.value = error.message || 'Erreur lors de l\'upload'
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Erreur lors de l\'upload'
+      uploadError.value = errorMessage
       throw error
     } finally {
       setTimeout(() => {

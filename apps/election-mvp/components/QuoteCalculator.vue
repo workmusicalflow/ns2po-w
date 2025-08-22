@@ -292,8 +292,7 @@ import { Button } from '@ns2po/ui'
 import { useQuoteCalculator } from '../composables/useQuoteCalculator'
 import type { 
   QuoteItem, 
-  QuoteCalculation, 
-  ValidationError,
+  QuoteCalculation,
   ItemCustomization,
   CloudinaryUploadResult 
 } from '@ns2po/types'
@@ -326,7 +325,6 @@ const {
   calculateProductPrice,
   formatCurrency,
   isCalculating,
-  lastCalculation,
   validationErrors 
 } = useQuoteCalculator()
 
@@ -345,7 +343,7 @@ const debouncedCalculate = useDebounceFn(async () => {
   try {
     const result = await calculateQuote({
       items: items.value,
-      customer: { customerType: props.customerType } as any
+      customer: { customerType: props.customerType }
     })
     
     calculation.value = result.calculation
@@ -452,7 +450,7 @@ const updateCustomizationLogo = (itemIndex: number, optionId: string, result: Cl
   }
 }
 
-const getCustomizationPrice = (itemIndex: number, optionId: string, choiceId: string): number => {
+const getCustomizationPrice = (itemIndex: number, optionId: string, _choiceId: string): number => {
   const item = items.value[itemIndex]
   if (!item) return 0
   

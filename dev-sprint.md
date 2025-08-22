@@ -1,9 +1,10 @@
 # 🚀 Sprint 2 - NS2PO Election MVP
-## Phase Core Business - Persistence & Paiements
+
+## Phase Core Business - Persistence & Suivi
 
 ### 📋 Vue d'ensemble du Sprint
 
-**Objectif Principal :** Transformer le MVP en une plateforme fonctionnelle avec persistence des données, authentification, et paiements réels.
+**Objectif Principal :** Transformer le MVP en une plateforme fonctionnelle avec persistence des données, suivi des commandes sans compte, et processus de paiement hors ligne pragmatique.
 
 **Durée :** 2-3 semaines
 **Effort :** ~Core 20% qui génère 80% de la valeur business
@@ -13,6 +14,7 @@
 ## ✅ Sprint 1 - Complété
 
 ### Réalisations Sprint 1
+
 - [x] Configuration initiale du projet (Turborepo + pnpm)
 - [x] Composants UI de base (Button, Input, Card, Table)
 - [x] Système de routage Nuxt.js avec pages principales
@@ -27,6 +29,7 @@
 ## 🎯 Sprint 2 - Tâches Core 20% (Priorité P0)
 
 ### 1. **Configurer Base de Données Turso**
+
 - **Effort :** 2-3 jours
 - **Value :** 🔥 Critique - Sans persistence, pas de commandes réelles
 - **Détails :**
@@ -35,16 +38,37 @@
   - Connection strings et environment variables
   - Tests de base CRUD operations
 
-### 2. **Authentification Utilisateur**
-- **Effort :** 2 jours
-- **Value :** 🔥 Critique - Suivi des commandes clients
+### 2. **Système de Suivi Sans Compte** ✅ TERMINÉ
+
+- **Effort :** 2 jours → **Réalisé en 1 jour**
+- **Value :** 🔥 Critique - Suivi des commandes clients sans friction
+- **Statut :** ✅ **IMPLÉMENTÉ AVEC SUCCÈS**
 - **Détails :**
-  - Auth simple avec email/password (pas de OAuth complexe pour MVP)
-  - Session management avec JWT
-  - Pages login/register/profile
-  - Protection des routes sensibles
+  - ✅ Page `/suivi/[reference]` publique avec statut temps réel
+  - ✅ Timeline visuelle : commande → production → livraison (composant TrackingTimeline)
+  - ✅ Génération automatique de références uniques de suivi
+  - ✅ Système de notifications email complet avec templates HTML responsives
+  - ✅ Intégration SMTP fonctionnelle (info@topdigitalevel.site)
+  - ✅ Instructions paiement Mobile Money intégrées
+  - ✅ Tests manuels E2E documentés (TESTING.md)
+
+### 🎯 **SonarCloud Observabilité & Qualité** ✅ TERMINÉ (BONUS)
+
+- **Effort :** 1.5 jours → **Réalisé en 1.5 jour**
+- **Value :** 🔥 Critique - Infrastructure de qualité pour la maintenance
+- **Statut :** ✅ **INFRASTRUCTURE QUALITÉ OPÉRATIONNELLE**
+- **Détails :**
+  - ✅ Script automatisé de récupération issues SonarCloud via API
+  - ✅ Correction de tous les problèmes CRITICAL (1) et MAJOR (8)
+  - ✅ Système de rapports qualité automatisé (scripts/quality-report.js)
+  - ✅ GitHub Actions workflow pour monitoring continu (.github/workflows/quality-check.yml)
+  - ✅ Améliorations accessibilité (6 problèmes Web:S6853 corrigés)
+  - ✅ Optimisations TypeScript (assertions, imports, console.log cleanup)
+  - ✅ Documentation complète (sonar-analysis.md, quality-improvements-summary.md)
+  - ✅ npm scripts intégrés (quality:report, quality:check)
 
 ### 3. **Prévisualisation Produits avec Personnalisation**
+
 - **Effort :** 3-4 jours
 - **Value :** 🔥 Critique - Core feature différenciatrice
 - **Détails :**
@@ -54,6 +78,7 @@
   - Export preview pour validation client
 
 ### 4. **Intégration Airtable API Complète**
+
 - **Effort :** 1-2 jours
 - **Value :** 🔥 Critique - Catalogue produits dynamique
 - **Détails :**
@@ -62,25 +87,28 @@
   - Mise à jour des prix en temps réel
   - Gestion des stocks et disponibilité
 
-### 5. **Dashboard Administrateur**
-- **Effort :** 3 jours
-- **Value :** 🔥 Critique - Gestion opérationnelle
-- **Détails :**
-  - Vue d'ensemble des commandes (nouveau, en cours, livré)
-  - Gestion des clients et historique
-  - Export des données pour production
-  - Notifications des nouvelles commandes
+### 5. **Dashboard Admin via Airtable (Pragmatique)**
 
-### 6. **Paiement en Ligne**
-- **Effort :** 3-4 jours
-- **Value :** 🔥 Critique - Monétisation directe
+- **Effort :** 1 jour
+- **Value :** 🔥 Critique - Gestion opérationnelle efficace
 - **Détails :**
-  - Intégration API Mobile Money (Orange, MTN, Moov)
-  - Gateway de paiement local (PerfectPay, CinetPay)
-  - Gestion des statuts de paiement
-  - Callbacks et confirmations
+  - Configuration vues Airtable pour gestion des commandes
+  - Automatisations Airtable pour statuts et notifications
+  - Export direct depuis Airtable pour production
+  - Interface existante sans développement custom
+
+### 6. **Instructions de Paiement Hors Ligne**
+
+- **Effort :** 1 jour
+- **Value :** 🔥 Critique - Process de paiement réaliste
+- **Détails :**
+  - Affichage des contacts NS2PO depuis la base de données
+  - Instructions pour virements bancaires et Mobile Money
+  - Système de confirmation manuelle des paiements
+  - Suivi des paiements via dashboard Airtable
 
 ### 7. **Déploiement Vercel avec CI/CD**
+
 - **Effort :** 1-2 jours
 - **Value :** 🔥 Critique - Mise en production
 - **Détails :**
@@ -94,16 +122,19 @@
 ## 📈 Améliorations P1 (Post-MVP)
 
 ### **Notifications Email/SMS**
+
 - Confirmations de commande automatiques
 - Statuts de production et livraison
 - Relances paiement
 
 ### **Système de Suivi Livraison**
+
 - Statuts détaillés (production, expédition, livraison)
 - Intégration transporteurs locaux
 - Notifications temps réel
 
 ### **Optimisation SEO & Performance**
+
 - Meta tags dynamiques
 - Compression images
 - Cache aggressive
@@ -114,16 +145,19 @@
 ## 🔮 Innovations P2 (Futures Phases)
 
 ### **Analytics & Reporting**
+
 - Dashboard vendeur avec métriques
 - Rapports de ventes période
 - Insights comportement clients
 
 ### **App Mobile React Native**
+
 - Interface native pour commandes rapides
 - Push notifications
 - Mode offline
 
 ### **Chatbot IA Support**
+
 - Réponses automatiques FAQ
 - Assistance commande en direct
 - Integration WhatsApp Business
@@ -133,33 +167,39 @@
 ## 🛠️ Stack Technique Sprint 2
 
 ### **Nouvelles Technologies**
+
 - **Turso :** Base de données SQLite distribuée
-- **Auth :** NextAuth.js ou solution custom
-- **Paiement :** CinetPay/PerfectPay APIs
+- **Suivi :** Système de références uniques sans auth
+- **Airtable :** Dashboard admin intégré
 - **Canvas :** Fabric.js pour customisation
 - **Deploy :** Vercel avec GitHub Actions
+- **Qualité :** SonarCloud API + GitHub Actions monitoring
 
 ### **Architecture Updated**
-```
+
+```typescript
 ns2po-mvp/
 ├── apps/election-mvp/
 │   ├── server/api/
-│   │   ├── auth/           # Authentification
+│   │   ├── suivi/          # Système de suivi
 │   │   ├── orders/         # Gestion commandes
-│   │   ├── payments/       # Paiements
-│   │   └── admin/          # Dashboard admin
+│   │   ├── contacts/       # Informations paiement
+│   │   └── airtable/       # Sync dashboard admin
 │   ├── pages/
-│   │   ├── auth/           # Login/Register
-│   │   ├── dashboard/      # Client dashboard
-│   │   ├── admin/          # Admin dashboard
+│   │   ├── suivi/          # Pages de suivi [reference]
+│   │   ├── paiement/       # Instructions paiement
 │   │   └── customize/      # Prévisualisation
+│   ├── scripts/
+│   │   └── quality-report.js # Rapports SonarCloud automatisés
 │   └── services/
 │       ├── turso.ts        # Database client
-│       ├── auth.ts         # Auth service
-│       └── payments.ts     # Payment gateway
+│       ├── tracking.ts     # Service de suivi
+│       └── airtable.ts     # Admin dashboard
 ├── packages/
 │   ├── database/           # Turso schemas & migrations
-│   └── payment/            # Payment utilities
+│   └── tracking/           # Utilities de suivi
+├── .github/workflows/
+│   └── quality-check.yml   # CI/CD + monitoring qualité
 ```
 
 ---
@@ -167,54 +207,62 @@ ns2po-mvp/
 ## 📊 Métriques de Succès Sprint 2
 
 ### **Objectifs Mesurables**
-- ✅ Utilisateur peut créer un compte et se connecter
-- ✅ Commande complète avec paiement réel fonctionne E2E
-- ✅ Admin peut gérer commandes depuis dashboard
+
+- ✅ Client peut suivre sa commande avec référence unique
+- ✅ Commande complète avec instructions paiement hors ligne
+- ✅ Admin peut gérer commandes depuis Airtable
 - ✅ Prévisualisation produit personnalisé en temps réel
 - ✅ Site déployé en production avec domaine
 
 ### **KPIs Business**
-- **Time to Order :** < 5 minutes de découverte à paiement
+
+- **Time to Order :** < 5 minutes de découverte à instructions paiement
 - **Conversion Rate :** > 15% visiteur → commande
-- **Admin Efficiency :** Traitement commande < 24h
-- **Customer Satisfaction :** Prévisualisation = produit final
+- **Admin Efficiency :** Traitement commande < 24h via Airtable
+- **Customer Satisfaction :** Prévisualisation = produit final + suivi transparent
 
 ---
 
 ## 🗓️ Timeline Estimée
 
 ### **Semaine 1 :** Fondations
-- Jour 1-2 : Setup Turso + Auth
+
+- Jour 1-2 : Setup Turso + Système de suivi
 - Jour 3-4 : Intégration Airtable complète
 - Jour 5 : Tests et debugging
 
 ### **Semaine 2 :** Business Logic
+
 - Jour 6-8 : Prévisualisation produits
-- Jour 9-10 : Dashboard admin
-- Jour 11-12 : Paiements
+- Jour 9 : Configuration dashboard Airtable
+- Jour 10-11 : Instructions paiement + contacts
 
 ### **Semaine 3 :** Production
-- Jour 13-14 : Déploiement et CI/CD
-- Jour 15 : Tests E2E et optimisations
-- Jour 16-17 : Buffer et docs
+
+- Jour 12-13 : Déploiement et CI/CD
+- Jour 14 : Tests E2E et optimisations
+- Jour 15 : Buffer et docs
 
 ---
 
 ## 🚨 Risques Identifiés
 
 ### **Techniques**
-- **API Paiement :** Documentation locale parfois limitée
+
 - **Canvas Performance :** Optimisation pour mobile
 - **Turso Latency :** Cache strategy importante
+- **Suivi References :** Unicité et sécurité des références
 
 ### **Business**
-- **Réglementation :** Validation paiements CI
+
+- **Process Paiement :** Gestion manuelle des confirmations
 - **UX Mobile :** Majorité trafic mobile attendu
-- **Support Client :** Volume commandes inconnu
+- **Support Client :** Volume commandes et suivi manuel
 
 ### **Mitigation**
-- Tests API paiement en bac à sable
+
 - Progressive enhancement pour mobile
+- Airtable automatisations pour réduire la charge manuelle
 - Monitoring et alertes proactives
 
 ---
@@ -222,6 +270,7 @@ ns2po-mvp/
 ## 📝 Variables d'Environnement Sprint 2
 
 ### Actuelles (Sprint 1)
+
 ```bash
 # Airtable
 AIRTABLE_API_KEY=
@@ -234,19 +283,19 @@ CLOUDINARY_API_SECRET=
 ```
 
 ### Nouvelles (Sprint 2)
+
 ```bash
 # Turso Database
 TURSO_DATABASE_URL=
 TURSO_AUTH_TOKEN=
 
-# Authentication
-JWT_SECRET=
-SESSION_SECRET=
+# Tracking System
+TRACKING_SECRET_KEY=
+REFERENCE_PREFIX=NS2PO
 
-# Payment Gateway
-CINETPAY_API_KEY=
-CINETPAY_SITE_ID=
-PERFECTPAY_MERCHANT_ID=
+# Airtable Admin
+AIRTABLE_PERSONAL_ACCESS_TOKEN=
+AIRTABLE_ADMIN_BASE_ID=
 
 # Email/SMS (P1)
 SMTP_HOST=
@@ -256,8 +305,39 @@ SMTP_PASSWORD=
 
 ---
 
-**Status Sprint 2 :** 🚀 Prêt pour le développement !
+## 🎯 **Prochaines Étapes Recommandées - Sprint 3**
+
+### **Option A : Finaliser MVP Core Business**
+- **Focus :** Terminer les 5 tâches restantes du Sprint 2
+- **Durée :** 1-2 semaines
+- **Value :** 🔥 Permet de lancer la plateforme en production
+- **Priorité :** 
+  1. Prévisualisation produits avec personnalisation (3-4 jours)
+  2. Intégration Airtable API complète (1-2 jours)  
+  3. Dashboard admin Airtable (1 jour)
+  4. Instructions paiement hors ligne (1 jour)
+  5. Déploiement Vercel CI/CD (1-2 jours)
+
+### **Option B : Améliorer l'Infrastructure Qualité**
+- **Focus :** Étendre le système SonarCloud avec tests automatisés
+- **Durée :** 1 semaine
+- **Value :** 🔥 Base solide pour scaling et maintenance
+- **Priorité :**
+  1. Configurer règles ESLint personnalisées pour éviter réintroduction issues
+  2. Implémenter tests E2E avec Playwright complets
+  3. Ajouter métriques de couverture de code
+  4. Configurer seuils qualité dans les PR (quality gates)
+  5. Intégrer monitoring performance (Lighthouse CI)
+
+### **Option C : Feature Critique Business**
+- **Focus :** Implémenter une fonctionnalité manquante critique
+- **Durée :** Variable selon complexité
+- **Value :** Selon analyse business
 
 ---
 
-*Mis à jour le 21 août 2025 - NS2PO Election MVP*
+**Status Sprint 2 :** ✅ Système de suivi + Infrastructure qualité = **67% Complete**
+
+---
+
+_Mis à jour le 22 août 2025 - NS2PO Election MVP_

@@ -378,8 +378,7 @@ import CloudinaryUpload from './CloudinaryUpload.vue'
 const { 
   submitContactForm, 
   validateContactForm, 
-  isSubmitting, 
-  validationErrors,
+  isSubmitting,
   getFieldErrors,
   clearValidationErrors 
 } = useContactForm()
@@ -431,7 +430,7 @@ const additionalData = ref({
 })
 
 const submitError = ref('')
-const submitSuccess = ref<any>(null)
+const submitSuccess = ref<{ message: string; id?: string } | null>(null)
 
 // Computed
 const minDate = computed(() => {
@@ -520,7 +519,15 @@ const getFieldError = (fieldName: string): string => {
   return errors.length > 0 ? errors[0]?.message || '' : ''
 }
 
-const onFileUploaded = (file: any) => {
+interface UploadedFile {
+  public_id: string
+  original_filename: string
+  secure_url: string
+  bytes: number
+  resource_type: string
+}
+
+const onFileUploaded = (file: UploadedFile) => {
   if (!formData.value.attachments) {
     formData.value.attachments = []
   }
@@ -533,7 +540,7 @@ const onFileUploaded = (file: any) => {
   })
 }
 
-const onUploadError = (error: any) => {
+const onUploadError = (error: Error | { message: string }) => {
   console.error('Erreur upload:', error)
 }
 
@@ -561,8 +568,9 @@ const handleSubmit = async () => {
       }, 5000)
     }
 
-  } catch (error: any) {
-    submitError.value = error.message || 'Une erreur est survenue lors de l\'envoi'
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Une erreur est survenue lors de l\'envoi'
+    submitError.value = errorMessage
   }
 }
 
