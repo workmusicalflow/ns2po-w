@@ -10,8 +10,10 @@
               src="/logos/logo-ns2po.jpg"
               alt="NS2PO - Spécialiste publicité par l'objet"
               class="h-12 w-auto object-contain rounded"
+            />
+            <span class="text-xl font-bold text-text-main"
+              >NS2PO Élections</span
             >
-            <span class="text-xl font-bold text-text-main">NS2PO Élections</span>
           </NuxtLink>
 
           <!-- Navigation Menu -->
@@ -40,10 +42,10 @@
               Devis
             </NuxtLink>
             <NuxtLink
-              to="/contact"
+              to="/contacts"
               class="text-gray-600 hover:text-primary transition-colors"
               :class="{
-                'text-primary font-medium': $route.path === '/contact',
+                'text-primary font-medium': $route.path === '/contacts',
               }"
             >
               Contact
@@ -52,9 +54,7 @@
 
           <!-- CTA Button -->
           <div class="hidden md:block">
-            <Button @click="navigateTo('/devis')">
-              Créer un devis
-            </Button>
+            <Button @click="navigateTo('/devis')"> Créer un devis </Button>
           </div>
 
           <!-- Mobile Menu Button -->
@@ -119,10 +119,10 @@
               Devis
             </NuxtLink>
             <NuxtLink
-              to="/contact"
+              to="/contacts"
               class="block text-gray-600 hover:text-primary transition-colors"
               :class="{
-                'text-primary font-medium': $route.path === '/contact',
+                'text-primary font-medium': $route.path === '/contacts',
               }"
               @click="mobileMenuOpen = false"
             >
@@ -160,7 +160,7 @@
                 src="/logos/logo-ns2po.jpg"
                 alt="NS2PO Logo"
                 class="h-10 w-auto object-contain rounded"
-              >
+              />
               <span class="text-xl font-bold">NS2PO</span>
             </div>
             <p class="text-gray-300 mb-4 max-w-md">
@@ -196,9 +196,7 @@
 
           <!-- Quick Links -->
           <div>
-            <h3 class="text-lg font-semibold mb-4">
-              Liens rapides
-            </h3>
+            <h3 class="text-lg font-semibold mb-4">Liens rapides</h3>
             <ul class="space-y-2">
               <li>
                 <NuxtLink
@@ -237,9 +235,7 @@
 
           <!-- Contact Info -->
           <div>
-            <h3 class="text-lg font-semibold mb-4">
-              Contact
-            </h3>
+            <h3 class="text-lg font-semibold mb-4">Contact</h3>
 
             <ul class="space-y-2 text-gray-300">
               <li>📍 Abidjan, Côte d'Ivoire</li>
@@ -255,7 +251,7 @@
           class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400"
         >
           <p>
-            &copy; 2024 NS2PO. Tous droits réservés. | Spécialiste publicité par
+            &copy; 2025 NS2PO. Tous droits réservés. | Spécialiste publicité par
             l'objet depuis 2011
           </p>
         </div>

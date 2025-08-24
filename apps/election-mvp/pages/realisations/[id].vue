@@ -114,7 +114,7 @@
               </h1>
               <span 
                 v-if="realisation.isFeatured"
-                class="px-2 py-1 bg-accent text-white text-xs font-medium rounded-full"
+                class="px-2 py-1 bg-accent text-white text-xs font-medium rounded-full whitespace-nowrap"
               >
                 En vedette
               </span>
