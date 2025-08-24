@@ -4,7 +4,7 @@
 
 import type { ContactFormData, ContactSubmissionResponse } from '@ns2po/types'
 import { createTursoClient, generateId, formatDateForDB, stringifyForDB } from '@ns2po/database'
-import { sendOrderNotification, sendCustomerConfirmation } from '../../../server/utils/email'
+import { sendOrderNotification, sendCustomerConfirmation } from '../../utils/email'
 
 export default defineEventHandler(async (event) => {
   try {

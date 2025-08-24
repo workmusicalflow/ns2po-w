@@ -3,7 +3,9 @@
     <div class="container mx-auto px-4 py-8">
       <!-- Header -->
       <div class="mb-8">
-        <h1 class="text-3xl font-bold text-text-main mb-2">Nos Réalisations</h1>
+        <h1 class="text-3xl font-bold text-text-main mb-2">
+          Nos Réalisations
+        </h1>
         <p class="text-gray-600">
           Découvrez nos créations réalisées pour des campagnes électorales et
           inspirez-vous pour votre projet
@@ -20,10 +22,18 @@
             v-model="selectedCategory"
             class="w-full border border-gray-300 rounded-md px-3 py-2"
           >
-            <option value="">Toutes catégories</option>
-            <option value="textile">Textiles</option>
-            <option value="gadget">Gadgets</option>
-            <option value="epi">EPI</option>
+            <option value="">
+              Toutes catégories
+            </option>
+            <option value="textile">
+              Textiles
+            </option>
+            <option value="gadget">
+              Gadgets
+            </option>
+            <option value="epi">
+              EPI
+            </option>
           </select>
         </div>
 
@@ -35,7 +45,9 @@
             v-model="selectedTag"
             class="w-full border border-gray-300 rounded-md px-3 py-2"
           >
-            <option value="">Tous tags</option>
+            <option value="">
+              Tous tags
+            </option>
             <option v-for="tag in availableTags" :key="tag" :value="tag">
               {{ tag }}
             </option>
@@ -51,8 +63,8 @@
             :variant="showAllSources ? 'primary' : 'outline'"
             size="small"
             class="w-full"
-            @click="toggleAllSources"
             :disabled="allLoading"
+            @click="toggleAllSources"
           >
             <span v-if="allLoading" class="mr-2">
               <div
@@ -87,7 +99,9 @@
         <div
           class="inline-block w-8 h-8 border-4 border-accent border-t-transparent rounded-full animate-spin"
         />
-        <p class="mt-4 text-gray-600">Chargement des réalisations...</p>
+        <p class="mt-4 text-gray-600">
+          Chargement des réalisations...
+        </p>
       </div>
 
       <div
@@ -257,12 +271,12 @@ const toggleAllSources = async () => {
 };
 
 const handleInspiration = (realisation: Realisation) => {
-  // Redirection vers le catalogue avec contexte d'inspiration
+  // Redirection vers devis avec contexte d'inspiration (catalogue sera disponible en Mars 2025)
   const productId = realisation.productIds[0];
   if (productId) {
-    navigateTo(`/catalogue?inspiredBy=${realisation.id}&product=${productId}`);
+    navigateTo(`/devis?inspiredBy=${realisation.id}&product=${productId}`);
   } else {
-    navigateTo(`/catalogue?inspiredBy=${realisation.id}`);
+    navigateTo(`/devis?inspiredBy=${realisation.id}`);
   }
 };
 

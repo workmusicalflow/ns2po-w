@@ -10,10 +10,8 @@
               src="/logos/logo-ns2po.jpg"
               alt="NS2PO - Spécialiste publicité par l'objet"
               class="h-12 w-auto object-contain rounded"
-            />
-            <span class="text-xl font-bold text-text-main"
-              >NS2PO Élections</span
             >
+            <span class="text-xl font-bold text-text-main">NS2PO Élections</span>
           </NuxtLink>
 
           <!-- Navigation Menu -->
@@ -25,6 +23,7 @@
             >
               Accueil
             </NuxtLink>
+            <!-- Catalogue - Disponible dans la prochaine version (Mars 2025)
             <NuxtLink
               to="/catalogue"
               class="text-gray-600 hover:text-primary transition-colors"
@@ -34,6 +33,7 @@
             >
               Catalogue
             </NuxtLink>
+            -->
             <NuxtLink
               to="/devis"
               class="text-gray-600 hover:text-primary transition-colors"
@@ -54,7 +54,9 @@
 
           <!-- CTA Button -->
           <div class="hidden md:block">
-            <Button @click="navigateTo('/devis')"> Créer un devis </Button>
+            <Button @click="navigateTo('/devis')">
+              Créer un devis
+            </Button>
           </div>
 
           <!-- Mobile Menu Button -->
@@ -100,6 +102,7 @@
             >
               Accueil
             </NuxtLink>
+            <!-- Catalogue - Disponible dans la prochaine version (Mars 2025)
             <NuxtLink
               to="/catalogue"
               class="block text-gray-600 hover:text-primary transition-colors"
@@ -110,6 +113,7 @@
             >
               Catalogue
             </NuxtLink>
+            -->
             <NuxtLink
               to="/devis"
               class="block text-gray-600 hover:text-primary transition-colors"
@@ -160,7 +164,7 @@
                 src="/logos/logo-ns2po.jpg"
                 alt="NS2PO Logo"
                 class="h-10 w-auto object-contain rounded"
-              />
+              >
               <span class="text-xl font-bold">NS2PO</span>
             </div>
             <p class="text-gray-300 mb-4 max-w-md">
@@ -196,8 +200,11 @@
 
           <!-- Quick Links -->
           <div>
-            <h3 class="text-lg font-semibold mb-4">Liens rapides</h3>
+            <h3 class="text-lg font-semibold mb-4">
+              Liens rapides
+            </h3>
             <ul class="space-y-2">
+              <!-- Catalogue - Disponible dans la prochaine version (Mars 2025)
               <li>
                 <NuxtLink
                   to="/catalogue"
@@ -206,6 +213,7 @@
                   Catalogue produits
                 </NuxtLink>
               </li>
+              -->
               <li>
                 <NuxtLink
                   to="/devis"
@@ -235,12 +243,34 @@
 
           <!-- Contact Info -->
           <div>
-            <h3 class="text-lg font-semibold mb-4">Contact</h3>
+            <h3 class="text-lg font-semibold mb-4">
+              Contact
+            </h3>
 
             <ul class="space-y-2 text-gray-300">
               <li>📍 Abidjan, Côte d'Ivoire</li>
-              <li>📞 +225 XX XX XX XX</li>
-              <li>✉️ contact@ns2po.ci</li>
+              <li v-if="priorityContact?.mobilePhone">
+                <a
+                  :href="getTelLink(priorityContact.mobilePhone)"
+                  class="hover:text-white transition-colors"
+                >
+                  📞 {{ formatPhoneNumber(priorityContact.mobilePhone) }}
+                </a>
+              </li>
+              <li v-else>
+                📞 +225 XX XX XX XX
+              </li>
+              <li v-if="priorityContact?.email">
+                <a
+                  :href="getEmailLink(priorityContact.email)"
+                  class="hover:text-white transition-colors"
+                >
+                  ✉️ {{ priorityContact.email }}
+                </a>
+              </li>
+              <li v-else>
+                ✉️ contact@ns2po.ci
+              </li>
               <li>🕒 Lun-Ven: 8h-17h</li>
             </ul>
           </div>
@@ -261,7 +291,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from "vue";
+import { ref, watch, computed, onMounted } from "vue";
 import { Button } from "@ns2po/ui";
 
 // État réactif pour le menu mobile - test hook TypeScript strict enforcer
@@ -275,4 +305,21 @@ watch(
     mobileMenuOpen.value = false;
   }
 );
+
+// Composable pour les contacts dynamiques
+const {
+  formatPhoneNumber,
+  getTelLink,
+  getEmailLink,
+  getPriorityContact,
+  fetchContacts,
+} = useContacts();
+
+// Contact prioritaire pour le footer
+const priorityContact = computed(() => getPriorityContact());
+
+// Charger les contacts au montage
+onMounted(() => {
+  fetchContacts();
+});
 </script>
