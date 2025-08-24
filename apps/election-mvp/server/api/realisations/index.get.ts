@@ -60,7 +60,8 @@ function transformAirtableToHybrid(
       publicId.includes("/") && !publicId.includes(".")
         ? `${publicId}.jpg`
         : publicId;
-    return `https://res.cloudinary.com/dsrvzogof/image/upload/w_800,h_600,c_fill,f_auto,q_auto/${fullPath}`;
+    // Use c_fit instead of c_fill to preserve image proportions and avoid truncation
+    return `https://res.cloudinary.com/dsrvzogof/image/upload/w_800,h_600,c_fit,f_auto,q_auto/${fullPath}`;
   });
 
   return {
