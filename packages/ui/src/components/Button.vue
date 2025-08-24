@@ -52,7 +52,7 @@ const buttonClasses = computed(() => [
 
 /* Variants */
 .btn--primary {
-  @apply bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500;
+  @apply bg-primary text-white hover:bg-primary/90 focus:ring-primary/50;
 }
 
 .btn--secondary {
@@ -68,7 +68,7 @@ const buttonClasses = computed(() => [
 }
 
 .btn--outline {
-  @apply border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white focus:ring-blue-500;
+  @apply border-2 border-primary text-primary hover:bg-primary hover:text-white focus:ring-primary/50;
 }
 
 /* Sizes */

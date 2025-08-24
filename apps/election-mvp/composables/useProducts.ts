@@ -1,6 +1,7 @@
 /**
  * Composable pour la gestion des produits
- * Fournit une interface reactive pour les données Airtable
+ * Utilise Turso (cache performant) + fallback Airtable
+ * Structure Cloudinary: ns2po-w/products/
  */
 
 import { ref, computed, readonly } from 'vue'
@@ -14,14 +15,14 @@ export const useProducts = () => {
   const error = ref<string | null>(null)
 
   /**
-   * Charge tous les produits depuis Airtable
+   * Charge tous les produits depuis Turso (cache performant)
    */
   const loadProducts = async () => {
     loading.value = true
     error.value = null
     
     try {
-      const { data } = await $fetch<{ data: Product[] }>('/api/products')
+      const { data } = await $fetch<{ data: Product[] }>('/api/products/turso')
       products.value = data
     } catch (err) {
       error.value = 'Erreur lors du chargement des produits'

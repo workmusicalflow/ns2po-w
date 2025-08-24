@@ -72,7 +72,17 @@ export default [
         defineNuxtConfig: 'readonly',
         // Node.js globals
         require: 'readonly',
-        global: 'readonly'
+        global: 'readonly',
+        // Custom composables
+        useCloudinaryImage: 'readonly',
+        useCloudinary: 'readonly',
+        useContactForm: 'readonly',
+        useDatabase: 'readonly',
+        useCustomers: 'readonly',
+        useOrders: 'readonly',
+        usePaymentInstructions: 'readonly',
+        useProducts: 'readonly',
+        useQuoteCalculator: 'readonly'
       }
     },
     plugins: {

@@ -4,6 +4,7 @@
  */
 
 import path from 'path';
+import fs from 'fs';
 
 /**
  * Parse le nom d'un fichier d'asset selon les conventions NS2PO
@@ -222,7 +223,7 @@ export function generateOptimizedFilename(assetInfo) {
  * @returns {Object} Métadonnées extraites
  */
 export function extractAssetMetadata(filePath, cloudinaryResponse = {}) {
-  const stats = require('fs').statSync(filePath);
+  const stats = fs.statSync(filePath);
   const assetInfo = parseFilename(filePath);
   
   return {

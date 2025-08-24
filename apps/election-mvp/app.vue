@@ -3,6 +3,9 @@
     <NuxtLayout>
       <NuxtPage />
     </NuxtLayout>
+    
+    <!-- Modal d'image global -->
+    <ImageModal />
   </div>
 </template>
 

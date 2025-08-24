@@ -7,8 +7,8 @@ export default defineNuxtConfig({
     typeCheck: false  // Désactivé pour éviter oxc-parser en CI, utilise vue-tsc
   },
 
-  // CSS framework - will add Tailwind later
-  css: [],
+  // CSS framework
+  css: ['~/assets/css/main.css', '~/assets/css/themes.css'],
 
   // Build configuration
   build: {
@@ -40,7 +40,8 @@ export default defineNuxtConfig({
       appName: 'NS2PO Election MVP',
       version: '0.1.0',
       cloudinaryCloudName: process.env.CLOUDINARY_CLOUD_NAME,
-      siteUrl: process.env.NUXT_PUBLIC_SITE_URL || 'http://localhost:3000'
+      siteUrl: process.env.NUXT_PUBLIC_SITE_URL || 'http://localhost:3000',
+      googleAnalyticsId: process.env.NUXT_PUBLIC_GA_MEASUREMENT_ID
     }
   },
 
@@ -51,12 +52,174 @@ export default defineNuxtConfig({
 
   // Modules
   modules: [
-    '@nuxtjs/cloudinary'
+    '@nuxtjs/tailwindcss',
+    '@nuxtjs/cloudinary',
+    '@nuxt/image'
   ],
+
+  // Nitro configuration for caching and performance
+  nitro: {
+    routeRules: {
+      // Static pages - cache 1 hour
+      '/': { 
+        prerender: false, 
+        headers: { 'Cache-Control': 'public, max-age=3600, s-maxage=7200, stale-while-revalidate=86400' } 
+      },
+      '/demo/**': { 
+        headers: { 'Cache-Control': 'public, max-age=1800, s-maxage=3600, stale-while-revalidate=86400' } 
+      },
+      
+      // API routes caching
+      '/api/products/**': { 
+        cors: true,
+        headers: { 
+          'Cache-Control': 'public, max-age=300, s-maxage=600, stale-while-revalidate=86400',
+          'Vary': 'Accept-Encoding'
+        } 
+      },
+      '/api/realisations/**': { 
+        cors: true,
+        headers: { 
+          'Cache-Control': 'public, max-age=900, s-maxage=1800, stale-while-revalidate=86400',
+          'Vary': 'Accept-Encoding'
+        } 
+      },
+      '/api/contact': { 
+        cors: true,
+        headers: { 'Cache-Control': 'no-store' } 
+      },
+      
+      // Assets caching (handled by Vercel but added as fallback)
+      '/_nuxt/**': { 
+        headers: { 'Cache-Control': 'public, max-age=31536000, immutable' } 
+      },
+      
+      // Sitemap
+      '/sitemap.xml': { 
+        headers: { 'Cache-Control': 'public, max-age=86400' } 
+      }
+    },
+    
+    // Storage pour le cache
+    storage: {
+      'cache': {
+        driver: 'memory'
+      }
+    },
+
+    // Compression
+    compressPublicAssets: true
+  },
 
   // Cloudinary configuration
   cloudinary: {
-    cloudName: process.env.CLOUDINARY_CLOUD_NAME
+    cloudName: process.env.CLOUDINARY_CLOUD_NAME,
+    
+    // Configuration pour les images de produits et réalisations
+    image: {
+      quality: 'auto:good',
+      format: 'auto',
+      loading: 'lazy',
+      responsive: true,
+      sizes: 'sm:300px md:400px lg:500px',
+      placeholder: true,
+      
+      // Presets pour différents contextes
+      presets: {
+        // Cartes produits dans le catalogue
+        productCard: {
+          modifiers: {
+            format: 'auto',
+            quality: 'auto:good',
+            width: 400,
+            height: 300,
+            crop: 'fill',
+            gravity: 'center'
+          }
+        },
+        
+        // Images héroïques des réalisations
+        realisationHero: {
+          modifiers: {
+            format: 'auto',
+            quality: 'auto:good',
+            width: 800,
+            height: 600,
+            crop: 'fill',
+            gravity: 'center'
+          }
+        },
+        
+        // Miniatures pour les galeries
+        thumbnail: {
+          modifiers: {
+            format: 'auto',
+            quality: 'auto:eco',
+            width: 150,
+            height: 150,
+            crop: 'fill',
+            gravity: 'face:center'
+          }
+        },
+        
+        // Images haute résolution pour prévisualisations
+        preview: {
+          modifiers: {
+            format: 'auto',
+            quality: 'auto:best',
+            width: 1200,
+            height: 900,
+            crop: 'fit',
+            gravity: 'center'
+          }
+        }
+      }
+    }
+  },
+
+  // @nuxt/image configuration  
+  image: {
+    cloudinary: {
+      baseURL: `https://res.cloudinary.com/${process.env.CLOUDINARY_CLOUD_NAME}/image/upload/`,
+    },
+    presets: {
+      productCard: {
+        modifiers: {
+          format: 'auto',
+          quality: 'auto:good',
+          width: 400,
+          height: 300,
+          fit: 'cover'
+        }
+      },
+      realisationHero: {
+        modifiers: {
+          format: 'auto',
+          quality: 'auto:good', 
+          width: 800,
+          height: 600,
+          fit: 'cover'
+        }
+      },
+      realisationFull: {
+        modifiers: {
+          format: 'auto',
+          quality: 'auto:best',
+          width: 1200,
+          height: 1200,
+          fit: 'inside'
+        }
+      },
+      thumbnail: {
+        modifiers: {
+          format: 'auto',
+          quality: 'auto:eco',
+          width: 150,
+          height: 150,
+          fit: 'cover'
+        }
+      }
+    }
   },
 
   // App configuration

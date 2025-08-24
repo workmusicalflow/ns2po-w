@@ -17,7 +17,19 @@
     "test:coverage": "turbo test:coverage",
     "clean": "turbo clean",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "assets:add": "node scripts/asset-manager.mjs add",
+    "assets:remove": "node scripts/asset-manager.mjs remove",
+    "assets:update": "node scripts/asset-manager.mjs update",
+    "assets:sync": "node scripts/asset-manager.mjs sync",
+    "assets:stats": "node scripts/asset-manager.mjs stats",
+    "assets:invalidate": "node scripts/asset-manager.mjs invalidate"
+  },
+  "dependencies": {
+    "@libsql/client": "^0.15.12",
+    "airtable": "^0.12.2",
+    "cloudinary": "^2.7.0",
+    "dotenv": "^17.2.1"
   },
   "devDependencies": {
     "@turbo/gen": "^1.10.12",

@@ -25,7 +25,7 @@ Créer "NS2PO Élections MVP" - une plateforme de génération de devis et pré-
 
 ### Stack Principal
 
-- **Frontend :** Nuxt.js 3 + Vue.js + TypeScript + Tailwind CSS
+- **Frontend :** Nuxt.js 3 + Vue.js + TypeScript + Tailwind CSS + HeadlessUI
 - **Backend :** API Routes Nuxt + Turso (SQLite)
 - **Données :** Airtable (catalogue produits)
 - **Médias :** Cloudinary (images/logos)
@@ -37,6 +37,73 @@ Créer "NS2PO Élections MVP" - une plateforme de génération de devis et pré-
 * `Drizzle ORM Nuxt Turso` : Le trio gagnant pour interagir avec la base de données de manière typée et sécurisée.
 * `Headless CMS pros and cons` : Pour bien comprendre la philosophie derrière l'utilisation d'Airtable.
 * - `Nuxt 3 Data Fetching (useFetch, useAsyncData)` : Les hooks fondamentaux pour récupérer les données (ex: depuis Airtable).
+
+## 🎨 Identité Visuelle & Design System NS2PO
+
+### Palette de Couleurs Officielle
+
+**Couleurs de Marque :**
+
+- **Primaire (Ocre/Or) :** `#C99A3B` - Couleur principale, chaleureuse et distinctive
+- **Accent (Bourgogne) :** `#6A2B3A` - Titres, CTA, inspire sérieux et confiance
+- **Fond Neutre :** `#F8F8F8` - Arrière-plans, plus doux qu'un blanc pur
+- **Texte Principal :** `#2D2D2D` - Quasi-noir pour lisibilité optimale
+
+**Couleurs Sémantiques :**
+
+- **Sécurité (Jaune Vif) :** `#F7DC00` - Éléments EPI et sécurité
+- **Succès (Vert) :** `#28a745` - Messages de validation
+- **Erreur (Rouge) :** `#dc3545` - Messages d'erreur
+
+### Typographie
+
+- **Police Titres (`font-heading`) :** **Poppins** - Sans Serif grasse et condensée
+- **Police Corps (`font-body`) :** **Inter** - Sans Serif très lisible
+
+### Design Tokens Architecture
+
+```css
+:root {
+  /* Palette RGB pour opacité Tailwind */
+  --color-primary: 201 154 59;
+  --color-accent: 106 43 58;
+  --color-background: 248 248 248;
+  --color-text-main: 45 45 45;
+  --color-safety: 247 220 0;
+
+  /* Typographie */
+  --font-family-heading: "Poppins", sans-serif;
+  --font-family-body: "Inter", sans-serif;
+
+  /* Bordures */
+  --border-radius-sm: 4px;
+  --border-radius-md: 8px;
+  --border-radius-lg: 16px;
+}
+```
+
+### Configuration Tailwind Customisée
+
+```javascript
+// tailwind.config.js
+export default {
+  theme: {
+    extend: {
+      colors: {
+        primary: "rgb(var(--color-primary) / <alpha-value>)",
+        accent: "rgb(var(--color-accent) / <alpha-value>)",
+        background: "rgb(var(--color-background) / <alpha-value>)",
+        "text-main": "rgb(var(--color-text-main) / <alpha-value>)",
+        safety: "rgb(var(--color-safety) / <alpha-value>)",
+      },
+      fontFamily: {
+        heading: ["var(--font-family-heading)"],
+        body: ["var(--font-family-body)"],
+      },
+    },
+  },
+};
+```
 
 ### Structure des Dossiers
 
@@ -87,6 +154,13 @@ pnpm test             # Tests unitaires
 2. **Composables :** Camel Case préfixé `use` (`useProductCalculator`)
 3. **Types :** Interface préfixée `I` (`IProduct`, `IQuoteRequest`)
 4. **Fichiers :** Kebab case (`product-catalog.vue`)
+
+## Au besoin de documentations à jour
+
+**le serveur MCP Context7:**
+Fournit de la documentation à jour : Il se connecte aux documentations officielles des technologies (comme Nuxt, Vue.js, etc.) et fournit les informations les plus récentes et spécifiques à une version.
+Évite les "hallucinations" de l'IA : Il empêche l'IA d'inventer des fonctions ou d'utiliser des syntaxes qui n'existent plus, ce qui fait gagner un temps précieux aux développeurs.
+Améliore la pertinence du code généré : En donnant le bon "contexte" (d'où son nom), l'IA génère un code plus fiable et fonctionnel.
 
 ## Fonctionnalités Clés du MVP
 
@@ -182,8 +256,8 @@ CREATE TABLE contacts (
 ## Variables d'Environnement
 
 ```bash
-# Airtable
-AIRTABLE_API_KEY=keyXXXXXXXXXXXXXX
+# Airtable Configuration (existing)
+AIRTABLE_API_KEY=patVeuzyzmUrECCbT.39608f70cb85b60236dacb42374b53d2442c4425d5204e136eed9d492075d833
 AIRTABLE_BASE_ID=apprQLdnVwlbfnioT
 
 # Cloudinary
@@ -326,6 +400,7 @@ https://github.com/workmusicalflow/ns2po-w.git
 - Utiliser terminal-observer (MCP) pour toute commande dont l'exécution est suceptible de prendre du temps. Et en général met à profit tous les serveurs MCP disponibles et utiles à ta progression et ton expérience DevExp.
 - pour tout besoin d'avis experts vous aurai à étendre votre collaboration via des sessions conversationnelles itératives avec mcp**gemini-copilot et mcp**gpt5-copilot. pour évaluer les recommandations puis vous prendrez les meilleurs décisions. pour la documentation au niveau des bibliothèques, builder et framework vous pouvez faire de la recherche web ou utiliser le serveur `mcp context7`.
 - **vérificateur de types pour le projet TypeScript** :
+
   ```bash
   cd /Users/ns2poportable/Desktop/ns2po-w/apps/election-mvp && pnpm exec tsc --noEmit
   ```
@@ -335,17 +410,19 @@ https://github.com/workmusicalflow/ns2po-w.git
 ### 🔧 Scripts de Maintenance et Interfaces Admin
 
 **Gestion des Assets** :
+
 ```bash
 # CLI complet de gestion des assets (Cloudinary, Airtable, Turso)
 node scripts/asset-manager.mjs <command> [options]
 
 # Commandes disponibles :
 node scripts/asset-manager.mjs add <file-path>        # Upload asset
-node scripts/asset-manager.mjs remove <public-id>    # Supprimer asset  
+node scripts/asset-manager.mjs remove <public-id>    # Supprimer asset
 node scripts/asset-manager.mjs sync                  # Synchronisation complète
 ```
 
 **Synchronisation Performance** :
+
 ```bash
 # Scripts optimisés pour la sync Airtable ↔ Turso
 node scripts/sync-performance.mjs <command>
@@ -357,25 +434,29 @@ node scripts/sync-performance.mjs health   # État de santé de la sync
 ```
 
 **Interface Admin** :
+
 - `/admin/assets` : Gestion visuelle des assets avec preview et métriques
 - `/admin/assets/upload` : Interface d'upload avec drag & drop et validation
 - Convention de nommage : `[type]-[description]-[variant].[ext]`
 - Validation automatique : formats, taille, optimisation Cloudinary
 
 **Composables Métier** :
+
 - `useQuoteCalculator()` : Calcul de devis avec remises volume/client
 - `useContactForm()` : Validation et soumission formulaires
 - `useProducts()` : Interface Airtable pour le catalogue
 - `useDatabase()` : Services Turso (clients, commandes, paiements)
 
 **Architecture de Données** :
+
 - **Airtable** : Source de vérité (produits, catégories, règles prix)
-- **Turso** : Cache performant + données métier (clients, commandes)  
+- **Turso** : Cache performant + données métier (clients, commandes)
 - **Cloudinary** : Assets optimisés avec transformations automatiques
 
 ## 🔍 Monitoring SonarCloud
 
 ### Configuration Projet SonarCloud
+
 - **Projet** : `workmusicalflow_ns2po-w`
 - **Organisation** : `workmusicalflow`
 - **Token d'accès** : `e2f7e9976d2bfce91c1eb6de29b1118835d88884`
@@ -399,6 +480,7 @@ curl -H "Authorization: Bearer e2f7e9976d2bfce91c1eb6de29b1118835d88884" \
 ### 🎯 Analyse des Retours SonarCloud
 
 **Métriques clés à surveiller** :
+
 - `alert_status` : Statut global de la Quality Gate (OK/ERROR)
 - `bugs` : Nombre de bugs détectés
 - `vulnerabilities` : Vulnérabilités de sécurité
@@ -410,21 +492,102 @@ curl -H "Authorization: Bearer e2f7e9976d2bfce91c1eb6de29b1118835d88884" \
 - `sqale_rating` : Note de maintenabilité (1=A, 2=B, 3=C, 4=D, 5=E)
 
 **Conditions Quality Gate** :
+
 - `new_reliability_rating` : ≤ 1 (A) pour nouveau code
-- `new_security_rating` : ≤ 1 (A) pour nouveau code  
+- `new_security_rating` : ≤ 1 (A) pour nouveau code
 - `new_maintainability_rating` : ≤ 1 (A) pour nouveau code
 - `new_coverage` : ≥ 80% pour nouveau code
 - `new_duplicated_lines_density` : ≤ 3% pour nouveau code
 - `new_security_hotspots_reviewed` : 100% pour nouveau code
 
 **Types d'issues par priorité** :
+
 1. **CRITICAL/BLOCKER** : Problèmes bloquants (vulnérabilités critiques)
 2. **MAJOR** : Problèmes importants (bugs, accessibilité)
 3. **MINOR** : Améliorations (code smells, optimisations)
 4. **INFO** : Informations (TODO, commentaires)
 
 **Focus sécurité MVP** :
+
 - Vulnérabilités dans les uploads de fichiers
 - Validation des entrées utilisateur
 - Protection contre les injections (SQL, XSS)
 - Gestion sécurisée des tokens et secrets
+
+## 🔄 Workflow Post-Push SonarCloud
+
+### Processus Automatisé Post-Commit
+
+**Après chaque `git push origin main`** :
+
+1. **Déclenchement automatique** des GitHub Actions workflows :
+   - `Build and Quality Gate` : Build du projet + analyse SonarCloud
+   - `Code Quality Check` : Vérifications qualité complémentaires
+
+2. **Monitoring des workflows** :
+
+   ```bash
+   # Vérifier le statut des workflows en cours
+   gh run list --limit 3
+
+   # Surveiller un workflow spécifique
+   gh run watch [RUN_ID]
+   ```
+
+3. **Récupération des nouvelles métriques SonarCloud** (après ~2-3 minutes) :
+
+   ```bash
+   # Status global de la Quality Gate
+   curl -H "Authorization: Bearer e2f7e9976d2bfce91c1eb6de29b1118835d88884" \
+     "https://sonarcloud.io/api/qualitygates/project_status?projectKey=workmusicalflow_ns2po-w"
+
+   # Nouvelles issues détectées
+   curl -H "Authorization: Bearer e2f7e9976d2bfce91c1eb6de29b1118835d88884" \
+     "https://sonarcloud.io/api/issues/search?componentKeys=workmusicalflow_ns2po-w&organization=workmusicalflow&ps=500&createdAfter=$(date -d '10 minutes ago' -Iseconds)"
+   ```
+
+4. **Analyse des retours** :
+   - ✅ **Quality Gate PASSED** : Continuer le développement
+   - ❌ **Quality Gate FAILED** : Corriger les nouvelles issues avant de continuer
+   - 📊 **Métriques améliorées** : Documenter les gains de qualité
+
+### Script d'Automatisation Recommandé
+
+```bash
+# Workflow complet post-push
+#!/bin/bash
+echo "🚀 Monitoring post-push SonarCloud..."
+
+# 1. Attendre que les workflows se lancent
+sleep 30
+
+# 2. Surveiller l'exécution
+echo "📊 Workflows en cours :"
+gh run list --limit 3
+
+# 3. Attendre la fin de l'analyse (2-3 minutes)
+echo "⏳ Attente de l'analyse SonarCloud (3 minutes)..."
+sleep 180
+
+# 4. Récupérer le nouveau statut
+echo "📈 Nouveau statut Quality Gate :"
+curl -s -H "Authorization: Bearer e2f7e9976d2bfce91c1eb6de29b1118835d88884" \
+  "https://sonarcloud.io/api/qualitygates/project_status?projectKey=workmusicalflow_ns2po-w" | jq '.projectStatus'
+
+# 5. Lister les nouvelles issues
+echo "🔍 Nouvelles issues détectées :"
+curl -s -H "Authorization: Bearer e2f7e9976d2bfce91c1eb6de29b1118835d88884" \
+  "https://sonarcloud.io/api/issues/search?componentKeys=workmusicalflow_ns2po-w&organization=workmusicalflow&ps=100&createdAfter=$(date -d '10 minutes ago' -Iseconds)" | jq '.issues | length'
+```
+
+### Cycle d'Amélioration Continue
+
+**Chaque push** devient une opportunité d'amélioration :
+
+1. **Corriger** les issues critiques/majeures détectées
+2. **Commiter** les corrections avec un message descriptif
+3. **Pusher** pour déclencher une nouvelle analyse
+4. **Monitorer** l'évolution des métriques
+5. **Répéter** jusqu'à obtenir une Quality Gate stable
+
+**Objectif MVP** : Maintenir une Quality Gate ✅ **PASSED** en permanence

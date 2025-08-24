@@ -5,11 +5,9 @@
 
 export default defineEventHandler(async (_event) => {
   try {
-    // Utiliser le MCP Airtable pour récupérer les produits
-    const _baseId = 'apprQLdnVwlbfnioT'
-    const _tableId = 'tbldm6u6qQczFxwvC'
-    
-    // Note: Dans un vrai projet, on utiliserait le MCP server-side
+    // Note: Dans un vrai projet, on utiliserait le MCP Airtable server-side
+    // const baseId = 'apprQLdnVwlbfnioT'
+    // const tableId = 'tbldm6u6qQczFxwvC'
     // Pour l'instant, on simule les données basées sur ce qu'on a créé
     const mockProducts = [
       {

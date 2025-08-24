@@ -191,7 +191,7 @@ beforeEach(() => {
   if (!fs.existsSync(global.TEST_PATHS.tempAssets)) {
     try {
       fs.mkdirSync(global.TEST_PATHS.tempAssets, { recursive: true });
-    } catch (error) {
+    } catch (_error) {
       // Ignore si le dossier existe déjà
     }
   }

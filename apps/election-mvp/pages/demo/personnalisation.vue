@@ -28,13 +28,19 @@
             @click="selectedProduct = product"
           >
             <div class="product-image">
-              <img 
-                v-if="product.image" 
-                :src="product.image" 
+              <AdvancedResponsiveImage
+                v-if="product.image"
+                :public-id-or-url="getPublicIdFromProduct(product)"
                 :alt="product.name"
-                class="w-full h-32 object-cover"
-              >
-              <div v-else class="w-full h-32 bg-gray-200 flex items-center justify-center">
+                context="product"
+                :options="{ height: 128, crop: 'fill', quality: 'auto' }"
+                img-class="w-full h-32 object-cover rounded-t-lg"
+                container-class="w-full h-32 relative overflow-hidden rounded-t-lg"
+                root-margin="100px"
+                custom-sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 300px"
+                :show-debug-info="false"
+              />
+              <div v-else class="w-full h-32 bg-gray-200 flex items-center justify-center rounded-t-lg">
                 <span class="text-gray-500">{{ product.name }}</span>
               </div>
             </div>
@@ -79,6 +85,7 @@
 import { ref } from 'vue'
 import ProductPreview from '../../components/ProductPreview.vue'
 import type { Product, ProductCustomization } from '@ns2po/types'
+import { useCloudinaryImage } from '~/composables/useCloudinaryImage'
 
 // Configuration de la page
 definePageMeta({
@@ -86,7 +93,22 @@ definePageMeta({
   description: 'Testez la personnalisation de produits avec prévisualisation temps réel'
 })
 
-// Produits de démonstration
+// Composable pour optimiser les images Cloudinary
+const { getProductImageUrl } = useCloudinaryImage()
+
+// Helper pour extraire le public_id des produits
+const getPublicIdFromProduct = (product: Product): string => {
+  // Pour les produits de démo, utiliser directement le public_id
+  const publicIds: Record<string, string> = {
+    'demo-tshirt': 'ns2po-w/products/textile-tshirt-001.jpg',
+    'demo-polo': 'ns2po-w/products/textile-polo-001.jpg',
+    'demo-casquette': 'ns2po-w/products/textile-casquette-001.jpg'
+  }
+  
+  return publicIds[product.id] || product.id
+}
+
+// Produits de démonstration avec images optimisées
 const demoProducts: Product[] = [
   {
     id: 'demo-tshirt',
@@ -96,7 +118,7 @@ const demoProducts: Product[] = [
     minQuantity: 10,
     maxQuantity: 1000,
     description: 'T-shirt 100% coton, disponible en plusieurs couleurs',
-    image: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400&h=400&fit=crop&crop=center',
+    image: getProductImageUrl('ns2po-w/products/textile-tshirt-001.jpg'),
     tags: ['coton', 'unisexe', 'personnalisable'],
     isActive: true
   },
@@ -108,7 +130,7 @@ const demoProducts: Product[] = [
     minQuantity: 5,
     maxQuantity: 500,
     description: 'Polo professionnel en coton piqué',
-    image: 'https://images.unsplash.com/photo-1586790170083-2f9ceadc732d?w=400&h=400&fit=crop&crop=center',
+    image: getProductImageUrl('ns2po-w/products/textile-polo-001.jpg'),
     tags: ['polo', 'professionnel', 'coton'],
     isActive: true
   },
@@ -120,7 +142,7 @@ const demoProducts: Product[] = [
     minQuantity: 20,
     maxQuantity: 2000,
     description: 'Casquette ajustable avec visière incurvée',
-    image: 'https://images.unsplash.com/photo-1588850561407-ed78c282e89b?w=400&h=400&fit=crop&crop=center',
+    image: getProductImageUrl('ns2po-w/products/textile-casquette-001.jpg'),
     tags: ['casquette', 'ajustable', 'visière'],
     isActive: true
   }

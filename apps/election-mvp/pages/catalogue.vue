@@ -9,6 +9,73 @@
         <p class="text-gray-600">
           Découvrez notre gamme complète de produits personnalisables
         </p>
+        
+        <!-- Message d'inspiration si arrivé via une réalisation -->
+        <div 
+          v-if="inspirationContext"
+          class="mt-4 p-4 bg-accent/10 border border-accent/20 rounded-lg"
+        >
+          <div class="flex items-center gap-3">
+            <svg class="w-5 h-5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+            </svg>
+            <div>
+              <p class="font-medium text-accent">
+                Inspiré par "{{ inspirationContext.realisationTitle }}"
+              </p>
+              <p class="text-sm text-gray-600">
+                Explorez nos produits similaires pour créer votre propre réalisation
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section "Inspirez-vous" si contexte d'inspiration -->
+      <div v-if="inspirationContext || inspirationLoading" class="mb-8">
+        <Card class="bg-gradient-to-r from-accent/5 to-primary/5 border-accent/20">
+          <div class="mb-4">
+            <h2 class="text-xl font-semibold text-text-main mb-2">
+              💡 Inspirez-vous de nos réalisations
+            </h2>
+            <p class="text-gray-600 text-sm">
+              Ces créations pourraient vous donner des idées pour votre projet
+            </p>
+          </div>
+          
+          <!-- État de chargement -->
+          <div v-if="inspirationLoading" class="flex justify-center py-8">
+            <div class="inline-block w-6 h-6 border-4 border-accent border-t-transparent rounded-full animate-spin" />
+            <p class="ml-3 text-gray-600 text-sm">
+              Chargement des suggestions...
+            </p>
+          </div>
+          
+          <!-- Suggestions de réalisations -->
+          <div v-else-if="suggestedRealisations.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <RealisationCard
+              v-for="realisation in suggestedRealisations.slice(0, 3)"
+              :key="realisation.id"
+              :realisation="realisation"
+              :show-related-products="false"
+              :max-tags="2"
+              class="transform scale-95"
+              @inspire="handleRealisationInspiration"
+              @view-details="handleViewRealisationDetails"
+              @select="handleViewRealisationDetails"
+            />
+          </div>
+          
+          <!-- Message si pas de suggestions -->
+          <div v-else-if="inspirationContext && suggestedRealisations.length === 0" class="text-center py-6">
+            <p class="text-gray-600 text-sm mb-4">
+              Aucune réalisation similaire trouvée pour le moment
+            </p>
+            <Button variant="outline" size="small" @click="navigateTo('/realisations')">
+              Voir toutes nos réalisations
+            </Button>
+          </div>
+        </Card>
       </div>
 
       <!-- Search Bar -->
@@ -288,11 +355,67 @@ const addToQuote = (product: Product) => {
   }
 }
 
+// Gestion du contexte d'inspiration
+const route = useRoute()
+const inspirationContext = ref(null)
+const suggestedRealisations = ref([])
+const inspirationLoading = ref(false)
+
+// Composable pour les réalisations
+const { getInspirationSuggestions, getRealisation } = useRealisations()
+
+// Initialisation du contexte d'inspiration
+const initInspirationContext = async () => {
+  const inspiredBy = route.query.inspiredBy as string
+  if (inspiredBy) {
+    inspirationLoading.value = true
+    try {
+      const realisation = await getRealisation(inspiredBy)
+      if (realisation) {
+        inspirationContext.value = {
+          realisationId: realisation.id,
+          realisationTitle: realisation.title
+        }
+        
+        // Suggestions d'inspiration basées sur cette réalisation
+        const productId = route.query.product as string
+        suggestedRealisations.value = getInspirationSuggestions(
+          productId,
+          realisation.categoryIds[0],
+          realisation.tags
+        )
+      }
+    } catch (error) {
+      console.error('Erreur lors du chargement du contexte d\'inspiration:', error)
+      // En cas d'erreur, on cache la section inspiration
+      inspirationContext.value = null
+    } finally {
+      inspirationLoading.value = false
+    }
+  }
+}
+
+// Gestionnaires d'événements pour les réalisations
+const handleRealisationInspiration = (realisation) => {
+  // Redirection vers le catalogue avec contexte d'inspiration mis à jour
+  const productId = realisation.productIds[0]
+  if (productId) {
+    navigateTo(`/catalogue?inspiredBy=${realisation.id}&product=${productId}`)
+  } else {
+    navigateTo(`/catalogue?inspiredBy=${realisation.id}`)
+  }
+}
+
+const handleViewRealisationDetails = (realisation) => {
+  navigateTo(`/realisations/${realisation.id}`)
+}
+
 // Chargement initial
 onMounted(async () => {
   await Promise.all([
     loadProducts(),
-    loadCategories()
+    loadCategories(),
+    initInspirationContext()
   ])
 })
 </script>
