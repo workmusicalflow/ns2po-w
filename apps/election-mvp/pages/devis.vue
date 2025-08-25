@@ -1,292 +1,99 @@
 <template>
   <div class="quote-page">
-    <!-- Hero Section -->
-    <section class="hero-section">
-      <div class="container mx-auto px-4">
-        <div class="hero-content">
-          <h1 class="hero-title">
-            Calculateur de devis personnalisé
-          </h1>
-          <p class="hero-subtitle">
-            Créez votre devis en quelques clics pour vos gadgets électoraux personnalisés
-          </p>
-          
-          <!-- Message contextuel d'inspiration -->
-          <div 
-            v-if="inspirationContext"
-            class="mt-4 p-3 bg-accent/10 border border-accent/20 rounded-lg inline-flex items-center gap-2"
-          >
-            <svg class="w-4 h-4 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-            </svg>
-            <span class="text-sm text-accent font-medium">
-              Inspiré par "{{ inspirationContext.realisationTitle }}"
-            </span>
-          </div>
-          <div class="hero-features">
-            <div class="feature">
-              <span class="feature-icon">⚡</span>
-              <span>Calcul en temps réel</span>
-            </div>
-            <div class="feature">
-              <span class="feature-icon">💰</span>
-              <span>Remises automatiques</span>
-            </div>
-            <div class="feature">
-              <span class="feature-icon">📊</span>
-              <span>Devis détaillé</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
     <!-- Main Content -->
     <div class="main-content">
-      <div class="container mx-auto px-4">
-        <!-- Navigation Steps -->
-        <div class="steps-nav">
-          <div class="steps-container">
-            <div 
-              v-for="(step, index) in steps"
-              :key="step.id"
-              :class="[
-                'step',
-                {
-                  'step--active': currentStep === index,
-                  'step--completed': index < currentStep,
-                  'step--disabled': index > currentStep
-                }
-              ]"
-              @click="goToStep(index)"
-            >
-              <div class="step-number">
-                {{ index + 1 }}
-              </div>
-              <div class="step-label">
-                {{ step.label }}
-              </div>
-            </div>
-          </div>
-        </div>
-
+      <div class="container mx-auto px-4 py-8">
         <!-- Step Content -->
         <div class="step-content">
-          <!-- Étape 1: Informations client -->
-          <div v-if="currentStep === 0" class="step-panel">
-            <h2 class="step-title">
-              Informations client
-            </h2>
-            <p class="step-description">
-              Renseignez vos informations pour personnaliser votre devis
-            </p>
+          <!-- Étape 1: Sélection Bundle/Packs de campagne -->
+          <div v-if="currentStep === 1" class="step-panel">
+            <!-- Interface Bundle Selector -->
+            <div class="bundle-selector-interface">
+              <!-- Sélecteur de bundles -->
+              <BundleSelector
+                :bundles="filteredBundles"
+                :loading="bundlesLoading"
+                :error="bundlesError"
+                :featured-first="true"
+                :show-filters="true"
+                :compact="false"
+                @bundle-selected="onBundleSelected"
+                @custom-selection="onCustomSelection"
+                @filter-changed="onFilterChanged"
+              />
 
-            <form class="customer-form" @submit.prevent="nextStep">
-              <div class="form-grid">
-                <div class="form-group">
-                  <label class="form-label">Type de client *</label>
-                  <select v-model="customerInfo.customerType" class="form-select" required>
-                    <option value="">
-                      Sélectionner
-                    </option>
-                    <option value="individual">
-                      Particulier
-                    </option>
-                    <option value="party">
-                      Parti politique
-                    </option>
-                    <option value="candidate">
-                      Candidat
-                    </option>
-                    <option value="organization">
-                      Organisation
-                    </option>
-                  </select>
-                </div>
-
-                <div class="form-group">
-                  <label class="form-label">Nom complet *</label>
-                  <input 
-                    v-model="customerInfo.firstName"
-                    type="text" 
-                    class="form-input" 
-                    placeholder="Votre nom complet"
-                    required
-                  >
-                </div>
-
-                <div class="form-group">
-                  <label class="form-label">Email *</label>
-                  <input 
-                    v-model="customerInfo.email"
-                    type="email" 
-                    class="form-input" 
-                    placeholder="votre@email.com"
-                    required
-                  >
-                </div>
-
-                <div class="form-group">
-                  <label class="form-label">Téléphone *</label>
-                  <input 
-                    v-model="customerInfo.phone"
-                    type="tel" 
-                    class="form-input" 
-                    placeholder="+225 XX XX XX XX"
-                    required
-                  >
-                </div>
-
-                <div class="form-group">
-                  <label class="form-label">Organisation/Parti</label>
-                  <input 
-                    v-model="customerInfo.company"
-                    type="text" 
-                    class="form-input" 
-                    placeholder="Nom de votre organisation"
-                  >
-                </div>
-
-                <div class="form-group">
-                  <label class="form-label">Ville</label>
-                  <input 
-                    v-model="customerInfo.address!.city"
-                    type="text" 
-                    class="form-input" 
-                    placeholder="Abidjan, Bouaké, etc."
-                  >
-                </div>
+              <!-- Customizer de panier rapide (affiché si sélection active) -->
+              <div
+                v-if="
+                  bundleSelectionSummary &&
+                    bundleSelectionSummary.totalItems > 0
+                "
+                class="mt-8"
+              >
+                <QuickCartCustomizer
+                  :show-suggestions="true"
+                  :max-suggestions="4"
+                  :compact="false"
+                  @quote-requested="proceedToConfiguration"
+                  @selection-cleared="onSelectionCleared"
+                  @product-added="onProductAdded"
+                  @product-removed="onProductRemoved"
+                  @quantity-changed="onQuantityChanged"
+                />
               </div>
 
-              <div class="form-actions">
-                <Button type="submit" variant="primary">
-                  Continuer vers les produits
-                </Button>
-              </div>
-            </form>
-          </div>
-
-          <!-- Étape 2: Sélection produits -->
-          <div v-else-if="currentStep === 1" class="step-panel">
-            <h2 class="step-title">
-              Sélection des produits
-            </h2>
-            <p class="step-description">
-              Choisissez vos produits dans notre catalogue
-            </p>
-
-            <!-- Catalogue de produits -->
-            <div class="product-catalog">
-              <!-- Filtres -->
-              <div class="catalog-filters">
-                <div class="filter-group">
-                  <label class="filter-label">Catégorie</label>
-                  <select v-model="selectedCategory" class="filter-select" @change="filterProducts">
-                    <option value="">
-                      Toutes les catégories
-                    </option>
-                    <option v-for="category in categories" :key="category.id" :value="category.id">
-                      {{ category.name }}
-                    </option>
-                  </select>
-                </div>
-
-                <div class="filter-group">
-                  <label class="filter-label">Recherche</label>
-                  <input 
-                    v-model="searchQuery"
-                    type="text"
-                    class="filter-input" 
-                    placeholder="Rechercher un produit..." 
-                    @input="filterProducts"
+              <!-- Message d'encouragement si aucune sélection -->
+              <div v-else class="text-center py-12 bg-gray-50 rounded-lg mt-8">
+                <div class="max-w-md mx-auto">
+                  <div
+                    class="w-16 h-16 mx-auto mb-4 bg-primary/10 rounded-full flex items-center justify-center"
                   >
-                </div>
-              </div>
-
-              <!-- Liste des produits -->
-              <div class="products-grid">
-                <div 
-                  v-for="product in filteredProducts"
-                  :key="product.id"
-                  class="product-card"
-                >
-                  <div class="product-image">
-                    <img 
-                      :src="product.image || '/placeholder-product.jpg'"
-                      :alt="product.name"
-                      class="product-img"
+                    <svg
+                      class="w-8 h-8 text-primary"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
                     >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"
+                      />
+                    </svg>
                   </div>
-                  
-                  <div class="product-info">
-                    <h3 class="product-name">
-                      {{ product.name }}
-                    </h3>
-                    <p class="product-category">
-                      {{ product.category }}
-                    </p>
-                    <p class="product-price">
-                      À partir de {{ formatCurrency(product.basePrice) }}
-                    </p>
-                    <p class="product-min-qty">
-                      Quantité minimum: {{ product.minQuantity }}
-                    </p>
-                  </div>
-
-                  <div class="product-actions">
-                    <Button 
-                      variant="primary"
-                      size="small"
-                      :disabled="isProductInQuote(product.id)"
-                      @click="addProductToQuote(product)"
-                    >
-                      {{ isProductInQuote(product.id) ? 'Déjà ajouté' : 'Ajouter' }}
-                    </Button>
-                  </div>
+                  <h3
+                    class="text-lg font-heading font-semibold text-gray-900 mb-2"
+                  >
+                    Prêt à conquérir votre électorat ?
+                  </h3>
+                  <p class="text-gray-600">
+                    Choisissez un pack adapté à votre campagne ou créez votre
+                    sélection sur-mesure. Nos experts ont préparé des
+                    combinaisons gagnantes pour chaque niveau d'élection.
+                  </p>
                 </div>
-              </div>
-
-              <!-- Pagination -->
-              <div v-if="totalPages > 1" class="pagination">
-                <Button 
-                  :disabled="currentPage === 1"
-                  variant="outline"
-                  size="small"
-                  @click="previousPage"
-                >
-                  Précédent
-                </Button>
-                
-                <span class="pagination-info">
-                  Page {{ currentPage }} sur {{ totalPages }}
-                </span>
-                
-                <Button 
-                  :disabled="currentPage === totalPages"
-                  variant="outline"
-                  size="small"
-                  @click="nextPage"
-                >
-                  Suivant
-                </Button>
               </div>
             </div>
 
-            <div class="step-actions">
-              <Button variant="outline" @click="previousStep">
-                Retour
-              </Button>
-              <Button 
-                variant="primary" 
-                :disabled="quoteItems.length === 0"
+            <div class="step-actions justify-center">
+              <Button
+                variant="primary"
+                size="lg"
+                :disabled="
+                  !bundleSelectionSummary ||
+                    bundleSelectionSummary.totalItems === 0
+                "
                 @click="nextStep"
               >
-                Configurer les produits ({{ quoteItems.length }})
+                Configurer la sélection ({{
+                  bundleSelectionSummary?.totalItems || 0
+                }})
               </Button>
             </div>
           </div>
 
-          <!-- Étape 3: Configuration et calcul -->
+          <!-- Étape 2: Configuration et calcul -->
           <div v-else-if="currentStep === 2" class="step-panel">
             <h2 class="step-title">
               Configuration et devis
@@ -311,8 +118,8 @@
               <Button variant="outline" @click="previousStep">
                 Retour aux produits
               </Button>
-              <Button 
-                variant="primary" 
+              <Button
+                variant="primary"
                 :disabled="!currentCalculation"
                 @click="nextStep"
               >
@@ -321,7 +128,7 @@
             </div>
           </div>
 
-          <!-- Étape 4: Finalisation -->
+          <!-- Étape 3: Finalisation -->
           <div v-else-if="currentStep === 3" class="step-panel">
             <h2 class="step-title">
               Finalisation du devis
@@ -339,7 +146,10 @@
                 <div class="customer-summary">
                   <p><strong>Nom:</strong> {{ customerInfo.firstName }}</p>
                   <p><strong>Email:</strong> {{ customerInfo.email }}</p>
-                  <p><strong>Type:</strong> {{ getCustomerTypeLabel(customerInfo.customerType) }}</p>
+                  <p>
+                    <strong>Type:</strong>
+                    {{ getCustomerTypeLabel(customerInfo.customerType) }}
+                  </p>
                   <p v-if="customerInfo.company">
                     <strong>Organisation:</strong> {{ customerInfo.company }}
                   </p>
@@ -352,14 +162,18 @@
                   Produits commandés
                 </h3>
                 <div class="products-summary">
-                  <div 
+                  <div
                     v-for="item in quoteItems"
                     :key="item.id"
                     class="product-summary-item"
                   >
-                    <span class="product-summary-name">{{ item.product?.name }}</span>
+                    <span class="product-summary-name">{{
+                      item.product?.name
+                    }}</span>
                     <span class="product-summary-qty">{{ item.quantity }} unités</span>
-                    <span class="product-summary-price">{{ formatCurrency(getItemTotal(item)) }}</span>
+                    <span class="product-summary-price">{{
+                      formatCurrency(getItemTotal(item))
+                    }}</span>
                   </div>
                 </div>
               </div>
@@ -370,19 +184,30 @@
                   <div class="total-breakdown">
                     <div class="total-line">
                       <span>Sous-total:</span>
-                      <span>{{ formatCurrency(currentCalculation.subtotal) }}</span>
+                      <span>{{
+                        formatCurrency(currentCalculation.subtotal)
+                      }}</span>
                     </div>
-                    <div v-if="currentCalculation.discountAmount > 0" class="total-line discount">
+                    <div
+                      v-if="currentCalculation.discountAmount > 0"
+                      class="total-line discount"
+                    >
                       <span>Remises:</span>
-                      <span>-{{ formatCurrency(currentCalculation.discountAmount) }}</span>
+                      <span>-{{
+                        formatCurrency(currentCalculation.discountAmount)
+                      }}</span>
                     </div>
                     <div class="total-line">
                       <span>TVA:</span>
-                      <span>{{ formatCurrency(currentCalculation.taxAmount) }}</span>
+                      <span>{{
+                        formatCurrency(currentCalculation.taxAmount)
+                      }}</span>
                     </div>
                     <div class="total-line final">
                       <span>Total TTC:</span>
-                      <span class="final-amount">{{ formatCurrency(currentCalculation.totalAmount) }}</span>
+                      <span class="final-amount">{{
+                        formatCurrency(currentCalculation.totalAmount)
+                      }}</span>
                     </div>
                   </div>
                 </div>
@@ -391,19 +216,35 @@
               <!-- Actions finales -->
               <div class="final-actions">
                 <div class="action-grid">
-                  <Button variant="primary" class="action-btn" @click="downloadPDF">
+                  <Button
+                    variant="primary"
+                    class="action-btn"
+                    @click="downloadPDF"
+                  >
                     📄 Télécharger le devis PDF
                   </Button>
-                  
-                  <Button variant="secondary" class="action-btn" @click="sendByEmail">
+
+                  <Button
+                    variant="secondary"
+                    class="action-btn"
+                    @click="sendByEmail"
+                  >
                     ✉️ Envoyer par email
                   </Button>
-                  
-                  <Button variant="outline" class="action-btn" @click="startPreorder">
+
+                  <Button
+                    variant="outline"
+                    class="action-btn"
+                    @click="startPreorder"
+                  >
                     🛒 Passer la pré-commande
                   </Button>
-                  
-                  <Button variant="outline" class="action-btn" @click="requestMeeting">
+
+                  <Button
+                    variant="outline"
+                    class="action-btn"
+                    @click="requestMeeting"
+                  >
                     📞 Demander un rendez-vous
                   </Button>
                 </div>
@@ -437,233 +278,512 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-import { Button } from '@ns2po/ui'
-import type { CustomerInfo, Product, QuoteItem, QuoteCalculation, Category } from '@ns2po/types'
+import { ref, onMounted, computed, provide } from "vue";
+import {
+  Button,
+  BundleSelector,
+  QuickCartCustomizer,
+  PersistentSummary,
+} from "@ns2po/ui";
+import type {
+  CustomerInfo,
+  QuoteItem as QuoteItemType,
+  QuoteCalculation,
+  Category,
+  CampaignBundle,
+} from "@ns2po/types";
+import { useQuoteItems } from "~/composables/useQuoteItems";
+import { useCampaignBundles } from "~/composables/useCampaignBundles";
 
 // Import du composant QuoteCalculator (sera créé si nécessaire)
 // import QuoteCalculator from '~/components/QuoteCalculator.vue'
 
 useHead({
-  title: 'Devis - NS2PO Élections',
+  title: "Devis - NS2PO Élections",
   meta: [
     {
-      name: 'description',
-      content: 'Générez votre devis personnalisé pour vos gadgets de campagne électorale'
-    }
-  ]
-})
+      name: "description",
+      content:
+        "Générez votre devis personnalisé pour vos gadgets de campagne électorale",
+    },
+  ],
+});
 
 // Variables d'état pour les étapes
-const currentStep = ref(0)
+const currentStep = ref(1); // Commencer directement avec Bundle Selector
 
 const steps = [
-  { id: 'customer', label: 'Informations' },
-  { id: 'products', label: 'Produits' },
-  { id: 'calculate', label: 'Configuration' },
-  { id: 'finalize', label: 'Finalisation' }
-]
+  { id: "products", label: "Arsenal de Campagne" },
+  { id: "calculate", label: "Configuration" },
+  { id: "finalize", label: "Finalisation" },
+];
 
 // État réactif
 const customerInfo = ref<Partial<CustomerInfo>>({
-  firstName: '',
-  lastName: '',
-  email: '',
-  phone: '',
-  company: '',
+  firstName: "",
+  lastName: "",
+  email: "",
+  phone: "",
+  company: "",
   customerType: undefined,
   address: {
-    street: '',
-    city: '',
-    region: '',
-    country: 'CI'
-  }
-})
+    street: "",
+    city: "",
+    region: "",
+    country: "CI",
+  },
+});
 
-// État des produits
-const categories = ref<Category[]>([])
-const filteredProducts = ref<Product[]>([])
-const selectedCategory = ref('')
-const searchQuery = ref('')
-const currentPage = ref(1)
-const totalPages = ref(1)
-const quoteItems = ref<QuoteItem[]>([])
-const currentCalculation = ref<QuoteCalculation | null>(null)
+// Utilisation du composable useQuoteItems pour récupérer les articles depuis Airtable
+const {
+  quoteItems: availableQuoteItems,
+  loading: loadingQuoteItems,
+  error: quoteItemsError,
+  loadQuoteItems,
+  searchQuoteItems,
+  quoteItemsByCategory,
+} = useQuoteItems();
+
+// Bundle Selector System - Intégration du nouveau système de packs de campagne
+const {
+  loading: bundlesLoading,
+  error: bundlesError,
+  selectedBundle,
+  selectedBundleId,
+  multiSelectionState,
+  selectionSummary: bundleSelectionSummary,
+  currentCart,
+  availableBundles,
+  filteredBundles,
+  selectBundle,
+  clearSelection,
+  updateBundleProductQuantity,
+  removeBundleProduct,
+  updateCustomProductQuantity,
+  removeFromCustomSelection,
+  addCustomProduct,
+  reset: resetBundleSelection,
+  setFilters,
+} = useCampaignBundles();
+
+// État local pour les filtres et la sélection
+const selectedCategory = ref("");
+const searchQuery = ref("");
+const currentPage = ref(1);
+const totalPages = ref(1);
+
+// État des articles sélectionnés pour le devis
+const selectedQuoteItems = ref<QuoteItemType[]>([]);
+const currentCalculation = ref<QuoteCalculation | null>(null);
+
+// Catégories disponibles (computed depuis les articles de devis)
+const categories = computed(() => {
+  const categorySet = new Set<string>();
+  availableQuoteItems.value.forEach((item) => {
+    categorySet.add(item.category);
+  });
+  return Array.from(categorySet).map((cat) => ({
+    id: cat,
+    name: cat,
+    description: "",
+    slug: cat.toLowerCase().replace(/\s+/g, "-"),
+    isActive: true,
+  }));
+});
+
+// Articles filtrés selon les critères de recherche et catégorie
+const filteredProducts = computed(() => {
+  let filtered = availableQuoteItems.value;
+
+  // Filtrage par catégorie
+  if (selectedCategory.value) {
+    filtered = filtered.filter(
+      (item) => item.category === selectedCategory.value
+    );
+  }
+
+  // Filtrage par recherche
+  if (searchQuery.value.trim()) {
+    const query = searchQuery.value.toLowerCase().trim();
+    filtered = filtered.filter(
+      (item) =>
+        item.name.toLowerCase().includes(query) ||
+        item.category.toLowerCase().includes(query)
+    );
+  }
+
+  // Transformer les QuoteItems en Product pour compatibilité avec le template existant
+  return filtered.map((item) => ({
+    id: item.id,
+    name: item.name,
+    category: item.category,
+    basePrice: item.basePrice,
+    minQuantity: item.minQuantity,
+    maxQuantity: 10000, // Valeur par défaut
+    description: `Article de devis: ${item.name}`,
+    image: undefined,
+    tags: [],
+    isActive: item.status === "Active",
+  }));
+});
 
 // Refs pour composants
-const calculatorRef = ref(null)
+const calculatorRef = ref(null);
 
 // Gestion du contexte d'inspiration
-const route = useRoute()
-const inspirationContext = ref(null)
+const route = useRoute();
+const inspirationContext = ref(null);
 
-// Initialisation du contexte d'inspiration
+// Initialisation du contexte d'inspiration et chargement des articles
 onMounted(async () => {
-  const inspiredBy = route.query.inspiredBy as string
-  const productId = route.query.productId as string
-  
+  // Charger les articles de devis depuis Airtable
+  await loadQuoteItems();
+
+  const inspiredBy = route.query.inspiredBy as string;
+  const productId = route.query.productId as string;
+
   if (inspiredBy) {
     try {
-      const { getRealisation } = useRealisations()
-      const realisation = await getRealisation(inspiredBy)
+      const { getRealisation } = useRealisations();
+      const realisation = await getRealisation(inspiredBy);
       if (realisation) {
         inspirationContext.value = {
           realisationId: realisation.id,
-          realisationTitle: realisation.title
-        }
+          realisationTitle: realisation.title,
+        };
       }
     } catch (error) {
-      console.error('Erreur lors du chargement du contexte d\'inspiration:', error)
+      console.error(
+        "Erreur lors du chargement du contexte d'inspiration:",
+        error
+      );
     }
   }
-  
+
   // Si un produit spécifique est fourni, le pré-sélectionner
   if (productId) {
     try {
-      const storedProduct = sessionStorage.getItem('selectedProduct')
+      const storedProduct = sessionStorage.getItem("selectedProduct");
       if (storedProduct) {
-        const productData = JSON.parse(storedProduct)
+        const productData = JSON.parse(storedProduct);
         // Passer directement à l'étape de configuration si un produit est pré-sélectionné
         if (productData.id === productId) {
-          currentStep.value = 2
+          currentStep.value = 2;
         }
       }
     } catch (error) {
-      console.error('Erreur lors de la récupération du produit pré-sélectionné:', error)
+      console.error(
+        "Erreur lors de la récupération du produit pré-sélectionné:",
+        error
+      );
     }
   }
-})
+});
 
 // Méthodes de navigation
 const goToStep = (step: number) => {
-  if (step >= 0 && step < steps.length) {
-    currentStep.value = step
+  if (step >= 1 && step <= steps.length) {
+    currentStep.value = step;
   }
-}
+};
 
 const nextStep = () => {
-  if (currentStep.value < steps.length - 1) {
-    currentStep.value++
+  if (currentStep.value < steps.length) {
+    currentStep.value++;
   }
-}
+};
 
 const previousStep = () => {
-  if (currentStep.value > 0) {
-    currentStep.value--
+  if (currentStep.value > 1) {
+    currentStep.value--;
   }
-}
+};
 
 // Méthodes de filtrage produits
 const filterProducts = () => {
   // Filter products based on category and search query
   // Implementation would go here when backend filtering is available
-}
+};
 
 const nextPage = () => {
   if (currentPage.value < totalPages.value) {
-    currentPage.value++
+    currentPage.value++;
   }
-}
+};
 
 const previousPage = () => {
   if (currentPage.value > 1) {
-    currentPage.value--
+    currentPage.value--;
   }
-}
+};
 
 // Méthodes de gestion des produits
-const addProductToQuote = (product: Product) => {
-  const newItem: QuoteItem = {
+const addProductToQuote = (product: any) => {
+  // Trouver l'article de devis correspondant
+  const quoteItem = availableQuoteItems.value.find(
+    (item) => item.id === product.id
+  );
+  if (!quoteItem) return;
+
+  const newItem: QuoteItemType = {
     id: `item-${Date.now()}`,
     productId: product.id,
     product: product,
-    quantity: product.minQuantity,
-    unitPrice: product.basePrice,
+    quantity: quoteItem.minQuantity,
+    unitPrice: quoteItem.basePrice,
     customizations: [],
-    totalPrice: product.basePrice * product.minQuantity
-  }
-  quoteItems.value.push(newItem)
-}
+    totalPrice: quoteItem.basePrice * quoteItem.minQuantity,
+  };
+  selectedQuoteItems.value.push(newItem);
+};
 
 const isProductInQuote = (productId: string): boolean => {
-  return quoteItems.value.some(item => item.productId === productId)
-}
+  return selectedQuoteItems.value.some((item) => item.productId === productId);
+};
+
+// Computed pour renommer selectedQuoteItems en quoteItems (compatibilité template)
+const quoteItems = computed(() => selectedQuoteItems.value);
 
 const getItemTotal = (item: QuoteItem): number => {
-  return item.totalPrice
-}
+  return item.totalPrice;
+};
 
 // Méthodes de calcul
 const onQuoteUpdated = (calculation: QuoteCalculation) => {
-  currentCalculation.value = calculation
-}
+  currentCalculation.value = calculation;
+};
 
 const formatCurrency = (amount: number): string => {
-  return new Intl.NumberFormat('fr-CI', {
-    style: 'currency',
-    currency: 'XOF',
-    minimumFractionDigits: 0
-  }).format(amount)
-}
+  return new Intl.NumberFormat("fr-CI", {
+    style: "currency",
+    currency: "XOF",
+    minimumFractionDigits: 0,
+  }).format(amount);
+};
 
 const getCustomerTypeLabel = (type?: string): string => {
   const labels: Record<string, string> = {
-    individual: 'Particulier',
-    party: 'Parti politique',
-    candidate: 'Candidat',
-    organization: 'Organisation'
-  }
-  return labels[type || ''] || type || 'Non spécifié'
-}
+    individual: "Particulier",
+    party: "Parti politique",
+    candidate: "Candidat",
+    organization: "Organisation",
+  };
+  return labels[type || ""] || type || "Non spécifié";
+};
 
 // Actions finales
 const downloadQuote = () => {
   // TODO: Implement quote download functionality
-}
+};
 
 const sendQuote = () => {
   // TODO: Implement quote email sending
-}
+};
 
 const saveQuote = () => {
   // TODO: Implement quote saving to database
-}
+};
 
 const downloadPDF = () => {
   // TODO: Implement PDF generation and download
-}
+};
 
 const sendByEmail = () => {
   // TODO: Implement email sending functionality
-}
+};
 
 const startPreorder = () => {
-  navigateTo('/precommande')
-}
+  navigateTo("/precommande");
+};
 
 const requestMeeting = () => {
   // TODO: Implement meeting request functionality
-  navigateTo('/contact?type=meeting')
-}
+  navigateTo("/contact?type=meeting");
+};
 
 const startNewQuote = () => {
   // Réinitialiser le formulaire
-  currentStep.value = 0
+  currentStep.value = 1;
   customerInfo.value = {
-    firstName: '',
-    lastName: '',
-    email: '',
-    phone: '',
-    company: '',
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
+    company: "",
     customerType: undefined,
     address: {
-      street: '',
-      city: '',
-      region: '',
-      country: 'CI'
-    }
+      street: "",
+      city: "",
+      region: "",
+      country: "CI",
+    },
+  };
+  selectedQuoteItems.value = [];
+  currentCalculation.value = null;
+  resetBundleSelection();
+};
+
+// ====================================
+// BUNDLE SELECTOR EVENT HANDLERS
+// ====================================
+
+/**
+ * Gestionnaire de sélection de bundle
+ */
+const onBundleSelected = (bundle: CampaignBundle) => {
+  console.log("🎯 Bundle sélectionné:", bundle.name);
+  selectBundle(bundle.id);
+
+  // Convertir les produits du bundle en articles de devis
+  syncBundleToQuoteItems();
+};
+
+/**
+ * Gestionnaire de sélection personnalisée
+ */
+const onCustomSelection = () => {
+  console.log("🎨 Mode sélection personnalisée activé");
+  clearSelection();
+  // L'utilisateur peut maintenant sélectionner des produits individuellement
+};
+
+/**
+ * Gestionnaire de changement de filtre
+ */
+const onFilterChanged = (filters: any) => {
+  console.log("🔍 Filtres de bundle mis à jour:", filters);
+  setFilters(filters);
+};
+
+/**
+ * Gestionnaire de demande de devis depuis le customizer
+ */
+const proceedToConfiguration = () => {
+  console.log("📊 Procédure vers configuration de devis");
+  nextStep(); // Aller à l'étape de configuration
+};
+
+/**
+ * Gestionnaire de vidage de sélection
+ */
+const onSelectionCleared = () => {
+  console.log("🗑️ Sélection vidée");
+  clearSelection();
+  selectedQuoteItems.value = [];
+};
+
+/**
+ * Gestionnaire d'ajout de produit
+ */
+const onProductAdded = (productId: string) => {
+  console.log("➕ Produit ajouté:", productId);
+  // TODO: Implémenter l'ajout de produit via le catalogue
+};
+
+/**
+ * Gestionnaire de suppression de produit
+ */
+const onProductRemoved = (productId: string) => {
+  console.log("➖ Produit supprimé:", productId);
+  removeFromCustomSelection(productId);
+  syncBundleToQuoteItems();
+};
+
+/**
+ * Gestionnaire de changement de quantité
+ */
+const onQuantityChanged = (productId: string, quantity: number) => {
+  console.log("🔢 Quantité modifiée:", productId, quantity);
+  updateBundleProductQuantity(productId, quantity);
+  syncBundleToQuoteItems();
+};
+
+/**
+ * Synchronise la sélection bundle avec les articles de devis
+ */
+const syncBundleToQuoteItems = () => {
+  // Vider les articles existants
+  selectedQuoteItems.value = [];
+
+  if (selectedBundle.value) {
+    // Si un bundle est sélectionné, convertir ses produits
+    selectedBundle.value.products.forEach((bundleProduct) => {
+      const quoteItem: QuoteItemType = {
+        id: `bundle-${bundleProduct.id}-${Date.now()}`,
+        productId: bundleProduct.id,
+        product: {
+          id: bundleProduct.id,
+          name: bundleProduct.name,
+          basePrice: bundleProduct.basePrice,
+          category: "Bundle",
+          minQuantity: 1,
+          maxQuantity: 10000,
+          description: `Produit du pack: ${selectedBundle.value.name}`,
+          image: undefined,
+          tags: [],
+          isActive: true,
+        },
+        quantity: bundleProduct.quantity,
+        unitPrice: bundleProduct.basePrice,
+        customizations: [],
+        totalPrice: bundleProduct.subtotal,
+      };
+      selectedQuoteItems.value.push(quoteItem);
+    });
+  } else if (multiSelectionState.value.selections.size > 0) {
+    // Si des produits individuels sont sélectionnés
+    multiSelectionState.value.selections.forEach((selection) => {
+      // Trouver le produit dans le catalogue
+      const product = availableQuoteItems.value.find(
+        (item) => item.id === selection.productId
+      );
+      if (product) {
+        const quoteItem: QuoteItemType = {
+          id: `custom-${selection.productId}-${Date.now()}`,
+          productId: selection.productId,
+          product: {
+            id: product.id,
+            name: product.name,
+            basePrice: product.basePrice,
+            category: product.category,
+            minQuantity: product.minQuantity,
+            maxQuantity: 10000,
+            description: `Sélection personnalisée: ${product.name}`,
+            image: undefined,
+            tags: [],
+            isActive: true,
+          },
+          quantity: selection.quantity,
+          unitPrice: product.basePrice,
+          customizations: [],
+          totalPrice: product.basePrice * selection.quantity,
+        };
+        selectedQuoteItems.value.push(quoteItem);
+      }
+    });
   }
-  quoteItems.value = []
-  currentCalculation.value = null
-}
+
+  console.log(
+    "🔄 Articles de devis synchronisés:",
+    selectedQuoteItems.value.length
+  );
+};
+
+// ====================================
+// DEPENDENCY INJECTION POUR COMPOSANTS ENFANTS
+// ====================================
+
+// Fournir l'état bundle aux composants enfants
+provide("selectedBundle", selectedBundle);
+provide("selectedBundleId", selectedBundleId);
+provide("multiSelectionState", multiSelectionState);
+provide("selectionSummary", bundleSelectionSummary);
+provide("currentCart", currentCart);
+
+// Fournir les méthodes bundle aux composants enfants
+provide("updateBundleProductQuantity", updateBundleProductQuantity);
+provide("removeBundleProduct", removeBundleProduct);
+provide("updateCustomProductQuantity", updateCustomProductQuantity);
+provide("removeFromCustomSelection", removeFromCustomSelection);
+provide("reset", resetBundleSelection);
 </script>

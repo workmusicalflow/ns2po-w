@@ -1,3 +1,4 @@
+import { ref, readonly } from "vue";
 import type { CommercialContact } from "@ns2po/types";
 
 /**

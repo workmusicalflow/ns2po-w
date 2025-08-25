@@ -134,36 +134,44 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div class="text-sm space-y-2">
                 <div class="flex items-center gap-2">
-                  <div class="w-2 h-2 rounded-full" :class="themeValidation.colors ? 'bg-success' : 'bg-error'"></div>
+                  <div class="w-2 h-2 rounded-full" :class="themeValidation.colors ? 'bg-success' : 'bg-error'" />
                   <span>Couleurs cohérentes : {{ themeValidation.colors ? '✓' : '✗' }}</span>
                 </div>
                 <div class="flex items-center gap-2">
-                  <div class="w-2 h-2 rounded-full" :class="themeValidation.contrast ? 'bg-success' : 'bg-error'"></div>
+                  <div class="w-2 h-2 rounded-full" :class="themeValidation.contrast ? 'bg-success' : 'bg-error'" />
                   <span>Contraste accessible : {{ themeValidation.contrast ? '✓' : '✗' }}</span>
                 </div>
                 <div class="flex items-center gap-2">
-                  <div class="w-2 h-2 rounded-full" :class="themeValidation.transitions ? 'bg-success' : 'bg-error'"></div>
+                  <div class="w-2 h-2 rounded-full" :class="themeValidation.transitions ? 'bg-success' : 'bg-error'" />
                   <span>Transitions fluides : {{ themeValidation.transitions ? '✓' : '✗' }}</span>
                 </div>
               </div>
               <div class="text-sm space-y-2">
-                <p class="font-medium text-text-main">Thème actuel : {{ currentThemeName }}</p>
-                <p class="text-text-secondary">Mode sombre : {{ isDarkTheme ? 'Activé' : 'Désactivé' }}</p>
-                <p class="text-text-secondary">Thème électoral : {{ isElectionTheme ? 'Activé' : 'Désactivé' }}</p>
+                <p class="font-medium text-text-main">
+                  Thème actuel : {{ currentThemeName }}
+                </p>
+                <p class="text-text-secondary">
+                  Mode sombre : {{ isDarkTheme ? 'Activé' : 'Désactivé' }}
+                </p>
+                <p class="text-text-secondary">
+                  Thème électoral : {{ isElectionTheme ? 'Activé' : 'Désactivé' }}
+                </p>
               </div>
             </div>
             
             <!-- Theme Test Controls -->
             <div class="mt-6 pt-4 border-t border-text-main/10">
-              <h4 class="text-sm font-medium text-text-main mb-3">Tests Rapides</h4>
+              <h4 class="text-sm font-medium text-text-main mb-3">
+                Tests Rapides
+              </h4>
               <div class="flex flex-wrap gap-2">
                 <NSButton 
                   v-for="theme in availableThemes" 
                   :key="theme.value"
                   size="sm" 
                   variant="outline"
-                  @click="testThemeTransition(theme.value)"
                   class="text-xs"
+                  @click="testThemeTransition(theme.value)"
                 >
                   Test {{ theme.name }}
                 </NSButton>
@@ -184,10 +192,18 @@
               Police des Titres (Poppins)
             </h3>
             <div class="space-y-2">
-              <p class="text-4xl font-heading font-bold text-accent">Heading 1 - Bold</p>
-              <p class="text-3xl font-heading font-semibold text-text-main">Heading 2 - Semibold</p>
-              <p class="text-2xl font-heading font-medium text-text-main">Heading 3 - Medium</p>
-              <p class="text-xl font-heading font-normal text-text-main">Heading 4 - Normal</p>
+              <p class="text-4xl font-heading font-bold text-accent">
+                Heading 1 - Bold
+              </p>
+              <p class="text-3xl font-heading font-semibold text-text-main">
+                Heading 2 - Semibold
+              </p>
+              <p class="text-2xl font-heading font-medium text-text-main">
+                Heading 3 - Medium
+              </p>
+              <p class="text-xl font-heading font-normal text-text-main">
+                Heading 4 - Normal
+              </p>
             </div>
           </div>
           
@@ -219,34 +235,62 @@
         <div class="space-y-8">
           <!-- Button Variants -->
           <div class="p-6 bg-surface rounded-lg border border-text-main/10">
-            <h3 class="text-lg font-heading font-medium text-text-main mb-4">Variants</h3>
+            <h3 class="text-lg font-heading font-medium text-text-main mb-4">
+              Variants
+            </h3>
             <div class="flex flex-wrap gap-4">
-              <NSButton variant="primary">Primary</NSButton>
-              <NSButton variant="secondary">Secondary</NSButton>
-              <NSButton variant="accent">Accent</NSButton>
-              <NSButton variant="outline">Outline</NSButton>
-              <NSButton variant="danger">Danger</NSButton>
-              <NSButton variant="ghost">Ghost</NSButton>
+              <NSButton variant="primary">
+                Primary
+              </NSButton>
+              <NSButton variant="secondary">
+                Secondary
+              </NSButton>
+              <NSButton variant="accent">
+                Accent
+              </NSButton>
+              <NSButton variant="outline">
+                Outline
+              </NSButton>
+              <NSButton variant="danger">
+                Danger
+              </NSButton>
+              <NSButton variant="ghost">
+                Ghost
+              </NSButton>
             </div>
           </div>
 
           <!-- Button Sizes -->
           <div class="p-6 bg-surface rounded-lg border border-text-main/10">
-            <h3 class="text-lg font-heading font-medium text-text-main mb-4">Tailles</h3>
+            <h3 class="text-lg font-heading font-medium text-text-main mb-4">
+              Tailles
+            </h3>
             <div class="flex items-center gap-4">
-              <NSButton size="sm">Small</NSButton>
-              <NSButton size="md">Medium</NSButton>
-              <NSButton size="lg">Large</NSButton>
+              <NSButton size="sm">
+                Small
+              </NSButton>
+              <NSButton size="md">
+                Medium
+              </NSButton>
+              <NSButton size="lg">
+                Large
+              </NSButton>
             </div>
           </div>
 
           <!-- Button States -->
           <div class="p-6 bg-surface rounded-lg border border-text-main/10">
-            <h3 class="text-lg font-heading font-medium text-text-main mb-4">États</h3>
+            <h3 class="text-lg font-heading font-medium text-text-main mb-4">
+              États
+            </h3>
             <div class="flex flex-wrap gap-4">
               <NSButton>Normal</NSButton>
-              <NSButton loading>Loading</NSButton>
-              <NSButton disabled>Disabled</NSButton>
+              <NSButton loading>
+                Loading
+              </NSButton>
+              <NSButton disabled>
+                Disabled
+              </NSButton>
             </div>
           </div>
         </div>
@@ -277,7 +321,9 @@
               Contenu principal de la carte.
             </p>
             <template #footer>
-              <NSButton size="sm" variant="primary">Action</NSButton>
+              <NSButton size="sm" variant="primary">
+                Action
+              </NSButton>
             </template>
           </NSCard>
 
@@ -363,7 +409,7 @@
             <NSMenuItem @click="handleMenuAction('duplicate')">
               Dupliquer
             </NSMenuItem>
-            <NSMenuItem @click="handleMenuAction('delete')" class="text-error">
+            <NSMenuItem class="text-error" @click="handleMenuAction('delete')">
               Supprimer
             </NSMenuItem>
           </NSMenu>
@@ -376,16 +422,16 @@
           Modales
         </h2>
         <div class="flex gap-4">
-          <NSButton @click="showModal = true" variant="primary">
+          <NSButton variant="primary" @click="showModal = true">
             Ouvrir Modal
           </NSButton>
         </div>
 
         <NSModal 
           :is-open="showModal" 
-          @close="showModal = false"
           title="Exemple de Modal"
           size="md"
+          @close="showModal = false"
         >
           <div class="space-y-4">
             <p class="font-body text-text-main">
@@ -442,7 +488,9 @@
             </div>
             
             <div class="mt-6 p-4 bg-background rounded border border-text-main/10">
-              <h4 class="text-sm font-medium text-text-main mb-2">État du Thème</h4>
+              <h4 class="text-sm font-medium text-text-main mb-2">
+                État du Thème
+              </h4>
               <div class="text-xs text-text-secondary space-y-1">
                 <p>🎨 Thème actuel : <span class="text-accent font-medium">{{ currentThemeName }}</span></p>
                 <p>🌙 Mode sombre : <span class="text-accent font-medium">{{ isDarkTheme ? 'Activé' : 'Désactivé' }}</span></p>

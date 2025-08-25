@@ -120,8 +120,7 @@
           <label
             for="firstName"
             class="block text-sm font-medium text-gray-700 mb-2"
-            >Prénom *</label
-          >
+          >Prénom *</label>
           <input
             id="firstName"
             v-model="contactForm.firstName"
@@ -129,14 +128,13 @@
             required
             class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-colors"
             placeholder="Votre prénom"
-          />
+          >
         </div>
         <div>
           <label
             for="lastName"
             class="block text-sm font-medium text-gray-700 mb-2"
-            >Nom *</label
-          >
+          >Nom *</label>
           <input
             id="lastName"
             v-model="contactForm.lastName"
@@ -144,7 +142,7 @@
             required
             class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-colors"
             placeholder="Votre nom"
-          />
+          >
         </div>
 
         <!-- Organisation et Email -->
@@ -152,8 +150,7 @@
           <label
             for="organization"
             class="block text-sm font-medium text-gray-700 mb-2"
-            >Organisation / Parti Politique *</label
-          >
+          >Organisation / Parti Politique *</label>
           <input
             id="organization"
             v-model="contactForm.organization"
@@ -161,14 +158,13 @@
             required
             class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-colors"
             placeholder="Ex: PDCI, RDR, FPI, Organisation..."
-          />
+          >
         </div>
         <div>
           <label
             for="email"
             class="block text-sm font-medium text-gray-700 mb-2"
-            >Email *</label
-          >
+          >Email *</label>
           <input
             id="email"
             v-model="contactForm.email"
@@ -176,7 +172,7 @@
             required
             class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-colors"
             placeholder="votre@email.com"
-          />
+          >
         </div>
 
         <!-- Téléphone et Type de projet -->
@@ -184,8 +180,7 @@
           <label
             for="phone"
             class="block text-sm font-medium text-gray-700 mb-2"
-            >Téléphone (WhatsApp) *</label
-          >
+          >Téléphone (WhatsApp) *</label>
           <input
             id="phone"
             v-model="contactForm.phone"
@@ -193,28 +188,37 @@
             required
             class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-colors"
             placeholder="+225 XX XX XX XX XX"
-          />
+          >
         </div>
         <div>
           <label
             for="projectType"
             class="block text-sm font-medium text-gray-700 mb-2"
-            >Type de Projet *</label
-          >
+          >Type de Projet *</label>
           <select
             id="projectType"
             v-model="contactForm.projectType"
             required
             class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-colors"
           >
-            <option value="">Sélectionnez un type</option>
-            <option value="campagne-electorale">Campagne Électorale</option>
-            <option value="evenement-politique">Événement Politique</option>
+            <option value="">
+              Sélectionnez un type
+            </option>
+            <option value="campagne-electorale">
+              Campagne Électorale
+            </option>
+            <option value="evenement-politique">
+              Événement Politique
+            </option>
             <option value="cadeaux-institutionnels">
               Cadeaux Institutionnels
             </option>
-            <option value="communication-parti">Communication Parti</option>
-            <option value="autre">Autre</option>
+            <option value="communication-parti">
+              Communication Parti
+            </option>
+            <option value="autre">
+              Autre
+            </option>
           </select>
         </div>
 
@@ -223,8 +227,7 @@
           <label
             for="message"
             class="block text-sm font-medium text-gray-700 mb-2"
-            >Décrivez votre projet *</label
-          >
+          >Décrivez votre projet *</label>
           <textarea
             id="message"
             v-model="contactForm.message"
@@ -253,8 +256,8 @@
             to="/politique-confidentialite"
             class="text-accent hover:underline"
           >
-            Politique de Confidentialité </NuxtLink
-          >.
+            Politique de Confidentialité
+          </NuxtLink>.
         </p>
       </form>
     </section>
@@ -272,7 +275,9 @@
         <div
           class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"
         />
-        <p class="text-gray-600">Chargement des contacts...</p>
+        <p class="text-gray-600">
+          Chargement des contacts...
+        </p>
       </div>
 
       <!-- Error State -->
@@ -280,7 +285,9 @@
         <div
           class="bg-red-50 border border-red-200 rounded-lg p-6 max-w-md mx-auto"
         >
-          <p class="text-red-600 font-medium">❌ Erreur lors du chargement</p>
+          <p class="text-red-600 font-medium">
+            ❌ Erreur lors du chargement
+          </p>
           <p class="text-red-500 text-sm mt-2">
             {{ error }}
           </p>
@@ -334,7 +341,9 @@
                 </svg>
               </div>
               <div>
-                <p class="text-sm text-gray-500">Mobile (WhatsApp)</p>
+                <p class="text-sm text-gray-500">
+                  Mobile (WhatsApp)
+                </p>
                 <div class="flex gap-2">
                   <a
                     :href="getTelLink(contact.mobilePhone)"
@@ -372,7 +381,9 @@
                 </svg>
               </div>
               <div>
-                <p class="text-sm text-gray-500">Fixe</p>
+                <p class="text-sm text-gray-500">
+                  Fixe
+                </p>
                 <a
                   :href="getTelLink(contact.fixedPhone)"
                   class="text-accent hover:text-primary font-medium"
@@ -400,7 +411,9 @@
                 </svg>
               </div>
               <div>
-                <p class="text-sm text-gray-500">Email</p>
+                <p class="text-sm text-gray-500">
+                  Email
+                </p>
                 <a
                   :href="getEmailLink(contact.email)"
                   class="text-accent hover:text-primary font-medium break-all"
@@ -413,7 +426,9 @@
 
           <!-- Specialties -->
           <div v-if="contact.specialties.length > 0" class="mt-6">
-            <p class="text-sm font-medium text-gray-700 mb-2">Spécialités</p>
+            <p class="text-sm font-medium text-gray-700 mb-2">
+              Spécialités
+            </p>
             <div class="flex flex-wrap gap-2">
               <span
                 v-for="specialty in contact.specialties"
@@ -427,7 +442,9 @@
 
           <!-- Availability Hours -->
           <div v-if="hasAvailabilityHours(contact)" class="mt-6">
-            <p class="text-sm font-medium text-gray-700 mb-2">Horaires</p>
+            <p class="text-sm font-medium text-gray-700 mb-2">
+              Horaires
+            </p>
             <div class="text-xs text-gray-600 space-y-1">
               <div v-if="contact.availabilityHours.lundi_vendredi">
                 <strong>Lun-Ven:</strong>

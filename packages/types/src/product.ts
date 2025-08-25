@@ -53,6 +53,17 @@ export interface AirtablePriceRule {
   };
 }
 
+export interface AirtableQuoteItemCatalog {
+  readonly id: string;
+  readonly fields: {
+    readonly name?: string;
+    readonly category?: string;
+    readonly base_price?: number;
+    readonly min_quantity?: number;
+    readonly status?: string;
+  };
+}
+
 // =====================================
 // TYPES PRODUITS TRANSFORMÉS
 // =====================================
@@ -98,6 +109,15 @@ export interface ProductPriceRule {
   readonly pricePerUnit: number;
   readonly discount?: number;
   readonly isActive: boolean;
+}
+
+export interface QuoteItemCatalog {
+  readonly id: string;
+  readonly name: string;
+  readonly category: string;
+  readonly basePrice: number;
+  readonly minQuantity: number;
+  readonly status: "Active" | "Inactive";
 }
 
 // =====================================
@@ -213,8 +233,58 @@ export const ProductCategory = {
   ACCESSOIRE: "ACCESSOIRE",
 } as const;
 
+// =====================================
+// TYPES CONTACTS COMMERCIAUX
+// =====================================
+
+export interface CommercialContact {
+  readonly id: string;
+  readonly name: string;
+  readonly role: "sales" | "manager" | "support";
+  readonly mobilePhone: string;
+  readonly fixedPhone?: string;
+  readonly email?: string;
+  readonly specialties: readonly string[];
+  readonly availabilityHours: {
+    readonly lundi_vendredi?: string;
+    readonly samedi?: string;
+    readonly dimanche?: string;
+    readonly weekend?: string;
+    readonly urgences?: string;
+  };
+  readonly isActive: boolean;
+  readonly createdAt: string;
+  readonly updatedAt: string;
+}
+
+// Interface pour les données brutes de la DB Turso
+export interface TursoCommercialContact {
+  readonly id: string;
+  readonly name: string;
+  readonly role: string;
+  readonly mobile_phone: string;
+  readonly fixed_phone?: string;
+  readonly email?: string;
+  readonly specialties: string; // JSON string
+  readonly availability_hours: string; // JSON string
+  readonly is_active: number; // SQLite boolean as integer
+  readonly created_at: string;
+  readonly updated_at: string;
+}
+
+// =====================================
+// ENUMS CONTACTS
+// =====================================
+
+export const ContactRole = {
+  SALES: "sales",
+  MANAGER: "manager",
+  SUPPORT: "support",
+} as const;
+
 // Type unions
 export type CustomizationPosition =
   (typeof CustomizationPosition)[keyof typeof CustomizationPosition];
 export type ProductCategory =
   (typeof ProductCategory)[keyof typeof ProductCategory];
+export type ContactRole = (typeof ContactRole)[keyof typeof ContactRole];

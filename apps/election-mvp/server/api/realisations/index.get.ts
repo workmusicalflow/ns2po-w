@@ -2,7 +2,7 @@ import type { HybridRealisation, AirtableRealisation } from "@ns2po/types";
 import {
   getCloudinaryCreativeImages,
   cloudinaryImageToHybridRealisation,
-} from "~/server/utils/cloudinary-discovery";
+} from "../../utils/cloudinary-discovery";
 
 const AIRTABLE_BASE_ID = "apprQLdnVwlbfnioT";
 const AIRTABLE_API_KEY = process.env.AIRTABLE_API_KEY;
@@ -102,7 +102,7 @@ export default defineEventHandler(
       // 2. Transformation des réalisations Airtable en format hybride
       const airtableHybridRealisations = airtableRealisations
         .map(transformAirtableToHybrid)
-        .filter((r) => r.isActive);
+        .filter((r: HybridRealisation) => r.isActive);
 
       console.log(
         `✅ Airtable: ${airtableHybridRealisations.length} réalisations actives`
@@ -110,14 +110,16 @@ export default defineEventHandler(
 
       // 3. Génération des réalisations auto-discovery pour les images non référencées
       const airtablePublicIds = new Set(
-        airtableHybridRealisations.flatMap((r) => r.cloudinaryPublicIds)
+        airtableHybridRealisations.flatMap(
+          (r: HybridRealisation) => r.cloudinaryPublicIds
+        )
       );
 
       const autoDiscoveryImages = cloudinaryImages.filter(
-        (image) => !airtablePublicIds.has(image.public_id)
+        (image: any) => !airtablePublicIds.has(image.public_id)
       );
 
-      const autoDiscoveryRealisations = autoDiscoveryImages.map((image) =>
+      const autoDiscoveryRealisations = autoDiscoveryImages.map((image: any) =>
         cloudinaryImageToHybridRealisation(image)
       );
 

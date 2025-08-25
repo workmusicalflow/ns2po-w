@@ -118,67 +118,6 @@ export default defineNuxtConfig({
   // Cloudinary configuration
   cloudinary: {
     cloudName: process.env.CLOUDINARY_CLOUD_NAME,
-
-    // Configuration pour les images de produits et réalisations
-    image: {
-      quality: "auto:good",
-      format: "auto",
-      loading: "lazy",
-      responsive: true,
-      sizes: "sm:300px md:400px lg:500px",
-      placeholder: true,
-
-      // Presets pour différents contextes
-      presets: {
-        // Cartes produits dans le catalogue
-        productCard: {
-          modifiers: {
-            format: "auto",
-            quality: "auto:good",
-            width: 400,
-            height: 300,
-            crop: "fill",
-            gravity: "center",
-          },
-        },
-
-        // Images héroïques des réalisations
-        realisationHero: {
-          modifiers: {
-            format: "auto",
-            quality: "auto:good",
-            width: 800,
-            height: 600,
-            crop: "fill",
-            gravity: "center",
-          },
-        },
-
-        // Miniatures pour les galeries
-        thumbnail: {
-          modifiers: {
-            format: "auto",
-            quality: "auto:eco",
-            width: 150,
-            height: 150,
-            crop: "fill",
-            gravity: "face:center",
-          },
-        },
-
-        // Images haute résolution pour prévisualisations
-        preview: {
-          modifiers: {
-            format: "auto",
-            quality: "auto:best",
-            width: 1200,
-            height: 900,
-            crop: "fit",
-            gravity: "center",
-          },
-        },
-      },
-    },
   },
 
   // @nuxt/image configuration

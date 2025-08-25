@@ -1,6 +1,8 @@
 <template>
   <div class="p-8">
-    <h1 class="text-2xl font-bold mb-4">Test CMS Airtable - Réalisations</h1>
+    <h1 class="text-2xl font-bold mb-4">
+      Test CMS Airtable - Réalisations
+    </h1>
     
     <div v-if="loading" class="text-blue-600">
       Chargement des réalisations...
@@ -11,11 +13,17 @@
     </div>
     
     <div v-else>
-      <h2 class="text-xl font-semibold mb-2">Réalisations en vedette ({{ featuredCount }})</h2>
+      <h2 class="text-xl font-semibold mb-2">
+        Réalisations en vedette ({{ featuredCount }})
+      </h2>
       <div class="grid gap-4">
         <div v-for="realisation in featured" :key="realisation.id" class="border p-4 rounded">
-          <h3 class="font-bold">{{ realisation.title }}</h3>
-          <p class="text-sm text-gray-600">{{ realisation.description }}</p>
+          <h3 class="font-bold">
+            {{ realisation.title }}
+          </h3>
+          <p class="text-sm text-gray-600">
+            {{ realisation.description }}
+          </p>
           <div class="mt-2">
             <strong>Images Cloudinary:</strong>
             <ul class="list-disc list-inside">
@@ -38,7 +46,9 @@
         </div>
       </div>
       
-      <h2 class="text-xl font-semibold mb-2 mt-6">Toutes les réalisations ({{ totalCount }})</h2>
+      <h2 class="text-xl font-semibold mb-2 mt-6">
+        Toutes les réalisations ({{ totalCount }})
+      </h2>
       <div class="text-sm text-gray-600">
         {{ realisations.length }} réalisations chargées
       </div>

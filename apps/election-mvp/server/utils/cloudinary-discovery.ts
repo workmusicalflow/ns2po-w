@@ -26,7 +26,7 @@ export function parseCreativeFilename(filename: string) {
 
   let type = null;
   let identifier = null;
-  let keywords = [];
+  let keywords: string[] = [];
 
   // Test des patterns
   for (const pattern of patterns) {
@@ -154,7 +154,7 @@ export async function getCloudinaryCreativeImages(): Promise<any[]> {
       .max_results(500)
       .execute();
 
-    return result.resources.map((resource) => ({
+    return result.resources.map((resource: any) => ({
       public_id: resource.public_id,
       secure_url: resource.secure_url,
       created_at: resource.created_at,
@@ -195,11 +195,13 @@ export function cloudinaryImageToHybridRealisation(
     order: undefined,
     source: "cloudinary-auto-discovery" as const,
     cloudinaryMetadata: {
+      publicId: image.public_id,
       width: image.width,
       height: image.height,
       format: image.format,
       bytes: image.bytes,
       createdAt: image.created_at,
+      url: image.secure_url,
     },
   };
 }

@@ -1,6 +1,6 @@
 <template>
   <TransitionRoot appear :show="isOpen" as="template">
-    <Dialog as="div" @close="handleClose" class="relative z-50">
+    <Dialog as="div" class="relative z-50" @close="handleClose">
       <TransitionChild
         as="template"
         enter="duration-300 ease-out"
@@ -34,8 +34,8 @@
                 
                 <button
                   v-if="closable"
-                  @click="handleClose"
                   class="ml-4 text-text-main/60 hover:text-text-main transition-colors"
+                  @click="handleClose"
                 >
                   <span class="sr-only">Fermer</span>
                   <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">

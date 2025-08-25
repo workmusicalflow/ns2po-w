@@ -13,8 +13,8 @@
       <!-- Icon prefix -->
       <div v-if="prefixIcon && typeof prefixIcon !== 'undefined'" class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
         <component 
-          v-if="prefixIcon && typeof prefixIcon !== 'undefined'" 
           :is="prefixIcon" 
+          v-if="prefixIcon && typeof prefixIcon !== 'undefined'" 
           :class="iconClasses"
           aria-hidden="true" 
         />
@@ -32,13 +32,13 @@
         @input="handleInput"
         @blur="handleBlur"
         @focus="handleFocus"
-      />
+      >
       
       <!-- Icon suffix -->
       <div v-if="suffixIcon && typeof suffixIcon !== 'undefined'" class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
         <component 
-          v-if="suffixIcon && typeof suffixIcon !== 'undefined'" 
           :is="suffixIcon" 
+          v-if="suffixIcon && typeof suffixIcon !== 'undefined'" 
           :class="iconClasses"
           aria-hidden="true" 
         />

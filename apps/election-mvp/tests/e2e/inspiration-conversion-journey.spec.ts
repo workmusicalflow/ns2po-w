@@ -88,7 +88,7 @@ test.describe("Parcours Inspiration → Conversion", () => {
 
         // Attendre que la prévisualisation se charge
         await page.waitForSelector('[data-testid="preview-canvas"]', {
-          timeout: 15000,
+          timeout: 10000,
         });
       }
     });
@@ -179,7 +179,7 @@ test.describe("Parcours Inspiration → Conversion", () => {
         'select[name="context"], select:has(option:text-matches("électoral", "i"))'
       );
       if ((await contextSelect.count()) > 0) {
-        await contextSelect.selectOption({ label: /électoral/i });
+        await contextSelect.selectOption({ label: "électoral" });
       }
 
       // Ajouter un message (optionnel)
@@ -277,7 +277,7 @@ test.describe("Parcours Inspiration → Conversion", () => {
       // Parcours rapide : Homepage → Inspiration → Produit → Ajout devis
       await page.goto("/");
       await page.waitForSelector('[data-testid="realisation-card"]', {
-        timeout: 15000,
+        timeout: 10000,
       });
 
       const loadTime = Date.now() - startTime;

@@ -37,7 +37,9 @@
             <svg class="w-12 h-12 mx-auto mb-2" fill="currentColor" viewBox="0 0 20 20">
               <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd" />
             </svg>
-            <p class="text-sm font-medium">{{ product.category }}</p>
+            <p class="text-sm font-medium">
+              {{ product.category }}
+            </p>
           </div>
         </div>
 
@@ -104,8 +106,8 @@
           <NSButton 
             size="sm" 
             variant="outline"
-            @click="decreaseQuantity"
             :disabled="selectedQuantity <= product.minQuantity"
+            @click="decreaseQuantity"
           >
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4" />
@@ -121,7 +123,7 @@
               themeClasses.text.primary,
               isDarkTheme ? 'bg-surface border-text-main/30' : 'bg-background border-text-main/20'
             ]"
-          />
+          >
           
           <NSButton 
             size="sm" 
@@ -152,8 +154,8 @@
         <NSButton 
           variant="ghost" 
           size="sm"
-          @click="$emit('preview', product)"
           :title="'Prévisualiser ' + product.name"
+          @click="$emit('preview', product)"
         >
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />

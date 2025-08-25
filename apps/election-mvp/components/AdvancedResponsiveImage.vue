@@ -42,7 +42,7 @@
         :srcset="responsiveConfig.sources.avif.srcset"
         :type="responsiveConfig.sources.avif.type"
         :sizes="responsiveConfig.sizes"
-      />
+      >
       
       <!-- Format WebP avec srcset -->
       <source
@@ -50,7 +50,7 @@
         :srcset="responsiveConfig.sources.webp.srcset"
         :type="responsiveConfig.sources.webp.type"
         :sizes="responsiveConfig.sizes"
-      />
+      >
       
       <!-- Fallback avec srcset pour navigateurs anciens -->
       <img
@@ -64,7 +64,7 @@
         decoding="async"
         @load="handleImageLoad"
         @error="handleImageError"
-      />
+      >
     </picture>
 
     <!-- État d'erreur -->

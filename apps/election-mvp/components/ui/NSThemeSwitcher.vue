@@ -5,7 +5,7 @@
       <template #trigger="{ open }">
         <NSButton variant="outline" size="sm">
           <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zM21 5a2 2 0 00-2-2h-4a2 2 0 00-2 2v6a2 2 0 002 2h4a2 2 0 002-2V5zM21 15a2 2 0 00-2-2h-4a2 2 0 00-2 2v2a2 2 0 002 2h4a2 2 0 002-2v-2z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zM21 5a2 2 0 00-2-2h-4a2 2 0 00-2 2v6a2 2 0 002 2h4a2 2 0 002-2V5zM21 15a2 2 0 00-2-2h-4a2 2 0 00-2 2v2a2 2 0 002 2h4a2 2 0 002-2v-2z" />
           </svg>
           {{ currentThemeName }}
           <svg 
@@ -23,8 +23,8 @@
       <NSMenuItem 
         v-for="themeOption in themesList" 
         :key="themeOption.value"
-        @click="handleThemeChange(themeOption.value)"
         :class="{ 'bg-primary/10 text-primary': currentTheme === themeOption.value }"
+        @click="handleThemeChange(themeOption.value)"
       >
         <div class="flex items-center">
           <div 
@@ -48,8 +48,8 @@
     <NSButton 
       variant="ghost" 
       size="sm"
-      @click="handleColorSchemeToggle"
       :title="colorScheme === 'light' ? 'Passer en mode sombre' : 'Passer en mode clair'"
+      @click="handleColorSchemeToggle"
     >
       <svg 
         v-if="colorScheme === 'light'" 
