@@ -39,6 +39,9 @@ importers:
       '@headlessui/vue':
         specifier: ^1.7.23
         version: 1.7.23(vue@3.5.18)
+      '@heroicons/vue':
+        specifier: ^2.2.0
+        version: 2.2.0(vue@3.5.18)
       '@libsql/client':
         specifier: ^0.15.12
         version: 0.15.12
@@ -1962,6 +1965,14 @@ packages:
       vue: ^3.2.0
     dependencies:
       '@tanstack/vue-virtual': 3.13.12(vue@3.5.18)
+      vue: 3.5.18(typescript@5.9.2)
+    dev: false
+
+  /@heroicons/vue@2.2.0(vue@3.5.18):
+    resolution: {integrity: sha512-G3dbSxoeEKqbi/DFalhRxJU4mTXJn7GwZ7ae8NuEQzd1bqdd0jAbdaBZlHPcvPD2xI1iGzNVB4k20Un2AguYPw==}
+    peerDependencies:
+      vue: '>= 3'
+    dependencies:
       vue: 3.5.18(typescript@5.9.2)
     dev: false
 

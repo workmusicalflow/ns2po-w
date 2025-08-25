@@ -1,4 +1,6 @@
 {
+  "installCommand": "cd ../.. && pnpm install",
+  "buildCommand": "cd ../.. && pnpm -F @ns2po/election-mvp build",
   "headers": [
     {
       "source": "/_nuxt/(.*)",
