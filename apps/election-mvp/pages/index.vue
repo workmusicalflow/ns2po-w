@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-background">
+  <div class="bg-background">
     <!-- Hero Video Section -->
     <section class="hero-section">
       <div class="hero-video-container">
@@ -196,8 +196,10 @@ const initHeroAnimations = () => {
         .to(".hero-cta", { opacity: 1, y: 0, duration: 0.6 }, "<0.25"); // Réduit de 0.8 à 0.6
 
       // Effet de parallaxe léger adapté au ratio 2.85:1
+      // Ajuste le déplacement selon la taille d'écran
+      const isMobile = window.innerWidth <= 768;
       gsap.to(".hero-content", {
-        yPercent: -15, // Augmenté pour compenser la section plus courte
+        yPercent: isMobile ? -8 : -15, // Réduit sur mobile pour rester centré
         ease: "none",
         scrollTrigger: {
           trigger: ".hero-section",
@@ -336,53 +338,87 @@ useHead({
   transform: translateY(-2px) scale(1.02);
 }
 
-/* Responsive adjustments */
-@media (max-width: 768px) {
+/* Tablettes - garde le ratio original */
+@media (max-width: 768px) and (min-width: 501px) {
   .hero-section {
-    /* Ajuste le ratio pour donner plus d'espace au contenu sur mobile */
-    padding-bottom: calc(100% / 2.2);
-    min-height: 60vh; /* Hauteur minimum augmentée pour éviter le cut-off */
+    padding-bottom: calc(100% / 2.85); /* Ratio original conservé */
+    max-height: 60vh; /* Limite pour voir le contenu suivant */
+  }
+
+  .hero-content {
+    padding: 0 20px;
+  }
+}
+
+/* Vrais mobiles - ratio optimisé */
+@media (max-width: 500px) {
+  .hero-section {
+    /* Hauteur optimisée pour vrais mobiles uniquement */
+    padding-bottom: 0;
+    height: calc(
+      100vh - 64px
+    ); /* Hauteur viewport moins navigation fixe (64px) */
+    min-height: 400px; /* Hauteur minimum pour lisibilité */
+    max-height: 460px; /* Encore plus compact */
   }
 
   .hero-content {
     padding: 0 15px;
-    padding-bottom: 30px; /* Espace supplémentaire en bas pour le bouton */
+    /* Position ajustée pour éviter les barres système */
+    top: calc(50% - 20px); /* Légèrement plus haut pour compenser */
+    padding-bottom: clamp(20px, 5vh, 40px);
   }
 
   .hero-title {
-    font-size: clamp(2rem, 8vw, 3rem);
-    margin-bottom: 10px; /* Réduit l'espace pour optimiser l'espace vertical */
+    font-size: clamp(1.75rem, 8vw, 2.2rem);
+    margin-bottom: 8px;
+    line-height: 1.1; /* Plus serré sur mobile */
   }
 
   .hero-subtitle {
-    font-size: clamp(1rem, 4vw, 1.4rem);
-    margin-bottom: 20px; /* Réduit l'espace avant le bouton */
+    font-size: clamp(0.95rem, 4vw, 1.2rem);
+    margin-bottom: 15px;
+    line-height: 1.3;
   }
 
   .hero-cta {
-    margin-top: 5px; /* Réduit l'espace au-dessus du bouton sur mobile */
+    margin-top: 5px;
+    font-size: clamp(0.9rem, 3vw, 1.05rem);
+    padding: 0.5rem 1.5rem;
   }
 }
 
 /* Pour les très petits écrans (iPhone SE, etc.) */
 @media (max-width: 375px) {
   .hero-section {
-    padding-bottom: calc(100% / 2);
-    min-height: 65vh;
+    /* Hauteur encore plus optimisée pour petits écrans */
+    height: calc(
+      100vh - 64px
+    ); /* Hauteur viewport moins navigation fixe (64px) */
+    min-height: 350px;
+    max-height: 500px;
   }
 
   .hero-content {
-    padding-bottom: 40px; /* Plus d'espace pour garantir la visibilité du bouton */
+    top: calc(50% - 15px); /* Position encore plus ajustée */
+    padding-bottom: clamp(15px, 4vh, 30px);
   }
 
   .hero-title {
-    font-size: 1.8rem;
-    margin-bottom: 8px;
+    font-size: 1.5rem;
+    margin-bottom: 6px;
+    line-height: 1.05;
   }
 
   .hero-subtitle {
-    font-size: 1rem;
-    margin-bottom: 15px;
+    font-size: 0.9rem;
+    margin-bottom: 12px;
+    line-height: 1.25;
+  }
+
+  .hero-cta {
+    font-size: 0.85rem;
+    padding: 0.4rem 1.2rem;
   }
 }
 </style>
