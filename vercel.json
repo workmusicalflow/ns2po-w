@@ -1,6 +1,9 @@
 {
-  "installCommand": "cd ../.. && pnpm install",
-  "buildCommand": "cd ../.. && pnpm -F @ns2po/election-mvp build",
+  "version": 2,
+  "buildCommand": "pnpm build --filter=@ns2po/election-mvp",
+  "outputDirectory": "apps/election-mvp/.vercel/output",
+  "installCommand": "pnpm install",
+  "framework": null,
   "headers": [
     {
       "source": "/_nuxt/(.*)",
@@ -25,7 +28,7 @@
       ]
     },
     {
-      "source": "/(.*\\.(css|js|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot))$",
+      "source": "/assets/(.*)",
       "headers": [
         {
           "key": "Cache-Control",

@@ -88,6 +88,11 @@ export default defineEventHandler(
       console.log(
         "🔄 Hybrid API: Fusion des données Airtable et auto-discovery Cloudinary..."
       );
+      console.log("🔍 Debug env vars:", {
+        AIRTABLE_API_KEY: AIRTABLE_API_KEY ? "✅ Set" : "❌ Missing",
+        CLOUDINARY_CLOUD_NAME: process.env.CLOUDINARY_CLOUD_NAME ? "✅ Set" : "❌ Missing",
+        NODE_ENV: process.env.NODE_ENV
+      });
 
       // 1. Récupération parallèle des données Airtable et Cloudinary
       const [airtableRealisations, cloudinaryImages] = await Promise.all([
