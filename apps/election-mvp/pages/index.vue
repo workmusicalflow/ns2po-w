@@ -339,21 +339,50 @@ useHead({
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .hero-section {
-    /* Maintient le ratio 2.85:1 même sur mobile */
-    padding-bottom: calc(100% / 2.85);
-    min-height: 50vh; /* Hauteur minimum pour éviter une section trop petite */
+    /* Ajuste le ratio pour donner plus d'espace au contenu sur mobile */
+    padding-bottom: calc(100% / 2.2);
+    min-height: 60vh; /* Hauteur minimum augmentée pour éviter le cut-off */
   }
 
   .hero-content {
     padding: 0 15px;
+    padding-bottom: 30px; /* Espace supplémentaire en bas pour le bouton */
   }
 
   .hero-title {
     font-size: clamp(2rem, 8vw, 3rem);
+    margin-bottom: 10px; /* Réduit l'espace pour optimiser l'espace vertical */
   }
 
   .hero-subtitle {
     font-size: clamp(1rem, 4vw, 1.4rem);
+    margin-bottom: 20px; /* Réduit l'espace avant le bouton */
+  }
+
+  .hero-cta {
+    margin-top: 5px; /* Réduit l'espace au-dessus du bouton sur mobile */
+  }
+}
+
+/* Pour les très petits écrans (iPhone SE, etc.) */
+@media (max-width: 375px) {
+  .hero-section {
+    padding-bottom: calc(100% / 2);
+    min-height: 65vh;
+  }
+
+  .hero-content {
+    padding-bottom: 40px; /* Plus d'espace pour garantir la visibilité du bouton */
+  }
+
+  .hero-title {
+    font-size: 1.8rem;
+    margin-bottom: 8px;
+  }
+
+  .hero-subtitle {
+    font-size: 1rem;
+    margin-bottom: 15px;
   }
 }
 </style>
