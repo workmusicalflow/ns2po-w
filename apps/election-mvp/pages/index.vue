@@ -30,6 +30,14 @@
           Demander un devis
         </Button>
       </div>
+
+      <!-- Team Photos - positioned at bottom right -->
+      <TeamPhotos
+        position="hero"
+        :animation-enabled="true"
+        message="Une équipe dédiée à votre réussite"
+        message-position="left"
+      />
     </section>
 
     <!-- Services Cards -->
@@ -124,7 +132,7 @@
 </template>
 
 <script setup lang="ts">
-import { Button, Card } from "@ns2po/ui";
+import { Button, Card, TeamPhotos } from "@ns2po/ui";
 import type { Realisation } from "@ns2po/types";
 
 // Gestion des réalisations

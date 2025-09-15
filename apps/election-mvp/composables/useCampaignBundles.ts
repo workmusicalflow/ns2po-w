@@ -14,12 +14,10 @@ import type {
   CartItem,
   BundleCustomization,
 } from "@ns2po/types";
+// Importation des fonctions utilitaires statiques pour fallback
 import {
-  campaignBundles,
-  getBundlesByAudience,
-  getBundlesByBudget,
-  getFeaturedBundles,
-  getBundleById,
+  campaignBundles as staticCampaignBundles,
+  getBundleById as getStaticBundleById,
 } from "~/../../packages/types/src/campaign-bundles-data";
 
 export const useCampaignBundles = () => {
@@ -29,6 +27,8 @@ export const useCampaignBundles = () => {
 
   const loading = ref(false);
   const error = ref("");
+  const lastFetch = ref<Date | null>(null);
+  const useStaticFallback = ref(false);
 
   // Bundle selection
   const selectedBundleId = ref("");
@@ -53,13 +53,21 @@ export const useCampaignBundles = () => {
   // Bundle customization state
   const bundleCustomization = ref<BundleCustomization | null>(null);
 
+  // API data cache
+  const apiCampaignBundles = ref<CampaignBundle[]>([]);
+
   // =====================================
   // COMPUTED PROPERTIES
   // =====================================
 
+  // Source de données - API ou statique selon la disponibilité
+  const currentBundles = computed(() => {
+    return useStaticFallback.value ? staticCampaignBundles : apiCampaignBundles.value;
+  });
+
   // Filtered bundles based on current filters
   const filteredBundles = computed(() => {
-    let result = [...campaignBundles];
+    let result = [...currentBundles.value];
 
     // Filter by audience
     if (audienceFilter.value !== "all") {
@@ -100,7 +108,7 @@ export const useCampaignBundles = () => {
   // Available audiences from current bundles
   const availableAudiences = computed(() => {
     const audiences = new Set(
-      campaignBundles
+      currentBundles.value
         .filter((bundle) => bundle.isActive)
         .map((bundle) => bundle.targetAudience)
     );
@@ -110,7 +118,7 @@ export const useCampaignBundles = () => {
   // Available budgets from current bundles
   const availableBudgets = computed(() => {
     const budgets = new Set(
-      campaignBundles
+      currentBundles.value
         .filter((bundle) => bundle.isActive)
         .map((bundle) => bundle.budgetRange)
     );
@@ -118,7 +126,9 @@ export const useCampaignBundles = () => {
   });
 
   // Featured bundles
-  const featuredBundles = computed(() => getFeaturedBundles());
+  const featuredBundles = computed(() =>
+    currentBundles.value.filter(bundle => bundle.isFeatured && bundle.isActive)
+  );
 
   // Current selection summary
   const selectionSummary = computed(() => {
@@ -155,49 +165,152 @@ export const useCampaignBundles = () => {
   // =====================================
 
   /**
-   * Load bundles data (simulate API call)
+   * Load bundles data from API with fallback to static data
    */
-  const loadBundles = async () => {
+  const loadBundles = async (forceRefresh: boolean = false) => {
     try {
       loading.value = true;
       error.value = "";
 
-      // Simulate API delay
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      // Vérifier si on a besoin de rafraîchir les données
+      const now = new Date();
+      const shouldRefresh = forceRefresh ||
+        !lastFetch.value ||
+        (now.getTime() - lastFetch.value.getTime()) > 15 * 60 * 1000; // 15 minutes
 
-      // Data is already imported statically, but we could
-      // fetch from API here in the future
-      console.log("📦 Bundles loaded successfully:", campaignBundles.length);
+      if (!shouldRefresh && apiCampaignBundles.value.length > 0) {
+        console.log("📦 Utilisation du cache local");
+        return;
+      }
+
+      console.log("🌐 Chargement des bundles depuis l'API...");
+
+      // Tentative de récupération depuis l'API
+      try {
+        const response = await $fetch<{
+          success: boolean;
+          data?: CampaignBundle[];
+          error?: string;
+        }>("/api/campaign-bundles", {
+          query: {
+            featured: false, // Récupérer tous les bundles
+          },
+        });
+
+        if (response.success && response.data) {
+          apiCampaignBundles.value = response.data;
+          useStaticFallback.value = false;
+          lastFetch.value = now;
+          console.log(`✅ ${response.data.length} bundles chargés depuis l'API`);
+        } else {
+          throw new Error(response.error || "Réponse API invalide");
+        }
+      } catch (apiError) {
+        console.warn("⚠️ Erreur API, utilisation des données statiques:", apiError);
+
+        // Fallback vers les données statiques
+        apiCampaignBundles.value = staticCampaignBundles;
+        useStaticFallback.value = true;
+        error.value = "Mode dégradé : utilisation des données en cache";
+
+        console.log(`📦 ${staticCampaignBundles.length} bundles chargés en mode statique`);
+      }
     } catch (err) {
-      error.value = "Erreur lors du chargement des packs de campagne";
-      console.error("Bundle loading error:", err);
+      console.error("❌ Erreur critique lors du chargement:", err);
+
+      // Fallback d'urgence
+      apiCampaignBundles.value = staticCampaignBundles;
+      useStaticFallback.value = true;
+      error.value = "Erreur lors du chargement, utilisation des données locales";
     } finally {
       loading.value = false;
     }
   };
 
   /**
+   * Récupère un bundle par ID depuis l'API ou le cache local
+   */
+  const fetchBundleById = async (bundleId: string): Promise<CampaignBundle | null> => {
+    try {
+      // D'abord vérifier dans le cache local
+      const cachedBundle = currentBundles.value.find(bundle => bundle.id === bundleId);
+      if (cachedBundle) {
+        console.log(`📦 Bundle trouvé dans le cache: ${cachedBundle.name}`);
+        return cachedBundle;
+      }
+
+      // Si pas en cache et qu'on utilise l'API, essayer de récupérer depuis l'API
+      if (!useStaticFallback.value) {
+        console.log(`🌐 Récupération du bundle depuis l'API: ${bundleId}`);
+
+        const response = await $fetch<{
+          success: boolean;
+          data?: CampaignBundle;
+          error?: string;
+        }>(`/api/campaign-bundles/${bundleId}`);
+
+        if (response.success && response.data) {
+          console.log(`✅ Bundle récupéré depuis l'API: ${response.data.name}`);
+          return response.data;
+        }
+      }
+
+      // Fallback vers les données statiques
+      const staticBundle = getStaticBundleById(bundleId);
+      if (staticBundle) {
+        console.log(`📦 Bundle trouvé en mode statique: ${staticBundle.name}`);
+        return staticBundle;
+      }
+
+      return null;
+    } catch (error) {
+      console.error(`❌ Erreur récupération bundle ${bundleId}:`, error);
+
+      // Fallback vers les données statiques en cas d'erreur
+      const staticBundle = getStaticBundleById(bundleId);
+      if (staticBundle) {
+        console.log(`📦 Fallback statique pour bundle: ${staticBundle.name}`);
+        return staticBundle;
+      }
+
+      return null;
+    }
+  };
+
+  /**
    * Select a bundle
    */
-  const selectBundle = (bundleId: string) => {
-    const bundle = getBundleById(bundleId);
-    if (bundle) {
-      selectedBundleId.value = bundleId;
-      selectedBundle.value = bundle;
-      isCustomSelection.value = false;
-      bundleCustomization.value = null;
+  const selectBundle = async (bundleId: string) => {
+    try {
+      loading.value = true;
 
-      // Clear multi-selection state
-      multiSelectionState.value = {
-        selections: new Map(),
-        totalItems: 0,
-        totalPrice: 0,
-      };
+      const bundle = await fetchBundleById(bundleId);
+      if (bundle) {
+        selectedBundleId.value = bundleId;
+        selectedBundle.value = bundle;
+        isCustomSelection.value = false;
+        bundleCustomization.value = null;
 
-      // Create cart from bundle
-      createCartFromBundle(bundle);
+        // Clear multi-selection state
+        multiSelectionState.value = {
+          selections: new Map(),
+          totalItems: 0,
+          totalPrice: 0,
+        };
 
-      console.log("🎯 Bundle selected:", bundle.name);
+        // Create cart from bundle
+        createCartFromBundle(bundle);
+
+        console.log("🎯 Bundle selected:", bundle.name);
+      } else {
+        error.value = `Bundle non trouvé: ${bundleId}`;
+        console.error("❌ Bundle non trouvé:", bundleId);
+      }
+    } catch (err) {
+      error.value = "Erreur lors de la sélection du bundle";
+      console.error("❌ Erreur sélection bundle:", err);
+    } finally {
+      loading.value = false;
     }
   };
 
@@ -371,15 +484,45 @@ export const useCampaignBundles = () => {
   };
 
   /**
+   * Get bundles by audience from current data source
+   */
+  const getBundlesByAudience = (audience: BundleTargetAudience) => {
+    return currentBundles.value.filter(
+      (bundle) => bundle.targetAudience === audience && bundle.isActive
+    );
+  };
+
+  /**
+   * Get bundles by budget from current data source
+   */
+  const getBundlesByBudget = (budget: BundleBudgetRange) => {
+    return currentBundles.value.filter(
+      (bundle) => bundle.budgetRange === budget && bundle.isActive
+    );
+  };
+
+  /**
+   * Get bundle by ID from current data source
+   */
+  const getBundleById = (bundleId: string): CampaignBundle | null => {
+    return currentBundles.value.find((bundle) => bundle.id === bundleId) || null;
+  };
+
+  /**
+   * Refresh data from API
+   */
+  const refreshBundles = async () => {
+    await loadBundles(true);
+  };
+
+  /**
    * Get recommendation based on target audience and budget
    */
   const getRecommendation = (
     audience: BundleTargetAudience,
     maxBudget?: number
   ): CampaignBundle | null => {
-    let candidates = getBundlesByAudience(audience).filter(
-      (bundle) => bundle.isActive
-    );
+    let candidates = getBundlesByAudience(audience);
 
     if (maxBudget) {
       candidates = candidates.filter(
@@ -396,14 +539,22 @@ export const useCampaignBundles = () => {
   // =====================================
 
   // Watch for bundle selection changes
-  watch(selectedBundleId, (newId) => {
-    if (newId) {
-      const bundle = getBundleById(newId);
+  watch(selectedBundleId, async (newId) => {
+    if (newId && !selectedBundle.value) {
+      const bundle = await fetchBundleById(newId);
       if (bundle) {
         selectedBundle.value = bundle;
       }
     }
   });
+
+  // Watch for API data changes to trigger re-computation
+  watch(
+    () => [apiCampaignBundles.value.length, useStaticFallback.value],
+    () => {
+      console.log(`📊 Données mises à jour: ${currentBundles.value.length} bundles disponibles`);
+    }
+  );
 
   // =====================================
   // INITIALIZATION
@@ -422,6 +573,8 @@ export const useCampaignBundles = () => {
     // State
     loading: readonly(loading),
     error: readonly(error),
+    lastFetch: readonly(lastFetch),
+    useStaticFallback: readonly(useStaticFallback),
     selectedBundleId: readonly(selectedBundleId),
     selectedBundle: readonly(selectedBundle),
     isCustomSelection: readonly(isCustomSelection),
@@ -430,6 +583,7 @@ export const useCampaignBundles = () => {
     bundleCustomization: readonly(bundleCustomization),
 
     // Computed
+    currentBundles,
     filteredBundles,
     availableAudiences,
     availableBudgets,
@@ -443,6 +597,8 @@ export const useCampaignBundles = () => {
 
     // Methods
     loadBundles,
+    refreshBundles,
+    fetchBundleById,
     selectBundle,
     selectCustom,
     addToCustomSelection,
@@ -453,10 +609,12 @@ export const useCampaignBundles = () => {
     reset,
     getRecommendation,
 
-    // Static data access
-    allBundles: campaignBundles,
+    // Data access methods
     getBundleById,
     getBundlesByAudience,
     getBundlesByBudget,
+
+    // Legacy static access (for backward compatibility)
+    allBundles: computed(() => currentBundles.value),
   };
 };

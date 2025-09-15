@@ -6,6 +6,276 @@
  */
 
 export const AIRTABLE_SCHEMA = {
+  // =====================================
+  // CAMPAIGN BUNDLES MANAGEMENT
+  // =====================================
+
+  // Table principale des packs de campagne
+  CampaignBundles: {
+    tableName: 'CampaignBundles',
+    description: 'Gestion des packs de campagne pré-configurés NS2PO',
+    fields: {
+      // Identifiants
+      name: {
+        type: 'singleLineText',
+        description: 'Nom du pack (ex: Pack Argent)',
+        required: true
+      },
+
+      bundle_id: {
+        type: 'singleLineText',
+        description: 'ID unique du bundle (ex: pack-argent-001)',
+        required: true
+      },
+
+      description: {
+        type: 'longText',
+        description: 'Description marketing du pack'
+      },
+
+      // Ciblage et positionnement
+      target_audience: {
+        type: 'singleSelect',
+        options: [
+          { name: 'local', color: 'blueLight2' },
+          { name: 'regional', color: 'greenLight2' },
+          { name: 'national', color: 'purpleLight2' },
+          { name: 'universal', color: 'orangeLight2' }
+        ],
+        description: 'Niveau de campagne ciblé'
+      },
+
+      budget_range: {
+        type: 'singleSelect',
+        options: [
+          { name: 'starter', color: 'grayLight2' },
+          { name: 'medium', color: 'yellowLight2' },
+          { name: 'premium', color: 'redLight2' },
+          { name: 'enterprise', color: 'purpleLight2' }
+        ],
+        description: 'Gamme budgétaire'
+      },
+
+      // Tarification
+      estimated_total: {
+        type: 'currency',
+        description: 'Prix total estimé avec remise',
+        symbol: 'FCFA',
+        required: true
+      },
+
+      original_total: {
+        type: 'currency',
+        description: 'Prix original avant remise',
+        symbol: 'FCFA'
+      },
+
+      savings: {
+        type: 'currency',
+        description: 'Montant d\'économie (original - estimé)',
+        symbol: 'FCFA'
+      },
+
+      // Métriques et popularité
+      popularity: {
+        type: 'number',
+        description: 'Score de popularité (0-100)',
+        precision: 0
+      },
+
+      // Statuts et contrôles
+      is_active: {
+        type: 'checkbox',
+        description: 'Pack visible et sélectionnable',
+        defaultValue: true
+      },
+
+      is_featured: {
+        type: 'checkbox',
+        description: 'Pack mis en avant (badge populaire)'
+      },
+
+      // Tags et métadonnées
+      tags: {
+        type: 'multipleSelects',
+        options: [
+          { name: '5k-personnes', color: 'blueLight1' },
+          { name: '10k-15k-personnes', color: 'greenLight1' },
+          { name: '20k-30k-personnes', color: 'purpleLight1' },
+          { name: 'campagne-locale', color: 'orangeLight1' },
+          { name: 'départementale', color: 'yellowLight1' },
+          { name: 'national', color: 'redLight1' },
+          { name: 'budget-optimisé', color: 'grayLight1' },
+          { name: 'prestige', color: 'purpleLight1' },
+          { name: 'premium', color: 'redLight1' }
+        ],
+        description: 'Tags de classification et recherche'
+      },
+
+      // Relations
+      bundle_products: {
+        type: 'multipleRecordLinks',
+        linkedTable: 'BundleProducts',
+        description: 'Produits inclus dans ce pack'
+      },
+
+      // Timestamps
+      created_time: {
+        type: 'createdTime',
+        description: 'Date de création automatique'
+      },
+
+      last_modified: {
+        type: 'lastModifiedTime',
+        description: 'Dernière modification automatique'
+      },
+
+      // Cache et synchronisation
+      last_cache_invalidation: {
+        type: 'dateTime',
+        description: 'Dernière invalidation cache'
+      },
+
+      sync_status: {
+        type: 'singleSelect',
+        options: [
+          { name: 'synced', color: 'greenBright' },
+          { name: 'pending', color: 'yellowBright' },
+          { name: 'error', color: 'redBright' }
+        ],
+        description: 'Statut de synchronisation avec frontend'
+      }
+    },
+
+    // Vues optimisées pour la gestion
+    views: {
+      'Packs Actifs': {
+        type: 'grid',
+        filters: [{ field: 'is_active', operator: 'is', value: true }],
+        sort: [{ field: 'popularity', direction: 'desc' }],
+        fields: ['name', 'target_audience', 'budget_range', 'estimated_total', 'popularity', 'is_featured']
+      },
+
+      'Par Popularité': {
+        type: 'grid',
+        sort: [
+          { field: 'is_featured', direction: 'desc' },
+          { field: 'popularity', direction: 'desc' }
+        ],
+        fields: ['name', 'popularity', 'estimated_total', 'target_audience']
+      },
+
+      'Gestion Tarifs': {
+        type: 'grid',
+        fields: ['name', 'estimated_total', 'original_total', 'savings', 'last_modified'],
+        sort: [{ field: 'estimated_total', direction: 'desc' }]
+      },
+
+      'Sync Status': {
+        type: 'grid',
+        filters: [{ field: 'sync_status', operator: 'is not', value: 'synced' }],
+        fields: ['name', 'sync_status', 'last_cache_invalidation', 'last_modified']
+      }
+    }
+  },
+
+  // Table des produits dans les bundles
+  BundleProducts: {
+    tableName: 'BundleProducts',
+    description: 'Produits inclus dans les packs de campagne avec quantités',
+    fields: {
+      // Identifiants
+      product_name: {
+        type: 'singleLineText',
+        description: 'Nom du produit dans le bundle',
+        required: true
+      },
+
+      product_id: {
+        type: 'singleLineText',
+        description: 'ID référence du produit',
+        required: true
+      },
+
+      // Tarification
+      base_price: {
+        type: 'currency',
+        description: 'Prix unitaire de base',
+        symbol: 'FCFA',
+        required: true
+      },
+
+      quantity: {
+        type: 'number',
+        description: 'Quantité incluse dans le pack',
+        precision: 0,
+        required: true
+      },
+
+      subtotal: {
+        type: 'formula',
+        description: 'Sous-total calculé (base_price * quantity)',
+        formula: '{base_price} * {quantity}'
+      },
+
+      // Relations
+      campaign_bundle: {
+        type: 'multipleRecordLinks',
+        linkedTable: 'CampaignBundles',
+        description: 'Pack(s) contenant ce produit'
+      },
+
+      // Référence vers table Products existante (optionnel)
+      linked_product: {
+        type: 'multipleRecordLinks',
+        linkedTable: 'Products',
+        description: 'Lien vers le produit du catalogue principal'
+      },
+
+      // Métadonnées
+      display_order: {
+        type: 'number',
+        description: 'Ordre d\'affichage dans le pack',
+        precision: 0
+      },
+
+      // Timestamps
+      created_time: {
+        type: 'createdTime',
+        description: 'Date de création automatique'
+      },
+
+      last_modified: {
+        type: 'lastModifiedTime',
+        description: 'Dernière modification automatique'
+      }
+    },
+
+    // Vues optimisées
+    views: {
+      'Par Bundle': {
+        type: 'grid',
+        sort: [
+          { field: 'campaign_bundle', direction: 'asc' },
+          { field: 'display_order', direction: 'asc' }
+        ],
+        fields: ['product_name', 'campaign_bundle', 'quantity', 'base_price', 'subtotal']
+      },
+
+      'Prix Élevés': {
+        type: 'grid',
+        sort: [{ field: 'subtotal', direction: 'desc' }],
+        fields: ['product_name', 'base_price', 'quantity', 'subtotal', 'campaign_bundle']
+      },
+
+      'Récent': {
+        type: 'grid',
+        sort: [{ field: 'last_modified', direction: 'desc' }],
+        fields: ['product_name', 'campaign_bundle', 'last_modified']
+      }
+    }
+  },
+
   // Table principale pour tous les assets
   Assets: {
     tableName: 'Assets',
@@ -285,6 +555,109 @@ export const AIRTABLE_AUTOMATIONS = {
         message: '🆕 Nouvel asset uploadé: {{name}} ({{category}}/{{subcategory}})'
       }
     ]
+  },
+
+  // =====================================
+  // CAMPAIGN BUNDLES AUTOMATIONS
+  // =====================================
+
+  // Automation 4: Invalidation cache sur mise à jour bundle
+  bundleCacheInvalidation: {
+    name: 'Bundle Cache Invalidation on Update',
+    trigger: {
+      type: 'recordUpdated',
+      table: 'CampaignBundles',
+      conditions: ['is_active changed', 'estimated_total changed', 'popularity changed']
+    },
+    actions: [
+      {
+        type: 'webhook',
+        url: '{{process.env.NUXT_PUBLIC_SITE_URL}}/api/campaign-bundles/invalidate-cache',
+        method: 'POST',
+        payload: {
+          bundle_id: '{{bundle_id}}',
+          record_id: '{{record_id}}',
+          trigger: 'bundle_updated'
+        }
+      },
+      {
+        type: 'updateRecord',
+        fields: {
+          last_cache_invalidation: '{{now}}',
+          sync_status: 'pending'
+        }
+      }
+    ]
+  },
+
+  // Automation 5: Recalcul automatique des totaux bundle
+  bundleTotalRecalculation: {
+    name: 'Bundle Total Recalculation',
+    trigger: {
+      type: 'recordUpdated',
+      table: 'BundleProducts',
+      conditions: ['base_price changed', 'quantity changed']
+    },
+    actions: [
+      {
+        type: 'webhook',
+        url: '{{process.env.NUXT_PUBLIC_SITE_URL}}/api/campaign-bundles/recalculate-totals',
+        method: 'POST',
+        payload: {
+          bundle_product_id: '{{record_id}}',
+          campaign_bundle_ids: '{{campaign_bundle}}',
+          trigger: 'product_updated'
+        }
+      }
+    ]
+  },
+
+  // Automation 6: Sync vers cache frontend
+  bundleFrontendSync: {
+    name: 'Bundle Frontend Cache Sync',
+    trigger: {
+      type: 'recordUpdated',
+      table: 'CampaignBundles',
+      conditions: ['sync_status changed to pending']
+    },
+    actions: [
+      {
+        type: 'webhook',
+        url: '{{process.env.NUXT_PUBLIC_SITE_URL}}/api/campaign-bundles/sync-frontend',
+        method: 'POST',
+        payload: {
+          bundle_data: '{{all_fields}}',
+          operation: 'sync_cache',
+          timestamp: '{{now}}'
+        }
+      }
+    ]
+  },
+
+  // Automation 7: Notification nouveau pack créé
+  newBundleNotification: {
+    name: 'New Campaign Bundle Notification',
+    trigger: {
+      type: 'recordCreated',
+      table: 'CampaignBundles'
+    },
+    actions: [
+      {
+        type: 'slack',
+        message: '🎯 Nouveau pack de campagne créé: {{name}} ({{target_audience}}, {{estimated_total}} FCFA)'
+      },
+      {
+        type: 'webhook',
+        url: '{{process.env.NUXT_PUBLIC_SITE_URL}}/api/campaign-bundles/webhook/new-bundle',
+        method: 'POST',
+        payload: {
+          bundle_id: '{{bundle_id}}',
+          name: '{{name}}',
+          target_audience: '{{target_audience}}',
+          estimated_total: '{{estimated_total}}'
+        }
+      }
+    ]
   }
 };
 
@@ -298,27 +671,101 @@ export const AIRTABLE_SETUP_SCRIPT = `
 const baseId = 'YOUR_BASE_ID';
 const tables = ${JSON.stringify(AIRTABLE_SCHEMA, null, 2)};
 
-async function createAssetTables() {
-  console.log('🚀 Création des tables Assets...');
-  
-  // Création de la table Assets
-  const assetsTable = await base.createTableAsync(
-    tables.Assets.tableName,
-    tables.Assets.fields
-  );
-  
-  console.log('✅ Table Assets créée:', assetsTable.name);
-  
-  // Création de la table SyncLog
-  const syncLogTable = await base.createTableAsync(
-    tables.SyncLog.tableName,
-    tables.SyncLog.fields
-  );
-  
-  console.log('✅ Table SyncLog créée:', syncLogTable.name);
-  console.log('🎉 Setup terminé !');
+async function createAllTables() {
+  console.log('🚀 Création du schéma complet Airtable NS2PO...');
+
+  try {
+    // =====================================
+    // CAMPAIGN BUNDLES TABLES
+    // =====================================
+
+    console.log('📦 Création des tables Campaign Bundles...');
+
+    // 1. Création de la table CampaignBundles
+    const campaignBundlesTable = await base.createTableAsync(
+      tables.CampaignBundles.tableName,
+      tables.CampaignBundles.fields
+    );
+    console.log('✅ Table CampaignBundles créée:', campaignBundlesTable.name);
+
+    // 2. Création de la table BundleProducts
+    const bundleProductsTable = await base.createTableAsync(
+      tables.BundleProducts.tableName,
+      tables.BundleProducts.fields
+    );
+    console.log('✅ Table BundleProducts créée:', bundleProductsTable.name);
+
+    // =====================================
+    // ASSET MANAGEMENT TABLES
+    // =====================================
+
+    console.log('🖼️ Création des tables Asset Management...');
+
+    // 3. Création de la table Assets
+    const assetsTable = await base.createTableAsync(
+      tables.Assets.tableName,
+      tables.Assets.fields
+    );
+    console.log('✅ Table Assets créée:', assetsTable.name);
+
+    // 4. Création de la table SyncLog
+    const syncLogTable = await base.createTableAsync(
+      tables.SyncLog.tableName,
+      tables.SyncLog.fields
+    );
+    console.log('✅ Table SyncLog créée:', syncLogTable.name);
+
+    // =====================================
+    // CONFIGURATION DES VUES
+    // =====================================
+
+    console.log('👁️ Configuration des vues optimisées...');
+
+    // Vues pour CampaignBundles
+    for (const [viewName, viewConfig] of Object.entries(tables.CampaignBundles.views)) {
+      try {
+        await campaignBundlesTable.createViewAsync(viewName, viewConfig.type, {
+          visibleFields: viewConfig.fields?.map(f => campaignBundlesTable.getFieldByName(f)),
+          sorts: viewConfig.sort?.map(s => ({
+            field: campaignBundlesTable.getFieldByName(s.field),
+            direction: s.direction
+          }))
+        });
+        console.log('📋 Vue CampaignBundles créée:', viewName);
+      } catch (err) {
+        console.warn('⚠️ Échec création vue:', viewName, err.message);
+      }
+    }
+
+    // Vues pour BundleProducts
+    for (const [viewName, viewConfig] of Object.entries(tables.BundleProducts.views)) {
+      try {
+        await bundleProductsTable.createViewAsync(viewName, viewConfig.type, {
+          visibleFields: viewConfig.fields?.map(f => bundleProductsTable.getFieldByName(f)),
+          sorts: viewConfig.sort?.map(s => ({
+            field: bundleProductsTable.getFieldByName(s.field),
+            direction: s.direction
+          }))
+        });
+        console.log('📋 Vue BundleProducts créée:', viewName);
+      } catch (err) {
+        console.warn('⚠️ Échec création vue:', viewName, err.message);
+      }
+    }
+
+    console.log('🎉 Setup complet terminé avec succès !');
+    console.log('📊 Tables créées:');
+    console.log('   - CampaignBundles (' + Object.keys(tables.CampaignBundles.fields).length + ' champs)');
+    console.log('   - BundleProducts (' + Object.keys(tables.BundleProducts.fields).length + ' champs)');
+    console.log('   - Assets (' + Object.keys(tables.Assets.fields).length + ' champs)');
+    console.log('   - SyncLog (' + Object.keys(tables.SyncLog.fields).length + ' champs)');
+
+  } catch (error) {
+    console.error('❌ Erreur lors du setup:', error);
+    console.error('Stack:', error.stack);
+  }
 }
 
-// Exécuter le setup
-createAssetTables();
+// Exécuter le setup complet
+createAllTables();
 `;

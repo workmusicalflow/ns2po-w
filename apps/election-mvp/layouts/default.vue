@@ -37,6 +37,16 @@
             </NuxtLink>
             -->
             <NuxtLink
+              to="/realisations"
+              class="text-gray-600 hover:text-primary transition-colors"
+              :class="{
+                'text-primary font-medium':
+                  $route.path.startsWith('/realisations'),
+              }"
+            >
+              Réalisations
+            </NuxtLink>
+            <NuxtLink
               to="/devis"
               class="text-gray-600 hover:text-primary transition-colors"
               :class="{ 'text-primary font-medium': $route.path === '/devis' }"
@@ -116,6 +126,17 @@
               Catalogue
             </NuxtLink>
             -->
+            <NuxtLink
+              to="/realisations"
+              class="block text-gray-600 hover:text-primary transition-colors"
+              :class="{
+                'text-primary font-medium':
+                  $route.path.startsWith('/realisations'),
+              }"
+              @click="mobileMenuOpen = false"
+            >
+              Réalisations
+            </NuxtLink>
             <NuxtLink
               to="/devis"
               class="block text-gray-600 hover:text-primary transition-colors"
@@ -218,6 +239,14 @@
               -->
               <li>
                 <NuxtLink
+                  to="/realisations"
+                  class="text-gray-300 hover:text-white transition-colors"
+                >
+                  Nos réalisations
+                </NuxtLink>
+              </li>
+              <li>
+                <NuxtLink
                   to="/devis"
                   class="text-gray-300 hover:text-white transition-colors"
                 >
@@ -226,7 +255,7 @@
               </li>
               <li>
                 <NuxtLink
-                  to="/contact"
+                  to="/contacts"
                   class="text-gray-300 hover:text-white transition-colors"
                 >
                   Nous contacter
