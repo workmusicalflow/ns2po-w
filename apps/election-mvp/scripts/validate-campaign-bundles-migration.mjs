@@ -74,10 +74,10 @@ async function validateCampaignBundles() {
 }
 
 async function validateBundleProducts() {
-  console.log('\n📦 Validation des BundleProducts...');
+  console.log('\n📦 Validation des CampaignBundleProducts...');
 
   try {
-    const records = await base('BundleProducts').select().all();
+    const records = await base('CampaignBundleProducts').select().all();
     console.log(`✅ ${records.length} produits trouvés dans Airtable`);
 
     const productsByBundle = {};
@@ -135,7 +135,7 @@ async function validateBundleProducts() {
       bundleBreakdown: productsByBundle
     };
   } catch (error) {
-    console.error('❌ Erreur validation BundleProducts:', error);
+    console.error('❌ Erreur validation CampaignBundleProducts:', error);
     throw error;
   }
 }
@@ -174,7 +174,7 @@ async function validateAPICompatibility() {
     }
 
     // Test de récupération des produits
-    const products = await base('BundleProducts')
+    const products = await base('CampaignBundleProducts')
       .select({
         filterByFormula: `FIND("${bundle.id}", ARRAYJOIN({campaign_bundle}, ","))`,
         maxRecords: 5
@@ -201,7 +201,7 @@ async function generateMigrationReport() {
     console.log('\n🎉 RAPPORT DE MIGRATION');
     console.log('='.repeat(50));
     console.log(`📦 CampaignBundles: ${bundleValidation.valid}/${bundleValidation.expected} ✅`);
-    console.log(`📦 BundleProducts: ${productValidation.total} total (attendu: ${productValidation.expected})`);
+    console.log(`📦 CampaignBundleProducts: ${productValidation.total} total (attendu: ${productValidation.expected})`);
     console.log(`🔌 Compatibilité API: ${apiCompatible ? '✅' : '❌'}`);
 
     if (bundleValidation.errors.length > 0) {

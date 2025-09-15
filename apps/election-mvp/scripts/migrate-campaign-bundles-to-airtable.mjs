@@ -7,13 +7,6 @@
  */
 
 import Airtable from 'airtable';
-import { readFileSync } from 'fs';
-import { fileURLToPath } from 'url';
-import { dirname, join } from 'path';
-
-// Configuration
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
 
 // Configuration Airtable
 const AIRTABLE_API_KEY = process.env.AIRTABLE_API_KEY;
@@ -229,7 +222,7 @@ async function migrateBundles() {
         if (isDryRun) {
           console.log(`📋 [DRY RUN] Produit à créer:`, productRecord);
         } else {
-          const createdProduct = await base('BundleProducts').create(productRecord);
+          const createdProduct = await base('CampaignBundleProducts').create(productRecord);
           console.log(`  ✅ Produit créé: ${product.product_name} (${createdProduct.id})`);
           results.products.push(createdProduct.id);
         }

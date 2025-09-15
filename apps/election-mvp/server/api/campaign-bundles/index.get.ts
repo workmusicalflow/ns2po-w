@@ -3,6 +3,7 @@
  * Récupère tous les campaign bundles actifs depuis Airtable
  */
 
+import { setHeader, setResponseStatus } from 'h3';
 import { airtableService } from "~/services/airtable";
 import type { BundleApiResponse } from "@ns2po/types";
 

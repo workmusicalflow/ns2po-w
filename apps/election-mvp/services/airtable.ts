@@ -36,7 +36,7 @@ interface AirtableCampaignBundle {
     is_active?: boolean;
     is_featured?: boolean;
     tags?: string[];
-    bundle_products?: string[]; // IDs des BundleProducts liés
+    CampaignBundleProducts?: string[]; // IDs des CampaignBundleProducts liés
     created_time?: string;
     last_modified?: string;
     sync_status?: string;
@@ -340,7 +340,7 @@ export class AirtableService {
    */
   async getBundleProducts(bundleId: string): Promise<BundleProduct[]> {
     try {
-      const records = await this.base("BundleProducts")
+      const records = await this.base("CampaignBundleProducts")
         .select({
           filterByFormula: `FIND("${bundleId}", ARRAYJOIN({campaign_bundle}, ","))`,
           sort: [{ field: "display_order", direction: "asc" }],

@@ -6,12 +6,8 @@
  * Usage: node scripts/test-campaign-bundles-integration.mjs [--verbose]
  */
 
-import { fileURLToPath } from 'url';
-import { dirname, join } from 'path';
-
-// Configuration
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+// Configuration Environnement
+import process from 'process';
 
 // Arguments
 const args = process.argv.slice(2);
@@ -388,7 +384,7 @@ async function testPerformance() {
 async function testMigrationScriptLogic() {
   // Test de la logique du script de migration (sans exécution)
   try {
-    const migrationScript = await import('./migrate-campaign-bundles-to-airtable.mjs');
+    await import('./migrate-campaign-bundles-to-airtable.mjs');
 
     // Vérifier que le script peut être importé sans erreur
     if (verbose) {

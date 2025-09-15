@@ -1,0 +1,88 @@
+{
+  "name": "NS2PO Élections MVP - Sprint Correction Itérative",
+  "description": "Sprint de correction pour simplifier les packs de campagne. Garder seulement 3 packs : Argent (5K personnes), Or (10-15K personnes), et Platinium (20-30K personnes). Optimisation du ciblage électoral et amélioration de l'expérience utilisateur.",
+  "created": "2025-09-14T23:22:46.046Z",
+  "updated": "2025-09-14T23:37:43.825Z",
+  "tasks": [
+    {
+      "id": 1,
+      "title": "Analyser les packs de campagne existants",
+      "description": "Identifier tous les packs de campagne actuels dans le code et la base de données (Airtable/Turso) pour comprendre la structure existante avant simplification",
+      "status": "pending",
+      "priority": 5,
+      "dependencies": [],
+      "created": "2025-09-14T23:22:50.936Z",
+      "updated": "2025-09-14T23:22:50.936Z"
+    },
+    {
+      "id": 2,
+      "title": "Redéfinir les 3 nouveaux packs (Argent, Or, Platinium)",
+      "description": "Créer les spécifications des 3 nouveaux packs : Argent (5K personnes), Or (10-15K personnes), Platinium (20-30K personnes) avec produits, prix et ciblage optimisés",
+      "status": "completed",
+      "priority": 5,
+      "dependencies": [
+        1
+      ],
+      "created": "2025-09-14T23:22:55.408Z",
+      "updated": "2025-09-14T23:26:58.397Z"
+    },
+    {
+      "id": 3,
+      "title": "Mettre à jour la base de données Airtable",
+      "description": "Modifier les données Airtable pour supprimer les anciens packs et ajouter les 3 nouveaux packs de campagne avec leurs spécifications",
+      "status": "pending",
+      "priority": 4,
+      "dependencies": [
+        2
+      ],
+      "created": "2025-09-14T23:22:59.799Z",
+      "updated": "2025-09-14T23:22:59.799Z"
+    },
+    {
+      "id": 4,
+      "title": "Adapter les composables de packs de campagne",
+      "description": "Mettre à jour useCampaignBundles.ts et autres composables pour gérer les 3 nouveaux packs uniquement",
+      "status": "completed",
+      "priority": 4,
+      "dependencies": [
+        3
+      ],
+      "created": "2025-09-14T23:23:04.239Z",
+      "updated": "2025-09-14T23:37:30.913Z"
+    },
+    {
+      "id": 5,
+      "title": "Mettre à jour l'interface utilisateur",
+      "description": "Adapter les composants UI (BundleSelector, PersistentSummary, etc.) pour afficher uniquement les 3 nouveaux packs",
+      "status": "completed",
+      "priority": 3,
+      "dependencies": [
+        4
+      ],
+      "created": "2025-09-14T23:23:09.085Z",
+      "updated": "2025-09-14T23:37:34.743Z"
+    },
+    {
+      "id": 6,
+      "title": "Créer le hook de session NS2PO",
+      "description": "Écrire le hook de démarrage de session spécifique au projet NS2PO en s'inspirant du hook JELI existant",
+      "status": "completed",
+      "priority": 2,
+      "dependencies": [],
+      "created": "2025-09-14T23:23:13.523Z",
+      "updated": "2025-09-14T23:25:13.986Z"
+    },
+    {
+      "id": 7,
+      "title": "Valider le fonctionnement complet des 3 nouveaux packs",
+      "description": "Tester que les 3 packs (Argent, Or, Platinium) s'affichent correctement dans l'interface et que la sélection fonctionne",
+      "status": "completed",
+      "priority": 3,
+      "dependencies": [
+        5
+      ],
+      "created": "2025-09-14T23:37:40.040Z",
+      "updated": "2025-09-14T23:37:43.825Z"
+    }
+  ]
+}

@@ -385,11 +385,11 @@ export const useCache = () => {
 
   return {
     // State
-    loading: readonly(loading),
-    error: readonly(error),
+    loading,
+    error,
     cacheSize,
     memoryUsage,
-    cacheStats: readonly(cacheStats),
+    cacheStats,
 
     // Core operations
     get,
