@@ -1,6 +1,6 @@
 /**
  * API Route: PUT /api/campaign-bundles/[id]
- * Met à jour un campaign bundle existant
+ * Met à jour un campaign bundle existant avec la nouvelle structure Turso
  */
 
 import { getDatabase } from "~/server/utils/database"
@@ -23,8 +23,6 @@ export default defineEventHandler(async (event) => {
 
     // Récupération du body
     const body = await readBody(event)
-
-    // Ajouter l'ID au body pour la validation
     body.id = bundleId
 
     // Validation du schéma
@@ -58,8 +56,8 @@ export default defineEventHandler(async (event) => {
 
     // Vérifier que le bundle existe
     const existingBundle = await db.execute({
-      sql: 'SELECT id FROM campaign_bundles WHERE id = ? OR airtable_id = ?',
-      args: [bundleId, bundleId]
+      sql: 'SELECT id FROM campaign_bundles WHERE id = ?',
+      args: [bundleId]
     })
 
     if (existingBundle.rows.length === 0) {
@@ -85,16 +83,19 @@ export default defineEventHandler(async (event) => {
       }
     }
 
-    // Calculs automatiques si des produits sont fournis
-    let calculatedTotal = validatedData.estimatedTotal
-    let savings = validatedData.savings
-
-    if (validatedData.products) {
-      calculatedTotal = validatedData.products.reduce((total, product) => total + product.subtotal, 0)
-      savings = (validatedData.originalTotal || 0) - calculatedTotal
-    }
-
     try {
+      // Calculs automatiques
+      let calculatedTotal = validatedData.estimatedTotal
+      let discountPercentage = 0
+      let basePrice = validatedData.originalTotal
+
+      if (validatedData.products) {
+        const productsTotal = validatedData.products.reduce((total, product) => total + product.subtotal, 0)
+        calculatedTotal = productsTotal
+        basePrice = validatedData.originalTotal || productsTotal
+        discountPercentage = basePrice > 0 ? ((basePrice - calculatedTotal) / basePrice * 100) : 0
+      }
+
       // Construire la requête UPDATE dynamiquement
       const updateFields = []
       const updateArgs = []
@@ -114,29 +115,14 @@ export default defineEventHandler(async (event) => {
         updateArgs.push(validatedData.targetAudience)
       }
 
-      if (validatedData.budgetRange !== undefined) {
-        updateFields.push('budget_range = ?')
-        updateArgs.push(validatedData.budgetRange)
+      if (basePrice !== undefined) {
+        updateFields.push('base_price = ?')
+        updateArgs.push(basePrice)
       }
 
-      if (calculatedTotal !== undefined) {
-        updateFields.push('estimated_total = ?')
-        updateArgs.push(calculatedTotal)
-      }
-
-      if (validatedData.originalTotal !== undefined) {
-        updateFields.push('original_total = ?')
-        updateArgs.push(validatedData.originalTotal)
-      }
-
-      if (savings !== undefined) {
-        updateFields.push('savings = ?')
-        updateArgs.push(savings)
-      }
-
-      if (validatedData.popularity !== undefined) {
-        updateFields.push('popularity = ?')
-        updateArgs.push(validatedData.popularity)
+      if (discountPercentage !== undefined) {
+        updateFields.push('discount_percentage = ?')
+        updateArgs.push(discountPercentage)
       }
 
       if (validatedData.isActive !== undefined) {
@@ -144,23 +130,32 @@ export default defineEventHandler(async (event) => {
         updateArgs.push(validatedData.isActive ? 1 : 0)
       }
 
-      if (validatedData.isFeatured !== undefined) {
-        updateFields.push('is_featured = ?')
-        updateArgs.push(validatedData.isFeatured ? 1 : 0)
+      if (validatedData.displayOrder !== undefined) {
+        updateFields.push('display_order = ?')
+        updateArgs.push(validatedData.displayOrder)
+      }
+
+      if (validatedData.icon !== undefined) {
+        updateFields.push('icon = ?')
+        updateArgs.push(validatedData.icon)
+      }
+
+      if (validatedData.color !== undefined) {
+        updateFields.push('color = ?')
+        updateArgs.push(validatedData.color)
       }
 
       if (validatedData.tags !== undefined) {
-        updateFields.push('tags = ?')
+        updateFields.push('features = ?')
         updateArgs.push(JSON.stringify(validatedData.tags))
       }
 
       // Toujours mettre à jour updated_at
-      updateFields.push('updated_at = datetime(\'now\')')
-      updateArgs.push(bundleId) // Pour la clause WHERE
+      updateFields.push('updated_at = CURRENT_TIMESTAMP')
 
       if (updateFields.length > 1) { // Plus que juste updated_at
-        const sql = `UPDATE campaign_bundles SET ${updateFields.join(', ')} WHERE id = ? OR airtable_id = ?`
-        updateArgs.push(bundleId) // Deuxième paramètre pour la clause WHERE
+        updateArgs.push(bundleId) // Pour la clause WHERE
+        const sql = `UPDATE campaign_bundles SET ${updateFields.join(', ')} WHERE id = ?`
 
         await db.execute({
           sql,
@@ -172,24 +167,24 @@ export default defineEventHandler(async (event) => {
       if (validatedData.products) {
         // Supprimer les anciens produits
         await db.execute({
-          sql: 'DELETE FROM bundle_products WHERE campaign_bundle_id = ?',
+          sql: 'DELETE FROM bundle_products WHERE bundle_id = ?',
           args: [bundleId]
         })
 
         // Ajouter les nouveaux produits
-        for (const product of validatedData.products) {
+        for (let i = 0; i < validatedData.products.length; i++) {
+          const product = validatedData.products[i]
           await db.execute({
             sql: `INSERT INTO bundle_products (
-              campaign_bundle_id, product_id, product_name, base_price,
-              quantity, subtotal, created_at
-            ) VALUES (?, ?, ?, ?, ?, ?, datetime('now'))`,
+              bundle_id, product_id, quantity, custom_price, is_required, display_order
+            ) VALUES (?, ?, ?, ?, ?, ?)`,
             args: [
               bundleId,
               product.id,
-              product.name,
-              product.basePrice,
               product.quantity,
-              product.subtotal
+              product.basePrice,
+              product.isRequired !== false ? 1 : 0,
+              i + 1
             ]
           })
         }
@@ -197,52 +192,80 @@ export default defineEventHandler(async (event) => {
 
       console.log(`✅ Bundle mis à jour avec succès: ${bundleId}`)
 
-      // Récupérer le bundle mis à jour
+      // Récupérer le bundle mis à jour avec ses produits
       const updatedBundleResult = await db.execute({
         sql: `SELECT
-          id, airtable_id, name, description, target_audience as targetAudience,
-          budget_range as budgetRange, estimated_total as estimatedTotal,
-          original_total as originalTotal, savings, popularity, is_active as isActive,
-          is_featured as isFeatured, tags, created_at as createdAt, updated_at as updatedAt
-        FROM campaign_bundles WHERE id = ? OR airtable_id = ?`,
-        args: [bundleId, bundleId]
+          cb.id, cb.name, cb.description, cb.target_audience as targetAudience,
+          cb.base_price as basePrice, cb.discount_percentage as discountPercentage,
+          cb.final_price as finalPrice, cb.is_active as isActive,
+          cb.display_order as displayOrder, cb.icon, cb.color, cb.features,
+          cb.created_at as createdAt, cb.updated_at as updatedAt
+        FROM campaign_bundles cb WHERE cb.id = ?`,
+        args: [bundleId]
       })
+
+      if (updatedBundleResult.rows.length === 0) {
+        throw createError({
+          statusCode: 404,
+          statusMessage: 'Bundle non trouvé après mise à jour'
+        })
+      }
 
       const bundleData = updatedBundleResult.rows[0]
 
-      // Récupérer les produits
+      // Récupérer les produits associés
       const productsResult = await db.execute({
-        sql: `SELECT product_id, product_name, base_price, quantity, subtotal
-              FROM bundle_products WHERE campaign_bundle_id = ?`,
+        sql: `
+          SELECT
+            bp.product_id, p.name as product_name,
+            COALESCE(bp.custom_price, p.base_price) as basePrice,
+            bp.quantity,
+            (COALESCE(bp.custom_price, p.base_price) * bp.quantity) as subtotal,
+            bp.is_required
+          FROM bundle_products bp
+          LEFT JOIN products p ON bp.product_id = p.id
+          WHERE bp.bundle_id = ?
+          ORDER BY bp.display_order ASC
+        `,
         args: [bundleId]
       })
 
       const products = productsResult.rows.map((row: any) => ({
         id: row.product_id,
         name: row.product_name,
-        basePrice: Number(row.base_price) || 0,
+        basePrice: Number(row.basePrice) || 0,
         quantity: Number(row.quantity) || 1,
-        subtotal: Number(row.subtotal) || 0
+        subtotal: Number(row.subtotal) || 0,
+        isRequired: Boolean(row.is_required)
       }))
+
+      // Calculer les totaux
+      const estimatedTotal = Number(bundleData.finalPrice) || 0
+      const originalTotal = products.reduce((sum, p) => sum + p.subtotal, 0)
+      const savings = originalTotal - estimatedTotal
 
       const response = {
         success: true,
         data: {
-          id: bundleData.airtable_id || bundleData.id,
+          id: String(bundleData.id),
           name: bundleData.name,
           description: bundleData.description || '',
           targetAudience: bundleData.targetAudience,
-          budgetRange: bundleData.budgetRange,
+          budgetRange: estimatedTotal < 20000 ? 'starter' : estimatedTotal < 50000 ? 'standard' : 'premium',
           products,
-          estimatedTotal: Number(bundleData.estimatedTotal) || 0,
-          originalTotal: Number(bundleData.originalTotal) || 0,
-          savings: Number(bundleData.savings) || 0,
-          popularity: Number(bundleData.popularity) || 0,
+          estimatedTotal,
+          originalTotal,
+          savings: Math.max(0, savings),
+          popularity: 90,
           isActive: Boolean(bundleData.isActive),
-          isFeatured: Boolean(bundleData.isFeatured),
-          tags: bundleData.tags ? JSON.parse(bundleData.tags) : [],
+          isFeatured: bundleData.displayOrder <= 3,
+          tags: bundleData.features ? JSON.parse(bundleData.features) : [],
           createdAt: bundleData.createdAt,
-          updatedAt: bundleData.updatedAt
+          updatedAt: bundleData.updatedAt,
+          icon: bundleData.icon,
+          color: bundleData.color,
+          displayOrder: bundleData.displayOrder,
+          discountPercentage: Number(bundleData.discountPercentage) || 0
         },
         duration: Date.now() - startTime
       }

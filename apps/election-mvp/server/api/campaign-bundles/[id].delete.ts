@@ -30,8 +30,8 @@ export default defineEventHandler(async (event) => {
 
     // Vérifier que le bundle existe
     const existingBundle = await db.execute({
-      sql: 'SELECT id, name FROM campaign_bundles WHERE id = ? OR airtable_id = ?',
-      args: [bundleId, bundleId]
+      sql: 'SELECT id, name FROM campaign_bundles WHERE id = ?',
+      args: [bundleId]
     })
 
     if (existingBundle.rows.length === 0) {
@@ -44,16 +44,16 @@ export default defineEventHandler(async (event) => {
     const bundleName = existingBundle.rows[0].name
 
     try {
-      // 1. Supprimer les produits du bundle
+      // 1. Supprimer les produits du bundle (CASCADE automatique grâce aux FK)
       await db.execute({
-        sql: 'DELETE FROM bundle_products WHERE campaign_bundle_id = ?',
+        sql: 'DELETE FROM bundle_products WHERE bundle_id = ?',
         args: [bundleId]
       })
 
       // 2. Supprimer le bundle principal
       await db.execute({
-        sql: 'DELETE FROM campaign_bundles WHERE id = ? OR airtable_id = ?',
-        args: [bundleId, bundleId]
+        sql: 'DELETE FROM campaign_bundles WHERE id = ?',
+        args: [bundleId]
       })
 
       console.log(`✅ Bundle supprimé avec succès: ${bundleId} (${bundleName})`)

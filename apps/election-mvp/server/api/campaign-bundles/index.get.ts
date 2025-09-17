@@ -74,66 +74,81 @@ export default defineEventHandler(async (event): Promise<BundleApiResponse> => {
 
         let sql = `
           SELECT
-            id, airtable_id, name, description, target_audience as targetAudience,
-            budget_range as budgetRange, estimated_total as estimatedTotal,
-            original_total as originalTotal, savings, popularity, is_active as isActive,
-            is_featured as isFeatured, tags, created_at as createdAt, updated_at as updatedAt
-          FROM campaign_bundles
-          WHERE is_active = true
+            cb.id, cb.name, cb.description, cb.target_audience as targetAudience,
+            cb.base_price as basePrice, cb.discount_percentage as discountPercentage,
+            cb.final_price as finalPrice, cb.is_active as isActive,
+            cb.display_order as displayOrder, cb.icon, cb.color, cb.features,
+            cb.created_at as createdAt, cb.updated_at as updatedAt
+          FROM campaign_bundles cb
+          WHERE cb.is_active = 1
         `
 
         const conditions = []
         const args = []
 
         if (audience && audience !== "all") {
-          conditions.push("target_audience = ?")
+          conditions.push("cb.target_audience = ?")
           args.push(audience)
-        }
-
-        if (featured) {
-          conditions.push("is_featured = true")
         }
 
         if (conditions.length > 0) {
           sql += " AND " + conditions.join(" AND ")
         }
 
-        sql += " ORDER BY is_featured DESC, popularity DESC"
+        sql += " ORDER BY cb.display_order ASC, cb.created_at DESC"
 
         const result = await tursoClient.execute({ sql, args })
 
         bundles = await Promise.all(result.rows.map(async (row: any) => {
-          // Récupération des produits du bundle depuis Turso
+          // Récupération des produits du bundle depuis la table bundle_products
           const productsResult = await tursoClient.execute({
-            sql: `SELECT product_id, product_name, base_price, quantity, subtotal
-                  FROM bundle_products WHERE campaign_bundle_id = ?`,
-            args: [row.airtable_id || row.id]
+            sql: `
+              SELECT
+                bp.product_id, p.name as product_name,
+                COALESCE(bp.custom_price, p.base_price) as basePrice,
+                bp.quantity,
+                (COALESCE(bp.custom_price, p.base_price) * bp.quantity) as subtotal,
+                bp.is_required
+              FROM bundle_products bp
+              LEFT JOIN products p ON bp.product_id = p.id
+              WHERE bp.bundle_id = ?
+              ORDER BY bp.display_order ASC
+            `,
+            args: [row.id]
           })
 
           const products = productsResult.rows.map((productRow: any) => ({
             id: productRow.product_id,
             name: productRow.product_name,
-            basePrice: Number(productRow.base_price) || 0,
+            basePrice: Number(productRow.basePrice) || 0,
             quantity: Number(productRow.quantity) || 1,
-            subtotal: Number(productRow.subtotal) || 0
+            subtotal: Number(productRow.subtotal) || 0,
+            isRequired: Boolean(productRow.is_required)
           }))
 
+          // Calculer les totaux
+          const estimatedTotal = Number(row.finalPrice) || 0
+          const originalTotal = products.reduce((sum, p) => sum + p.subtotal, 0)
+          const savings = originalTotal - estimatedTotal
+
           return {
-            id: row.airtable_id || row.id,
+            id: String(row.id),
             name: row.name,
             description: row.description || '',
             targetAudience: row.targetAudience,
-            budgetRange: row.budgetRange,
+            budgetRange: estimatedTotal < 20000 ? 'starter' : estimatedTotal < 50000 ? 'standard' : 'premium',
             products,
-            estimatedTotal: Number(row.estimatedTotal) || 0,
-            originalTotal: Number(row.originalTotal) || 0,
-            savings: Number(row.savings) || 0,
-            popularity: Number(row.popularity) || 0,
+            estimatedTotal,
+            originalTotal,
+            savings: Math.max(0, savings),
+            popularity: 90, // Valeur par défaut, pourrait être calculée
             isActive: Boolean(row.isActive),
-            isFeatured: Boolean(row.isFeatured),
-            tags: row.tags ? JSON.parse(row.tags) : [],
+            isFeatured: row.displayOrder <= 3, // Les 3 premiers sont featured
+            tags: row.features ? JSON.parse(row.features) : [],
             createdAt: row.createdAt,
-            updatedAt: row.updatedAt
+            updatedAt: row.updatedAt,
+            icon: row.icon,
+            color: row.color
           }
         }))
 

@@ -2,7 +2,7 @@
   "name": "Migration Airtable vers Turso Edge Database",
   "description": "Migration critique du CMS Airtable vers Turso Edge Database pour éliminer les limitations de quotas API (1000/mois → 500M/mois) et améliorer les performances (500ms → 20ms). Projet structuré en 6 phases sur 4 semaines avec architecture hybride pour minimiser les risques. Objectifs: économie 240€/an, scalabilité 10000 users/jour, UX 10x améliorée.",
   "created": "2025-09-17T00:07:09.349Z",
-  "updated": "2025-09-17T14:43:36.001Z",
+  "updated": "2025-09-17T15:15:56.963Z",
   "tasks": [
     {
       "id": 1,
@@ -108,7 +108,7 @@
         8
       ],
       "created": "2025-09-17T00:08:17.525Z",
-      "updated": "2025-09-17T14:36:45.053Z"
+      "updated": "2025-09-17T15:07:21.918Z"
     },
     {
       "id": 10,
@@ -120,19 +120,19 @@
         9
       ],
       "created": "2025-09-17T00:08:27.855Z",
-      "updated": "2025-09-17T14:43:36.001Z"
+      "updated": "2025-09-17T15:07:27.188Z"
     },
     {
       "id": 11,
       "title": "🎨 PHASE 2.4 - Dashboard et Monitoring Admin",
       "description": "Finaliser le dashboard admin avec monitoring et contrôles.\n- Créer dashboard avec métriques clés (produits, syncs, erreurs)\n- Ajouter interface de contrôle synchronisation manuelle\n- Implémenter logs viewer pour debug\n- Créer gestion backup/restore données\n- Ajouter monitoring santé Turso en temps réel\n- Finaliser UX et responsive design admin",
-      "status": "pending",
+      "status": "completed",
       "priority": 3,
       "dependencies": [
         10
       ],
       "created": "2025-09-17T00:08:34.496Z",
-      "updated": "2025-09-17T00:08:34.496Z"
+      "updated": "2025-09-17T15:07:31.305Z"
     },
     {
       "id": 12,
@@ -253,6 +253,18 @@
       ],
       "created": "2025-09-17T00:24:07.770Z",
       "updated": "2025-09-17T13:23:35.256Z"
+    },
+    {
+      "id": 22,
+      "title": "🔄 PHASE 3.2 - Migration API Campaign Bundles vers Turso",
+      "description": "Migrer complètement les bundles d'Airtable vers Turso avec tests.\n- Adapter API endpoints pour utiliser Turso au lieu d'Airtable\n- Migrer les produits associés aux bundles depuis Airtable\n- Configurer les relations bundle_products avec les produits existants\n- Tester l'interface admin /admin/bundles/ avec les nouvelles tables\n- Valider calculs prix et génération des bundles\n- Synchroniser données Airtable → Turso pour bundles",
+      "status": "in-progress",
+      "priority": 5,
+      "dependencies": [
+        11
+      ],
+      "created": "2025-09-17T15:15:52.202Z",
+      "updated": "2025-09-17T15:15:56.962Z"
     }
   ]
 }

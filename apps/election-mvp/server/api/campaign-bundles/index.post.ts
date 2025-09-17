@@ -50,9 +50,6 @@ export default defineEventHandler(async (event) => {
       })
     }
 
-    // Génération de l'ID
-    const bundleId = `bundle_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
-
     // Calculs automatiques
     const calculatedTotal = validatedData.products.reduce((total, product) => total + product.subtotal, 0)
     const savings = (validatedData.originalTotal || 0) - calculatedTotal
@@ -68,58 +65,62 @@ export default defineEventHandler(async (event) => {
 
     // Transaction pour créer le bundle et ses produits
     try {
+      // Calcul du prix de base et remise
+      const originalTotal = validatedData.originalTotal || calculatedTotal
+      const discountPercentage = originalTotal > 0 ? ((originalTotal - calculatedTotal) / originalTotal * 100) : 0
+
       // 1. Créer le bundle principal
-      await db.execute({
+      const bundleResult = await db.execute({
         sql: `INSERT INTO campaign_bundles (
-          id, airtable_id, name, description, target_audience, budget_range,
-          estimated_total, original_total, savings, popularity, is_active,
-          is_featured, tags, created_at, updated_at
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`,
+          name, description, target_audience, base_price, discount_percentage,
+          is_active, display_order, icon, color, features
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         args: [
-          bundleId,
-          bundleId, // Utiliser le même ID pour airtable_id dans le contexte admin
           validatedData.name,
           validatedData.description,
           validatedData.targetAudience,
-          validatedData.budgetRange,
-          calculatedTotal,
-          validatedData.originalTotal || calculatedTotal,
-          savings,
-          validatedData.popularity,
+          originalTotal,
+          discountPercentage,
           validatedData.isActive ? 1 : 0,
-          validatedData.isFeatured ? 1 : 0,
+          validatedData.displayOrder || 0,
+          validatedData.icon || null,
+          validatedData.color || null,
           JSON.stringify(validatedData.tags || [])
         ]
       })
 
+      const newBundleId = bundleResult.lastInsertRowid
+
       // 2. Créer les produits du bundle
-      for (const product of validatedData.products) {
+      for (let i = 0; i < validatedData.products.length; i++) {
+        const product = validatedData.products[i]
         await db.execute({
           sql: `INSERT INTO bundle_products (
-            campaign_bundle_id, product_id, product_name, base_price,
-            quantity, subtotal, created_at
-          ) VALUES (?, ?, ?, ?, ?, ?, datetime('now'))`,
+            bundle_id, product_id, quantity, custom_price, is_required, display_order
+          ) VALUES (?, ?, ?, ?, ?, ?)`,
           args: [
-            bundleId,
+            newBundleId,
             product.id,
-            product.name,
-            product.basePrice,
             product.quantity,
-            product.subtotal
+            product.basePrice, // Utiliser comme prix custom si différent du prix produit
+            product.isRequired !== false ? 1 : 0, // true par défaut
+            i + 1 // Ordre basé sur la position dans le tableau
           ]
         })
       }
 
-      console.log(`✅ Bundle créé avec succès: ${bundleId}`)
+      console.log(`✅ Bundle créé avec succès: ${newBundleId}`)
 
       // Retourner le bundle créé
       const response = {
         success: true,
         data: {
-          id: bundleId,
+          id: newBundleId,
           ...validatedData,
           estimatedTotal: calculatedTotal,
+          originalTotal: originalTotal,
           savings: savings,
+          discountPercentage: discountPercentage,
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString()
         },
