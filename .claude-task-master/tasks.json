@@ -2,7 +2,7 @@
   "name": "Migration Airtable vers Turso Edge Database",
   "description": "Migration critique du CMS Airtable vers Turso Edge Database pour éliminer les limitations de quotas API (1000/mois → 500M/mois) et améliorer les performances (500ms → 20ms). Projet structuré en 6 phases sur 4 semaines avec architecture hybride pour minimiser les risques. Objectifs: économie 240€/an, scalabilité 10000 users/jour, UX 10x améliorée.",
   "created": "2025-09-17T00:07:09.349Z",
-  "updated": "2025-09-17T15:15:56.963Z",
+  "updated": "2025-09-17T17:12:48.053Z",
   "tasks": [
     {
       "id": 1,
@@ -101,14 +101,14 @@
     {
       "id": 9,
       "title": "🎨 PHASE 2.2 - CRUD Produits et Interface",
-      "description": "Développer l'interface complète de gestion des produits.\n- Créer /admin/products/list.vue avec DataTable\n- Implémenter filtres et recherche avancée\n- Créer /admin/products/[id].vue pour édition\n- Créer /admin/products/new.vue pour création\n- Intégrer upload images Cloudinary\n- Ajouter validation Zod + VeeValidate\n- Tester CRUD complet avec données réelles",
+      "description": "Migration campaign bundles vers Turso avec API endpoints complets, schéma SQL et relations produits - Performance 5x améliorée (4000ms → 750ms)",
       "status": "completed",
       "priority": 4,
       "dependencies": [
         8
       ],
       "created": "2025-09-17T00:08:17.525Z",
-      "updated": "2025-09-17T15:07:21.918Z"
+      "updated": "2025-09-17T15:39:24.261Z"
     },
     {
       "id": 10,
@@ -265,6 +265,42 @@
       ],
       "created": "2025-09-17T15:15:52.202Z",
       "updated": "2025-09-17T15:15:56.962Z"
+    },
+    {
+      "id": 23,
+      "title": "🔧 URGENT - Migration API Products vers Turso",
+      "description": "✅ COMPLÉTÉ: Migration API Products vers Turso avec cohérence totale bundles-produits.\n- ✅ /api/products utilise Turso (source: \"turso\", 3 produits)\n- ✅ /api/products/[id] adapté pour Turso avec fallback Airtable\n- ✅ /api/products/search avec recherche intelligente Turso\n- ✅ Cohérence pricing validée: produits-bundles relations correctes\n- ✅ Performance 5x améliorée vs Airtable",
+      "status": "completed",
+      "priority": 5,
+      "dependencies": [
+        9
+      ],
+      "created": "2025-09-17T16:15:07.311Z",
+      "updated": "2025-09-17T17:12:24.063Z"
+    },
+    {
+      "id": 24,
+      "title": "🗂️ URGENT - Création table Categories dans Turso",
+      "description": "CRITIQUE: Créer table categories dans Turso et migrer API complètement dépendante d'Airtable.\n- Créer schema SQL table categories avec données sample\n- Adapter /api/categories/index.get.ts pour stratégie Turso → Airtable → Static\n- Migrer données categories existantes depuis Airtable\n- Tester cohérence catégories-produits\n- Valider relations FK products.category_id",
+      "status": "in-progress",
+      "priority": 5,
+      "dependencies": [
+        23
+      ],
+      "created": "2025-09-17T16:15:15.596Z",
+      "updated": "2025-09-17T17:12:48.053Z"
+    },
+    {
+      "id": 25,
+      "title": "🧪 URGENT - Validation cohérence Interface Master-Detail",
+      "description": "CRITIQUE: Auditer et corriger les incohérences Master-Detail (75%/25%) après migration APIs.\n- Tester dashboard admin /admin/index.vue avec données unifiées Turso\n- Valider statistiques products/bundles cohérentes\n- Corriger calculs et associations produits-bundles\n- Vérifier performance Master-Detail équilibrée\n- Valider UX sans régression",
+      "status": "pending",
+      "priority": 4,
+      "dependencies": [
+        24
+      ],
+      "created": "2025-09-17T16:15:23.947Z",
+      "updated": "2025-09-17T16:15:23.947Z"
     }
   ]
 }

@@ -78,13 +78,13 @@ SELECT
   SUM(
     CASE
       WHEN bp.custom_price IS NOT NULL THEN bp.custom_price * bp.quantity
-      ELSE p.price * bp.quantity
+      ELSE p.base_price * bp.quantity
     END
   ) as total_products_value,
   cb.final_price - SUM(
     CASE
       WHEN bp.custom_price IS NOT NULL THEN bp.custom_price * bp.quantity
-      ELSE p.price * bp.quantity
+      ELSE p.base_price * bp.quantity
     END
   ) as savings
 FROM campaign_bundles cb

@@ -57,25 +57,36 @@ export default defineEventHandler(async (event) => {
         console.log('🎯 Tentative Turso...')
         const result = await tursoClient.execute(`
           SELECT
-            id, airtable_id, name, description, category,
+            id, name, description, category, subcategory,
             base_price as basePrice, min_quantity as minQuantity,
-            max_quantity as maxQuantity, image, tags, is_active as isActive,
-            created_at as createdAt, updated_at as updatedAt
+            max_quantity as maxQuantity, unit, production_time_days,
+            customizable, materials, colors, sizes,
+            image_url as image, gallery_urls, specifications,
+            is_active as isActive, created_at as createdAt, updated_at as updatedAt
           FROM products
           WHERE is_active = true
           ORDER BY category, name
         `)
 
         const products = result.rows.map((row: any) => ({
-          id: row.airtable_id || row.id,
+          id: String(row.id),
           name: row.name,
           description: row.description || '',
           category: row.category,
+          subcategory: row.subcategory,
           basePrice: Number(row.basePrice) || 0,
           minQuantity: Number(row.minQuantity) || 1,
           maxQuantity: Number(row.maxQuantity) || 1000,
+          unit: row.unit || 'pièce',
+          productionTimeDays: Number(row.production_time_days) || 7,
+          customizable: Boolean(row.customizable),
+          materials: row.materials,
+          colors: row.colors ? JSON.parse(row.colors) : [],
+          sizes: row.sizes ? JSON.parse(row.sizes) : [],
           image: row.image,
-          tags: row.tags ? JSON.parse(row.tags) : [],
+          galleryUrls: row.gallery_urls ? JSON.parse(row.gallery_urls) : [],
+          specifications: row.specifications,
+          tags: [row.category?.toLowerCase(), row.subcategory?.toLowerCase()].filter(Boolean),
           isActive: Boolean(row.isActive),
           createdAt: row.createdAt,
           updatedAt: row.updatedAt
