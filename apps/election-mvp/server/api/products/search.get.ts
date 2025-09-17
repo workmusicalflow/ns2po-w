@@ -1,9 +1,8 @@
 /**
  * API Route: GET /api/products/search
- * Recherche de produits par terme avec stratégie hybride Turso → Airtable → Fallback
+ * Recherche de produits par terme avec stratégie Turso-first → Fallback statique
  */
 
-import { airtableService } from '../../../services/airtable'
 import { getDatabase } from '../../utils/database'
 
 export default defineEventHandler(async (event) => {
@@ -95,30 +94,11 @@ export default defineEventHandler(async (event) => {
           duration
         }
       } catch (tursoError) {
-        console.warn(`⚠️ Turso recherche failed pour "${cleanTerm}", trying Airtable...`, tursoError)
+        console.warn(`⚠️ Turso recherche failed pour "${cleanTerm}", using static fallback...`, tursoError)
       }
     }
 
-    // 2. Fallback : Airtable
-    try {
-      console.log(`🔄 Recherche Airtable pour "${cleanTerm}"...`)
-      const products = await airtableService.searchProducts(cleanTerm)
-
-      const duration = Date.now() - startTime
-      console.log(`✅ Airtable recherche OK: ${products.length} produits pour "${cleanTerm}" en ${duration}ms`)
-
-      return {
-        success: true,
-        data: products,
-        count: products.length,
-        query: cleanTerm,
-        source: 'airtable',
-        duration
-      }
-    } catch (airtableError) {
-      console.warn(`⚠️ Airtable recherche failed pour "${cleanTerm}"`, airtableError)
-
-      // 3. Fallback final : Recherche dans données statiques
+    // 2. Fallback final : Recherche dans données statiques
       const staticFallback = [
         {
           id: 'static-1',
@@ -146,7 +126,6 @@ export default defineEventHandler(async (event) => {
         duration,
         warning: 'Service dégradé - recherche limitée'
       }
-    }
 
   } catch (error) {
     console.error(`❌ Erreur critique recherche "${cleanTerm}":`, error)

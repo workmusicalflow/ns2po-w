@@ -1,10 +1,8 @@
 /**
  * API Route: GET /api/health
- * Health check pour monitoring de l'infrastructure hybride
+ * Health check pour monitoring de l'infrastructure Turso-first
  */
 
-import { airtableTursoSync } from '../services/airtable-sync'
-import { airtableService } from '../../services/airtable'
 import { getDatabase } from '../utils/database'
 
 export default defineEventHandler(async (event) => {
@@ -13,7 +11,7 @@ export default defineEventHandler(async (event) => {
   try {
     console.log('🏥 Health check démarré...')
 
-    // Tests de santé parallèles
+    // Test de santé Turso uniquement (abandon Airtable complet)
     const healthChecks = await Promise.allSettled([
       // Test Turso
       (async () => {
@@ -38,46 +36,6 @@ export default defineEventHandler(async (event) => {
             error: error instanceof Error ? error.message : 'Erreur inconnue'
           }
         }
-      })(),
-
-      // Test Airtable
-      (async () => {
-        try {
-          const startAirtable = Date.now()
-          await airtableService.getProducts()
-          return {
-            name: 'airtable',
-            status: 'up',
-            responseTime: Date.now() - startAirtable,
-            baseId: process.env.AIRTABLE_BASE_ID || 'not-configured'
-          }
-        } catch (error) {
-          return {
-            name: 'airtable',
-            status: 'down',
-            error: error instanceof Error ? error.message : 'Erreur inconnue'
-          }
-        }
-      })(),
-
-      // Test intégration sync
-      (async () => {
-        try {
-          const startSync = Date.now()
-          const health = await airtableTursoSync.healthCheck()
-          return {
-            name: 'sync',
-            status: health.turso && health.airtable ? 'up' : 'partial',
-            responseTime: Date.now() - startSync,
-            details: health
-          }
-        } catch (error) {
-          return {
-            name: 'sync',
-            status: 'down',
-            error: error instanceof Error ? error.message : 'Erreur inconnue'
-          }
-        }
       })()
     ])
 
@@ -86,7 +44,7 @@ export default defineEventHandler(async (event) => {
       if (result.status === 'fulfilled') {
         return result.value
       } else {
-        const serviceNames = ['turso', 'airtable', 'sync']
+        const serviceNames = ['turso']
         return {
           name: serviceNames[index] || `service-${index}`,
           status: 'error',
@@ -160,19 +118,15 @@ function generateRecommendations(services: any[]): string[] {
   const recommendations = []
 
   const tursoService = services.find(s => s.name === 'turso')
-  const airtableService = services.find(s => s.name === 'airtable')
 
   if (tursoService?.status === 'down') {
     recommendations.push('Vérifier la connexion Turso et les variables d\'environnement')
-  }
-
-  if (airtableService?.status === 'down') {
-    recommendations.push('Vérifier la clé API Airtable et l\'ID de base')
+    recommendations.push('Le mode fallback statique est activé')
   }
 
   if (services.every(s => s.status === 'down')) {
     recommendations.push('Vérifier la connectivité réseau')
-    recommendations.push('Le mode fallback statique est activé')
+    recommendations.push('Tous les APIs utilisent le mode fallback statique')
   }
 
   if (services.some(s => s.responseTime && s.responseTime > 2000)) {
@@ -180,7 +134,8 @@ function generateRecommendations(services: any[]): string[] {
   }
 
   if (recommendations.length === 0) {
-    recommendations.push('Tous les services fonctionnent normalement')
+    recommendations.push('Infrastructure Turso fonctionne parfaitement')
+    recommendations.push('Migration Airtable → Turso terminée avec succès')
   }
 
   return recommendations

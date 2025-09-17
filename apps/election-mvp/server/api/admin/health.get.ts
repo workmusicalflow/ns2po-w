@@ -4,7 +4,6 @@
  */
 
 import { getDatabase } from "~/server/utils/database"
-import { testAirtableConnection } from "~/server/utils/airtable"
 
 export default defineEventHandler(async (event) => {
   const startTime = Date.now()
@@ -63,25 +62,7 @@ export default defineEventHandler(async (event) => {
       responseTime: tursoResponseTime
     })
 
-    // 2. Test Airtable API
-    let airtableStatus = 'down'
-    let airtableResponseTime = 0
-
-    try {
-      const airtableTest = await testAirtableConnection()
-      airtableStatus = airtableTest.success ? 'up' : 'down'
-      airtableResponseTime = airtableTest.responseTime || 0
-    } catch (error) {
-      airtableStatus = 'down'
-      airtableResponseTime = 5000
-      console.error('❌ Erreur connexion Airtable:', error)
-    }
-
-    services.push({
-      name: 'Airtable API',
-      status: airtableStatus,
-      responseTime: airtableResponseTime
-    })
+    // 2. Note: Airtable monitoring removed - abandoned in favor of Turso-first architecture
 
     // 3. Test Cloudinary (basique)
     let cloudinaryStatus = 'up'

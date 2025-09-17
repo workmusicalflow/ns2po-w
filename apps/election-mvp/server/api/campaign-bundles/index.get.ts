@@ -1,9 +1,9 @@
 /**
  * API Route: GET /api/campaign-bundles
- * Récupère tous les campaign bundles avec stratégie hybride Turso → Airtable → Fallback statique
+ * Récupère tous les campaign bundles avec stratégie Turso-first → Fallback statique
  */
 
-import { airtableService } from "~/services/airtable";
+// Note: Airtable service removed - now using Turso-first → Static fallback architecture
 import { getDatabase } from "~/server/utils/database";
 import type { BundleApiResponse } from "@ns2po/types";
 
@@ -157,36 +157,11 @@ export default defineEventHandler(async (event): Promise<BundleApiResponse> => {
         console.log(`✅ Turso OK: ${bundles.length} bundles en ${duration}ms`)
 
       } catch (tursoError) {
-        console.warn('⚠️ Turso failed, trying Airtable...', tursoError)
+        console.warn('⚠️ Turso failed, using static fallback...', tursoError)
       }
     }
 
-    // 2. Fallback : Airtable (données autoritaires)
-    if (!bundles) {
-      try {
-        console.log('🔄 Tentative Airtable...')
-
-        if (audience && audience !== "all") {
-          bundles = await airtableService.getCampaignBundlesByAudience(audience);
-        } else {
-          bundles = await airtableService.getCampaignBundles();
-        }
-
-        // Filtrage des bundles featured si demandé
-        if (featured) {
-          bundles = bundles.filter(bundle => bundle.isFeatured);
-        }
-
-        source = 'airtable'
-        const duration = Date.now() - startTime
-        console.log(`✅ Airtable OK: ${bundles.length} bundles en ${duration}ms`)
-
-      } catch (airtableError) {
-        console.warn('⚠️ Airtable failed, using static fallback...', airtableError)
-      }
-    }
-
-    // 3. Fallback final : Données statiques
+    // 2. Fallback final : Données statiques (Airtable abandonné)
     if (!bundles) {
       bundles = [...STATIC_BUNDLES_FALLBACK]
 
@@ -209,10 +184,8 @@ export default defineEventHandler(async (event): Promise<BundleApiResponse> => {
     // Cache headers pour optimiser les performances
     if (source === 'turso') {
       setHeader(event, "Cache-Control", "public, max-age=900"); // 15 minutes pour Turso
-    } else if (source === 'airtable') {
-      setHeader(event, "Cache-Control", "public, max-age=300"); // 5 minutes pour Airtable
     } else {
-      setHeader(event, "Cache-Control", "public, max-age=60"); // 1 minute pour fallback
+      setHeader(event, "Cache-Control", "public, max-age=60"); // 1 minute pour fallback statique
     }
     setHeader(event, "CDN-Cache-Control", "public, max-age=1800"); // 30 minutes sur CDN
 

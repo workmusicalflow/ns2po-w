@@ -3,7 +3,7 @@
  * Récupère un campaign bundle spécifique par ID ou bundle_id
  */
 
-import { airtableService } from "~/services/airtable";
+// Note: Airtable service removed - now using Turso-first → Static fallback architecture
 import type { CampaignBundle } from "@ns2po/types";
 
 export default defineEventHandler(async (event) => {

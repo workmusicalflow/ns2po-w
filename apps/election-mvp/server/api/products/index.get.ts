@@ -1,9 +1,8 @@
 /**
  * API Route: GET /api/products
- * Récupère tous les produits avec stratégie hybride Turso → Airtable → Fallback statique
+ * Récupère tous les produits avec stratégie Turso-first → Fallback statique
  */
 
-import { airtableService } from '../../../services/airtable'
 import { getDatabase } from '../../utils/database'
 
 // Fallback statique minimal pour résilience
@@ -104,31 +103,11 @@ export default defineEventHandler(async (event) => {
           cached: false
         }
       } catch (tursoError) {
-        console.warn('⚠️ Turso failed, trying Airtable...', tursoError)
+        console.warn('⚠️ Turso failed, using static fallback...', tursoError)
       }
     }
 
-    // 2. Fallback : Airtable (données autoritaires)
-    try {
-      console.log('🔄 Tentative Airtable...')
-      const products = await airtableService.getProducts()
-
-      const duration = Date.now() - startTime
-      console.log(`✅ Airtable OK: ${products.length} produits en ${duration}ms`)
-
-      return {
-        success: true,
-        data: products,
-        source: 'airtable',
-        count: products.length,
-        duration,
-        cached: false
-      }
-    } catch (airtableError) {
-      console.warn('⚠️ Airtable failed, using static fallback...', airtableError)
-    }
-
-    // 3. Fallback final : Données statiques (résilience maximale)
+    // 2. Fallback final : Données statiques (résilience maximale)
     const duration = Date.now() - startTime
     console.log(`🛡️ Fallback statique: ${STATIC_FALLBACK.length} produits en ${duration}ms`)
 

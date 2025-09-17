@@ -1,9 +1,8 @@
 /**
  * API Route: GET /api/products/[id]
- * Récupère un produit spécifique par ID avec stratégie hybride Turso → Airtable → Fallback
+ * Récupère un produit spécifique par ID avec stratégie Turso-first
  */
 
-import { airtableService } from '../../../services/airtable'
 import { getDatabase } from '../../utils/database'
 
 export default defineEventHandler(async (event) => {
@@ -80,37 +79,12 @@ export default defineEventHandler(async (event) => {
           duration
         }
       } catch (tursoError) {
-        console.warn(`⚠️ Turso failed pour produit ${id}, trying Airtable...`, tursoError)
-      }
-    }
-
-    // 2. Fallback : Airtable
-    try {
-      console.log(`🔄 Tentative Airtable pour produit ${id}...`)
-      const product = await airtableService.getProduct(id)
-
-      if (!product) {
+        console.warn(`⚠️ Turso failed pour produit ${id}`, tursoError)
         throw createError({
           statusCode: 404,
           statusMessage: 'Produit non trouvé'
         })
       }
-
-      const duration = Date.now() - startTime
-      console.log(`✅ Airtable OK: produit ${id} en ${duration}ms`)
-
-      return {
-        success: true,
-        data: product,
-        source: 'airtable',
-        duration
-      }
-    } catch (airtableError) {
-      console.warn(`⚠️ Airtable failed pour produit ${id}`, airtableError)
-      throw createError({
-        statusCode: 404,
-        statusMessage: 'Produit non trouvé'
-      })
     }
 
   } catch (error) {

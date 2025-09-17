@@ -37,7 +37,7 @@ Configuration Tailwind avec tokens CSS variables pour couleurs et polices.
 
 ## Fonctionnalités MVP
 
-* Catalogue produits depuis Airtable
+* Catalogue produits depuis Turso Database (abandon Airtable complet)
 * Personnalisation visuelle avec upload logos (Cloudinary, Canvas)
 * Génération devis dynamique, export PDF, sauvegarde Turso
 * Formulaires validés (Zod, Vee-Validate), envoi API Nuxt
@@ -52,10 +52,10 @@ Configuration Tailwind avec tokens CSS variables pour couleurs et polices.
 * **Composants** : DataTable, FormField, Modal réutilisables
 
 ### Fonctionnalités CMS
-* **Monitoring** : Health check Turso, statut sync Airtable→Turso
-* **Synchronisation** : Déclenchement manuel + visualisation logs
-* **Navigation** : Dashboard, Products, Bundles, Sync, Settings
-* **APIs intégrées** : `/api/products`, `/api/campaign-bundles`, `/api/sync-status`, `/api/health`
+* **Monitoring** : Health check Turso, statistiques performance
+* **Gestion données** : CRUD produits, bundles, catégories via Turso
+* **Navigation** : Dashboard, Products, Bundles, Categories, Settings
+* **APIs intégrées** : `/api/products`, `/api/campaign-bundles`, `/api/categories`, `/api/health`
 
 ### Sécurité
 * Middleware d'authentification sur toutes les routes `/admin/*`
@@ -64,27 +64,23 @@ Configuration Tailwind avec tokens CSS variables pour couleurs et polices.
 
 ## Intégrations Externes
 
-* **Airtable API** (catalogue)
-* **Cloudinary SDK** (images)
-* **Turso DB** production opérationnelle
+* **Turso Database** - Base de données principale (Edge SQLite)
+* **Cloudinary SDK** - Gestion et optimisation images
+* **SMTP** - Envoi emails (devis, notifications)
 
 ## Variables d'Environnement
 
 ```bash
-# Airtable
-AIRTABLE_API_KEY=patVeuzyzmUrECCbT.39608f70cb85b60236dacb42374b53d2442c4425d5204e136eed9d492075d833
-AIRTABLE_BASE_ID=apprQLdnVwlbfnioT
+# Turso - Infrastructure Principale (Edge Database)
+TURSO_DATABASE_URL=libsql://ns2po-election-mvp-workmusicalflow.aws-eu-west-1.turso.io
+TURSO_AUTH_TOKEN=XXXXXXXXXXXXXXXX
 
-# Cloudinary
+# Cloudinary - Gestion Médias
 CLOUDINARY_CLOUD_NAME=dsrvzogof
 CLOUDINARY_API_KEY=775318993136791
 CLOUDINARY_API_SECRET=ywTgN-mioXQXW1lOWmq2xNAIK7U
 
-# Turso - Infrastructure Opérationnelle
-TURSO_DATABASE_URL=libsql://ns2po-election-mvp-workmusicalflow.aws-eu-west-1.turso.io
-TURSO_AUTH_TOKEN=XXXXXXXXXXXXXXXX
-
-# SMTP
+# SMTP - Envoi Emails
 SMTP_HOST=mail.topdigitalevel.site
 SMTP_PORT=587
 SMTP_USERNAME=info@topdigitalevel.site

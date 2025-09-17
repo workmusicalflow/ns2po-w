@@ -1,9 +1,8 @@
 /**
  * API Route: GET /api/categories
- * Récupère toutes les catégories avec stratégie hybride Turso → Airtable → Fallback statique
+ * Récupère toutes les catégories avec stratégie Turso-first → Fallback statique
  */
 
-import { airtableService } from '../../../services/airtable'
 import { getDatabase } from '../../utils/database'
 
 // Fallback statique minimal pour résilience
@@ -153,36 +152,11 @@ export default defineEventHandler(async (event) => {
         console.log(`✅ Turso OK: ${categories.length} catégories en ${duration}ms`)
 
       } catch (tursoError) {
-        console.warn('⚠️ Turso failed, trying Airtable...', tursoError)
+        console.warn('⚠️ Turso failed, using static fallback...', tursoError)
       }
     }
 
-    // 2. Fallback : Airtable (données autoritaires)
-    if (!categories) {
-      try {
-        console.log('🔄 Tentative Airtable...')
-        const airtableCategories = await airtableService.getCategories()
-
-        // Transformer format Airtable si nécessaire
-        categories = airtableCategories.map((cat: any) => ({
-          id: cat.id,
-          name: cat.name || '',
-          slug: cat.slug || cat.name?.toLowerCase().replace(/\s+/g, '-') || '',
-          description: cat.description || '',
-          isActive: cat.isActive !== false,
-          subcategories: cat.subcategories || []
-        }))
-
-        source = 'airtable'
-        const duration = Date.now() - startTime
-        console.log(`✅ Airtable OK: ${categories.length} catégories en ${duration}ms`)
-
-      } catch (airtableError) {
-        console.warn('⚠️ Airtable failed, using static fallback...', airtableError)
-      }
-    }
-
-    // 3. Fallback final : Données statiques
+    // 2. Fallback final : Données statiques
     if (!categories) {
       categories = [...STATIC_CATEGORIES_FALLBACK]
 
@@ -226,10 +200,8 @@ export default defineEventHandler(async (event) => {
     // Cache headers pour optimiser les performances
     if (source === 'turso') {
       setHeader(event, "Cache-Control", "public, max-age=1800") // 30 minutes pour Turso
-    } else if (source === 'airtable') {
-      setHeader(event, "Cache-Control", "public, max-age=600") // 10 minutes pour Airtable
     } else {
-      setHeader(event, "Cache-Control", "public, max-age=300") // 5 minutes pour fallback
+      setHeader(event, "Cache-Control", "public, max-age=300") // 5 minutes pour fallback statique
     }
 
     const response = {
