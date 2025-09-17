@@ -14,6 +14,7 @@ export { default as StatusBadge } from "./components/StatusBadge.vue";
 export { default as BundleSelector } from "./components/BundleSelector.vue";
 export { default as QuickCartCustomizer } from "./components/QuickCartCustomizer.vue";
 export { default as PersistentSummary } from "./components/PersistentSummary.vue";
+export { default as TeamPhotos } from "./components/TeamPhotos.vue";
 
 // Types pour une meilleure compatibilité TypeScript
 export type {
