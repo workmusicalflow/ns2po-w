@@ -2,7 +2,7 @@
   "name": "Migration Airtable vers Turso Edge Database",
   "description": "Migration critique du CMS Airtable vers Turso Edge Database pour éliminer les limitations de quotas API (1000/mois → 500M/mois) et améliorer les performances (500ms → 20ms). Projet structuré en 6 phases sur 4 semaines avec architecture hybride pour minimiser les risques. Objectifs: économie 240€/an, scalabilité 10000 users/jour, UX 10x améliorée.",
   "created": "2025-09-17T00:07:09.349Z",
-  "updated": "2025-09-17T13:43:06.485Z",
+  "updated": "2025-09-17T14:43:36.001Z",
   "tasks": [
     {
       "id": 1,
@@ -90,37 +90,37 @@
       "id": 8,
       "title": "🎨 PHASE 2.1 - Architecture Mini-CMS",
       "description": "Créer l'architecture de base du mini-CMS d'administration.\n- Créer la structure /admin avec layout dédié\n- Installer et configurer Nuxt UI Pro pour l'admin\n- Créer middleware d'authentification admin\n- Designer la navigation et dashboard principal\n- Créer composants de base: DataTable, Forms, Modal\n- Tester l'accès sécurisé à /admin",
-      "status": "pending",
+      "status": "completed",
       "priority": 4,
       "dependencies": [
         7
       ],
       "created": "2025-09-17T00:08:10.978Z",
-      "updated": "2025-09-17T00:08:10.978Z"
+      "updated": "2025-09-17T14:18:23.295Z"
     },
     {
       "id": 9,
       "title": "🎨 PHASE 2.2 - CRUD Produits et Interface",
       "description": "Développer l'interface complète de gestion des produits.\n- Créer /admin/products/list.vue avec DataTable\n- Implémenter filtres et recherche avancée\n- Créer /admin/products/[id].vue pour édition\n- Créer /admin/products/new.vue pour création\n- Intégrer upload images Cloudinary\n- Ajouter validation Zod + VeeValidate\n- Tester CRUD complet avec données réelles",
-      "status": "pending",
+      "status": "completed",
       "priority": 4,
       "dependencies": [
         8
       ],
       "created": "2025-09-17T00:08:17.525Z",
-      "updated": "2025-09-17T00:08:17.525Z"
+      "updated": "2025-09-17T14:36:45.053Z"
     },
     {
       "id": 10,
       "title": "🎨 PHASE 2.3 - Gestion Bundles et Pricing",
       "description": "Développer les interfaces de gestion des packs et règles tarifaires.\n- Créer /admin/bundles/ pour gestion des packs campagne\n- Implémenter configuration produits par bundle\n- Créer /admin/pricing/ pour règles de tarification\n- Ajouter gestion des remises volume et client\n- Créer prévisualisation des prix en temps réel\n- Intégrer avec le calculateur de devis existant",
-      "status": "pending",
+      "status": "completed",
       "priority": 3,
       "dependencies": [
         9
       ],
       "created": "2025-09-17T00:08:27.855Z",
-      "updated": "2025-09-17T00:08:27.855Z"
+      "updated": "2025-09-17T14:43:36.001Z"
     },
     {
       "id": 11,

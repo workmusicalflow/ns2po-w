@@ -51,7 +51,7 @@ export default defineNuxtConfig({
   },
 
   // Modules
-  modules: ["@nuxtjs/tailwindcss", "@nuxtjs/cloudinary", "@nuxt/image"],
+  modules: ["@nuxtjs/tailwindcss", "@nuxtjs/cloudinary", "@nuxt/image", "@nuxt/icon"],
 
   // Nitro configuration for caching and performance
   nitro: {

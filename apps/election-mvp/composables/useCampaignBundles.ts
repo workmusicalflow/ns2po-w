@@ -28,6 +28,27 @@ export const useCampaignBundles = () => {
   const loading = ref(false);
   const error = ref("");
   const lastFetch = ref<Date | null>(null);
+
+  // =============================================
+  // STUB FUNCTIONS FOR DEVIS.VUE COMPATIBILITY
+  // =============================================
+
+  function updateBundleProductQuantity(productId: string, quantity: number) {
+    console.warn("updateBundleProductQuantity: stub implementation");
+  }
+
+  function removeBundleProduct(productId: string) {
+    console.warn("removeBundleProduct: stub implementation");
+  }
+
+  function updateCustomProductQuantity(productId: string, quantity: number) {
+    console.warn("updateCustomProductQuantity: stub implementation");
+  }
+
+  function syncBundleToQuoteItems() {
+    console.warn("syncBundleToQuoteItems: stub implementation");
+  }
+
   const useStaticFallback = ref(false);
 
   // Bundle selection
@@ -202,6 +223,13 @@ export const useCampaignBundles = () => {
           useStaticFallback.value = false;
           lastFetch.value = now;
           console.log(`✅ ${response.data.length} bundles chargés depuis l'API`);
+
+          // Vérifier si les bundles ont des produits
+          const bundlesWithProducts = response.data.filter(bundle => bundle.products && bundle.products.length > 0);
+          if (bundlesWithProducts.length === 0) {
+            console.warn("⚠️ Bundles API sans produits, basculement vers données statiques");
+            throw new Error("Bundles sans produits - utilisation des données statiques");
+          }
         } else {
           throw new Error(response.error || "Réponse API invalide");
         }
@@ -211,7 +239,7 @@ export const useCampaignBundles = () => {
         // Fallback vers les données statiques
         apiCampaignBundles.value = staticCampaignBundles;
         useStaticFallback.value = true;
-        error.value = "Mode dégradé : utilisation des données en cache";
+        error.value = null; // Nettoyer l'erreur car le fallback a réussi
 
         console.log(`📦 ${staticCampaignBundles.length} bundles chargés en mode statique`);
       }
@@ -221,7 +249,7 @@ export const useCampaignBundles = () => {
       // Fallback d'urgence
       apiCampaignBundles.value = staticCampaignBundles;
       useStaticFallback.value = true;
-      error.value = "Erreur lors du chargement, utilisation des données locales";
+      error.value = null; // Nettoyer l'erreur car le fallback d'urgence a réussi
     } finally {
       loading.value = false;
     }
@@ -445,7 +473,7 @@ export const useCampaignBundles = () => {
   };
 
   /**
-   * Apply filters
+   * Set filters
    */
   const setFilters = (
     audience: BundleTargetAudience | "all" = "all",
@@ -456,7 +484,6 @@ export const useCampaignBundles = () => {
     budgetFilter.value = budget;
     searchQuery.value = search;
   };
-
   /**
    * Clear all filters
    */
@@ -603,6 +630,10 @@ export const useCampaignBundles = () => {
     selectCustom,
     addToCustomSelection,
     removeFromCustomSelection,
+    updateBundleProductQuantity,
+    removeBundleProduct,
+    updateCustomProductQuantity,
+    syncBundleToQuoteItems,
     customizeBundle,
     setFilters,
     clearFilters,

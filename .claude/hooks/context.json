@@ -1,0 +1,37 @@
+{
+  "context_updater": {
+    "enabled": true,
+    "auto_detect": true,
+    "preserve_custom": true,
+    "cache_duration": 3600,
+    "sections": [
+      {"id": "project_info", "enabled": true, "priority": 1},
+      {"id": "git_status", "enabled": true, "priority": 10},
+      {"id": "package_management", "enabled": true, "priority": 20},
+      {"id": "environment", "enabled": true, "priority": 30},
+      {"id": "commands", "enabled": true, "priority": 40},
+      {"id": "health", "enabled": true, "priority": 50},
+      {"id": "mcp_servers", "enabled": true, "priority": 55},
+      {"id": "activity", "enabled": true, "priority": 60}
+    ],
+    "ignore_patterns": ["node_modules", ".git", "dist", "build", "coverage", ".next", ".nuxt", "__pycache__", ".DS_Store"]
+  },
+  "plugins": {
+    "git": {"recent_commits": 5, "include_remote": true},
+    "health": {"check_typescript": true, "timeout": 10, "check_todos": true},
+    "commands": {"max_per_category": 5, "categories": ["dev", "build", "test", "lint", "deploy"]},
+    "environment": {
+      "service_patterns": {
+        "Database": "DATABASE_URL|DB_|POSTGRES_|MYSQL_|MONGO_|TURSO_",
+        "Cache": "REDIS_|MEMCACHED_",
+        "Email": "SMTP_|MAIL_|SENDGRID_|POSTMARK_",
+        "Storage": "AWS_S3_|CLOUDINARY_|AZURE_STORAGE_",
+        "AI": "OPENAI_|ANTHROPIC_|GEMINI_|HUGGING_",
+        "Analytics": "GOOGLE_ANALYTICS_|MIXPANEL_|SEGMENT_",
+        "CMS": "AIRTABLE_|CONTENTFUL_|STRAPI_"
+      }
+    },
+    "activity": {"recent_window": 24, "max_files": 10}
+  },
+  "debug": {"verbose": false, "backup": true, "max_backups": 3}
+}

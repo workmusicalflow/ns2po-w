@@ -16,11 +16,11 @@ if [[ "$PROMPT" =~ ^(ajoute|crée|implémente|modifie|construis|développe|fais)
     
     echo "🤔 [Coach Stratégique] Nouvelle tâche de développement détectée. Analyse de la valeur..." >&2
     
-    # Appeler le Pareto-Planner MCP pour classifier la tâche.
-    # La sortie JSON de cet outil sera automatiquement injectée dans le contexte que Claude recevra.
-    # Cela force Claude à prendre connaissance de la classification (Core 20% ou Enhancement 80%)
-    # avant même de commencer à réfléchir à la solution.
-    claude mcp call pareto-planner classify_task_value --task_description "$PROMPT"
+    # Afficher une suggestion pour prioriser selon le principe 80/20
+    echo "💡 [Coach Stratégique] Rappel du principe 80/20:" >&2
+    echo "   • Core 20% : Fonctionnalités essentielles qui apportent 80% de la valeur" >&2
+    echo "   • Enhancement 80% : Améliorations qui apportent 20% de valeur additionnelle" >&2
+    echo "   Considérez si cette tâche fait partie du Core MVP ou des améliorations futures." >&2
 fi
 
 # Le hook doit toujours se terminer avec un code de sortie 0 pour ne pas bloquer Claude.
