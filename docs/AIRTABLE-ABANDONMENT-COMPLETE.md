@@ -181,3 +181,23 @@ Scripts de migration conservés dans `.archive/airtable-legacy/` pour référenc
 **L'infrastructure NS2PO Election MVP fonctionne désormais 100% avec Turso + Fallback statique.**
 
 *Documentation générée automatiquement lors de la Task #30 - 2025-09-17*
+
+---
+
+## 🔧 MISE À JOUR POST-IMPLÉMENTATION
+
+**Date** : 2025-09-17 19:15
+**Problème détecté** : API réalisations retournait encore `source: "airtable"`
+**Cause racine** : Migration 004 (table realisations) non exécutée sur base Turso
+**Action corrective** : Exécution migration `004_create_realisations.sql`
+
+### Validation Finale ✅
+```bash
+# Avant correction
+curl /api/realisations → source: "airtable" ❌
+
+# Après correction
+curl /api/realisations → source: "turso" ✅ (28 items)
+```
+
+**Résultat** : L'abandon complet d'Airtable est maintenant RÉELLEMENT effectif sur toutes les APIs.
