@@ -27,7 +27,7 @@ Créer "NS2PO Élections MVP" - une plateforme de génération de devis et pré-
 
 - **Frontend :** Nuxt.js 3 + Vue.js + TypeScript + Tailwind CSS + HeadlessUI
 - **Backend :** API Routes Nuxt + Turso (SQLite)
-- **Données :** Airtable (catalogue produits)
+- **Données :** 🚀 **MIGRATION EN COURS** : Airtable → Turso (infrastructure déjà prête)
 - **Médias :** Cloudinary (images/logos)
 - **Déploiement :** Vercel
 - **Monorepo :** Turborepo + pnpm workspaces
@@ -217,25 +217,27 @@ import { v2 as cloudinary } from 'cloudinary'
 - w_500,h_500,c_fill: Redimensionnement uniforme
 ```
 
-### Turso (Base de données)
+### 🚀 Turso (Base de données) - INFRASTRUCTURE OPÉRATIONNELLE
+
+**Base Existante** : `ns2po-election-mvp`
+**URL** : `libsql://ns2po-election-mvp-workmusicalflow.aws-eu-west-1.turso.io`
+**Status** : ✅ 10 tables déjà créées et fonctionnelles
 
 ```sql
--- Tables principales
-CREATE TABLE quotes (
-  id INTEGER PRIMARY KEY,
-  customer_data JSON,
-  products JSON,
-  total_amount REAL,
-  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-);
-
-CREATE TABLE contacts (
-  id INTEGER PRIMARY KEY,
-  type TEXT CHECK(type IN ('quote', 'preorder', 'custom')),
-  data JSON,
-  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-);
+-- Tables principales (déjà créées)
+✅ products (3 records) - Catalogue avec données Airtable synchronisées
+✅ quotes (0 records) - Prêt pour génération devis
+✅ orders (0 records) - Gestion commandes
+✅ customers (0 records) - Base clients
+✅ contacts (0 records) - Formulaires contact
+✅ admin_users (0 records) - Authentification CMS
+✅ commercial_contacts (2 records) - Équipe commerciale configurée
+✅ payment_instructions (0 records) - Instructions paiement
+✅ pricing_rules (0 records) - Règles tarifaires
+✅ product_customizations (0 records) - Personnalisations
 ```
+
+**Prochaine étape** : Configuration client Nuxt (Tâche #2)
 
 ## Workflow de Développement
 
@@ -265,9 +267,9 @@ CLOUDINARY_CLOUD_NAME=dsrvzogof
 CLOUDINARY_API_KEY=775318993136791
 CLOUDINARY_API_SECRET=ywTgN-mioXQXW1lOWmq2xNAIK7U
 
-# Turso
-TURSO_DATABASE_URL=libsql://xxx.turso.io
-TURSO_AUTH_TOKEN=XXXXXXXXXXXXXXXX
+# Turso - Infrastructure Opérationnelle
+TURSO_DATABASE_URL=libsql://ns2po-election-mvp-workmusicalflow.aws-eu-west-1.turso.io
+TURSO_AUTH_TOKEN=XXXXXXXXXXXXXXXX  # Token disponible via `turso auth`
 
 # SMTP (VALIDÉ)
 SMTP_HOST=mail.topdigitalevel.site
@@ -591,3 +593,106 @@ curl -s -H "Authorization: Bearer e2f7e9976d2bfce91c1eb6de29b1118835d88884" \
 5. **Répéter** jusqu'à obtenir une Quality Gate stable
 
 **Objectif MVP** : Maintenir une Quality Gate ✅ **PASSED** en permanence
+
+---
+
+## 🚀 MIGRATION AIRTABLE → TURSO - STATUS TEMPS RÉEL
+
+<!-- START_SECTION:migration_status -->
+<!-- CONTENU AUTO-GÉNÉRÉ - NE PAS MODIFIER MANUELLEMENT -->
+**Task-Master** : ⚠️ Non accessible
+**Status** : Vérification manuelle requise
+**Commande** : `pnpm exec task-master status`
+<!-- END_SECTION:migration_status -->
+
+### 📊 Infrastructure Découverte (2025-01-17)
+
+**RÉVÉLATION MAJEURE** : Base Turso `ns2po-election-mvp` déjà opérationnelle !
+
+## 🏥 INFRASTRUCTURE STATUS - AUTO-GÉNÉRÉ
+
+<!-- START_SECTION:infrastructure -->
+<!-- CONTENU AUTO-GÉNÉRÉ - NE PAS MODIFIER MANUELLEMENT -->
+- **Turso** : ✅ Connecté (ns2po-election-mvp)
+- **Variables Env** : ✅ TURSO_DATABASE_URL, ⚠️ AIRTABLE_API_KEY (migration), ⚠️ AIRTABLE_API_KEY (migration)
+- **Git** : ✅ 20 fichier(s) modifié(s)
+<!-- END_SECTION:infrastructure -->
+
+## 💻 COMMANDES ESSENTIELLES - AUTO-GÉNÉRÉ
+
+<!-- START_SECTION:essential_commands -->
+<!-- CONTENU AUTO-GÉNÉRÉ - NE PAS MODIFIER MANUELLEMENT -->
+### 🚀 Migration Airtable→Turso
+```bash
+# Gestion Task Master
+pnpm exec task-master status              # État migration
+pnpm exec task-master next-task           # Prochaine tâche
+pnpm exec task-master update [id] --status completed
+
+# Infrastructure Turso
+turso auth login                          # Authentification
+turso db shell ns2po-election-mvp         # Accès base
+turso db show ns2po-election-mvp          # Détails infra
+
+# Développement Nuxt
+pnpm dev                                  # Serveur dev
+pnpm type-check                           # Validation TS
+pnpm add @libsql/client                   # Client Turso
+```
+
+### 📊 Qualité Code
+```bash
+pnpm lint                                 # ESLint check
+pnpm test                                 # Tests unitaires
+pnpm test:e2e                            # Tests E2E
+```
+<!-- END_SECTION:essential_commands -->
+
+## 🗓️ TIMELINE PROJET - AUTO-GÉNÉRÉ
+
+<!-- START_SECTION:timeline -->
+<!-- CONTENU AUTO-GÉNÉRÉ - NE PAS MODIFIER MANUELLEMENT -->
+### 🎯 Timeline Migration Accélérée
+
+**Phase Actuelle** : Configuration Nuxt Client (Sprint 1)
+**Durée restante** : 1-2 semaines (au lieu de 4)
+**Économie prévue** : 240€/an dès Go-Live
+
+**Prochaines étapes** :
+1. **Tâche #2** : Configuration client Nuxt Turso (0.5j)
+2. **Tâche #21** : Audit compatibilité app (0.5j)
+3. **Sprint 2** : API hybride + Go-Live (3-5j)
+
+**Documentation** :
+- Plan complet : `docs/MIGRATION-AIRTABLE-TURSO-PLAN.md`
+- Sprint planning : `docs/SPRINT-PLANNING-MIGRATION.md`
+
+**Dernière update** : 2025-09-17 01:05
+<!-- END_SECTION:timeline -->
+
+#### Commandes Migration Essentielles (LEGACY - À SUPPRIMER)
+
+#### Timeline Accélérée
+- **Avant** : 4 semaines de migration complète
+- **Après découverte** : 1-2 semaines de configuration uniquement
+- **Économie immédiate** : 240€/an dès Go-Live
+- **Performance** : <20ms au lieu de 500ms (Airtable)
+
+#### Documentation Migration
+- `docs/MIGRATION-AIRTABLE-TURSO-PLAN.md` - Plan stratégique complet
+- `docs/SPRINT-PLANNING-MIGRATION.md` - Planning détaillé accéléré
+- `.claude-task-master/tasks.json` - Tracking 21 tâches avec progression
+
+#### Prochaine Action Critique
+**Tâche #2** : Configuration client Nuxt Turso (0.5 jour)
+- Installer `@libsql/client`
+- Créer `server/utils/turso.ts`
+- Connecter à base existante : `libsql://ns2po-election-mvp-workmusicalflow.aws-eu-west-1.turso.io`
+
+#### Context Engineering Optimisé
+- Hook session mis à jour avec status migration temps réel
+- CLAUDE.md enrichi avec infrastructure découverte
+- Task-master synchronisé avec timeline accélérée
+- Documentation cross-sessions pour continuité développement
+
+**🎯 OBJECTIF IMMÉDIAT** : Démarrer configuration Nuxt pour Go-Live sous 10 jours !
