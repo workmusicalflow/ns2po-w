@@ -74,6 +74,26 @@
               <span>Packs Campagne</span>
             </NuxtLink>
 
+            <!-- Categories -->
+            <NuxtLink
+              to="/admin/categories"
+              class="flex items-center space-x-3 px-3 py-2 rounded-md text-sm font-medium"
+              :class="$route.path.startsWith('/admin/categories') ? 'bg-amber-100 text-amber-700' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'"
+            >
+              <Icon name="heroicons:tag" class="w-5 h-5" />
+              <span>Catégories</span>
+            </NuxtLink>
+
+            <!-- Realisations -->
+            <NuxtLink
+              to="/admin/realisations"
+              class="flex items-center space-x-3 px-3 py-2 rounded-md text-sm font-medium"
+              :class="$route.path.startsWith('/admin/realisations') ? 'bg-amber-100 text-amber-700' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'"
+            >
+              <Icon name="heroicons:photo" class="w-5 h-5" />
+              <span>Réalisations</span>
+            </NuxtLink>
+
             <!-- Sync Management -->
             <NuxtLink
               to="/admin/sync"
@@ -115,6 +135,9 @@
         </div>
       </main>
     </div>
+
+    <!-- Global Notification Container -->
+    <NotificationContainer />
   </div>
 </template>
 

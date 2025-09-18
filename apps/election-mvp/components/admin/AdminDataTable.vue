@@ -1,14 +1,26 @@
 <template>
   <div class="bg-white shadow-sm border border-gray-200 rounded-lg overflow-hidden">
     <!-- Header avec titre et actions -->
-    <div v-if="title || $slots.header" class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+    <div v-if="title || $slots.header || createButton" class="px-6 py-4 border-b border-gray-200 bg-gray-50">
       <div class="flex items-center justify-between">
         <div>
           <h3 v-if="title" class="text-lg font-medium text-gray-900">{{ title }}</h3>
           <p v-if="description" class="text-sm text-gray-600 mt-1">{{ description }}</p>
         </div>
-        <div v-if="$slots.header">
-          <slot name="header" />
+        <div class="flex items-center space-x-3">
+          <!-- Standardized Create Button -->
+          <button
+            v-if="createButton"
+            @click="$emit('create')"
+            class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-amber-600 hover:bg-amber-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500"
+          >
+            <Icon name="heroicons:plus" class="w-4 h-4 mr-2" />
+            {{ createButton.text || 'Nouveau' }}
+          </button>
+          <!-- Custom header actions -->
+          <div v-if="$slots.header">
+            <slot name="header" />
+          </div>
         </div>
       </div>
     </div>
@@ -55,7 +67,7 @@
                 </div>
               </div>
             </th>
-            <th v-if="$slots.actions" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th v-if="$slots.actions || showStandardActions" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
               Actions
             </th>
           </tr>
@@ -69,7 +81,7 @@
                 <div class="h-4 bg-gray-200 rounded"></div>
               </div>
             </td>
-            <td v-if="$slots.actions" class="px-6 py-4 whitespace-nowrap text-right">
+            <td v-if="$slots.actions || showStandardActions" class="px-6 py-4 whitespace-nowrap text-right">
               <div class="animate-pulse">
                 <div class="h-4 w-16 bg-gray-200 rounded ml-auto"></div>
               </div>
@@ -97,15 +109,37 @@
                   {{ column.formatter ? column.formatter(getNestedValue(item, column.key), item) : getNestedValue(item, column.key) }}
                 </slot>
               </td>
-              <td v-if="$slots.actions" class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                <slot name="actions" :item="item" :index="index" />
+              <td v-if="$slots.actions || showStandardActions" class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                <!-- Standard Actions -->
+                <div v-if="showStandardActions" class="flex items-center justify-end space-x-2">
+                  <button
+                    v-if="allowEdit"
+                    @click="$emit('edit', item)"
+                    class="inline-flex items-center px-2 py-1 border border-gray-300 rounded text-xs font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500"
+                    :title="`Modifier ${getItemLabel(item)}`"
+                  >
+                    <Icon name="heroicons:pencil" class="w-3 h-3" />
+                  </button>
+                  <button
+                    v-if="allowDelete"
+                    @click="confirmDelete(item)"
+                    class="inline-flex items-center px-2 py-1 border border-red-300 rounded text-xs font-medium text-red-700 bg-white hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                    :title="`Supprimer ${getItemLabel(item)}`"
+                  >
+                    <Icon name="heroicons:trash" class="w-3 h-3" />
+                  </button>
+                  <!-- Custom action buttons via slot -->
+                  <slot name="custom-actions" :item="item" :index="index" />
+                </div>
+                <!-- Legacy actions slot (fallback) -->
+                <slot v-else name="actions" :item="item" :index="index" />
               </td>
             </tr>
           </template>
 
           <!-- Empty state -->
           <tr v-else>
-            <td :colspan="columns.length + ($slots.actions ? 1 : 0)" class="px-6 py-12 text-center">
+            <td :colspan="columns.length + (($slots.actions || showStandardActions) ? 1 : 0)" class="px-6 py-12 text-center">
               <div class="flex flex-col items-center justify-center">
                 <Icon name="heroicons:document-text" class="w-12 h-12 text-gray-400 mb-4" />
                 <h3 class="text-sm font-medium text-gray-900 mb-1">{{ emptyTitle || 'Aucune donnée' }}</h3>
@@ -145,16 +179,79 @@
         </div>
       </div>
     </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div
+      v-if="showDeleteModal"
+      class="fixed inset-0 z-50 overflow-y-auto"
+      @click.self="cancelDelete"
+    >
+      <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+        <!-- Background overlay -->
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"></div>
+
+        <!-- Modal panel -->
+        <div class="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
+          <div class="sm:flex sm:items-start">
+            <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+              <Icon name="heroicons:exclamation-triangle" class="h-6 w-6 text-red-600" />
+            </div>
+            <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+              <h3 class="text-lg leading-6 font-medium text-gray-900">
+                {{ deleteModal.title || 'Confirmer la suppression' }}
+              </h3>
+              <div class="mt-2">
+                <p class="text-sm text-gray-500">
+                  {{ deleteModal.message || `Êtes-vous sûr de vouloir supprimer "${getItemLabel(itemToDelete)}" ? Cette action est irréversible.` }}
+                </p>
+              </div>
+            </div>
+          </div>
+          <div class="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
+            <button
+              @click="executeDelete"
+              :disabled="isDeleting"
+              class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm disabled:opacity-50"
+            >
+              <Icon v-if="isDeleting" name="heroicons:arrow-path" class="w-4 h-4 mr-2 animate-spin" />
+              {{ deleteModal.confirmText || 'Supprimer' }}
+            </button>
+            <button
+              @click="cancelDelete"
+              :disabled="isDeleting"
+              class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 sm:mt-0 sm:w-auto sm:text-sm disabled:opacity-50"
+            >
+              {{ deleteModal.cancelText || 'Annuler' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div>
 </template>
 
 <script setup lang="ts">
+import { globalNotifications } from '~/composables/useNotifications'
+
 interface Column {
   key: string
   label: string
   sortable?: boolean
   formatter?: (value: any, item: any) => string
   class?: string
+}
+
+interface CreateButton {
+  text?: string
+  icon?: string
+}
+
+interface DeleteModal {
+  title?: string
+  message?: string
+  confirmText?: string
+  cancelText?: string
 }
 
 interface Props {
@@ -170,6 +267,14 @@ interface Props {
   emptyTitle?: string
   emptyDescription?: string
   getRowKey?: (item: any) => string | number
+  // New standardized CRUD props
+  createButton?: CreateButton | boolean
+  showStandardActions?: boolean
+  allowEdit?: boolean
+  allowDelete?: boolean
+  itemLabelKey?: string
+  deleteModal?: DeleteModal
+  onDelete?: (item: any) => Promise<void>
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -177,13 +282,34 @@ const props = withDefaults(defineProps<Props>(), {
   pageSize: 10,
   showPagination: true,
   searchKey: '',
-  searchValue: ''
+  searchValue: '',
+  showStandardActions: false,
+  allowEdit: true,
+  allowDelete: true,
+  itemLabelKey: 'name'
 })
+
+// Emits
+const emit = defineEmits<{
+  create: []
+  edit: [item: any]
+  delete: [item: any]
+  'delete-success': [item: any]
+  'delete-error': [error: any, item: any]
+}>()
 
 // Reactive state
 const currentPage = ref(1)
 const sortKey = ref('')
 const sortOrder = ref<'asc' | 'desc'>('asc')
+
+// Delete modal state
+const showDeleteModal = ref(false)
+const itemToDelete = ref<any>(null)
+const isDeleting = ref(false)
+
+// Global notifications
+const { crudSuccess, crudError } = globalNotifications
 
 // Computed
 const filteredData = computed(() => {
@@ -237,6 +363,47 @@ function toggleSort(key: string) {
 
 function getNestedValue(obj: any, path: string): any {
   return path.split('.').reduce((current, key) => current?.[key], obj)
+}
+
+// New CRUD methods
+function getItemLabel(item: any): string {
+  if (!item) return ''
+  return getNestedValue(item, props.itemLabelKey) || item.id || item.name || 'Élément'
+}
+
+function confirmDelete(item: any) {
+  itemToDelete.value = item
+  showDeleteModal.value = true
+}
+
+function cancelDelete() {
+  showDeleteModal.value = false
+  itemToDelete.value = null
+  isDeleting.value = false
+}
+
+async function executeDelete() {
+  if (!itemToDelete.value) return
+
+  isDeleting.value = true
+  try {
+    if (props.onDelete) {
+      // Use custom delete handler
+      await props.onDelete(itemToDelete.value)
+    } else {
+      // Emit delete event for parent to handle
+      emit('delete', itemToDelete.value)
+    }
+
+    crudSuccess.deleted(getItemLabel(itemToDelete.value))
+    emit('delete-success', itemToDelete.value)
+    cancelDelete()
+  } catch (error: any) {
+    console.error('Erreur lors de la suppression:', error)
+    crudError.deleted('élément', error.message || 'Une erreur est survenue lors de la suppression.')
+    emit('delete-error', error, itemToDelete.value)
+    isDeleting.value = false
+  }
 }
 
 // Watch for data changes to reset pagination
