@@ -137,7 +137,7 @@
     </div>
 
     <!-- Global Notification Container -->
-    <NotificationContainer />
+    <UiNSNotificationContainer />
   </div>
 </template>
 

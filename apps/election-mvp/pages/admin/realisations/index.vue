@@ -6,6 +6,23 @@
         <div>
           <h1 class="text-2xl font-bold text-gray-900">Gestion des Réalisations</h1>
           <p class="text-gray-600">Gérez vos réalisations avec Turso + Cloudinary Auto-Discovery</p>
+
+          <!-- Légende des sources -->
+          <div class="mt-3 flex items-center space-x-4 text-sm">
+            <span class="text-gray-500 font-medium">Sources :</span>
+            <UiTooltip content="<strong>Base Turso</strong><br/>Réalisations stockées en base. Suppression définitive possible.">
+              <div class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                <Icon name="heroicons:circle-stack" class="w-3 h-3 mr-1" />
+                Turso
+              </div>
+            </UiTooltip>
+            <UiTooltip content="<strong>Auto-Discovery Cloudinary</strong><br/>Réalisations découvertes automatiquement. Désactivation douce seulement.">
+              <div class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                <Icon name="heroicons:cloud" class="w-3 h-3 mr-1" />
+                Auto-discovery
+              </div>
+            </UiTooltip>
+          </div>
         </div>
         <div class="flex items-center space-x-3">
           <button
@@ -23,6 +40,61 @@
             <Icon name="heroicons:plus" class="w-4 h-4 mr-2" />
             Nouvelle Réalisation
           </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div v-if="stats" class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+      <!-- Total -->
+      <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+        <div class="flex items-center">
+          <div class="flex-shrink-0">
+            <Icon name="heroicons:document-text" class="h-6 w-6 text-gray-600" />
+          </div>
+          <div class="ml-3">
+            <p class="text-sm font-medium text-gray-500">Total</p>
+            <p class="text-lg font-semibold text-gray-900">{{ stats.total }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Turso -->
+      <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+        <div class="flex items-center">
+          <div class="flex-shrink-0">
+            <Icon name="heroicons:circle-stack" class="h-6 w-6 text-blue-600" />
+          </div>
+          <div class="ml-3">
+            <p class="text-sm font-medium text-gray-500">Turso</p>
+            <p class="text-lg font-semibold text-blue-900">{{ stats.turso }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Auto-discovery -->
+      <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+        <div class="flex items-center">
+          <div class="flex-shrink-0">
+            <Icon name="heroicons:cloud" class="h-6 w-6 text-green-600" />
+          </div>
+          <div class="ml-3">
+            <p class="text-sm font-medium text-gray-500">Auto-discovery</p>
+            <p class="text-lg font-semibold text-green-900">{{ stats.autodiscovery }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Featured -->
+      <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+        <div class="flex items-center">
+          <div class="flex-shrink-0">
+            <Icon name="heroicons:star" class="h-6 w-6 text-amber-600" />
+          </div>
+          <div class="ml-3">
+            <p class="text-sm font-medium text-gray-500">En vedette</p>
+            <p class="text-lg font-semibold text-amber-900">{{ stats.featured }}</p>
+          </div>
         </div>
       </div>
     </div>
@@ -165,9 +237,12 @@
 
               <!-- Source Badge -->
               <div class="absolute top-2 right-2">
-                <span :class="getSourceBadgeClass(realisation.source)">
-                  {{ getSourceLabel(realisation.source) }}
-                </span>
+                <UiTooltip :content="getSourceTooltip(realisation.source)">
+                  <span :class="getSourceBadgeClass(realisation.source)">
+                    <Icon :name="getSourceIcon(realisation.source)" class="w-3 h-3 mr-1" />
+                    {{ getSourceLabel(realisation.source) }}
+                  </span>
+                </UiTooltip>
               </div>
             </div>
 
@@ -310,9 +385,11 @@
 
               <!-- Source -->
               <td class="px-6 py-4 whitespace-nowrap">
-                <span :class="getSourceBadgeClass(realisation.source)">
-                  {{ getSourceLabel(realisation.source) }}
-                </span>
+                <UiTooltip :content="getSourceTooltip(realisation.source)">
+                  <span :class="getSourceBadgeClass(realisation.source)">
+                    {{ getSourceLabel(realisation.source) }}
+                  </span>
+                </UiTooltip>
               </td>
 
               <!-- Status -->
@@ -413,6 +490,16 @@
       @saved="onRealisationSaved"
     />
 
+    <!-- Confirmation Modal -->
+    <AdminConfirmationModal
+      v-if="selectedRealisationForDelete"
+      :show="showConfirmModal"
+      :source="selectedRealisationForDelete.source"
+      :item-name="selectedRealisationForDelete.title"
+      :on-confirm="confirmDelete"
+      :on-cancel="closeConfirmModal"
+    />
+
     <!-- Notifications -->
     <div
       v-if="notification.show"
@@ -452,6 +539,9 @@
 </template>
 
 <script setup lang="ts">
+import RealisationFormModal from '~/components/admin/RealisationFormModal.vue'
+import AdminConfirmationModal from '~/components/admin/ConfirmationModal.vue'
+
 interface Realisation {
   id: string
   title: string
@@ -573,8 +663,8 @@ const stats = computed(() => {
   return {
     turso: realisations.value.filter(r => r.source === 'turso').length,
     autodiscovery: realisations.value.filter(r => r.source === 'cloudinary-auto-discovery').length,
-    airtable: realisations.value.filter(r => r.source === 'airtable').length,
-    featured: realisations.value.filter(r => r.isFeatured).length
+    featured: realisations.value.filter(r => r.isFeatured).length,
+    total: realisations.value.length
   }
 })
 
@@ -670,12 +760,20 @@ const duplicateRealisation = async (realisation: Realisation) => {
   }
 }
 
-const deleteRealisation = async (realisation: Realisation) => {
-  const action = realisation.source === 'cloudinary-auto-discovery' ? 'désactiver' : 'supprimer'
+// État pour la modale de confirmation
+const showConfirmModal = ref(false)
+const selectedRealisationForDelete = ref<Realisation | null>(null)
 
-  if (!confirm(`Êtes-vous sûr de vouloir ${action} la réalisation "${realisation.title}" ?`)) {
-    return
-  }
+const deleteRealisation = async (realisation: Realisation) => {
+  selectedRealisationForDelete.value = realisation
+  showConfirmModal.value = true
+}
+
+const confirmDelete = async () => {
+  if (!selectedRealisationForDelete.value) return
+
+  const realisation = selectedRealisationForDelete.value
+  const action = realisation.source === 'cloudinary-auto-discovery' ? 'désactiver' : 'supprimer'
 
   try {
     await $fetch(`/api/realisations/${realisation.id}`, {
@@ -688,7 +786,14 @@ const deleteRealisation = async (realisation: Realisation) => {
     console.error('Erreur lors de la suppression:', err)
     const message = err.data?.message || `Erreur lors de la ${action === 'désactiver' ? 'désactivation' : 'suppression'} de la réalisation`
     showNotification('error', message)
+  } finally {
+    closeConfirmModal()
   }
+}
+
+const closeConfirmModal = () => {
+  showConfirmModal.value = false
+  selectedRealisationForDelete.value = null
 }
 
 const getCloudinaryUrl = (publicId: string, transformation = 'w_300,h_200,c_fill') => {
@@ -698,24 +803,40 @@ const getCloudinaryUrl = (publicId: string, transformation = 'w_300,h_200,c_fill
 const getSourceLabel = (source: string) => {
   switch (source) {
     case 'turso': return 'Turso'
-    case 'cloudinary-auto-discovery': return 'Auto'
-    case 'airtable': return 'Airtable'
+    case 'cloudinary-auto-discovery': return 'Auto-discovery'
     default: return source
   }
 }
 
 const getSourceBadgeClass = (source: string) => {
-  const baseClasses = 'inline-flex items-center px-2 py-1 rounded-full text-xs font-medium'
+  const baseClasses = 'inline-flex items-center px-2 py-1 rounded-full text-xs font-medium transition-all hover:scale-105'
 
   switch (source) {
     case 'turso':
-      return `${baseClasses} bg-blue-100 text-blue-800`
+      return `${baseClasses} bg-blue-100 text-blue-800 hover:bg-blue-200`
     case 'cloudinary-auto-discovery':
-      return `${baseClasses} bg-purple-100 text-purple-800`
-    case 'airtable':
-      return `${baseClasses} bg-orange-100 text-orange-800`
+      return `${baseClasses} bg-green-100 text-green-800 hover:bg-green-200`
     default:
-      return `${baseClasses} bg-gray-100 text-gray-800`
+      return `${baseClasses} bg-gray-100 text-gray-800 hover:bg-gray-200`
+  }
+}
+
+const getSourceIcon = (source: string) => {
+  switch (source) {
+    case 'turso': return 'heroicons:circle-stack'
+    case 'cloudinary-auto-discovery': return 'heroicons:cloud'
+    default: return 'heroicons:document'
+  }
+}
+
+const getSourceTooltip = (source: string) => {
+  switch (source) {
+    case 'turso':
+      return '<strong>Base Turso</strong><br/>Stockage permanent en base de données.<br/>🔧 <em>Actions :</em> Modification & suppression définitive'
+    case 'cloudinary-auto-discovery':
+      return '<strong>Auto-Discovery Cloudinary</strong><br/>Détection automatique des images.<br/>🔧 <em>Actions :</em> Modification & désactivation douce seulement'
+    default:
+      return '<strong>Source inconnue</strong><br/>Type de source non reconnu.<br/>⚠️ <em>Comportement par défaut</em>'
   }
 }
 

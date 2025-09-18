@@ -25,7 +25,6 @@ def check_project_health():
         'pnpm': False,
         'typescript': False,
         'git': False,
-        'airtable': False,
         'cloudinary': False,
         'turso': False,
         'smtp': False
@@ -60,7 +59,6 @@ def check_project_health():
             try:
                 with open(env_path, 'r') as f:
                     env_content = f.read()
-                    health_status['airtable'] = 'AIRTABLE_API_KEY' in env_content
                     health_status['cloudinary'] = 'CLOUDINARY_CLOUD_NAME' in env_content
                     health_status['turso'] = 'TURSO_DATABASE_URL' in env_content
                     health_status['smtp'] = 'SMTP_HOST' in env_content
@@ -264,7 +262,6 @@ def display_ns2po_dashboard():
     print(f"   • pnpm workspace: {status_symbols[health['pnpm']]}")
     print(f"   • TypeScript: {status_symbols[health['typescript']]}")
     print(f"   • Git: {status_symbols[health['git']]}")
-    print(f"   • Airtable API: {status_symbols[health['airtable']]}")
     print(f"   • Cloudinary CDN: {status_symbols[health['cloudinary']]}")
     print(f"   • Turso Database: {status_symbols[health['turso']]}")
     print(f"   • SMTP Email: {status_symbols[health['smtp']]}")
@@ -342,8 +339,6 @@ def display_ns2po_dashboard():
     issues = []
     if not health['pnpm']:
         issues.append("pnpm non disponible - installer avec: npm install -g pnpm")
-    if not health['airtable']:
-        issues.append("Airtable non configuré - vérifier AIRTABLE_API_KEY dans .env")
     if not health['cloudinary']:
         issues.append("Cloudinary non configuré - vérifier CLOUDINARY_CLOUD_NAME")
     if not health['turso']:
@@ -365,13 +360,13 @@ def display_ns2po_dashboard():
     print(f"   • TypeScript strict pour fiabilité")
     print(f"   • Architecture monorepo scalable")
     
-    # MIGRATION STATUS
-    print(f"\n🚀 MIGRATION AIRTABLE → TURSO:")
-    print(f"   • Status: INFRASTRUCTURE DÉCOUVERTE - PRÊTE!")
+    # POST-MIGRATION STATUS
+    print(f"\n🚀 ARCHITECTURE POST-MIGRATION:")
+    print(f"   • Status: ✅ MIGRATION AIRTABLE → TURSO 100% TERMINÉE")
     print(f"   • Base Turso: ns2po-election-mvp (10 tables opérationnelles)")
-    print(f"   • Timeline: 1-2 semaines au lieu de 4")
-    print(f"   • Prochaine tâche: Configuration client Nuxt (Tâche #2)")
-    print(f"   • Commande: pnpm exec task-master next-task")
+    print(f"   • Sources de données: Turso + Cloudinary Auto-discovery")
+    print(f"   • Économies réalisées: 240€/an (abandon Airtable)")
+    print(f"   • Commande task-master: pnpm exec task-master next-task")
 
     # Recommandations pour la session
     print(f"\n📋 Recommandations pour cette session:")

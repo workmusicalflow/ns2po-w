@@ -128,6 +128,11 @@ export const useCloudinaryImage = () => {
       return "";
     }
 
+    // Assurer que le publicId a une extension d'image valide
+    const validatedPublicId = publicId.match(/\.(jpg|jpeg|png|webp|gif|svg)$/i)
+      ? publicId
+      : `${publicId}.jpg`;
+
     // Application du preset si fourni
     const finalOptions = preset ? { ...presets[preset], ...options } : options;
 
@@ -148,7 +153,7 @@ export const useCloudinaryImage = () => {
 
     const transformationString = transformations.join(",");
 
-    return `https://res.cloudinary.com/${cloudName}/image/upload/${transformationString}/${publicId}`;
+    return `https://res.cloudinary.com/${cloudName}/image/upload/${transformationString}/${validatedPublicId}`;
   };
 
   /**

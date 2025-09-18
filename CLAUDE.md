@@ -15,7 +15,7 @@ PMI ivoirienne de publicité par l'objet depuis 2011, NS2PO digitalise son offre
 
 * **Frontend** : Nuxt 3 + Vue 3 + TypeScript + Tailwind + HeadlessUI
 * **Backend** : API Routes Nuxt + Turso (SQLite)
-* **Migration** : Airtable → Turso (cache performant)
+* **Base de Données** : Turso SQLite (Migration Airtable 100% terminée)
 * **Admin CMS** : Mini-CMS sécurisé `/admin` avec Shadcn-vue + authentification middleware
 * **Médias** : Cloudinary (upload, optimisation, transformation)
 * **Déploiement** : Vercel, monorepo Turborepo + pnpm workspaces

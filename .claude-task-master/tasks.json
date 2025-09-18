@@ -1,366 +1,150 @@
 {
-  "name": "Migration Airtable vers Turso Edge Database",
-  "description": "Migration critique du CMS Airtable vers Turso Edge Database pour éliminer les limitations de quotas API (1000/mois → 500M/mois) et améliorer les performances (500ms → 20ms). Projet structuré en 6 phases sur 4 semaines avec architecture hybride pour minimiser les risques. Objectifs: économie 240€/an, scalabilité 10000 users/jour, UX 10x améliorée.",
-  "created": "2025-09-17T00:07:09.349Z",
-  "updated": "2025-09-17T19:01:27.484Z",
+  "name": "NS2PO Réalisations UX Enhancement",
+  "description": "Amélioration complète de l'expérience utilisateur pour le système de gestion des réalisations multi-sources (Turso/Auto-discovery/Airtable) avec documentation, UX/UI, fonctionnalités avancées et monitoring",
+  "created": "2025-09-18T12:23:52.765Z",
+  "updated": "2025-09-18T12:45:00.073Z",
   "tasks": [
     {
       "id": 1,
-      "title": "📋 PHASE 0.1 - Setup environnement Turso",
-      "description": "✅ DÉCOUVERTE: Base Turso ns2po-election-mvp déjà créée et opérationnelle !\n- Database URL: libsql://ns2po-election-mvp-workmusicalflow.aws-eu-west-1.turso.io\n- 10 tables avec schema complet et triggers\n- 3 produits déjà synchronisés depuis Airtable\n- 2 contacts commerciaux configurés\n- Architecture prête pour le CMS admin",
-      "status": "completed",
+      "title": "Phase 1.1: Documentation - Guide utilisateur système multi-sources",
+      "description": "Créer documentation complète expliquant les différences entre sources Turso/Auto-discovery/Airtable, stratégies de suppression (soft vs hard delete), et workflow de modification. Format : Markdown avec exemples visuels et captures d'écran.",
+      "status": "pending",
       "priority": 5,
       "dependencies": [],
-      "created": "2025-09-17T00:07:16.062Z",
-      "updated": "2025-09-17T00:21:53.354Z"
+      "created": "2025-09-18T12:24:00.887Z",
+      "updated": "2025-09-18T12:24:00.887Z"
     },
     {
       "id": 2,
-      "title": "📋 PHASE 0.2 - Configuration Nuxt Turso client",
-      "description": "✅ CONFIGURATION TERMINÉE - Infrastructure Turso opérationnelle.\n- Base Turso déjà connectée: libsql://ns2po-election-mvp-workmusicalflow.aws-eu-west-1.turso.io\n- Client @libsql/client v0.15.12 installé ✅\n- Configuration .env présente avec TURSO_DATABASE_URL et TURSO_AUTH_TOKEN ✅\n- Connexion testée avec succès: API /api/products/turso fonctionne (3 produits) ✅\n- Fichier server/utils/database.ts configuré ✅\n- ⚡ RÉSULTAT: Skip phase installation, connexion opérationnelle",
+      "title": "Phase 1.2: Documentation - Tooltips interface admin",
+      "description": "Ajouter tooltips informatifs dans /admin/realisations pour expliquer chaque source (badge couleur + texte explicatif). Utiliser HeadlessUI Tooltip avec design NS2PO. Inclure légende permanente en haut de page.",
       "status": "completed",
-      "priority": 5,
+      "priority": 4,
       "dependencies": [
         1
       ],
-      "created": "2025-09-17T00:07:22.357Z",
-      "updated": "2025-09-17T13:02:40.077Z"
+      "created": "2025-09-18T12:24:08.351Z",
+      "updated": "2025-09-18T12:45:00.073Z"
     },
     {
       "id": 3,
-      "title": "📋 PHASE 0.3 - Design schéma database SQL",
-      "description": "✅ DÉCOUVERTE: Schéma SQL déjà implémenté et opérationnel !\n- 10 tables avec relations complètes (products, quotes, orders, customers, etc.)\n- Triggers automatiques pour updated_at\n- Index optimisés pour performance\n- Contraintes et validations en place\n- Compatible avec besoins métier NS2PO",
+      "title": "Phase 1.3: Documentation - Stratégie suppression équipe",
+      "description": "Documenter en détail la stratégie de suppression pour l'équipe technique : soft delete (Auto-discovery), hard delete (Turso/Airtable), implications business, procédures de récupération. Format : confluence/wiki technique.",
+      "status": "pending",
+      "priority": 3,
+      "dependencies": [
+        1
+      ],
+      "created": "2025-09-18T12:24:16.392Z",
+      "updated": "2025-09-18T12:24:16.392Z"
+    },
+    {
+      "id": 4,
+      "title": "Phase 2.1: UX - Badges colorés par source type",
+      "description": "Implémenter système de badges visuels dans DataTable : Turso (bleu), Auto-discovery (vert), Airtable (orange). Ajouter icônes distinctives et animation hover. Modifier AdminDataTable.vue et composant réalisations.",
       "status": "completed",
       "priority": 5,
       "dependencies": [
         2
       ],
-      "created": "2025-09-17T00:07:29.513Z",
-      "updated": "2025-09-17T00:21:59.343Z"
-    },
-    {
-      "id": 4,
-      "title": "📋 PHASE 0.4 - Setup Drizzle ORM et migrations",
-      "description": "✅ DÉCOUVERTE: Drizzle/Migrations déjà implémentées !\n- 10 tables avec schema SQL complet en production\n- Triggers automatiques (updated_at) déjà actifs\n- Relations et contraintes configurées\n- Index optimisés pour performance\n- Prêt pour ORM Drizzle si besoin\n- ⚡ PHASE SKIPPÉE: Architecture déjà en place",
-      "status": "completed",
-      "priority": 5,
-      "dependencies": [
-        3
-      ],
-      "created": "2025-09-17T00:07:40.275Z",
-      "updated": "2025-09-17T00:23:49.355Z"
+      "created": "2025-09-18T12:24:24.516Z",
+      "updated": "2025-09-18T12:36:30.297Z"
     },
     {
       "id": 5,
-      "title": "🔄 PHASE 1.1 - Service de synchronisation Airtable→Turso",
-      "description": "✅ SERVICE DE SYNCHRONISATION CRÉÉ - server/services/airtable-sync.ts opérationnel.\n- Classe AirtableTursoSync avec méthodes fetchAirtableData(), transformToSQL(), upsert batch ✅\n- Support tables: Products, Categories, CampaignBundles ✅\n- Gestion d'erreurs robuste avec logging détaillé ✅\n- Health check Turso/Airtable intégré ✅\n- Options: dryRun, batchSize, direction ✅\n- Instance singleton exportée: airtableTursoSync ✅\n- ⚡ GAIN: Service centralisé prêt pour API endpoints",
+      "title": "Phase 2.2: UX - Confirmations différenciées par source",
+      "description": "Créer modales de confirmation intelligentes : \"Suppression douce (récupérable)\" pour Auto-discovery, \"Suppression définitive\" pour Turso/Airtable. Ajouter composant ConfirmationModal.vue avec logique conditionnelle.",
       "status": "completed",
       "priority": 5,
       "dependencies": [
         4
       ],
-      "created": "2025-09-17T00:07:47.170Z",
-      "updated": "2025-09-17T13:08:42.039Z"
+      "created": "2025-09-18T12:24:32.214Z",
+      "updated": "2025-09-18T12:40:44.893Z"
     },
     {
       "id": 6,
-      "title": "🔄 PHASE 1.2 - Cron job et automation sync",
-      "description": "Automatiser la synchronisation avec cron jobs et webhooks.\n- Créer server/tasks/cron-sync.ts avec Nitro tasks\n- Configurer sync automatique toutes les 6h\n- Créer webhook /api/sync-manual pour sync immédiate\n- Implémenter retry logic et error handling\n- Ajouter notifications Slack/email en cas d'échec\n- Tester automatisation en développement",
-      "status": "completed",
-      "priority": 4,
+      "title": "Phase 2.3: UX - Historique des actions utilisateur",
+      "description": "Implémenter système de log des actions : suppression, modification, création avec timestamp, utilisateur, type d'action. Créer table audit_log et interface de consultation dans /admin/realisations/history.",
+      "status": "pending",
+      "priority": 3,
       "dependencies": [
         5
       ],
-      "created": "2025-09-17T00:07:53.921Z",
-      "updated": "2025-09-17T13:43:06.485Z"
+      "created": "2025-09-18T12:24:40.868Z",
+      "updated": "2025-09-18T12:24:40.868Z"
     },
     {
       "id": 7,
-      "title": "🔄 PHASE 1.3 - API Layer hybride avec fallback",
-      "description": "✅ API LAYER HYBRIDE CRÉÉ - Stratégie Turso → Airtable → Fallback statique opérationnelle.\n- API /products refactorisée avec fallback 3 niveaux ✅\n- API /campaign-bundles avec stratégie hybride ✅  \n- Cache Nitro intelligent: 15min Turso, 5min Airtable, 1min fallback ✅\n- Health check /api/health avec monitoring complet ✅\n- Tests validés: health=healthy, products=airtable(3), bundles=airtable(3) ✅\n- Fallback statique robuste pour résilience maximale ✅\n- ⚡ GAIN: Infrastructure prête pour Go-Live avec 99.9% uptime",
-      "status": "completed",
-      "priority": 5,
+      "title": "Phase 3.1: Fonctionnalités - Corbeille virtuelle soft-deleted",
+      "description": "Créer interface /admin/realisations/trash pour visualiser et récupérer les réalisations soft-deleted (Auto-discovery). Ajouter actions \"Restaurer\" et \"Supprimer définitivement\". Filtres par date et source.",
+      "status": "pending",
+      "priority": 4,
       "dependencies": [
-        5
+        6
       ],
-      "created": "2025-09-17T00:08:03.508Z",
-      "updated": "2025-09-17T13:17:43.654Z"
+      "created": "2025-09-18T12:24:48.936Z",
+      "updated": "2025-09-18T12:24:48.936Z"
     },
     {
       "id": 8,
-      "title": "🎨 PHASE 2.1 - Architecture Mini-CMS",
-      "description": "Créer l'architecture de base du mini-CMS d'administration.\n- Créer la structure /admin avec layout dédié\n- Installer et configurer Nuxt UI Pro pour l'admin\n- Créer middleware d'authentification admin\n- Designer la navigation et dashboard principal\n- Créer composants de base: DataTable, Forms, Modal\n- Tester l'accès sécurisé à /admin",
-      "status": "completed",
-      "priority": 4,
+      "title": "Phase 3.2: Fonctionnalités - Bulk operations par source",
+      "description": "Implémenter sélection multiple avec actions groupées : \"Supprimer sélection Turso\" (hard), \"Désactiver sélection Auto-discovery\" (soft), \"Changer source\", \"Export sélection\". Checkbox + état sélection global.",
+      "status": "pending",
+      "priority": 3,
       "dependencies": [
         7
       ],
-      "created": "2025-09-17T00:08:10.978Z",
-      "updated": "2025-09-17T14:18:23.295Z"
+      "created": "2025-09-18T12:24:57.135Z",
+      "updated": "2025-09-18T12:24:57.135Z"
     },
     {
       "id": 9,
-      "title": "🎨 PHASE 2.2 - CRUD Produits et Interface",
-      "description": "Migration campaign bundles vers Turso avec API endpoints complets, schéma SQL et relations produits - Performance 5x améliorée (4000ms → 750ms)",
-      "status": "completed",
-      "priority": 4,
+      "title": "Phase 3.3: Fonctionnalités - Export/Import sélectif",
+      "description": "Créer système export CSV/JSON par source avec métadonnées complètes. Import intelligent avec détection conflits et mapping automatique. Gestion des images Cloudinary dans export/import.",
+      "status": "pending",
+      "priority": 2,
       "dependencies": [
         8
       ],
-      "created": "2025-09-17T00:08:17.525Z",
-      "updated": "2025-09-17T15:39:24.261Z"
+      "created": "2025-09-18T12:25:05.342Z",
+      "updated": "2025-09-18T12:25:05.342Z"
     },
     {
       "id": 10,
-      "title": "🎨 PHASE 2.3 - Gestion Bundles et Pricing",
-      "description": "Développer les interfaces de gestion des packs et règles tarifaires.\n- Créer /admin/bundles/ pour gestion des packs campagne\n- Implémenter configuration produits par bundle\n- Créer /admin/pricing/ pour règles de tarification\n- Ajouter gestion des remises volume et client\n- Créer prévisualisation des prix en temps réel\n- Intégrer avec le calculateur de devis existant",
-      "status": "completed",
-      "priority": 3,
+      "title": "Phase 4.1: Monitoring - Dashboard analytics par source",
+      "description": "Créer dashboard /admin/analytics avec métriques : répartition par source, tendances création/suppression, top réalisations populaires, statistiques performance API. Graphiques Chart.js avec design NS2PO.",
+      "status": "pending",
+      "priority": 2,
       "dependencies": [
         9
       ],
-      "created": "2025-09-17T00:08:27.855Z",
-      "updated": "2025-09-17T15:07:27.188Z"
+      "created": "2025-09-18T12:25:13.512Z",
+      "updated": "2025-09-18T12:25:13.512Z"
     },
     {
       "id": 11,
-      "title": "🎨 PHASE 2.4 - Dashboard et Monitoring Admin",
-      "description": "Finaliser le dashboard admin avec monitoring et contrôles.\n- Créer dashboard avec métriques clés (produits, syncs, erreurs)\n- Ajouter interface de contrôle synchronisation manuelle\n- Implémenter logs viewer pour debug\n- Créer gestion backup/restore données\n- Ajouter monitoring santé Turso en temps réel\n- Finaliser UX et responsive design admin",
-      "status": "completed",
-      "priority": 3,
+      "title": "Phase 4.2: Monitoring - Alertes intelligentes suppressions",
+      "description": "Système d'alertes automatiques : notification équipe pour suppressions importantes (>10 réalisations), alertes seuils critiques (0 réalisations actives), rapport hebdomadaire activité. Integration email SMTP + notifications push.",
+      "status": "pending",
+      "priority": 2,
       "dependencies": [
         10
       ],
-      "created": "2025-09-17T00:08:34.496Z",
-      "updated": "2025-09-17T15:07:31.305Z"
+      "created": "2025-09-18T12:25:21.794Z",
+      "updated": "2025-09-18T12:25:21.794Z"
     },
     {
       "id": 12,
-      "title": "📦 PHASE 3.1 - Export complet données Airtable",
-      "description": "✅ DÉCOUVERTE: Export Airtable déjà effectué !\n- 3 produits déjà synchronisés dans Turso\n- Mapping Airtable→SQL déjà validé\n- Structure de données cohérente\n- Données de production opérationnelles\n- ⚡ PHASE SKIPPÉE: Import historique déjà fait",
-      "status": "completed",
-      "priority": 5,
+      "title": "Phase 4.3: Monitoring - Audit trail complet modifications",
+      "description": "Système de traçabilité complète : log détaillé de chaque modification (avant/après), interface de recherche dans l'historique, export audit reports, integration avec système de backup automatique. Conformité RGPD.",
+      "status": "pending",
+      "priority": 1,
       "dependencies": [
         11
       ],
-      "created": "2025-09-17T00:08:41.568Z",
-      "updated": "2025-09-17T00:23:54.649Z"
-    },
-    {
-      "id": 13,
-      "title": "📦 PHASE 3.2 - Import et validation données Turso",
-      "description": "✅ DÉCOUVERTE: Import Turso déjà validé !\n- 3 produits avec données complètes et cohérentes\n- 2 contacts commerciaux configurés  \n- Structure JSON validée (specifications, gallery_urls, etc.)\n- Intégrité référentielle respectée\n- ⚡ PHASE SKIPPÉE: Base déjà opérationnelle",
-      "status": "completed",
-      "priority": 5,
-      "dependencies": [
-        12
-      ],
-      "created": "2025-09-17T00:08:49.872Z",
-      "updated": "2025-09-17T00:24:00.428Z"
-    },
-    {
-      "id": 14,
-      "title": "📦 PHASE 3.3 - Tests E2E post-migration",
-      "description": "Valider que l'application fonctionne correctement avec les nouvelles données.\n- Exécuter suite tests E2E Playwright complète\n- Tester parcours complet utilisateur (catalogue → devis)\n- Valider calculs prix et génération PDF\n- Tester performance avec données réelles\n- Vérifier compatibilité mobile/desktop\n- Corriger les régressions détectées",
-      "status": "pending",
-      "priority": 4,
-      "dependencies": [
-        13
-      ],
-      "created": "2025-09-17T00:08:57.698Z",
-      "updated": "2025-09-17T00:08:57.698Z"
-    },
-    {
-      "id": 15,
-      "title": "🚀 PHASE 4.1 - Préparation Go-Live production",
-      "description": "Préparer le basculement définitif en production.\n- Valider checklist Go-Live complète\n- Configurer feature flags pour rollback rapide\n- Préparer monitoring temps réel (Sentry, Analytics)\n- Créer plan de rollback détaillé\n- Former l'équipe sur nouvelle architecture\n- Planifier fenêtre de maintenance",
-      "status": "pending",
-      "priority": 5,
-      "dependencies": [
-        14
-      ],
-      "created": "2025-09-17T00:09:03.842Z",
-      "updated": "2025-09-17T00:09:03.842Z"
-    },
-    {
-      "id": 16,
-      "title": "🚀 PHASE 4.2 - Déploiement progressif et monitoring",
-      "description": "Exécuter le basculement avec déploiement progressif.\n- Déployer en staging pour validation finale\n- Basculer 10% du trafic vers Turso\n- Monitorer métriques performance et erreurs\n- Augmenter progressivement (50% puis 100%)\n- Surveiller latence, conversion et UX\n- Confirmer stabilité avant désactivation Airtable",
-      "status": "pending",
-      "priority": 5,
-      "dependencies": [
-        15
-      ],
-      "created": "2025-09-17T00:09:14.185Z",
-      "updated": "2025-09-17T00:09:14.185Z"
-    },
-    {
-      "id": 17,
-      "title": "⚡ PHASE 5.1 - Optimisation cache et performance",
-      "description": "Optimiser les performances avec stratégies de cache avancées.\n- Implémenter Redis/Upstash pour hot data cache\n- Configurer edge caching Vercel pour assets\n- Ajouter stale-while-revalidate strategy\n- Optimiser queries SQL avec index intelligents\n- Implémenter connection pooling Turso\n- Mesurer et valider gains performance",
-      "status": "pending",
-      "priority": 3,
-      "dependencies": [
-        16
-      ],
-      "created": "2025-09-17T00:09:23.107Z",
-      "updated": "2025-09-17T00:09:23.107Z"
-    },
-    {
-      "id": 18,
-      "title": "⚡ PHASE 5.2 - Monitoring avancé et alertes",
-      "description": "Mettre en place monitoring production complet.\n- Configurer Sentry pour tracking erreurs avancé\n- Créer dashboards métriques business custom\n- Implémenter alertes proactives (Slack/email)\n- Ajouter monitoring uptime et performance\n- Créer rapports automatiques hebdomadaires\n- Configurer log aggregation et analysis",
-      "status": "pending",
-      "priority": 3,
-      "dependencies": [
-        17
-      ],
-      "created": "2025-09-17T00:09:30.886Z",
-      "updated": "2025-09-17T00:09:30.886Z"
-    },
-    {
-      "id": 19,
-      "title": "📚 PHASE 6.1 - Documentation et formation équipe",
-      "description": "Finaliser documentation et former l'équipe sur la nouvelle architecture.\n- Mettre à jour documentation technique complète\n- Créer guides utilisateur pour admin CMS\n- Former l'équipe marketing sur nouvelle interface\n- Documenter procedures backup/restore\n- Créer runbooks pour incidents production\n- Organiser session de formation hands-on",
-      "status": "pending",
-      "priority": 2,
-      "dependencies": [
-        18
-      ],
-      "created": "2025-09-17T00:09:38.691Z",
-      "updated": "2025-09-17T00:09:38.691Z"
-    },
-    {
-      "id": 20,
-      "title": "🧹 PHASE 6.2 - Nettoyage final et désactivation Airtable",
-      "description": "Finaliser la migration en supprimant définitivement les dépendances Airtable.\n- Supprimer code legacy Airtable du codebase\n- Désactiver compte Airtable et API keys\n- Nettoyer variables environnement inutilisées\n- Archiver définitivement backups Airtable\n- Valider que l'app fonctionne 100% sans Airtable\n- Créer post-mortem et lessons learned",
-      "status": "pending",
-      "priority": 2,
-      "dependencies": [
-        19
-      ],
-      "created": "2025-09-17T00:09:46.703Z",
-      "updated": "2025-09-17T00:09:46.703Z"
-    },
-    {
-      "id": 21,
-      "title": "⚡ NOUVEAU - Vérification compatibilité app Nuxt avec Turso",
-      "description": "✅ AUDIT COMPATIBILITÉ TERMINÉ - App Nuxt 100% prête pour Turso !\n- Composables analysés: useCampaignBundles (✅ hybride), useProducts (⚠️ 1 ligne) ✅\n- Pages analysées: devis.vue utilise composables, aucun appel API direct ✅\n- Structure données: APIs hybrides déjà compatibles (source: airtable/turso/static) ✅\n- Tests infrastructure: health=healthy, products=airtable(3), bundles=airtable(3) ✅\n- Effort migration: 0.5 JOUR (1 ligne dans useProducts.ts) ✅\n- ⚡ RÉSULTAT: App nativement compatible, infrastructure Turso opérationnelle",
-      "status": "completed",
-      "priority": 5,
-      "dependencies": [
-        2
-      ],
-      "created": "2025-09-17T00:24:07.770Z",
-      "updated": "2025-09-17T13:23:35.256Z"
-    },
-    {
-      "id": 22,
-      "title": "🔄 PHASE 3.2 - Migration API Campaign Bundles vers Turso",
-      "description": "Migrer complètement les bundles d'Airtable vers Turso avec tests.\n- Adapter API endpoints pour utiliser Turso au lieu d'Airtable\n- Migrer les produits associés aux bundles depuis Airtable\n- Configurer les relations bundle_products avec les produits existants\n- Tester l'interface admin /admin/bundles/ avec les nouvelles tables\n- Valider calculs prix et génération des bundles\n- Synchroniser données Airtable → Turso pour bundles",
-      "status": "in-progress",
-      "priority": 5,
-      "dependencies": [
-        11
-      ],
-      "created": "2025-09-17T15:15:52.202Z",
-      "updated": "2025-09-17T15:15:56.962Z"
-    },
-    {
-      "id": 23,
-      "title": "🔧 URGENT - Migration API Products vers Turso",
-      "description": "✅ COMPLÉTÉ: Migration API Products vers Turso avec cohérence totale bundles-produits.\n- ✅ /api/products utilise Turso (source: \"turso\", 3 produits)\n- ✅ /api/products/[id] adapté pour Turso avec fallback Airtable\n- ✅ /api/products/search avec recherche intelligente Turso\n- ✅ Cohérence pricing validée: produits-bundles relations correctes\n- ✅ Performance 5x améliorée vs Airtable",
-      "status": "completed",
-      "priority": 5,
-      "dependencies": [
-        9
-      ],
-      "created": "2025-09-17T16:15:07.311Z",
-      "updated": "2025-09-17T17:12:24.063Z"
-    },
-    {
-      "id": 24,
-      "title": "🗂️ URGENT - Création table Categories dans Turso",
-      "description": "✅ COMPLÉTÉ: Table categories créée et API migrée vers Turso avec structure hiérarchique.\\n- ✅ Migration 003_create_categories.sql: 6 catégories (3 main + 3 sous-catégories)\\n- ✅ /api/categories utilise Turso (source: \"turso\", 3 catégories)\\n- ✅ Support mode plat/hiérarchique avec relations parent-enfant\\n- ✅ Performance 13x améliorée (2000ms → 154ms)\\n- ✅ Cohérence produits-catégories validée",
-      "status": "completed",
-      "priority": 5,
-      "dependencies": [
-        23
-      ],
-      "created": "2025-09-17T16:15:15.596Z",
-      "updated": "2025-09-17T17:38:56.782Z"
-    },
-    {
-      "id": 25,
-      "title": "🧪 URGENT - Validation cohérence Interface Master-Detail",
-      "description": "✅ COMPLÉTÉ: Interface Master-Detail auditée et corrigée avec succès.\\n- ✅ Erreur SQL campaign-bundles corrigée (p.price → p.base_price)\\n- ✅ Composant AdminDataTable restauré et fonctionnel\\n- ✅ APIs 100% Turso-first: products, categories, bundles\\n- ✅ Performance validée: 5-13x améliorations mesurées\\n- ✅ Interface /admin fonctionnelle avec données cohérentes\\n- ✅ Migration Airtable → Turso 100% réussie",
-      "status": "completed",
-      "priority": 4,
-      "dependencies": [
-        24
-      ],
-      "created": "2025-09-17T16:15:23.947Z",
-      "updated": "2025-09-17T17:39:10.913Z"
-    },
-    {
-      "id": 26,
-      "title": "🏗️ ULTRATHINK Phase 1 - Design Schema Turso Réalisations",
-      "description": "CRITIQUE: Créer schema SQL Turso pour table realisations avec mappage exact interface TypeScript.\n- Analyser interface Realisation + HybridRealisation (11 champs + métadonnées)\n- Créer migration 004_create_realisations.sql avec tous les champs\n- Mapper relations FK: productIds → products.id, categoryIds → categories.id  \n- Préserver logique JSON pour arrays: cloudinaryPublicIds, tags, customizationOptionIds\n- Ajouter index performance: is_active, is_featured, order, title\n- Valider contraintes et triggers updated_at",
-      "status": "completed",
-      "priority": 5,
-      "dependencies": [
-        25
-      ],
-      "created": "2025-09-17T17:47:57.840Z",
-      "updated": "2025-09-17T17:53:03.155Z"
-    },
-    {
-      "id": 27,
-      "title": "Migration données Réalisations Airtable → Turso",
-      "description": "Phase 2: Migrer toutes les données Réalisations depuis Airtable vers Turso avec transformation des champs complexes (attachments, metadata). Créer script de migration automatique pour préserver les relations avec projects/categories.",
-      "status": "completed",
-      "priority": 5,
-      "dependencies": [
-        26
-      ],
-      "created": "2025-09-17T17:49:42.290Z",
-      "updated": "2025-09-17T18:13:33.270Z"
-    },
-    {
-      "id": 28,
-      "title": "Adaptation API Réalisations pour Turso-first",
-      "description": "Phase 3: Refactorer server/api/realisations/index.get.ts pour stratégie hybride Turso-first avec fallback Airtable. Maintenir compatibilité HybridRealisation interface et optimiser auto-discovery Cloudinary. Performance target: 5-10x amélioration.",
-      "status": "completed",
-      "priority": 5,
-      "dependencies": [
-        27
-      ],
-      "created": "2025-09-17T17:49:55.074Z",
-      "updated": "2025-09-17T18:32:51.291Z"
-    },
-    {
-      "id": 29,
-      "title": "Tests et validation migration Réalisations",
-      "description": "Phase 4: Tests complets Master-Detail interface avec nouvelles données Turso. Validation cohérence avec Products/Bundles APIs. Tests E2E parcours réalisations + performance benchmarks. Vérifier auto-discovery Cloudinary et fallback Airtable.",
-      "status": "completed",
-      "priority": 4,
-      "dependencies": [
-        28
-      ],
-      "created": "2025-09-17T17:50:04.456Z",
-      "updated": "2025-09-17T18:39:06.160Z"
-    },
-    {
-      "id": 30,
-      "title": "Finalisation abandon complet Airtable",
-      "description": "Phase 5: Supprimer toutes dépendances Airtable du code, nettoyer variables environnement, optimiser cache Turso. Documentation migration complète + guide rollback urgence. OBJECTIF: Abandon définitif Airtable, économie 240€/an, performance 5-13x.",
-      "status": "completed",
-      "priority": 3,
-      "dependencies": [
-        29
-      ],
-      "created": "2025-09-17T17:50:13.707Z",
-      "updated": "2025-09-17T19:01:27.484Z"
+      "created": "2025-09-18T12:25:29.799Z",
+      "updated": "2025-09-18T12:25:29.799Z"
     }
   ]
 }
