@@ -431,7 +431,7 @@ const emit = defineEmits<{
 }>()
 
 const { validateBundle } = useFormValidation()
-const { crudError } = globalNotifications
+const { crudSuccess, crudError } = globalNotifications
 
 // Form state
 const formData = reactive<Bundle>({
@@ -484,7 +484,22 @@ watchEffect(() => {
 
 // Computed
 const calculatedTotal = computed(() => {
-  return formData.products.reduce((total, product) => total + product.subtotal, 0)
+  const total = formData.products.reduce((sum, product) => sum + (product.subtotal || 0), 0)
+
+  // Only log when there are products with valid data
+  if (formData.products.length > 0 && formData.products.some(p => p.subtotal > 0)) {
+    console.log('🧮 Total calculé:', {
+      total,
+      produits: formData.products.filter(p => p.subtotal > 0).map(p => ({
+        nom: p.name,
+        quantité: p.quantity,
+        prixUnitaire: p.basePrice,
+        sousTotal: p.subtotal
+      }))
+    })
+  }
+
+  return total
 })
 
 const calculatedSavings = computed(() => {
@@ -495,22 +510,72 @@ const calculatedSavings = computed(() => {
 })
 
 const isFormValid = computed(() => {
-  return formData.name &&
-         formData.description &&
-         formData.targetAudience &&
-         formData.budgetRange &&
-         formData.products.length > 0 &&
-         Object.keys(errors.value).length === 0
+  // Basic field validation
+  const hasBasicFields = formData.name &&
+                        formData.description &&
+                        formData.targetAudience &&
+                        formData.budgetRange
+
+  // Product validation
+  const hasProducts = formData.products.length > 0
+  const allProductsValid = formData.products.every(product =>
+    product.id &&
+    product.name &&
+    product.basePrice > 0 &&
+    product.quantity > 0
+  )
+
+  // No validation errors
+  const noErrors = Object.keys(errors.value).length === 0
+
+  // Debug: only log if there are validation issues
+  if (!hasBasicFields || !hasProducts || !allProductsValid || !noErrors) {
+    console.log('🔍 Form validation issues:', {
+      hasBasicFields,
+      hasProducts,
+      allProductsValid,
+      noErrors,
+      productsCount: formData.products.length,
+      errorsCount: Object.keys(errors.value).length
+    })
+  }
+
+  return hasBasicFields && hasProducts && allProductsValid && noErrors
 })
 
 // Update calculated values
 watch(calculatedTotal, (newTotal) => {
-  formData.estimatedTotal = newTotal
+  if (newTotal !== formData.estimatedTotal) {
+    console.log('💰 Total mis à jour:', { newTotal, previousTotal: formData.estimatedTotal })
+    formData.estimatedTotal = newTotal
+  }
 })
 
 watch(calculatedSavings, (newSavings) => {
   formData.savings = newSavings
 })
+
+// Watch for product changes to ensure calculations are updated
+watch(() => formData.products, (newProducts, oldProducts) => {
+  console.log('🔄 products watcher:', {
+    newCount: newProducts.length,
+    oldCount: oldProducts?.length || 0,
+    products: newProducts.map(p => ({
+      id: p.id,
+      name: p.name,
+      quantity: p.quantity,
+      basePrice: p.basePrice,
+      subtotal: p.subtotal
+    }))
+  })
+
+  // Force recalculation for all products
+  newProducts.forEach((product, index) => {
+    if (product.id && product.basePrice > 0 && product.quantity > 0) {
+      updateSubtotal(index)
+    }
+  })
+}, { deep: true })
 
 // Methods
 const validateField = (fieldName: string) => {
@@ -530,34 +595,81 @@ const validateField = (fieldName: string) => {
 
 const addProduct = () => {
   console.log('🔧 addProduct called, current products length:', formData.products.length)
-  formData.products.push({
+
+  const newProduct = {
     id: '',
     name: '',
     basePrice: 0,
     quantity: 1,
     subtotal: 0
+  }
+
+  formData.products.push(newProduct)
+  console.log('✅ Product added:', {
+    newLength: formData.products.length,
+    newProduct
   })
-  console.log('✅ Product added, new length:', formData.products.length)
+
+  // Clear product validation error when adding a product
+  delete errors.value.products
 }
 
 const removeProduct = (index: number) => {
   formData.products.splice(index, 1)
+  // Validate products after removal
+  if (formData.products.length === 0) {
+    errors.value.products = 'Au moins un produit est requis'
+  }
 }
 
 const updateProductInfo = (index: number) => {
   const product = formData.products[index]
   const selectedProduct = props.availableProducts.find(p => p.id === product.id)
 
+  console.log('🔄 updateProductInfo:', {
+    index,
+    productId: product.id,
+    selectedProduct: selectedProduct ? {
+      id: selectedProduct.id,
+      name: selectedProduct.name,
+      basePrice: selectedProduct.basePrice
+    } : null,
+    availableProductsCount: props.availableProducts.length
+  })
+
   if (selectedProduct) {
     product.name = selectedProduct.name
     product.basePrice = selectedProduct.basePrice
+    console.log('✅ Product info updated:', {
+      index,
+      newName: product.name,
+      newBasePrice: product.basePrice,
+      quantity: product.quantity
+    })
     updateSubtotal(index)
+
+    // Validate that all products have valid selections
+    const hasIncompleteProducts = formData.products.some(p => !p.id || !p.name)
+    if (!hasIncompleteProducts && formData.products.length > 0) {
+      delete errors.value.products
+    }
   }
 }
 
 const updateSubtotal = (index: number) => {
   const product = formData.products[index]
-  product.subtotal = product.quantity * product.basePrice
+  const calculatedSubtotal = product.quantity * product.basePrice
+  product.subtotal = calculatedSubtotal
+
+  console.log('💰 updateSubtotal:', {
+    index,
+    productId: product.id,
+    productName: product.name,
+    quantity: product.quantity,
+    basePrice: product.basePrice,
+    calculatedSubtotal,
+    subtotal: product.subtotal
+  })
 }
 
 const updateTags = () => {
@@ -592,18 +704,39 @@ const submitForm = async () => {
   const result = validateBundle(formData)
 
   if (!result.success) {
+    // Clear previous errors
     errors.value = {}
+
+    // Set field-specific errors
     result.errors.forEach(error => {
       errors.value[error.field] = error.message
     })
+
+    // Show validation error notification
+    const errorMessages = result.errors.map(err => err.message)
+    const mainError = errorMessages[0]
+    const additionalErrors = errorMessages.length > 1 ?
+      `(+${errorMessages.length - 1} autre${errorMessages.length > 2 ? 's' : ''} erreur${errorMessages.length > 2 ? 's' : ''})` : ''
+
+    crudError.validation(`${mainError} ${additionalErrors}`)
     return
   }
 
   isSubmitting.value = true
   try {
+    console.log('📤 Soumission du formulaire bundle:', {
+      name: formData.name,
+      productsCount: formData.products.length,
+      estimatedTotal: formData.estimatedTotal
+    })
+
+    // Emit to parent component (which handles the actual API call)
     emit('submit', { ...formData })
-  } catch (error) {
-    console.error('Erreur soumission:', error)
+
+    // Note: Success notification will be handled by the parent component after API success
+  } catch (error: any) {
+    console.error('❌ Erreur soumission:', error)
+    crudError.created('bundle', error.message || 'Une erreur inattendue est survenue lors de la soumission.')
   } finally {
     isSubmitting.value = false
   }

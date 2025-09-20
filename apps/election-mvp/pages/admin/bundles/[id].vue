@@ -339,6 +339,8 @@
 </template>
 
 <script setup lang="ts">
+import { globalNotifications } from '~/composables/useNotifications'
+
 // Layout admin
 definePageMeta({
   layout: 'admin',
@@ -349,6 +351,9 @@ definePageMeta({
 useHead({
   title: computed(() => isNew.value ? 'Nouveau Bundle | Admin' : 'Modifier Bundle | Admin')
 })
+
+// Global notifications
+const { crudSuccess, crudError } = globalNotifications
 
 // Route params
 const route = useRoute()
@@ -432,18 +437,23 @@ async function fetchBundle() {
 
   try {
     const response = await $fetch(`/api/campaign-bundles/${bundleId.value}`)
-    Object.assign(form, response.data)
+    if (response.success && response.data) {
+      Object.assign(form, response.data)
 
-    // Set selected products
-    selectedProducts.value = response.data.products?.map(p => ({
-      ...p,
-      subtotal: p.quantity * p.basePrice
-    })) || []
+      // Set selected products
+      selectedProducts.value = response.data.products?.map(p => ({
+        ...p,
+        subtotal: p.quantity * p.basePrice
+      })) || []
 
-    // Set tags
-    tagsInput.value = response.data.tags?.join(', ') || ''
-  } catch (error) {
+      // Set tags
+      tagsInput.value = response.data.tags?.join(', ') || ''
+    } else {
+      throw new Error(response.message || 'Bundle non trouvé')
+    }
+  } catch (error: any) {
     console.error('Error fetching bundle:', error)
+    crudError.loaded('bundle', error.message || 'Impossible de charger le bundle.')
     await router.push('/admin/bundles')
   }
 }
@@ -451,9 +461,15 @@ async function fetchBundle() {
 async function fetchProducts() {
   try {
     const response = await $fetch('/api/products')
-    availableProducts.value = response.data || []
-  } catch (error) {
+    if (response.success) {
+      availableProducts.value = response.data || []
+    } else {
+      throw new Error(response.message || 'Erreur lors du chargement des produits')
+    }
+  } catch (error: any) {
     console.error('Error fetching products:', error)
+    crudError.loaded('produits', error.message || 'Impossible de charger les produits disponibles.')
+    availableProducts.value = []
   }
 }
 
@@ -559,10 +575,18 @@ async function handleSubmit() {
       body: bundleData
     })
 
-    await router.push('/admin/bundles')
-  } catch (error) {
+    if (response.success) {
+      const action = isNew.value ? 'créé' : 'modifié'
+      crudSuccess[isNew.value ? 'created' : 'updated'](bundleData.name, 'bundle')
+      await router.push('/admin/bundles')
+    } else {
+      throw new Error(response.message || 'Erreur lors de la sauvegarde')
+    }
+  } catch (error: any) {
     console.error('Error saving bundle:', error)
-    // TODO: Show error toast
+    const action = isNew.value ? 'création' : 'modification'
+    crudError[isNew.value ? 'created' : 'updated']('bundle',
+      error.message || `Une erreur est survenue lors de la ${action} du bundle.`)
   } finally {
     isSubmitting.value = false
   }
@@ -576,21 +600,29 @@ function duplicateBundle() {
 }
 
 async function deleteBundle() {
-  if (!confirm('Êtes-vous sûr de vouloir supprimer ce bundle ?')) return
+  if (!confirm(`Êtes-vous sûr de vouloir supprimer le bundle "${form.name}" ?`)) return
 
   try {
-    await $fetch(`/api/campaign-bundles/${bundleId.value}`, {
+    const response = await $fetch(`/api/campaign-bundles/${bundleId.value}`, {
       method: 'DELETE'
     })
 
-    await router.push('/admin/bundles')
-  } catch (error) {
+    if (response.success) {
+      crudSuccess.deleted(form.name, 'bundle')
+      await router.push('/admin/bundles')
+    } else {
+      throw new Error(response.message || 'Erreur lors de la suppression')
+    }
+  } catch (error: any) {
     console.error('Error deleting bundle:', error)
-    // TODO: Show error toast
+    crudError.deleted('bundle', error.message || 'Une erreur est survenue lors de la suppression du bundle.')
   }
 }
 
-function formatPrice(price: number): string {
+function formatPrice(price: number | undefined | null): string {
+  if (price === null || price === undefined || isNaN(price)) {
+    return 'N/A'
+  }
   return new Intl.NumberFormat('fr-FR', {
     style: 'currency',
     currency: 'XOF'
