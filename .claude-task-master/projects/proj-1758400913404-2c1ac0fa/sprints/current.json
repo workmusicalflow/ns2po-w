@@ -1,0 +1,36 @@
+{
+  "id": "sprint-1758400992730-089bd79c",
+  "name": "80% Enhancement - Améliorations UX",
+  "startDate": "2025-09-27",
+  "endDate": "2025-10-15",
+  "goals": "Améliorer l'expérience utilisateur avec des fonctionnalités avancées : drag & drop, recherche avancée, import/export, et autres optimisations qui apportent de la valeur mais ne sont pas critiques pour le fonctionnement de base.",
+  "status": "active",
+  "created": "2025-09-20T20:43:12.730Z",
+  "tasks": [],
+  "paretoDecisions": [
+    {
+      "taskId": 1,
+      "decision": "moved_to_vault",
+      "reason": "Amélioration UX non critique - drag & drop est pratique mais pas essentiel pour les opérations CRUD de base",
+      "timestamp": "2025-09-20T20:43:38.188Z"
+    },
+    {
+      "taskId": 2,
+      "decision": "moved_to_vault",
+      "reason": "Amélioration de recherche non critique - le système de filtres existant fonctionne pour les besoins essentiels",
+      "timestamp": "2025-09-20T20:43:44.224Z"
+    },
+    {
+      "taskId": 3,
+      "decision": "moved_to_vault",
+      "reason": "Fonctionnalité d'import/export non critique - utile pour migration en masse mais pas nécessaire pour gestion quotidienne",
+      "timestamp": "2025-09-20T20:43:50.077Z"
+    }
+  ],
+  "metrics": {
+    "tasksCompleted": 0,
+    "tasksMovedToVault": 3,
+    "velocityPoints": 0
+  },
+  "updated": "2025-09-20T20:43:50.077Z"
+}

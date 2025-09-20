@@ -1,0 +1,12 @@
+{
+  "id": "proj-1758400913404-2c1ac0fa",
+  "name": "CRUD Catégories /admin/categories",
+  "description": "Optimisation et amélioration du système de gestion des catégories dans l'interface d'administration NS2PO. Actuellement, l'interface existe mais présente des lacunes dans l'expérience utilisateur, la validation, et les fonctionnalités avancées. Analyser et implémenter les améliorations en respectant le principe 80/20 : fonctionnalités critiques en priorité.",
+  "created": "2025-09-20T20:41:53.416Z",
+  "sprints": [
+    "sprint-1758400948251-52898ae0",
+    "sprint-1758400992730-089bd79c"
+  ],
+  "activeSprint": "sprint-1758400992730-089bd79c",
+  "updated": "2025-09-20T20:43:12.733Z"
+}

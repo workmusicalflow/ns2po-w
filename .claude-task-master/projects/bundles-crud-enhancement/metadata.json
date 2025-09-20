@@ -1,0 +1,14 @@
+{
+  "id": "bundles-crud-enhancement",
+  "name": "NS2PO Réalisations UX Enhancement",
+  "description": "Amélioration complète de l'expérience utilisateur pour le système de gestion des réalisations multi-sources (Turso/Auto-discovery/Airtable) avec documentation, UX/UI, fonctionnalités avancées et monitoring",
+  "created": "2025-09-18T12:23:52.765Z",
+  "migratedFrom": "v2",
+  "migratedAt": "2025-09-20T18:38:27.616Z",
+  "sprints": [
+    "sprint-1758393507616-fd6ac2d5",
+    "sprint-1758393537757-b61a151b"
+  ],
+  "activeSprint": "sprint-1758393537757-b61a151b",
+  "updated": "2025-09-20T18:38:57.761Z"
+}

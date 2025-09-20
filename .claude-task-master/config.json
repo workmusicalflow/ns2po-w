@@ -1,0 +1,18 @@
+{
+  "version": "3.0",
+  "created": "2025-09-20T18:38:27.616Z",
+  "activeProject": "proj-1758400913404-2c1ac0fa",
+  "projects": [
+    {
+      "id": "bundles-crud-enhancement",
+      "name": "NS2PO Réalisations UX Enhancement",
+      "path": "/Users/logansery/Documents/ns2po-w/.claude-task-master/projects/bundles-crud-enhancement"
+    },
+    {
+      "id": "proj-1758400913404-2c1ac0fa",
+      "name": "CRUD Catégories /admin/categories",
+      "path": "/Users/logansery/Documents/ns2po-w/.claude-task-master/projects/proj-1758400913404-2c1ac0fa"
+    }
+  ],
+  "updated": "2025-09-20T20:41:53.419Z"
+}

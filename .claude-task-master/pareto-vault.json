@@ -1,0 +1,316 @@
+{
+  "items": [
+    {
+      "id": "pv-1758391568152-bbd0fe54",
+      "originalProject": "NS2PO Réalisations UX Enhancement",
+      "originalSprint": "main",
+      "task": {
+        "id": 1,
+        "title": "Phase 1.1: Documentation - Guide utilisateur système multi-sources",
+        "description": "Créer documentation complète expliquant les différences entre sources Turso/Auto-discovery/Airtable, stratégies de suppression (soft vs hard delete), et workflow de modification. Format : Markdown avec exemples visuels et captures d'écran.",
+        "status": "pending",
+        "priority": 5,
+        "dependencies": [],
+        "created": "2025-09-18T12:24:00.887Z",
+        "updated": "2025-09-18T12:24:00.887Z"
+      },
+      "reason": "Enhancement 80% - Documentation utilisateur non critique pour le MVP",
+      "tags": [
+        "documentation",
+        "ux",
+        "guide"
+      ],
+      "estimatedValue": "medium",
+      "revisitSuggestion": "Après stabilisation production",
+      "archivedAt": "2025-09-20T18:06:08.152Z"
+    },
+    {
+      "id": "pv-1758391571524-936156fc",
+      "originalProject": "NS2PO Réalisations UX Enhancement",
+      "originalSprint": "main",
+      "task": {
+        "id": 3,
+        "title": "Phase 1.3: Documentation - Stratégie suppression équipe",
+        "description": "Documenter en détail la stratégie de suppression pour l'équipe technique : soft delete (Auto-discovery), hard delete (Turso/Airtable), implications business, procédures de récupération. Format : confluence/wiki technique.",
+        "status": "pending",
+        "priority": 3,
+        "dependencies": [
+          1
+        ],
+        "created": "2025-09-18T12:24:16.392Z",
+        "updated": "2025-09-18T12:24:16.392Z"
+      },
+      "reason": "Enhancement 80% - Documentation technique équipe, non bloquante",
+      "tags": [
+        "documentation",
+        "technique",
+        "équipe"
+      ],
+      "estimatedValue": "low",
+      "revisitSuggestion": "Sprint Q2 2025",
+      "archivedAt": "2025-09-20T18:06:11.524Z"
+    },
+    {
+      "id": "pv-1758391573157-6c241ab5",
+      "originalProject": "NS2PO Réalisations UX Enhancement",
+      "originalSprint": "main",
+      "task": {
+        "id": 6,
+        "title": "Phase 2.3: UX - Historique des actions utilisateur",
+        "description": "Implémenter système de log des actions : suppression, modification, création avec timestamp, utilisateur, type d'action. Créer table audit_log et interface de consultation dans /admin/realisations/history.",
+        "status": "pending",
+        "priority": 3,
+        "dependencies": [
+          5
+        ],
+        "created": "2025-09-18T12:24:40.868Z",
+        "updated": "2025-09-18T12:24:40.868Z"
+      },
+      "reason": "Enhancement 80% - Historique des actions, nice-to-have",
+      "tags": [
+        "monitoring",
+        "historique",
+        "audit"
+      ],
+      "estimatedValue": "medium",
+      "revisitSuggestion": "Version 2.0",
+      "archivedAt": "2025-09-20T18:06:13.157Z"
+    },
+    {
+      "id": "pv-1758391574440-9fbbdd37",
+      "originalProject": "NS2PO Réalisations UX Enhancement",
+      "originalSprint": "main",
+      "task": {
+        "id": 7,
+        "title": "Phase 3.1: Fonctionnalités - Corbeille virtuelle soft-deleted",
+        "description": "Créer interface /admin/realisations/trash pour visualiser et récupérer les réalisations soft-deleted (Auto-discovery). Ajouter actions \"Restaurer\" et \"Supprimer définitivement\". Filtres par date et source.",
+        "status": "pending",
+        "priority": 4,
+        "dependencies": [
+          6
+        ],
+        "created": "2025-09-18T12:24:48.936Z",
+        "updated": "2025-09-18T12:24:48.936Z"
+      },
+      "reason": "Enhancement 80% - Corbeille virtuelle, fonctionnalité avancée",
+      "tags": [
+        "fonctionnalité",
+        "corbeille",
+        "récupération"
+      ],
+      "estimatedValue": "high",
+      "revisitSuggestion": "Après feedback utilisateurs",
+      "archivedAt": "2025-09-20T18:06:14.440Z"
+    },
+    {
+      "id": "pv-1758391575587-22dbadc7",
+      "originalProject": "NS2PO Réalisations UX Enhancement",
+      "originalSprint": "main",
+      "task": {
+        "id": 8,
+        "title": "Phase 3.2: Fonctionnalités - Bulk operations par source",
+        "description": "Implémenter sélection multiple avec actions groupées : \"Supprimer sélection Turso\" (hard), \"Désactiver sélection Auto-discovery\" (soft), \"Changer source\", \"Export sélection\". Checkbox + état sélection global.",
+        "status": "pending",
+        "priority": 3,
+        "dependencies": [
+          7
+        ],
+        "created": "2025-09-18T12:24:57.135Z",
+        "updated": "2025-09-18T12:24:57.135Z"
+      },
+      "reason": "Enhancement 80% - Bulk operations, optimisation workflow",
+      "tags": [
+        "fonctionnalité",
+        "bulk",
+        "optimisation"
+      ],
+      "estimatedValue": "high",
+      "revisitSuggestion": "Phase 2 production",
+      "archivedAt": "2025-09-20T18:06:15.587Z"
+    },
+    {
+      "id": "pv-1758391579004-25ee6384",
+      "originalProject": "NS2PO Réalisations UX Enhancement",
+      "originalSprint": "main",
+      "task": {
+        "id": 9,
+        "title": "Phase 3.3: Fonctionnalités - Export/Import sélectif",
+        "description": "Créer système export CSV/JSON par source avec métadonnées complètes. Import intelligent avec détection conflits et mapping automatique. Gestion des images Cloudinary dans export/import.",
+        "status": "pending",
+        "priority": 2,
+        "dependencies": [
+          8
+        ],
+        "created": "2025-09-18T12:25:05.342Z",
+        "updated": "2025-09-18T12:25:05.342Z"
+      },
+      "reason": "Enhancement 80% - Export/Import avancé, non critique MVP",
+      "tags": [
+        "export",
+        "import",
+        "données"
+      ],
+      "estimatedValue": "medium",
+      "revisitSuggestion": "Sprint fonctionnalités avancées",
+      "archivedAt": "2025-09-20T18:06:19.004Z"
+    },
+    {
+      "id": "pv-1758391583080-7f0ec78c",
+      "originalProject": "NS2PO Réalisations UX Enhancement",
+      "originalSprint": "main",
+      "task": {
+        "id": 10,
+        "title": "Phase 4.1: Monitoring - Dashboard analytics par source",
+        "description": "Créer dashboard /admin/analytics avec métriques : répartition par source, tendances création/suppression, top réalisations populaires, statistiques performance API. Graphiques Chart.js avec design NS2PO.",
+        "status": "pending",
+        "priority": 2,
+        "dependencies": [
+          9
+        ],
+        "created": "2025-09-18T12:25:13.512Z",
+        "updated": "2025-09-18T12:25:13.512Z"
+      },
+      "reason": "Enhancement 80% - Analytics dashboard, monitoring avancé",
+      "tags": [
+        "analytics",
+        "dashboard",
+        "monitoring"
+      ],
+      "estimatedValue": "high",
+      "revisitSuggestion": "Après 1000+ réalisations",
+      "archivedAt": "2025-09-20T18:06:23.080Z"
+    },
+    {
+      "id": "pv-1758391585016-c532afa8",
+      "originalProject": "legacy",
+      "originalSprint": "main",
+      "task": {
+        "id": 11,
+        "title": "Phase 4.2: Monitoring - Alertes intelligentes suppressions",
+        "description": "Système d'alertes automatiques : notification équipe pour suppressions importantes (>10 réalisations), alertes seuils critiques (0 réalisations actives), rapport hebdomadaire activité. Integration email SMTP + notifications push.",
+        "status": "pending",
+        "priority": 2,
+        "dependencies": [
+          10
+        ],
+        "created": "2025-09-18T12:25:21.794Z",
+        "updated": "2025-09-18T12:25:21.794Z"
+      },
+      "reason": "Enhancement 80% - Alertes automatiques, système avancé",
+      "tags": [
+        "alertes",
+        "notifications",
+        "monitoring"
+      ],
+      "estimatedValue": "medium",
+      "revisitSuggestion": "Après intégration SMTP complète",
+      "archivedAt": "2025-09-20T18:06:25.016Z"
+    },
+    {
+      "id": "pv-1758391595865-569b0afa",
+      "originalProject": "NS2PO Réalisations UX Enhancement",
+      "originalSprint": "main",
+      "task": {
+        "id": 12,
+        "title": "Phase 4.3: Monitoring - Audit trail complet modifications",
+        "description": "Système de traçabilité complète : log détaillé de chaque modification (avant/après), interface de recherche dans l'historique, export audit reports, integration avec système de backup automatique. Conformité RGPD.",
+        "status": "pending",
+        "priority": 1,
+        "dependencies": [
+          11
+        ],
+        "created": "2025-09-18T12:25:29.799Z",
+        "updated": "2025-09-18T12:25:29.799Z"
+      },
+      "reason": "Enhancement 80% - Audit trail RGPD, conformité future",
+      "tags": [
+        "audit",
+        "rgpd",
+        "compliance"
+      ],
+      "estimatedValue": "low",
+      "revisitSuggestion": "Avant expansion Europe",
+      "archivedAt": "2025-09-20T18:06:35.866Z"
+    },
+    {
+      "id": "pv-1758401018196-335360eb",
+      "originalProject": "proj-1758400913404-2c1ac0fa",
+      "originalSprint": "sprint-1758400992730-089bd79c",
+      "task": {
+        "id": 1,
+        "title": "🖱️ Implémenter drag & drop pour réorganiser l'ordre",
+        "description": "ENHANCEMENT: Ajouter la fonctionnalité de drag & drop pour réorganiser facilement l'ordre des catégories et sous-catégories. Améliore l'UX mais pas critique pour les opérations de base.",
+        "status": "pending",
+        "priority": 3,
+        "dependencies": [],
+        "created": "2025-09-20T20:43:19.533Z",
+        "updated": "2025-09-20T20:43:19.533Z",
+        "isPareto80": true
+      },
+      "reason": "Amélioration UX non critique - drag & drop est pratique mais pas essentiel pour les opérations CRUD de base",
+      "tags": [
+        "ux",
+        "enhancement",
+        "drag-drop",
+        "nice-to-have"
+      ],
+      "estimatedValue": "medium",
+      "revisitSuggestion": "Sprint 3 ou Q1 2025",
+      "archivedAt": "2025-09-20T20:43:38.196Z"
+    },
+    {
+      "id": "pv-1758401024227-d992eb81",
+      "originalProject": "proj-1758400913404-2c1ac0fa",
+      "originalSprint": "sprint-1758400992730-089bd79c",
+      "task": {
+        "id": 2,
+        "title": "🔍 Ajouter système de recherche avancée avec filtres",
+        "description": "ENHANCEMENT: Améliorer la recherche existante avec filtres multiples, tri avancé, et suggestions. Utile mais le système de base fonctionne déjà pour les besoins critiques.",
+        "status": "pending",
+        "priority": 2,
+        "dependencies": [],
+        "created": "2025-09-20T20:43:24.987Z",
+        "updated": "2025-09-20T20:43:24.987Z",
+        "isPareto80": true
+      },
+      "reason": "Amélioration de recherche non critique - le système de filtres existant fonctionne pour les besoins essentiels",
+      "tags": [
+        "search",
+        "filters",
+        "optimization",
+        "enhancement"
+      ],
+      "estimatedValue": "low",
+      "revisitSuggestion": "Q2 2025 ou quand volume de catégories important",
+      "archivedAt": "2025-09-20T20:43:44.227Z"
+    },
+    {
+      "id": "pv-1758401030078-7b0eed62",
+      "originalProject": "proj-1758400913404-2c1ac0fa",
+      "originalSprint": "sprint-1758400992730-089bd79c",
+      "task": {
+        "id": 3,
+        "title": "📊 Créer système d'import/export CSV des catégories",
+        "description": "ENHANCEMENT: Permettre l'import/export en masse des catégories via CSV pour faciliter la migration et sauvegarde. Fonctionnalité avancée, pas critique pour l'usage quotidien.",
+        "status": "pending",
+        "priority": 2,
+        "dependencies": [],
+        "created": "2025-09-20T20:43:30.768Z",
+        "updated": "2025-09-20T20:43:30.768Z",
+        "isPareto80": true
+      },
+      "reason": "Fonctionnalité d'import/export non critique - utile pour migration en masse mais pas nécessaire pour gestion quotidienne",
+      "tags": [
+        "import",
+        "export",
+        "csv",
+        "bulk-operations",
+        "migration"
+      ],
+      "estimatedValue": "low",
+      "revisitSuggestion": "Q3 2025 ou si besoin de migration importante",
+      "archivedAt": "2025-09-20T20:43:50.078Z"
+    }
+  ],
+  "updated": "2025-09-20T20:43:50.078Z"
+}

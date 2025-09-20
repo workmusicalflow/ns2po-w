@@ -1,0 +1,44 @@
+{
+  "name": "NS2PO Réalisations UX Enhancement",
+  "description": "Amélioration complète de l'expérience utilisateur pour le système de gestion des réalisations multi-sources (Turso/Auto-discovery/Airtable) avec documentation, UX/UI, fonctionnalités avancées et monitoring",
+  "created": "2025-09-18T12:23:52.765Z",
+  "updated": "2025-09-20T18:06:35.865Z",
+  "tasks": [
+    {
+      "id": 2,
+      "title": "Phase 1.2: Documentation - Tooltips interface admin",
+      "description": "Ajouter tooltips informatifs dans /admin/realisations pour expliquer chaque source (badge couleur + texte explicatif). Utiliser HeadlessUI Tooltip avec design NS2PO. Inclure légende permanente en haut de page.",
+      "status": "completed",
+      "priority": 4,
+      "dependencies": [
+        1
+      ],
+      "created": "2025-09-18T12:24:08.351Z",
+      "updated": "2025-09-18T12:45:00.073Z"
+    },
+    {
+      "id": 4,
+      "title": "Phase 2.1: UX - Badges colorés par source type",
+      "description": "Implémenter système de badges visuels dans DataTable : Turso (bleu), Auto-discovery (vert), Airtable (orange). Ajouter icônes distinctives et animation hover. Modifier AdminDataTable.vue et composant réalisations.",
+      "status": "completed",
+      "priority": 5,
+      "dependencies": [
+        2
+      ],
+      "created": "2025-09-18T12:24:24.516Z",
+      "updated": "2025-09-18T12:36:30.297Z"
+    },
+    {
+      "id": 5,
+      "title": "Phase 2.2: UX - Confirmations différenciées par source",
+      "description": "Créer modales de confirmation intelligentes : \"Suppression douce (récupérable)\" pour Auto-discovery, \"Suppression définitive\" pour Turso/Airtable. Ajouter composant ConfirmationModal.vue avec logique conditionnelle.",
+      "status": "completed",
+      "priority": 5,
+      "dependencies": [
+        4
+      ],
+      "created": "2025-09-18T12:24:32.214Z",
+      "updated": "2025-09-18T12:40:44.893Z"
+    }
+  ]
+}

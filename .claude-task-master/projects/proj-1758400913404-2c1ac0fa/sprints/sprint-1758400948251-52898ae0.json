@@ -1,0 +1,62 @@
+{
+  "id": "sprint-1758400948251-52898ae0",
+  "name": "Core 20% - Fonctionnalités Critiques",
+  "startDate": "2025-09-20",
+  "endDate": "2025-09-27",
+  "goals": "Implémenter les fonctionnalités essentielles pour rendre le CRUD des catégories 100% fonctionnel et utilisable par les administrateurs : correction des bugs critiques, validation robuste, et UX de base.",
+  "status": "closed",
+  "created": "2025-09-20T20:42:28.252Z",
+  "tasks": [
+    {
+      "id": 1,
+      "title": "🔧 Corriger l'ouverture de la modal CategoryFormModal",
+      "description": "CRITIQUE: La modal de création/édition de catégorie ne s'ouvre pas au clic sur \"Nouvelle Catégorie\". Déboguer et corriger le problème d'importation ou de logique du composant CategoryFormModal.vue pour permettre la création de nouvelles catégories.",
+      "status": "pending",
+      "priority": 5,
+      "dependencies": [],
+      "created": "2025-09-20T20:42:34.978Z",
+      "updated": "2025-09-20T20:42:34.978Z",
+      "isPareto80": false
+    },
+    {
+      "id": 2,
+      "title": "⚡ Implémenter la gestion d'erreurs frontend avec notifications",
+      "description": "CRITIQUE: Ajouter un système de notifications utilisateur robuste pour les erreurs de validation, succès/échec des opérations CRUD, et messages d'état. Remplacer le système de notification basique actuel par un composant plus fiable.",
+      "status": "pending",
+      "priority": 5,
+      "dependencies": [],
+      "created": "2025-09-20T20:42:40.343Z",
+      "updated": "2025-09-20T20:42:40.343Z",
+      "isPareto80": false
+    },
+    {
+      "id": 3,
+      "title": "✅ Ajouter validation côté client en temps réel",
+      "description": "CRITIQUE: Implémenter la validation en temps réel côté client (nom, slug unique, format couleur) avec feedback immédiat pour améliorer l'UX et réduire les erreurs. Synchroniser avec la validation backend Zod existante.",
+      "status": "pending",
+      "priority": 5,
+      "dependencies": [],
+      "created": "2025-09-20T20:42:47.016Z",
+      "updated": "2025-09-20T20:42:47.016Z",
+      "isPareto80": false
+    },
+    {
+      "id": 4,
+      "title": "🔄 Optimiser les performances de chargement des catégories",
+      "description": "CRITIQUE: Optimiser l'API et l'interface pour le chargement rapide des catégories. Ajouter cache intelligent, pagination si nécessaire, et améliorer l'affichage des états de chargement pour supporter la croissance business.",
+      "status": "pending",
+      "priority": 4,
+      "dependencies": [],
+      "created": "2025-09-20T20:42:52.591Z",
+      "updated": "2025-09-20T20:42:52.591Z",
+      "isPareto80": false
+    }
+  ],
+  "paretoDecisions": [],
+  "metrics": {
+    "tasksCompleted": 0,
+    "tasksMovedToVault": 0,
+    "velocityPoints": 0
+  },
+  "updated": "2025-09-20T20:43:12.732Z"
+}

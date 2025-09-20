@@ -1,0 +1,122 @@
+{
+  "id": "sprint-1758393537757-b61a151b",
+  "name": "Sprint 1 - Corrections Critiques CRUD Bundles",
+  "startDate": "2025-09-20",
+  "endDate": "2025-09-27",
+  "goals": "Corriger les problèmes critiques du CRUD bundles pour le rendre fonctionnel et fiable",
+  "status": "active",
+  "created": "2025-09-20T18:38:57.759Z",
+  "tasks": [
+    {
+      "id": 1,
+      "title": "🔥 CRITIQUE - Corriger données produits (prix à 0)",
+      "description": "PROBLÈME BLOQUANT : Tous les produits affichent 0 F CFA dans la sélection. Vérifier et corriger l'API /api/products, s'assurer que les prix sont correctement récupérés depuis Turso, et corriger le mapping des données dans le composant BundleForm.",
+      "status": "completed",
+      "priority": 5,
+      "dependencies": [],
+      "created": "2025-09-20T18:40:38.000Z",
+      "updated": "2025-09-20T19:18:57.441Z",
+      "isPareto80": false
+    },
+    {
+      "id": 2,
+      "title": "🔥 CRITIQUE - Vérifier/corriger API bundles (0 bundle trouvé)",
+      "description": "PROBLÈME BLOQUANT : Interface affiche \"0 bundle(s) trouvé(s)\". Vérifier l'endpoint /api/campaign-bundles, contrôler la table Turso bundles, et s'assurer que les données de test sont présentes. Corriger la récupération des données.",
+      "status": "completed",
+      "priority": 5,
+      "dependencies": [],
+      "created": "2025-09-20T18:40:39.990Z",
+      "updated": "2025-09-20T19:46:22.665Z",
+      "isPareto80": false
+    },
+    {
+      "id": 3,
+      "title": "🔥 CRITIQUE - Implémenter validation robuste formulaire",
+      "description": "PROBLÈME BLOQUANT : Validation formulaire insuffisante, bouton \"Créer\" devient actif même sans produits ajoutés. Implémenter validation côté client avec Zod, vérifier que au moins 1 produit est ajouté et que tous les champs requis sont remplis.",
+      "status": "completed",
+      "priority": 5,
+      "dependencies": [],
+      "created": "2025-09-20T18:40:42.789Z",
+      "updated": "2025-09-20T20:05:10.140Z",
+      "isPareto80": false
+    },
+    {
+      "id": 4,
+      "title": "🔥 CRITIQUE - Corriger calculs automatiques prix bundle",
+      "description": "PROBLÈME BLOQUANT : Prix total estimé reste à \"0 F CFA\" même après ajout de produits. Corriger la logique de calcul automatique (quantité × prix unitaire), mise à jour réactive des totaux, et affichage des économies si prix original fourni.",
+      "status": "completed",
+      "priority": 5,
+      "dependencies": [],
+      "created": "2025-09-20T18:40:44.331Z",
+      "updated": "2025-09-20T20:18:13.273Z",
+      "isPareto80": false
+    },
+    {
+      "id": 5,
+      "title": "🔥 CRITIQUE - Ajouter gestion d'erreurs et feedback UX",
+      "description": "PROBLÈME BLOQUANT : Aucun feedback d'erreur visible. Intégrer système de notifications (succès/erreur), gestion des cas d'échec API (création/modification), et messages utilisateur clairs avec le système de notifications NS2PO existant.",
+      "status": "completed",
+      "priority": 5,
+      "dependencies": [],
+      "created": "2025-09-20T18:40:44.459Z",
+      "updated": "2025-09-20T20:30:44.446Z",
+      "isPareto80": false
+    }
+  ],
+  "paretoDecisions": [
+    {
+      "taskId": 6,
+      "decision": "moved_to_vault",
+      "reason": "Enhancement 80% - Filtrage avancé, optimisation UX non-critique",
+      "timestamp": "2025-09-20T18:41:47.664Z"
+    },
+    {
+      "taskId": 7,
+      "decision": "moved_to_vault",
+      "reason": "Enhancement 80% - Export/Import, fonctionnalité avancée",
+      "timestamp": "2025-09-20T18:41:50.103Z"
+    },
+    {
+      "taskId": 8,
+      "decision": "moved_to_vault",
+      "reason": "Enhancement 80% - Templates, optimisation workflow",
+      "timestamp": "2025-09-20T18:41:51.962Z"
+    },
+    {
+      "taskId": 9,
+      "decision": "moved_to_vault",
+      "reason": "Enhancement 80% - Historique, fonctionnalité audit",
+      "timestamp": "2025-09-20T18:41:52.106Z"
+    },
+    {
+      "taskId": 10,
+      "decision": "moved_to_vault",
+      "reason": "Enhancement 80% - Analytics, monitoring avancé",
+      "timestamp": "2025-09-20T18:41:52.275Z"
+    },
+    {
+      "taskId": 11,
+      "decision": "moved_to_vault",
+      "reason": "Enhancement 80% - IA/ML, technologie avancée",
+      "timestamp": "2025-09-20T18:41:52.438Z"
+    },
+    {
+      "taskId": 12,
+      "decision": "moved_to_vault",
+      "reason": "Enhancement 80% - Intégration avancée, complexité élevée",
+      "timestamp": "2025-09-20T18:41:52.616Z"
+    },
+    {
+      "taskId": 13,
+      "decision": "moved_to_vault",
+      "reason": "Enhancement 80% - Permissions avancées, sécurité non-critique MVP",
+      "timestamp": "2025-09-20T18:41:52.845Z"
+    }
+  ],
+  "metrics": {
+    "tasksCompleted": 5,
+    "tasksMovedToVault": 8,
+    "velocityPoints": 0
+  },
+  "updated": "2025-09-20T20:30:44.446Z"
+}

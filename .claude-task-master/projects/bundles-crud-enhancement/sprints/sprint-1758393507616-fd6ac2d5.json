@@ -1,0 +1,52 @@
+{
+  "id": "sprint-1758393507616-fd6ac2d5",
+  "name": "Sprint Migré",
+  "startDate": "2025-09-20",
+  "status": "closed",
+  "created": "2025-09-20T18:38:27.616Z",
+  "tasks": [
+    {
+      "id": 2,
+      "title": "Phase 1.2: Documentation - Tooltips interface admin",
+      "description": "Ajouter tooltips informatifs dans /admin/realisations pour expliquer chaque source (badge couleur + texte explicatif). Utiliser HeadlessUI Tooltip avec design NS2PO. Inclure légende permanente en haut de page.",
+      "status": "completed",
+      "priority": 4,
+      "dependencies": [
+        1
+      ],
+      "created": "2025-09-18T12:24:08.351Z",
+      "updated": "2025-09-18T12:45:00.073Z"
+    },
+    {
+      "id": 4,
+      "title": "Phase 2.1: UX - Badges colorés par source type",
+      "description": "Implémenter système de badges visuels dans DataTable : Turso (bleu), Auto-discovery (vert), Airtable (orange). Ajouter icônes distinctives et animation hover. Modifier AdminDataTable.vue et composant réalisations.",
+      "status": "completed",
+      "priority": 5,
+      "dependencies": [
+        2
+      ],
+      "created": "2025-09-18T12:24:24.516Z",
+      "updated": "2025-09-18T12:36:30.297Z"
+    },
+    {
+      "id": 5,
+      "title": "Phase 2.2: UX - Confirmations différenciées par source",
+      "description": "Créer modales de confirmation intelligentes : \"Suppression douce (récupérable)\" pour Auto-discovery, \"Suppression définitive\" pour Turso/Airtable. Ajouter composant ConfirmationModal.vue avec logique conditionnelle.",
+      "status": "completed",
+      "priority": 5,
+      "dependencies": [
+        4
+      ],
+      "created": "2025-09-18T12:24:32.214Z",
+      "updated": "2025-09-18T12:40:44.893Z"
+    }
+  ],
+  "paretoDecisions": [],
+  "metrics": {
+    "tasksCompleted": 3,
+    "tasksMovedToVault": 0,
+    "velocityPoints": 0
+  },
+  "updated": "2025-09-20T18:38:57.760Z"
+}
