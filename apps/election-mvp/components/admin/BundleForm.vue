@@ -188,7 +188,7 @@
                 :key="availableProduct.id"
                 :value="availableProduct.id"
               >
-                {{ availableProduct.name }} ({{ formatPrice(availableProduct.price) }})
+                {{ availableProduct.name }} ({{ formatPrice(availableProduct.basePrice) }})
               </option>
             </select>
           </div>
@@ -390,7 +390,7 @@ import { globalNotifications } from '~/composables/useNotifications'
 interface Product {
   id: string
   name: string
-  price: number
+  basePrice: number
   reference?: string
   category_id?: string
 }
@@ -529,6 +529,7 @@ const validateField = (fieldName: string) => {
 }
 
 const addProduct = () => {
+  console.log('🔧 addProduct called, current products length:', formData.products.length)
   formData.products.push({
     id: '',
     name: '',
@@ -536,6 +537,7 @@ const addProduct = () => {
     quantity: 1,
     subtotal: 0
   })
+  console.log('✅ Product added, new length:', formData.products.length)
 }
 
 const removeProduct = (index: number) => {
@@ -548,7 +550,7 @@ const updateProductInfo = (index: number) => {
 
   if (selectedProduct) {
     product.name = selectedProduct.name
-    product.basePrice = selectedProduct.price
+    product.basePrice = selectedProduct.basePrice
     updateSubtotal(index)
   }
 }

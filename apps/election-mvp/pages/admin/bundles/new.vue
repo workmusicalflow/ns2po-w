@@ -30,6 +30,7 @@
 
 <script setup lang="ts">
 import { globalNotifications } from '~/composables/useNotifications'
+import BundleForm from '~/components/admin/BundleForm.vue'
 
 // Layout admin
 definePageMeta({
@@ -46,7 +47,7 @@ useHead({
 interface Product {
   id: string
   name: string
-  price: number
+  basePrice: number
   reference?: string
   category_id?: string
 }
@@ -111,7 +112,7 @@ onMounted(async () => {
       availableProducts.value = response.data.map((product: any) => ({
         id: product.id,
         name: product.name,
-        price: product.price || product.base_price || 0,
+        basePrice: product.basePrice || 0,
         reference: product.reference,
         category_id: product.category_id
       }))
