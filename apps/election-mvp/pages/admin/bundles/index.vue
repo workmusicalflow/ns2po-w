@@ -222,6 +222,9 @@
 </template>
 
 <script setup lang="ts">
+import AdminDataTable from '~/components/admin/AdminDataTable.vue'
+import { globalNotifications } from '~/composables/useNotifications'
+
 // Layout admin
 definePageMeta({
   layout: 'admin',
@@ -232,6 +235,9 @@ definePageMeta({
 useHead({
   title: 'Bundles | Admin'
 })
+
+// Global notifications
+const { crudSuccess, crudError } = globalNotifications
 
 // Types
 interface Bundle {
@@ -320,7 +326,11 @@ const columns = [
     key: 'updatedAt',
     label: 'Modifié',
     sortable: true,
-    formatter: (value: string) => new Date(value).toLocaleDateString('fr-FR')
+    formatter: (value: string) => {
+      if (!value) return 'N/A'
+      const date = new Date(value)
+      return isNaN(date.getTime()) ? 'N/A' : date.toLocaleDateString('fr-FR')
+    }
   }
 ]
 
@@ -355,7 +365,7 @@ async function fetchBundles() {
     bundles.value = response.data || []
   } catch (error) {
     console.error('Error fetching bundles:', error)
-    // TODO: Show error toast
+    crudError.validation('Impossible de charger les bundles')
   } finally {
     isLoading.value = false
   }
@@ -390,10 +400,10 @@ async function toggleStatus(bundle: Bundle) {
     // Update local state
     bundle.isActive = !bundle.isActive
 
-    // TODO: Show success toast
+    crudSuccess.updated(`Statut du bundle "${bundle.name}" modifié avec succès`, 'bundle')
   } catch (error) {
     console.error('Error toggling bundle status:', error)
-    // TODO: Show error toast
+    crudError.updated('bundle', `Erreur lors de la modification du statut du bundle "${bundle.name}"`)
   }
 }
 
@@ -411,10 +421,10 @@ async function deleteBundle(bundle: Bundle) {
       bundles.value.splice(index, 1)
     }
 
-    // TODO: Show success toast
+    crudSuccess.deleted(`Bundle "${bundle.name}" supprimé avec succès`, 'bundle')
   } catch (error) {
     console.error('Error deleting bundle:', error)
-    // TODO: Show error toast
+    crudError.deleted('bundle', `Erreur lors de la suppression du bundle "${bundle.name}"`)
   }
 }
 
@@ -458,7 +468,10 @@ function getBudgetClasses(budget: string): string {
   return budgetClasses[budget] || 'bg-gray-100 text-gray-800'
 }
 
-function formatPrice(price: number): string {
+function formatPrice(price: number | undefined | null): string {
+  if (price === null || price === undefined || isNaN(price)) {
+    return 'N/A'
+  }
   return new Intl.NumberFormat('fr-FR', {
     style: 'currency',
     currency: 'XOF'

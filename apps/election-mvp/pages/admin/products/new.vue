@@ -30,6 +30,7 @@
 
 <script setup lang="ts">
 import { globalNotifications } from '~/composables/useNotifications'
+import ProductForm from '~/components/admin/ProductForm.vue'
 
 // Layout admin
 definePageMeta({

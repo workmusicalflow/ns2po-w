@@ -287,6 +287,11 @@
 </template>
 
 <script setup lang="ts">
+// Import explicit du composant CategoryFormModal
+import CategoryFormModal from '../../../components/admin/CategoryFormModal.vue'
+// Import du système de notifications
+import { useNotifications } from '~/composables/useNotifications'
+
 interface Category {
   id: string
   name: string
@@ -309,34 +314,55 @@ definePageMeta({
   layout: 'admin'
 })
 
+// Système de notifications
+const { crudSuccess, crudError } = useNotifications()
+
 // State
-const categories = ref<Category[]>([])
-const loading = ref(true)
-const error = ref('')
 const showModal = ref(false)
 const selectedCategory = ref<Category | null>(null)
 
-// Filters
+// Filters with debounced search
 const filters = reactive({
   search: '',
   status: '',
   type: ''
 })
 
-// Notification
-const notification = reactive({
-  show: false,
-  type: 'success' as 'success' | 'error',
-  message: ''
+// Optimized data fetching with caching
+const { data: categoriesResponse, pending: loading, error, refresh: refreshCategories } = await useLazyFetch<{data: Category[]}>('/api/categories?flat=true', {
+  key: 'admin-categories',
+  server: true,
+  default: () => ({ data: [] })
 })
 
-// Computed
-const filteredCategories = computed(() => {
-  let filtered = [...categories.value]
+// Reactive categories from cached data
+const categories = computed(() => categoriesResponse.value?.data || [])
 
-  // Search filter
-  if (filters.search) {
-    const search = filters.search.toLowerCase()
+
+// Debounced search for better performance
+const debouncedSearch = ref('')
+const searchDebounceTimer = ref<NodeJS.Timeout | null>(null)
+
+watch(() => filters.search, (newSearch) => {
+  if (searchDebounceTimer.value) {
+    clearTimeout(searchDebounceTimer.value)
+  }
+
+  searchDebounceTimer.value = setTimeout(() => {
+    debouncedSearch.value = newSearch
+  }, 300) // 300ms debounce
+}, { immediate: true })
+
+// Optimized computed with memoization
+const filteredCategories = computed(() => {
+  const sourceCategories = categories.value
+  if (!sourceCategories.length) return []
+
+  let filtered = sourceCategories
+
+  // Search filter with debounced value
+  if (debouncedSearch.value) {
+    const search = debouncedSearch.value.toLowerCase()
     filtered = filtered.filter(category =>
       category.name.toLowerCase().includes(search) ||
       category.slug.toLowerCase().includes(search) ||
@@ -371,23 +397,29 @@ const rootCategories = computed(() =>
 )
 
 // Methods
-const fetchCategories = async () => {
-  try {
-    loading.value = true
-    error.value = ''
-
-    const { data } = await $fetch('/api/categories?flat=true')
-    categories.value = data || []
-  } catch (err) {
-    console.error('Erreur lors du chargement des catégories:', err)
-    error.value = 'Impossible de charger les catégories'
-  } finally {
-    loading.value = false
+// Optimistic update functions for better performance
+const optimisticAddCategory = (newCategory: Category) => {
+  const currentData = categoriesResponse.value
+  if (currentData) {
+    currentData.data = [newCategory, ...currentData.data]
   }
 }
 
-const refreshCategories = () => {
-  fetchCategories()
+const optimisticUpdateCategory = (updatedCategory: Category) => {
+  const currentData = categoriesResponse.value
+  if (currentData) {
+    const index = currentData.data.findIndex(cat => cat.id === updatedCategory.id)
+    if (index !== -1) {
+      currentData.data[index] = updatedCategory
+    }
+  }
+}
+
+const optimisticRemoveCategory = (categoryId: string) => {
+  const currentData = categoriesResponse.value
+  if (currentData) {
+    currentData.data = currentData.data.filter(cat => cat.id !== categoryId)
+  }
 }
 
 const openCreateModal = () => {
@@ -405,9 +437,11 @@ const closeModal = () => {
   selectedCategory.value = null
 }
 
-const onCategorySaved = (message: string) => {
-  showNotification('success', message)
-  fetchCategories()
+const onCategorySaved = async (message: string) => {
+  crudSuccess.created(message.replace('Catégorie ', ''), 'catégorie')
+
+  // Use cache refresh instead of full refetch for better performance
+  await refreshCategories()
   closeModal()
 }
 
@@ -429,17 +463,17 @@ const duplicateCategory = async (category: Category) => {
       body: duplicatedData
     })
 
-    showNotification('success', 'Catégorie dupliquée avec succès')
-    fetchCategories()
+    crudSuccess.created(category.name + ' (Copie)', 'catégorie')
+    await refreshCategories()
   } catch (err) {
     console.error('Erreur lors de la duplication:', err)
-    showNotification('error', 'Erreur lors de la duplication de la catégorie')
+    crudError.created('catégorie', 'Erreur lors de la duplication de la catégorie')
   }
 }
 
 const deleteCategory = async (category: Category) => {
   if (category.subcategories && category.subcategories.length > 0) {
-    showNotification('error', 'Impossible de supprimer une catégorie qui contient des sous-catégories')
+    crudError.deleted('catégorie', 'Impossible de supprimer une catégorie qui contient des sous-catégories')
     return
   }
 
@@ -452,36 +486,17 @@ const deleteCategory = async (category: Category) => {
       method: 'DELETE'
     })
 
-    showNotification('success', 'Catégorie supprimée avec succès')
-    fetchCategories()
+    crudSuccess.deleted(category.name, 'catégorie')
+
+    // Optimistic update: remove from cache immediately for better UX
+    optimisticRemoveCategory(category.id)
   } catch (err: any) {
     console.error('Erreur lors de la suppression:', err)
     const message = err.data?.message || 'Erreur lors de la suppression de la catégorie'
-    showNotification('error', message)
+    crudError.deleted('catégorie', message)
   }
-}
-
-const showNotification = (type: 'success' | 'error', message: string) => {
-  notification.type = type
-  notification.message = message
-  notification.show = true
-
-  setTimeout(() => {
-    notification.show = false
-  }, 5000)
 }
 
 // Lifecycle
-onMounted(() => {
-  fetchCategories()
-})
-
-// Auto-hide notification after 5 seconds
-watch(() => notification.show, (show) => {
-  if (show) {
-    setTimeout(() => {
-      notification.show = false
-    }, 5000)
-  }
-})
+// Data is automatically loaded by useLazyFetch on mount - no manual onMounted needed
 </script>

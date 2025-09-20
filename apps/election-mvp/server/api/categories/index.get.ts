@@ -46,6 +46,10 @@ const STATIC_CATEGORIES_FALLBACK = [
 export default defineEventHandler(async (event) => {
   const startTime = Date.now()
 
+  // Set cache headers for better performance
+  setHeader(event, 'Cache-Control', 'public, max-age=60, s-maxage=300')
+  setHeader(event, 'ETag', `categories-${Date.now()}`)
+
   try {
     console.log("📂 GET /api/categories - Début récupération hybride")
 

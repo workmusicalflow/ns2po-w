@@ -4,7 +4,7 @@
   "startDate": "2025-09-27",
   "endDate": "2025-10-15",
   "goals": "Améliorer l'expérience utilisateur avec des fonctionnalités avancées : drag & drop, recherche avancée, import/export, et autres optimisations qui apportent de la valeur mais ne sont pas critiques pour le fonctionnement de base.",
-  "status": "active",
+  "status": "closed",
   "created": "2025-09-20T20:43:12.730Z",
   "tasks": [],
   "paretoDecisions": [
@@ -32,5 +32,5 @@
     "tasksMovedToVault": 3,
     "velocityPoints": 0
   },
-  "updated": "2025-09-20T20:43:50.077Z"
+  "updated": "2025-09-20T21:11:30.322Z"
 }

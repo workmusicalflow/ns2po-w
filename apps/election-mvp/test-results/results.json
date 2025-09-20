@@ -1,7 +1,7 @@
 {
   "config": {
-    "configFile": "/Users/ns2poportable/Desktop/ns2po-w/apps/election-mvp/playwright.config.ts",
-    "rootDir": "/Users/ns2poportable/Desktop/ns2po-w/apps/election-mvp/tests/e2e",
+    "configFile": "/Users/logansery/Documents/ns2po-w/apps/election-mvp/playwright.config.ts",
+    "rootDir": "/Users/logansery/Documents/ns2po-w/apps/election-mvp/tests/e2e",
     "forbidOnly": false,
     "fullyParallel": true,
     "globalSetup": null,
@@ -37,13 +37,13 @@
     "quiet": false,
     "projects": [
       {
-        "outputDir": "/Users/ns2poportable/Desktop/ns2po-w/apps/election-mvp/test-results",
+        "outputDir": "/Users/logansery/Documents/ns2po-w/apps/election-mvp/test-results",
         "repeatEach": 1,
         "retries": 0,
         "metadata": {},
         "id": "chromium",
         "name": "chromium",
-        "testDir": "/Users/ns2poportable/Desktop/ns2po-w/apps/election-mvp/tests/e2e",
+        "testDir": "/Users/logansery/Documents/ns2po-w/apps/election-mvp/tests/e2e",
         "testIgnore": [],
         "testMatch": [
           "**/*.@(spec|test).?(c|m)[jt]s?(x)"
@@ -51,13 +51,13 @@
         "timeout": 60000
       },
       {
-        "outputDir": "/Users/ns2poportable/Desktop/ns2po-w/apps/election-mvp/test-results",
+        "outputDir": "/Users/logansery/Documents/ns2po-w/apps/election-mvp/test-results",
         "repeatEach": 1,
         "retries": 0,
         "metadata": {},
         "id": "firefox",
         "name": "firefox",
-        "testDir": "/Users/ns2poportable/Desktop/ns2po-w/apps/election-mvp/tests/e2e",
+        "testDir": "/Users/logansery/Documents/ns2po-w/apps/election-mvp/tests/e2e",
         "testIgnore": [],
         "testMatch": [
           "**/*.@(spec|test).?(c|m)[jt]s?(x)"
@@ -65,13 +65,13 @@
         "timeout": 60000
       },
       {
-        "outputDir": "/Users/ns2poportable/Desktop/ns2po-w/apps/election-mvp/test-results",
+        "outputDir": "/Users/logansery/Documents/ns2po-w/apps/election-mvp/test-results",
         "repeatEach": 1,
         "retries": 0,
         "metadata": {},
         "id": "mobile-chrome",
         "name": "mobile-chrome",
-        "testDir": "/Users/ns2poportable/Desktop/ns2po-w/apps/election-mvp/tests/e2e",
+        "testDir": "/Users/logansery/Documents/ns2po-w/apps/election-mvp/tests/e2e",
         "testIgnore": [],
         "testMatch": [
           "**/*.@(spec|test).?(c|m)[jt]s?(x)"
@@ -82,30 +82,24 @@
     "shard": null,
     "updateSnapshots": "missing",
     "updateSourceMethod": "patch",
-    "version": "1.52.0",
+    "version": "1.55.0",
     "workers": 4,
     "webServer": null
   },
   "suites": [],
   "errors": [
     {
-      "message": "Error: Playwright Test did not expect test.describe() to be called here.\nMost common reasons include:\n- You are calling test.describe() in a configuration file.\n- You are calling test.describe() in a file that is imported by the configuration file.\n- You have two different versions of @playwright/test. This usually happens\n  when one of the dependencies in your package.json depends on @playwright/test.",
-      "stack": "Error: Playwright Test did not expect test.describe() to be called here.\nMost common reasons include:\n- You are calling test.describe() in a configuration file.\n- You are calling test.describe() in a file that is imported by the configuration file.\n- You have two different versions of @playwright/test. This usually happens\n  when one of the dependencies in your package.json depends on @playwright/test.\n    at TestTypeImpl._currentSuite (/Users/ns2poportable/Desktop/ns2po-w/node_modules/.pnpm/playwright@1.55.0/node_modules/playwright/lib/common/testType.js:74:13)\n    at TestTypeImpl._describe (/Users/ns2poportable/Desktop/ns2po-w/node_modules/.pnpm/playwright@1.55.0/node_modules/playwright/lib/common/testType.js:114:24)\n    at Function.describe (/Users/ns2poportable/Desktop/ns2po-w/node_modules/.pnpm/playwright@1.55.0/node_modules/playwright/lib/transform/transform.js:275:12)\n    at /Users/ns2poportable/Desktop/ns2po-w/apps/election-mvp/tests/e2e/debug-homepage.spec.ts:3:6",
-      "location": {
-        "file": "/Users/ns2poportable/Desktop/ns2po-w/apps/election-mvp/tests/e2e/debug-homepage.spec.ts",
-        "column": 6,
-        "line": 3
-      },
-      "snippet": "\u001b[90m   at \u001b[39mdebug-homepage.spec.ts:3\n\n  1 | import { test, expect } from '@playwright/test'\n  2 |\n> 3 | test.describe('Debug Homepage', () => {\n    |      ^\n  4 |   test('Check if realisation cards are loaded', async ({ page }) => {\n  5 |     // Aller à la homepage\n  6 |     await page.goto('http://localhost:3003/')"
+      "message": "TypeError: Cannot redefine property: Symbol($$jest-matchers-object)",
+      "stack": "TypeError: Cannot redefine property: Symbol($$jest-matchers-object)\n    at /Users/logansery/Documents/ns2po-w/node_modules/.pnpm/@vitest+expect@1.6.1/node_modules/@vitest/expect/dist/index.js:21:10"
     },
     {
-      "message": "Error: No tests found.\nMake sure that arguments are regular expressions matching test files.\nYou may need to escape symbols like \"$\" or \"*\" and quote the arguments.",
-      "stack": "Error: No tests found.\nMake sure that arguments are regular expressions matching test files.\nYou may need to escape symbols like \"$\" or \"*\" and quote the arguments."
+      "message": "Error: No tests found",
+      "stack": "Error: No tests found"
     }
   ],
   "stats": {
-    "startTime": "2025-08-23T23:52:40.115Z",
-    "duration": 487.54999999999995,
+    "startTime": "2025-09-20T21:41:57.700Z",
+    "duration": 1197.0009999999997,
     "expected": 0,
     "skipped": 0,
     "unexpected": 0,

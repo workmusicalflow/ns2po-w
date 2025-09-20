@@ -4,8 +4,12 @@
     <div class="mb-8">
       <div class="flex items-center justify-between">
         <div>
-          <h1 class="text-2xl font-bold text-gray-900">Nouvelle Réalisation</h1>
-          <p class="text-gray-600">Ajouter une nouvelle réalisation au portfolio</p>
+          <h1 class="text-2xl font-bold text-gray-900">
+            {{ isNew ? 'Nouvelle Réalisation' : 'Modifier Réalisation' }}
+          </h1>
+          <p class="text-gray-600">
+            {{ isNew ? 'Créer une nouvelle réalisation pour le portfolio' : 'Modifier les informations de la réalisation' }}
+          </p>
         </div>
         <div class="flex items-center space-x-3">
           <NuxtLink
@@ -19,11 +23,31 @@
       </div>
     </div>
 
+    <!-- Loading State -->
+    <div v-if="isLoading" class="flex items-center justify-center py-12">
+      <Icon name="heroicons:arrow-path" class="w-8 h-8 animate-spin text-amber-600" />
+      <span class="ml-2 text-gray-600">Chargement...</span>
+    </div>
+
+    <!-- Error State -->
+    <div v-else-if="error" class="bg-red-50 border border-red-200 rounded-lg p-6">
+      <div class="flex">
+        <Icon name="heroicons:x-circle" class="w-5 h-5 text-red-400" />
+        <div class="ml-3">
+          <h3 class="text-sm font-medium text-red-800">Erreur</h3>
+          <p class="mt-1 text-sm text-red-700">{{ error }}</p>
+        </div>
+      </div>
+    </div>
+
     <!-- Realisation Form -->
     <RealisationForm
+      v-else
+      :realisation="realisation"
       :available-products="availableProducts"
       :available-categories="availableCategories"
       :available-customization-options="availableCustomizationOptions"
+      :is-edit="!isNew"
       @submit="handleSubmit"
       @cancel="handleCancel"
     />
@@ -34,6 +58,12 @@
 import { globalNotifications } from '~/composables/useNotifications'
 import RealisationForm from '~/components/admin/RealisationForm.vue'
 
+// Route params
+const route = useRoute()
+const router = useRouter()
+const realisationId = computed(() => route.params.id as string)
+const isNew = computed(() => realisationId.value === 'new')
+
 // Layout admin
 definePageMeta({
   layout: 'admin',
@@ -42,7 +72,7 @@ definePageMeta({
 
 // Head
 useHead({
-  title: 'Nouvelle Réalisation | Admin'
+  title: computed(() => isNew.value ? 'Nouvelle Réalisation | Admin' : 'Modifier Réalisation | Admin')
 })
 
 // Types
@@ -83,34 +113,34 @@ interface Realisation {
 const { crudSuccess, crudError } = globalNotifications
 
 // Reactive data
+const isLoading = ref(false)
+const error = ref('')
+const realisation = ref<Realisation | null>(null)
 const availableProducts = ref<Product[]>([])
 const availableCategories = ref<Category[]>([])
 const availableCustomizationOptions = ref<CustomizationOption[]>([])
 
 // Methods
-const handleSubmit = async (realisation: Realisation) => {
-  try {
-    const response = await $fetch('/api/realisations', {
-      method: 'POST',
-      body: realisation
-    })
+const fetchRealisation = async () => {
+  if (isNew.value) return
 
-    if (response.success) {
-      crudSuccess.created(realisation.title, 'réalisation')
-      await navigateTo(`/admin/realisations/${response.data.id}`)
+  isLoading.value = true
+  try {
+    const response = await $fetch(`/api/realisations/${realisationId.value}`)
+    if (response.success && response.data) {
+      realisation.value = response.data
+    } else {
+      error.value = 'Réalisation introuvable'
     }
-  } catch (error: any) {
-    console.error('Error creating realisation:', error)
-    crudError.created('réalisation', error.message || 'Une erreur est survenue lors de la création.')
+  } catch (err: any) {
+    console.error('Error fetching realisation:', err)
+    error.value = err.message || 'Erreur lors du chargement de la réalisation'
+  } finally {
+    isLoading.value = false
   }
 }
 
-const handleCancel = () => {
-  navigateTo('/admin/realisations')
-}
-
-// Fetch related data on mount
-onMounted(async () => {
+const fetchRelatedData = async () => {
   try {
     // Fetch products
     const productsResponse = await $fetch('/api/products')
@@ -153,8 +183,6 @@ onMounted(async () => {
     }
   } catch (error) {
     console.error('Error fetching related data:', error)
-    crudError.validation('Impossible de charger les données nécessaires')
-
     // Provide minimal fallback data
     availableProducts.value = []
     availableCategories.value = [
@@ -169,6 +197,59 @@ onMounted(async () => {
       { id: 'broderie', name: 'Broderie' },
       { id: 'serigraphie', name: 'Sérigraphie' }
     ]
+  }
+}
+
+const handleSubmit = async (realisationData: Realisation) => {
+  try {
+    if (isNew.value) {
+      // Create new realisation
+      const response = await $fetch('/api/realisations', {
+        method: 'POST',
+        body: realisationData
+      })
+
+      if (response.success) {
+        crudSuccess.created(realisationData.title, 'réalisation')
+        await navigateTo(`/admin/realisations/${response.data.id}`)
+      }
+    } else {
+      // Update existing realisation
+      const response = await $fetch(`/api/realisations/${realisationId.value}`, {
+        method: 'PUT',
+        body: realisationData
+      })
+
+      if (response.success) {
+        crudSuccess.updated(realisationData.title, 'réalisation')
+        realisation.value = response.data
+      }
+    }
+  } catch (error: any) {
+    console.error('Error saving realisation:', error)
+    const action = isNew.value ? 'création' : 'modification'
+    crudError.validation(`Une erreur est survenue lors de la ${action} de la réalisation: ${error.message || 'Erreur inconnue'}`)
+  }
+}
+
+const handleCancel = () => {
+  navigateTo('/admin/realisations')
+}
+
+// Lifecycle
+onMounted(async () => {
+  await Promise.all([
+    fetchRealisation(),
+    fetchRelatedData()
+  ])
+})
+
+// Watch for route changes
+watch(() => route.params.id, async (newId) => {
+  if (newId && newId !== 'new') {
+    await fetchRealisation()
+  } else {
+    realisation.value = null
   }
 })
 </script>

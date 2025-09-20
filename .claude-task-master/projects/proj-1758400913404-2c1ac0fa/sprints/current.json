@@ -1,36 +1,105 @@
 {
-  "id": "sprint-1758400992730-089bd79c",
-  "name": "80% Enhancement - Améliorations UX",
-  "startDate": "2025-09-27",
-  "endDate": "2025-10-15",
-  "goals": "Améliorer l'expérience utilisateur avec des fonctionnalités avancées : drag & drop, recherche avancée, import/export, et autres optimisations qui apportent de la valeur mais ne sont pas critiques pour le fonctionnement de base.",
+  "id": "sprint-1758402690319-e95a3dc3",
+  "name": "Core 20% - CRUD Categories MVP",
+  "startDate": "2025-09-20",
+  "endDate": "2025-09-27",
+  "goals": "Implémenter les fonctionnalités critiques du CRUD categories : création, modification, suppression et validation des catégories. Focus sur les opérations essentielles sans les améliorations cosmétiques.",
   "status": "active",
-  "created": "2025-09-20T20:43:12.730Z",
-  "tasks": [],
-  "paretoDecisions": [
+  "created": "2025-09-20T21:11:30.320Z",
+  "tasks": [
     {
-      "taskId": 1,
-      "decision": "moved_to_vault",
-      "reason": "Amélioration UX non critique - drag & drop est pratique mais pas essentiel pour les opérations CRUD de base",
-      "timestamp": "2025-09-20T20:43:38.188Z"
+      "id": 1,
+      "title": "✅ Corriger l'auto-import CategoryFormModal (RÉSOLU)",
+      "description": "RÉSOLU ✅ : Le composant CategoryFormModal ne se résolvait pas avec l'auto-import Nuxt. Solution appliquée : import explicite dans /pages/admin/categories/index.vue. Le modal s'ouvre maintenant parfaitement avec tous les champs de création. Test validé avec Playwright.",
+      "status": "completed",
+      "priority": 5,
+      "dependencies": [],
+      "created": "2025-09-20T21:11:38.609Z",
+      "updated": "2025-09-20T21:18:23.091Z",
+      "isPareto80": false
     },
     {
-      "taskId": 2,
-      "decision": "moved_to_vault",
-      "reason": "Amélioration de recherche non critique - le système de filtres existant fonctionne pour les besoins essentiels",
-      "timestamp": "2025-09-20T20:43:44.224Z"
+      "id": 2,
+      "title": "🔧 Corriger le composant NSNotificationContainer",
+      "description": "CRITIQUE P0 : Le composant NSNotificationContainer ne se résout pas dans le layout admin, causant des erreurs Vue. Impact : impossible d'afficher les notifications de succès/erreur lors des opérations CRUD. Appliquer la même solution que CategoryFormModal avec import explicite.",
+      "status": "in-progress",
+      "priority": 5,
+      "dependencies": [],
+      "created": "2025-09-20T21:11:54.170Z",
+      "updated": "2025-09-20T21:21:16.632Z",
+      "isPareto80": false
     },
     {
-      "taskId": 3,
-      "decision": "moved_to_vault",
-      "reason": "Fonctionnalité d'import/export non critique - utile pour migration en masse mais pas nécessaire pour gestion quotidienne",
-      "timestamp": "2025-09-20T20:43:50.077Z"
+      "id": 3,
+      "title": "🧪 Tester la création de catégories end-to-end",
+      "description": "CORE 20% P0 : Valider que le workflow complet de création fonctionne : ouverture modal → saisie données → validation → création API → rechargement liste → notification succès. Tester cas nominaux et erreurs.",
+      "status": "pending",
+      "priority": 5,
+      "dependencies": [
+        2
+      ],
+      "created": "2025-09-20T21:12:00.952Z",
+      "updated": "2025-09-20T21:12:00.952Z",
+      "isPareto80": false
+    },
+    {
+      "id": 4,
+      "title": "📝 Tester la modification de catégories existantes",
+      "description": "CORE 20% P1 : Valider le workflow de modification : clic bouton \"Modifier\" → ouverture modal prérempli → modification données → sauvegarde → mise à jour liste. Tester édition catégories principales et sous-catégories.",
+      "status": "pending",
+      "priority": 4,
+      "dependencies": [
+        3
+      ],
+      "created": "2025-09-20T21:12:07.395Z",
+      "updated": "2025-09-20T21:12:07.395Z",
+      "isPareto80": false
+    },
+    {
+      "id": 5,
+      "title": "🗑️ Tester la suppression de catégories",
+      "description": "CORE 20% P1 : Valider le workflow de suppression : clic bouton \"Supprimer\" → confirmation → suppression API → rechargement liste. Tester protection suppression catégories avec sous-catégories et gestion erreurs.",
+      "status": "pending",
+      "priority": 4,
+      "dependencies": [
+        4
+      ],
+      "created": "2025-09-20T21:12:13.406Z",
+      "updated": "2025-09-20T21:12:13.406Z",
+      "isPareto80": false
+    },
+    {
+      "id": 6,
+      "title": "⚡ Optimiser la validation côté client",
+      "description": "CORE 20% P2 : Améliorer la validation en temps réel dans CategoryFormModal : validation champs obligatoires, format slug, unicité nom/slug, feedback visuel immédiat. Désactivation bouton \"Créer\" si invalide.",
+      "status": "pending",
+      "priority": 3,
+      "dependencies": [
+        5
+      ],
+      "created": "2025-09-20T21:12:19.999Z",
+      "updated": "2025-09-20T21:12:19.999Z",
+      "isPareto80": false
+    },
+    {
+      "id": 7,
+      "title": "🎯 Tests E2E complets du CRUD categories",
+      "description": "CORE 20% P2 : Créer suite de tests Playwright complète couvrant tous les scénarios CRUD : création, modification, suppression, gestion erreurs, cas limites. Documentation des résultats pour validation MVP.",
+      "status": "pending",
+      "priority": 3,
+      "dependencies": [
+        6
+      ],
+      "created": "2025-09-20T21:12:28.642Z",
+      "updated": "2025-09-20T21:12:28.642Z",
+      "isPareto80": false
     }
   ],
+  "paretoDecisions": [],
   "metrics": {
-    "tasksCompleted": 0,
-    "tasksMovedToVault": 3,
+    "tasksCompleted": 1,
+    "tasksMovedToVault": 0,
     "velocityPoints": 0
   },
-  "updated": "2025-09-20T20:43:50.077Z"
+  "updated": "2025-09-20T21:21:16.635Z"
 }

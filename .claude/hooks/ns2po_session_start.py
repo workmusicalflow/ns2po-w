@@ -51,20 +51,26 @@ def check_project_health():
     except:
         pass
     
-    # Check for environment configuration
+    # Check for environment configuration (priorité .env.local puis .env)
     env_files = ['.env.local', '.env']
+    env_content_combined = ''
+
     for env_file in env_files:
         env_path = os.path.join(project_root, 'apps/election-mvp', env_file)
         if os.path.exists(env_path):
             try:
                 with open(env_path, 'r') as f:
-                    env_content = f.read()
-                    health_status['cloudinary'] = 'CLOUDINARY_CLOUD_NAME' in env_content
-                    health_status['turso'] = 'TURSO_DATABASE_URL' in env_content
-                    health_status['smtp'] = 'SMTP_HOST' in env_content
-                    break
+                    content = f.read().strip()
+                    if content:  # Fichier non vide
+                        env_content_combined += content + '\n'
             except:
                 pass
+
+    # Check all combined content
+    if env_content_combined:
+        health_status['cloudinary'] = 'CLOUDINARY_CLOUD_NAME' in env_content_combined
+        health_status['turso'] = 'TURSO_DATABASE_URL' in env_content_combined
+        health_status['smtp'] = 'SMTP_HOST' in env_content_combined
     
     return health_status
 
@@ -116,18 +122,19 @@ def check_code_quality():
     }
     
     try:
-        # Check TypeScript errors
-        app_path = os.path.join(project_root, 'apps/election-mvp')
+        # Check TypeScript errors avec pnpm type-check
         result = subprocess.run(
-            ['pnpm', 'exec', 'tsc', '--noEmit', '--project', 'tsconfig.json'],
-            capture_output=True, text=True, timeout=10, cwd=app_path
+            ['pnpm', 'type-check'],
+            capture_output=True, text=True, timeout=15, cwd=project_root
         )
-        
+
         if result.returncode == 0:
             quality_status['typescript_errors'] = 0
         else:
-            # Count errors in output
-            error_lines = [line for line in result.stdout.split('\n') if 'error' in line.lower()]
+            # Count errors in combined output (stdout + stderr)
+            combined_output = (result.stdout + result.stderr).lower()
+            error_lines = [line for line in combined_output.split('\n')
+                          if 'error ts' in line or ') error ' in line]
             quality_status['typescript_errors'] = len(error_lines)
     except:
         pass
@@ -335,22 +342,34 @@ def display_ns2po_dashboard():
     print(f"   • pnpm test:e2e     - Tests E2E Playwright")
     print(f"   • pnpm test:watch   - Tests en mode watch")
     
-    # Issues to address
+    # Issues to address (points d'attention réels)
     issues = []
+    warnings = []
+
     if not health['pnpm']:
         issues.append("pnpm non disponible - installer avec: npm install -g pnpm")
     if not health['cloudinary']:
-        issues.append("Cloudinary non configuré - vérifier CLOUDINARY_CLOUD_NAME")
+        warnings.append("Cloudinary: CLOUDINARY_CLOUD_NAME non trouvé dans les fichiers .env")
     if not health['turso']:
-        issues.append("Turso non configuré - vérifier TURSO_DATABASE_URL")
-    
+        warnings.append("Turso: TURSO_DATABASE_URL non trouvé dans les fichiers .env")
+    if not health['smtp']:
+        warnings.append("SMTP: SMTP_HOST non configuré (email non fonctionnel)")
+
     if quality['typescript_errors'] and quality['typescript_errors'] > 0:
-        issues.append(f"TypeScript: {quality['typescript_errors']} erreur(s) à corriger")
-    
+        if quality['typescript_errors'] > 5:
+            issues.append(f"TypeScript: {quality['typescript_errors']} erreur(s) critiques à corriger")
+        else:
+            warnings.append(f"TypeScript: {quality['typescript_errors']} erreur(s) mineures à corriger")
+
     if issues:
-        print(f"\n⚠️  Points d'attention:")
+        print(f"\n⚠️  Problèmes critiques:")
         for issue in issues:
             print(f"   • {issue}")
+
+    if warnings:
+        print(f"\n💡 Améliorations recommandées:")
+        for warning in warnings:
+            print(f"   • {warning}")
     
     # NS2PO Principles
     print(f"\n💡 Principes NS2PO:")
@@ -394,18 +413,22 @@ def main():
     """Main function with error handling."""
     try:
         # Read input from hook (required but not used for SessionStart)
-        input_data = json.load(sys.stdin)
-        
+        stdin_content = sys.stdin.read().strip()
+        if stdin_content:
+            input_data = json.loads(stdin_content)
+        else:
+            input_data = {}
+
         # Small delay to ensure proper display
         time.sleep(0.1)
-        
+
         # Display the NS2PO dashboard
         display_ns2po_dashboard()
-        
+
     except Exception as e:
         # Graceful error handling - don't block session start
         print(f"⚠️  Hook SessionStart: {e}", file=sys.stderr)
-    
+
     # Always exit successfully to not block Claude
     sys.exit(0)
 

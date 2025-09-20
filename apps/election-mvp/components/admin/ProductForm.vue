@@ -449,7 +449,25 @@ const submitForm = async () => {
 
   isSubmitting.value = true
   try {
-    emit('submit', { ...formData })
+    // Transform form data to match API schema
+    const apiData = {
+      ...formData,
+      // Map UI fields to API fields
+      category: formData.category_id,
+      base_price: formData.price,
+      // Remove UI-specific fields
+      category_id: undefined,
+      price: undefined
+    }
+
+    // Clean undefined fields
+    Object.keys(apiData).forEach(key => {
+      if (apiData[key] === undefined) {
+        delete apiData[key]
+      }
+    })
+
+    emit('submit', apiData)
   } catch (error) {
     console.error('Erreur soumission:', error)
   } finally {

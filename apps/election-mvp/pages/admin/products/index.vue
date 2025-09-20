@@ -112,21 +112,21 @@
       </template>
 
       <!-- Custom slot for status -->
-      <template #cell-status="{ value }">
+      <template #cell-isActive="{ value, item }">
         <span
           class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
           :class="{
-            'bg-green-100 text-green-800': value === 'active',
-            'bg-red-100 text-red-800': value === 'inactive',
-            'bg-yellow-100 text-yellow-800': value === 'draft'
+            'bg-green-100 text-green-800': value === true || item.status === 'active',
+            'bg-red-100 text-red-800': value === false || item.status === 'inactive',
+            'bg-yellow-100 text-yellow-800': item.status === 'draft'
           }"
         >
-          {{ getStatusText(value) }}
+          {{ value === true || item.status === 'active' ? 'Actif' : value === false || item.status === 'inactive' ? 'Inactif' : getStatusText(item.status) }}
         </span>
       </template>
 
       <!-- Custom slot for price -->
-      <template #cell-price="{ value }">
+      <template #cell-basePrice="{ value }">
         <span class="font-medium text-gray-900">
           {{ formatPrice(value) }}
         </span>
@@ -160,6 +160,9 @@
 </template>
 
 <script setup lang="ts">
+import AdminDataTable from '~/components/admin/AdminDataTable.vue'
+import { globalNotifications } from '~/composables/useNotifications'
+
 // Layout admin
 definePageMeta({
   layout: 'admin',
@@ -171,19 +174,28 @@ useHead({
   title: 'Produits | Admin'
 })
 
+// Global notifications
+const { crudSuccess, crudError } = globalNotifications
+
 // Types
 interface Product {
   id: string
   name: string
-  reference: string
+  reference?: string
   description: string
-  price: number
-  category_id: string
+  basePrice?: number
+  price?: number
+  category: string
+  category_id?: string
   category_name?: string
-  status: 'active' | 'inactive' | 'draft'
+  status?: 'active' | 'inactive' | 'draft'
+  isActive?: boolean
+  image?: string
   image_url?: string
-  created_at: string
-  updated_at: string
+  createdAt?: string
+  updatedAt?: string
+  created_at?: string
+  updated_at?: string
 }
 
 interface Category {
@@ -223,27 +235,27 @@ const columns = [
     class: 'text-gray-500'
   },
   {
-    key: 'category_name',
+    key: 'category',
     label: 'Catégorie',
     sortable: true,
     class: 'text-gray-600'
   },
   {
-    key: 'price',
+    key: 'basePrice',
     label: 'Prix',
     sortable: true,
     class: 'text-right'
   },
   {
-    key: 'status',
+    key: 'isActive',
     label: 'Statut',
     sortable: true
   },
   {
-    key: 'updated_at',
+    key: 'updatedAt',
     label: 'Modifié',
     sortable: true,
-    formatter: (value: string) => new Date(value).toLocaleDateString('fr-FR')
+    formatter: (value: string) => value ? new Date(value).toLocaleDateString('fr-FR') : 'N/A'
   }
 ]
 
@@ -253,12 +265,21 @@ const filteredProducts = computed(() => {
 
   // Filter by category
   if (filters.category) {
-    result = result.filter(product => product.category_id === filters.category)
+    result = result.filter(product =>
+      product.category === filters.category ||
+      product.category_id === filters.category
+    )
   }
 
   // Filter by status
   if (filters.status) {
-    result = result.filter(product => product.status === filters.status)
+    if (filters.status === 'active') {
+      result = result.filter(product => product.isActive === true || product.status === 'active')
+    } else if (filters.status === 'inactive') {
+      result = result.filter(product => product.isActive === false || product.status === 'inactive')
+    } else {
+      result = result.filter(product => product.status === filters.status)
+    }
   }
 
   return result
@@ -303,9 +324,29 @@ function duplicateProduct(product: Product) {
   console.log('Duplicate product:', product)
 }
 
-function deleteProduct(product: Product) {
-  // TODO: Implement delete functionality with confirmation
-  console.log('Delete product:', product)
+async function deleteProduct(product: Product) {
+  if (!confirm(`Êtes-vous sûr de vouloir supprimer le produit "${product.name}" ?`)) return
+
+  try {
+    await $fetch(`/api/products/${product.id}`, {
+      method: 'DELETE'
+    })
+
+    // Remove from local state
+    const index = products.value.findIndex(p => p.id === product.id)
+    if (index > -1) {
+      products.value.splice(index, 1)
+    }
+
+    crudSuccess.deleted(`Produit "${product.name}" supprimé avec succès`, 'product')
+  } catch (error) {
+    console.error('Error deleting product:', error)
+    if (error.statusCode === 409) {
+      crudError.deleted('product', 'Impossible de supprimer ce produit car il est utilisé dans des bundles.')
+    } else {
+      crudError.deleted('product', `Erreur lors de la suppression du produit "${product.name}"`)
+    }
+  }
 }
 
 function getStatusText(status: string): string {
@@ -317,7 +358,10 @@ function getStatusText(status: string): string {
   }
 }
 
-function formatPrice(price: number): string {
+function formatPrice(price: number | undefined | null): string {
+  if (price === null || price === undefined || isNaN(price)) {
+    return 'N/A'
+  }
   return new Intl.NumberFormat('fr-FR', {
     style: 'currency',
     currency: 'XOF'

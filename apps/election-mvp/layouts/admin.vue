@@ -142,6 +142,9 @@
 </template>
 
 <script setup lang="ts">
+// Import explicit du composant NSNotificationContainer
+import NSNotificationContainer from '../components/ui/NSNotificationContainer.vue'
+
 // Meta pour admin
 useHead({
   titleTemplate: '%s | NS2PO Admin',

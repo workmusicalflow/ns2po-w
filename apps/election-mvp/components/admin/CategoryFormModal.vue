@@ -34,7 +34,9 @@
               class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
               placeholder="Ex: TEXTILE, ACCESSOIRE..."
             />
-            <p v-if="errors.name" class="mt-1 text-sm text-red-600">{{ errors.name }}</p>
+            <p v-if="errors.name || realTimeErrors.name" class="mt-1 text-sm text-red-600">
+              {{ errors.name || realTimeErrors.name }}
+            </p>
           </div>
 
           <!-- Slug -->
@@ -53,7 +55,9 @@
             <p class="mt-1 text-xs text-gray-500">
               URL-friendly version du nom (lettres minuscules, chiffres et tirets uniquement)
             </p>
-            <p v-if="errors.slug" class="mt-1 text-sm text-red-600">{{ errors.slug }}</p>
+            <p v-if="errors.slug || realTimeErrors.slug" class="mt-1 text-sm text-red-600">
+              {{ errors.slug || realTimeErrors.slug }}
+            </p>
           </div>
 
           <!-- Description -->
@@ -137,7 +141,9 @@
                   class="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
                 />
               </div>
-              <p v-if="errors.color" class="mt-1 text-sm text-red-600">{{ errors.color }}</p>
+              <p v-if="errors.color || realTimeErrors.color" class="mt-1 text-sm text-red-600">
+                {{ errors.color || realTimeErrors.color }}
+              </p>
             </div>
           </div>
 
@@ -214,6 +220,9 @@
 </template>
 
 <script setup lang="ts">
+import { createCategorySchema } from '~/schemas/category'
+import { useFormValidation } from '~/composables/useFormValidation'
+
 interface Category {
   id: string
   name: string
@@ -246,6 +255,10 @@ const emit = defineEmits<{
 const loading = ref(false)
 const errors = ref<Record<string, string>>({})
 
+// Real-time validation setup
+const { validateWithSchema, realTimeValidation } = useFormValidation()
+const realTimeErrors = ref<Record<string, string>>({})
+
 // Form
 const form = reactive({
   name: '',
@@ -268,7 +281,12 @@ const availableParents = computed(() => {
 })
 
 const isFormValid = computed(() => {
-  return form.name.trim() && form.slug.trim() && !Object.keys(errors.value).length
+  return (
+    form.name.trim() &&
+    form.slug.trim() &&
+    !Object.keys(errors.value).length &&
+    !Object.keys(realTimeErrors.value).length
+  )
 })
 
 // Methods
@@ -357,13 +375,50 @@ const submitForm = async () => {
   }
 }
 
-// Watchers
+// Real-time validation watchers
 watch(() => form.name, (newName) => {
+  // Auto-generate slug for new categories
   if (newName && !isEdit.value) {
-    // Auto-generate slug only for new categories
     form.slug = generateSlug(newName)
   }
-})
+
+  // Real-time validation for name
+  if (newName.trim()) {
+    const nameValidation = validateWithSchema(createCategorySchema.pick({ name: true }), { name: newName })
+    if (nameValidation.errors.name) {
+      realTimeErrors.value.name = nameValidation.errors.name
+    } else {
+      delete realTimeErrors.value.name
+    }
+  } else {
+    delete realTimeErrors.value.name
+  }
+}, { immediate: true })
+
+watch(() => form.slug, (newSlug) => {
+  // Real-time validation for slug
+  if (newSlug.trim()) {
+    const slugValidation = validateWithSchema(createCategorySchema.pick({ slug: true }), { slug: newSlug })
+    if (slugValidation.errors.slug) {
+      realTimeErrors.value.slug = slugValidation.errors.slug
+    } else {
+      delete realTimeErrors.value.slug
+    }
+  } else {
+    delete realTimeErrors.value.slug
+  }
+}, { immediate: true })
+
+watch(() => form.color, (newColor) => {
+  // Real-time validation for color
+  if (newColor && !/^#[0-9A-Fa-f]{6}$/.test(newColor)) {
+    realTimeErrors.value.color = 'La couleur doit être au format hexadécimal #RRGGBB'
+  } else {
+    delete realTimeErrors.value.color
+  }
+}, { immediate: true })
+
+// Watchers
 
 // Initialize form with category data if editing
 watchEffect(() => {
@@ -392,5 +447,6 @@ watchEffect(() => {
     })
   }
   errors.value = {}
+  realTimeErrors.value = {}
 })
 </script>

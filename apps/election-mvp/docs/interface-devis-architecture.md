@@ -1,6 +1,6 @@
 # 📋 Documentation Architecture Interface `/devis`
 
-> **Documentation technique complète - Approche --Ultrathink++**
+> **Documentation technique complète**
 > Interface de génération de devis pour les gadgets de campagne électorale
 > **Version**: 1.0 | **Dernière mise à jour**: 2025-01-16
 
