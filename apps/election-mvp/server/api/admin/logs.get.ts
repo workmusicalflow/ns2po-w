@@ -3,7 +3,45 @@
  * Récupère les logs système pour le debugging
  */
 
-import { getDatabase } from "~/server/utils/database"
+import { getDatabase } from "../../utils/database"
+
+// Fonction pour s'assurer que la table system_logs existe
+async function ensureSystemLogsTable(db: any) {
+  try {
+    await db.execute({
+      sql: `CREATE TABLE IF NOT EXISTS system_logs (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        level TEXT NOT NULL,
+        message TEXT NOT NULL,
+        context TEXT,
+        source TEXT,
+        stack_trace TEXT,
+        metadata TEXT,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      )`,
+      args: []
+    })
+
+    // Index pour les performances
+    await db.execute({
+      sql: `CREATE INDEX IF NOT EXISTS idx_system_logs_level ON system_logs(level)`,
+      args: []
+    })
+
+    await db.execute({
+      sql: `CREATE INDEX IF NOT EXISTS idx_system_logs_created_at ON system_logs(created_at)`,
+      args: []
+    })
+
+    await db.execute({
+      sql: `CREATE INDEX IF NOT EXISTS idx_system_logs_source ON system_logs(source)`,
+      args: []
+    })
+  } catch (error) {
+    console.error('❌ Erreur création table system_logs:', error)
+    throw error
+  }
+}
 
 export default defineEventHandler(async (event) => {
   const startTime = Date.now()
@@ -29,6 +67,9 @@ export default defineEventHandler(async (event) => {
         statusMessage: 'Base de données non disponible'
       })
     }
+
+    // S'assurer que la table existe avant de l'interroger
+    await ensureSystemLogsTable(db)
 
     // Construction de la requête SQL dynamique
     let sql = `

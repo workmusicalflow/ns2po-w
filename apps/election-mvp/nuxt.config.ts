@@ -1,10 +1,24 @@
 export default defineNuxtConfig({
-  devtools: { enabled: true },
+  devtools: {
+    enabled: process.env.NODE_ENV === 'development',
+    timeline: {
+      enabled: true
+    },
+    // Évite les erreurs de performance
+    vscode: {
+      enabled: false // Désactive intégration VSCode si problématique
+    }
+  },
 
   // TypeScript configuration
   typescript: {
     strict: true,
     typeCheck: false, // Désactivé pour éviter oxc-parser en CI, utilise vue-tsc
+    tsConfig: {
+      compilerOptions: {
+        skipLibCheck: true
+      }
+    }
   },
 
   // CSS framework
@@ -51,7 +65,35 @@ export default defineNuxtConfig({
   },
 
   // Modules
-  modules: ["@nuxtjs/tailwindcss", "@nuxtjs/cloudinary", "@nuxt/image", "@nuxt/icon"],
+  modules: [
+    "@nuxtjs/tailwindcss",
+    "@nuxtjs/cloudinary",
+    "@nuxt/icon",
+    "@pinia/nuxt",
+    "@nuxt/devtools",
+    "@hebilicious/vue-query-nuxt"
+  ],
+
+  // Vue Query Configuration (simple config, advanced config in vue-query.config.ts)
+  vueQuery: {
+    queryClientOptions: {
+      defaultOptions: {
+        queries: {
+          staleTime: 5 * 60 * 1000, // 5 minutes
+          gcTime: 10 * 60 * 1000, // 10 minutes
+          refetchOnWindowFocus: true,
+          refetchOnReconnect: true,
+          refetchOnMount: true,
+          throwOnError: false,
+        },
+        mutations: {
+          retry: 1,
+          retryDelay: 1000,
+          throwOnError: false,
+        }
+      }
+    }
+  },
 
   // Nitro configuration for caching and performance
   nitro: {
@@ -98,6 +140,11 @@ export default defineNuxtConfig({
         headers: { "Cache-Control": "public, max-age=31536000, immutable" },
       },
 
+      // DevTools meta files - évite les 404 en développement
+      "/_nuxt/builds/meta/**": {
+        headers: { "Cache-Control": "no-cache" },
+      },
+
       // Sitemap
       "/sitemap.xml": {
         headers: { "Cache-Control": "public, max-age=86400" },
@@ -115,13 +162,32 @@ export default defineNuxtConfig({
     compressPublicAssets: true,
   },
 
+  // Configuration critique pour l'hydratation selon Perplexity
+  experimental: {
+    payloadExtraction: false, // Désactive extraction payload si problématique
+    inlineSSRStyles: false    // Évite les conflits CSS inline
+  },
+
+  // Configuration critique pour le debugging
+  sourcemap: {
+    server: process.env.NODE_ENV === 'development',
+    client: process.env.NODE_ENV === 'development'
+  },
+
+  // Fix pour les erreurs de développement
+  vite: {
+    clearScreen: false,
+    logLevel: 'info'
+  },
+
   // Cloudinary configuration
   cloudinary: {
     cloudName: process.env.CLOUDINARY_CLOUD_NAME,
   },
 
-  // @nuxt/image configuration
-  image: {
+  // Configuration Cloudinary via @nuxtjs/cloudinary
+  // Note: @nuxt/image retiré temporairement pour éviter les erreurs TypeScript
+  // image: {
     cloudinary: {
       baseURL: `https://res.cloudinary.com/${process.env.CLOUDINARY_CLOUD_NAME}/image/upload/`,
     },
@@ -163,7 +229,7 @@ export default defineNuxtConfig({
         },
       },
     },
-  },
+  // },
 
   // App configuration
   app: {
