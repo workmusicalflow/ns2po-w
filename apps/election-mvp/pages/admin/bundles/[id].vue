@@ -339,13 +339,20 @@
 </template>
 
 <script setup lang="ts">
-import { globalNotifications } from '~/composables/useNotifications'
+import type { BundleApiResponse, ApiResponse, Product, BundleProduct } from "@ns2po/types"
+// Auto-imported via Nuxt 3: globalNotifications
 
 // Layout admin
 definePageMeta({
   layout: 'admin',
   middleware: 'admin'
 })
+
+// Route params
+const route = useRoute()
+const router = useRouter()
+const bundleId = computed(() => route.params.id as string)
+const isNew = computed(() => bundleId.value === 'new')
 
 // Head
 useHead({
@@ -354,12 +361,6 @@ useHead({
 
 // Global notifications
 const { crudSuccess, crudError } = globalNotifications
-
-// Route params
-const route = useRoute()
-const router = useRouter()
-const bundleId = computed(() => route.params.id as string)
-const isNew = computed(() => bundleId.value === 'new')
 
 // Reactive data
 const isSubmitting = ref(false)
@@ -381,7 +382,7 @@ const form = reactive({
 })
 
 // Form errors
-const errors = reactive({
+const errors = reactive<Record<string, string>>({
   name: '',
   description: '',
   targetAudience: '',
@@ -392,8 +393,8 @@ const errors = reactive({
 })
 
 // Products
-const availableProducts = ref([])
-const selectedProducts = ref([])
+const availableProducts = ref<Product[]>([])
+const selectedProducts = ref<BundleProduct[]>([])
 
 // Options
 const audienceOptions = [
@@ -436,12 +437,12 @@ async function fetchBundle() {
   if (isNew.value) return
 
   try {
-    const response = await $fetch(`/api/campaign-bundles/${bundleId.value}`)
+    const response = await $fetch<BundleApiResponse>(`/api/campaign-bundles/${bundleId.value}`)
     if (response.success && response.data) {
       Object.assign(form, response.data)
 
       // Set selected products
-      selectedProducts.value = response.data.products?.map(p => ({
+      selectedProducts.value = response.data.products?.map((p: BundleProduct) => ({
         ...p,
         subtotal: p.quantity * p.basePrice
       })) || []
@@ -460,7 +461,7 @@ async function fetchBundle() {
 
 async function fetchProducts() {
   try {
-    const response = await $fetch('/api/products')
+    const response = await $fetch<ApiResponse<Product[]>>('/api/products')
     if (response.success) {
       availableProducts.value = response.data || []
     } else {
@@ -473,7 +474,7 @@ async function fetchProducts() {
   }
 }
 
-function addProduct(product) {
+function addProduct(product: Product) {
   const bundleProduct = {
     id: product.id,
     name: product.name,
@@ -488,12 +489,12 @@ function addProduct(product) {
   updateCalculatedTotal()
 }
 
-function removeProduct(index) {
+function removeProduct(index: number) {
   selectedProducts.value.splice(index, 1)
   updateCalculatedTotal()
 }
 
-function updateProductTotal(index) {
+function updateProductTotal(index: number) {
   const product = selectedProducts.value[index]
   product.subtotal = product.quantity * product.basePrice
   updateCalculatedTotal()
@@ -570,7 +571,7 @@ async function handleSubmit() {
         : 0
     }
 
-    const response = await $fetch(url, {
+    const response = await $fetch<ApiResponse<unknown>>(url, {
       method,
       body: bundleData
     })
@@ -603,7 +604,7 @@ async function deleteBundle() {
   if (!confirm(`Êtes-vous sûr de vouloir supprimer le bundle "${form.name}" ?`)) return
 
   try {
-    const response = await $fetch(`/api/campaign-bundles/${bundleId.value}`, {
+    const response = await $fetch<ApiResponse<unknown>>(`/api/campaign-bundles/${bundleId.value}`, {
       method: 'DELETE'
     })
 
