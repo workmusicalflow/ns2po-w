@@ -25,10 +25,11 @@
           <label class="block text-sm font-medium text-gray-700 mb-2">Recherche</label>
           <div class="relative">
             <input
-              v-model="filters.search"
+              v-model="searchQuery"
               type="text"
               placeholder="Nom, référence..."
               class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+              @input="handleSearchInput"
             />
             <Icon name="heroicons:magnifying-glass" class="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
           </div>
@@ -38,11 +39,12 @@
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-2">Catégorie</label>
           <select
-            v-model="filters.category"
+            v-model="selectedCategory"
             class="block w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+            @change="applyFilters"
           >
             <option value="">Toutes les catégories</option>
-            <option v-for="category in categories" :key="category.id" :value="category.id">
+            <option v-for="category in categories.data" :key="category.id" :value="category.id">
               {{ category.name }}
             </option>
           </select>
@@ -52,8 +54,9 @@
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-2">Statut</label>
           <select
-            v-model="filters.status"
+            v-model="selectedStatus"
             class="block w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+            @change="applyFilters"
           >
             <option value="">Tous les statuts</option>
             <option value="active">Actif</option>
@@ -73,6 +76,7 @@
           <button
             @click="exportProducts"
             class="px-4 py-2 text-sm text-amber-600 bg-amber-50 rounded-md hover:bg-amber-100 focus:outline-none focus:ring-2 focus:ring-amber-500"
+            :disabled="isLoading"
           >
             Exporter
           </button>
@@ -80,13 +84,49 @@
       </div>
     </div>
 
+    <!-- Loading State -->
+    <div v-if="isInitialLoading" class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+      <div class="animate-pulse space-y-4">
+        <div class="flex items-center justify-between">
+          <div class="h-4 bg-gray-200 rounded w-1/4"></div>
+          <div class="h-8 bg-gray-200 rounded w-32"></div>
+        </div>
+        <div class="space-y-3">
+          <div v-for="i in 5" :key="i" class="h-12 bg-gray-200 rounded"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Error State -->
+    <div v-else-if="error || searchError" class="bg-red-50 border border-red-200 rounded-lg p-6 mb-6">
+      <div class="flex">
+        <Icon name="heroicons:exclamation-triangle" class="h-5 w-5 text-red-400" />
+        <div class="ml-3">
+          <h3 class="text-sm font-medium text-red-800">Erreur de chargement</h3>
+          <div class="mt-2 text-sm text-red-700">
+            <p>{{ error?.message || searchError?.message || 'Une erreur est survenue' }}</p>
+          </div>
+          <div class="mt-4">
+            <button
+              @click="refetch"
+              class="bg-red-100 px-3 py-2 rounded-md text-sm font-medium text-red-800 hover:bg-red-200"
+            >
+              Réessayer
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Data Table -->
     <AdminDataTable
-      :data="filteredProducts"
+      v-else
+      :data="displayedProducts"
       :columns="columns"
-      :is-loading="isLoading"
+      :is-loading="isRefreshing"
+      :has-initial-data="!isLoading && displayedProducts.length > 0"
       :search-key="'name'"
-      :search-value="filters.search"
+      :search-value="searchQuery"
       title="Produits"
       description="Liste de tous les produits disponibles"
       empty-title="Aucun produit trouvé"
@@ -94,128 +134,221 @@
       :get-row-key="(item) => item.id"
     >
       <!-- Custom slot for product image -->
-      <template #cell-image="{ value, item }">
-        <div class="flex items-center">
-          <img
+      <template #cell-image="{ item }">
+        <div class="w-12 h-12 rounded-lg bg-gray-100 overflow-hidden">
+          <AdvancedResponsiveImage
             v-if="item.image_url"
             :src="item.image_url"
             :alt="item.name"
-            class="w-12 h-12 rounded-lg object-cover"
+            :width="48"
+            :height="48"
+            class="w-full h-full object-cover"
+            preset="productCard"
           />
-          <div
-            v-else
-            class="w-12 h-12 rounded-lg bg-gray-200 flex items-center justify-center"
-          >
+          <div v-else class="w-full h-full flex items-center justify-center">
             <Icon name="heroicons:photo" class="w-6 h-6 text-gray-400" />
           </div>
         </div>
       </template>
 
-      <!-- Custom slot for status -->
-      <template #cell-isActive="{ value, item }">
-        <span
-          class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
-          :class="{
-            'bg-green-100 text-green-800': value === true || item.status === 'active',
-            'bg-red-100 text-red-800': value === false || item.status === 'inactive',
-            'bg-yellow-100 text-yellow-800': item.status === 'draft'
-          }"
-        >
-          {{ value === true || item.status === 'active' ? 'Actif' : value === false || item.status === 'inactive' ? 'Inactif' : getStatusText(item.status) }}
-        </span>
+      <!-- Custom slot for product name -->
+      <template #cell-name="{ item }">
+        <div>
+          <div class="font-medium text-gray-900">{{ item.name }}</div>
+          <div v-if="item.reference" class="text-sm text-gray-500">{{ item.reference }}</div>
+        </div>
       </template>
 
       <!-- Custom slot for price -->
-      <template #cell-basePrice="{ value }">
-        <span class="font-medium text-gray-900">
-          {{ formatPrice(value) }}
-        </span>
+      <template #cell-price="{ item }">
+        <div class="text-right">
+          <div class="font-medium text-gray-900">
+            {{ formatPrice(item.price || item.basePrice || 0) }}
+          </div>
+          <div v-if="item.basePrice && item.price !== item.basePrice" class="text-sm text-gray-500 line-through">
+            {{ formatPrice(item.basePrice) }}
+          </div>
+        </div>
       </template>
 
-      <!-- Actions slot -->
-      <template #actions="{ item }">
+      <!-- Custom slot for status -->
+      <template #cell-status="{ item }">
+        <StatusBadge :status="getProductStatus(item)">
+          {{ getProductStatusLabel(item) }}
+        </StatusBadge>
+      </template>
+
+      <!-- Custom slot for actions -->
+      <template #cell-actions="{ item }">
         <div class="flex items-center space-x-2">
           <NuxtLink
             :to="`/admin/products/${item.id}`"
-            class="text-amber-600 hover:text-amber-700 text-sm font-medium"
+            class="text-amber-600 hover:text-amber-900 text-sm font-medium"
           >
             Modifier
           </NuxtLink>
           <button
-            @click="duplicateProduct(item)"
-            class="text-blue-600 hover:text-blue-700 text-sm font-medium"
+            @click="handleDeleteProduct(item)"
+            class="text-red-600 hover:text-red-900 text-sm font-medium"
+            :disabled="deleteProductMutation.isPending.value"
           >
-            Dupliquer
-          </button>
-          <button
-            @click="deleteProduct(item)"
-            class="text-red-600 hover:text-red-700 text-sm font-medium"
-          >
-            Supprimer
+            {{ deleteProductMutation.isPending.value ? 'Suppression...' : 'Supprimer' }}
           </button>
         </div>
       </template>
     </AdminDataTable>
+
+    <!-- Stats Summary -->
+    <div v-if="!isLoading && data" class="mt-6 bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+        <div>
+          <div class="text-2xl font-bold text-gray-900">{{ totalProducts }}</div>
+          <div class="text-sm text-gray-500">Produits total</div>
+        </div>
+        <div>
+          <div class="text-2xl font-bold text-green-600">{{ activeProductsCount }}</div>
+          <div class="text-sm text-gray-500">Produits actifs</div>
+        </div>
+        <div>
+          <div class="text-2xl font-bold text-amber-600">{{ Math.round(averagePrice).toLocaleString() }} XOF</div>
+          <div class="text-sm text-gray-500">Prix moyen</div>
+        </div>
+        <div>
+          <div class="text-2xl font-bold text-blue-600">{{ categories.data?.length || 0 }}</div>
+          <div class="text-sm text-gray-500">Catégories</div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import AdminDataTable from '~/components/admin/AdminDataTable.vue'
-import { globalNotifications } from '~/composables/useNotifications'
+/**
+ * Admin Products List Page - SOLID Architecture
+ * Uses VueQuery + Pinia for optimal state management and caching
+ */
 
-// Layout admin
+import AdminDataTable from '../../../components/admin/AdminDataTable.vue'
+import { StatusBadge } from '@ns2po/ui'
+import AdvancedResponsiveImage from '../../../components/AdvancedResponsiveImage.vue'
+
+// SOLID Architecture imports
+import { useProductsQuery, useProductSearchQuery, useDeleteProductMutation } from '../../../composables/useProductsQuery'
+import { useProductStore } from '../../../stores/useProductStore'
+import { initializeGlobalEventBus, useGlobalEventBus } from '../../../stores/useGlobalEventBus'
+import { refDebounced } from '@vueuse/core'
+import type { Product, ProductFilters, ProductStatus } from '../../../types/domain/Product'
+
+// Layout and metadata
 definePageMeta({
   layout: 'admin',
   middleware: 'admin'
 })
 
-// Head
 useHead({
   title: 'Produits | Admin'
 })
 
-// Global notifications
+// Initialize global event bus for store synchronization
+initializeGlobalEventBus()
+
+// Auto-imported via Nuxt 3: globalNotifications, useLazyAsyncData
 const { crudSuccess, crudError } = globalNotifications
 
-// Types
-interface Product {
-  id: string
-  name: string
-  reference?: string
-  description: string
-  basePrice?: number
-  price?: number
-  category: string
-  category_id?: string
-  category_name?: string
-  status?: 'active' | 'inactive' | 'draft'
-  isActive?: boolean
-  image?: string
-  image_url?: string
-  createdAt?: string
-  updatedAt?: string
-  created_at?: string
-  updated_at?: string
-}
+// ===== REACTIVE STATE =====
+const searchQuery = ref('')
+const selectedCategory = ref('')
+const selectedStatus = ref('')
+const debouncedSearch = refDebounced(searchQuery, 300)
 
-interface Category {
-  id: string
-  name: string
-}
+// ===== COMPUTED FILTERS =====
+const currentFilters = computed((): ProductFilters => {
+  const filters: ProductFilters = {}
 
-// Reactive data
-const isLoading = ref(false)
-const products = ref<Product[]>([])
-const categories = ref<Category[]>([])
+  if (selectedCategory.value) {
+    filters.category = selectedCategory.value
+  }
 
-// Filters
-const filters = reactive({
-  search: '',
-  category: '',
-  status: ''
+  if (selectedStatus.value) {
+    filters.status = selectedStatus.value as ProductStatus
+  }
+
+  return filters
 })
 
-// Table columns configuration
+// ===== VUE QUERY INTEGRATION =====
+// Main products query with intelligent caching
+const {
+  data,
+  error,
+  isLoading,
+  isFetching,
+  refetch
+} = useProductsQuery(currentFilters)
+
+// Search query (separate for performance)
+const {
+  data: searchResults,
+  error: searchError,
+  isLoading: isSearching
+} = useProductSearchQuery(debouncedSearch, currentFilters, {
+  enabled: computed(() => debouncedSearch.value.length >= 2)
+})
+
+// Categories query (could be moved to separate composable)
+const { data: categoriesData } = await useLazyAsyncData(
+  'categories',
+  () => $fetch('/api/categories'),
+  { default: () => ({ data: [] }) }
+)
+
+const categories = computed(() => categoriesData.value || { data: [] })
+
+// Delete mutation with optimistic updates
+const deleteProductMutation = useDeleteProductMutation({
+  onSuccess: (success, productId) => {
+    if (success) {
+      crudSuccess.deleted('Produit', 'product')
+    }
+  },
+  onError: (error) => {
+    crudError.deleted('product', error.message)
+  }
+})
+
+// ===== PINIA STORE INTEGRATION =====
+const productStore = useProductStore()
+
+// ===== COMPUTED PROPERTIES =====
+const displayedProducts = computed(() => {
+  // Use search results if searching, otherwise use main query
+  if (debouncedSearch.value.length >= 2) {
+    return searchResults.value || []
+  }
+  return data.value || []
+})
+
+const isInitialLoading = computed(() =>
+  isLoading.value && !data.value
+)
+
+const isRefreshing = computed(() =>
+  isFetching.value || isSearching.value
+)
+
+const totalProducts = computed(() =>
+  productStore.totalProducts
+)
+
+const activeProductsCount = computed(() =>
+  productStore.activeProductsCount
+)
+
+const averagePrice = computed(() =>
+  productStore.averagePrice
+)
+
+// ===== TABLE CONFIGURATION =====
 const columns = [
   {
     key: 'image',
@@ -229,150 +362,158 @@ const columns = [
     sortable: true
   },
   {
-    key: 'reference',
-    label: 'Référence',
-    sortable: true,
-    class: 'text-gray-500'
-  },
-  {
-    key: 'category',
-    label: 'Catégorie',
-    sortable: true,
-    class: 'text-gray-600'
-  },
-  {
-    key: 'basePrice',
+    key: 'price',
     label: 'Prix',
     sortable: true,
     class: 'text-right'
   },
   {
-    key: 'isActive',
+    key: 'category',
+    label: 'Catégorie',
+    sortable: true
+  },
+  {
+    key: 'status',
     label: 'Statut',
     sortable: true
   },
   {
-    key: 'updatedAt',
-    label: 'Modifié',
-    sortable: true,
-    formatter: (value: string) => value ? new Date(value).toLocaleDateString('fr-FR') : 'N/A'
+    key: 'actions',
+    label: 'Actions',
+    sortable: false,
+    class: 'w-32'
   }
 ]
 
-// Computed
-const filteredProducts = computed(() => {
-  let result = [...products.value]
-
-  // Filter by category
-  if (filters.category) {
-    result = result.filter(product =>
-      product.category === filters.category ||
-      product.category_id === filters.category
-    )
-  }
-
-  // Filter by status
-  if (filters.status) {
-    if (filters.status === 'active') {
-      result = result.filter(product => product.isActive === true || product.status === 'active')
-    } else if (filters.status === 'inactive') {
-      result = result.filter(product => product.isActive === false || product.status === 'inactive')
-    } else {
-      result = result.filter(product => product.status === filters.status)
-    }
-  }
-
-  return result
-})
-
-// Methods
-async function fetchProducts() {
-  isLoading.value = true
-  try {
-    const response = await $fetch('/api/products')
-    products.value = response.data || []
-  } catch (error) {
-    console.error('Error fetching products:', error)
-    // TODO: Show error toast
-  } finally {
-    isLoading.value = false
-  }
+// ===== METHODS =====
+function handleSearchInput() {
+  // Apply filters will be triggered by computed property reactivity
 }
 
-async function fetchCategories() {
-  try {
-    const response = await $fetch('/api/categories')
-    categories.value = response.data || []
-  } catch (error) {
-    console.error('Error fetching categories:', error)
+function applyFilters() {
+  // Filters are applied automatically via computed properties
+  // Force refetch if needed
+  if (!debouncedSearch.value) {
+    refetch()
   }
 }
 
 function resetFilters() {
-  filters.search = ''
-  filters.category = ''
-  filters.status = ''
+  searchQuery.value = ''
+  selectedCategory.value = ''
+  selectedStatus.value = ''
+  refetch()
 }
 
-function exportProducts() {
-  // TODO: Implement export functionality
-  console.log('Export products')
-}
-
-function duplicateProduct(product: Product) {
-  // TODO: Implement duplicate functionality
-  console.log('Duplicate product:', product)
-}
-
-async function deleteProduct(product: Product) {
-  if (!confirm(`Êtes-vous sûr de vouloir supprimer le produit "${product.name}" ?`)) return
-
+async function exportProducts() {
   try {
-    await $fetch(`/api/products/${product.id}`, {
-      method: 'DELETE'
-    })
+    // Use current filtered products for export
+    const productsToExport = displayedProducts.value
 
-    // Remove from local state
-    const index = products.value.findIndex(p => p.id === product.id)
-    if (index > -1) {
-      products.value.splice(index, 1)
+    if (productsToExport.length === 0) {
+      crudError.validation('Aucun produit à exporter')
+      return
     }
 
-    crudSuccess.deleted(`Produit "${product.name}" supprimé avec succès`, 'product')
+    // Create CSV content
+    const headers = ['Nom', 'Référence', 'Prix', 'Catégorie', 'Statut']
+    const csvContent = [
+      headers.join(','),
+      ...productsToExport.map(product => [
+        `"${product.name}"`,
+        `"${product.reference || ''}"`,
+        product.price || product.basePrice || 0,
+        `"${product.category || ''}"`,
+        `"${getProductStatus(product)}"`
+      ].join(','))
+    ].join('\n')
+
+    // Download file
+    const blob = new Blob([csvContent], { type: 'text/csv' })
+    const url = window.URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `produits-${new Date().toISOString().split('T')[0]}.csv`
+    link.click()
+    window.URL.revokeObjectURL(url)
+
+    crudSuccess.created('Export CSV', 'export')
   } catch (error) {
-    console.error('Error deleting product:', error)
-    if (error.statusCode === 409) {
-      crudError.deleted('product', 'Impossible de supprimer ce produit car il est utilisé dans des bundles.')
-    } else {
-      crudError.deleted('product', `Erreur lors de la suppression du produit "${product.name}"`)
+    crudError.created('export', 'Erreur lors de l\'export')
+  }
+}
+
+async function handleDeleteProduct(product: Product) {
+  if (!confirm(`Êtes-vous sûr de vouloir supprimer le produit "${product.name}" ?`)) {
+    return
+  }
+
+  deleteProductMutation.mutate(product.id)
+}
+
+function getProductStatus(product: Product): 'success' | 'warning' | 'error' | 'info' | 'neutral' {
+  // Mapping des statuts produit vers les statuts StatusBadge
+  if (product.status) {
+    switch (product.status) {
+      case 'active': return 'success'
+      case 'inactive': return 'error'
+      case 'draft': return 'warning'
+      default: return 'neutral'
     }
   }
+  if (product.isActive !== undefined) {
+    return product.isActive ? 'success' : 'error'
+  }
+  return 'warning' // draft par défaut
 }
 
-function getStatusText(status: string): string {
-  switch (status) {
-    case 'active': return 'Actif'
-    case 'inactive': return 'Inactif'
-    case 'draft': return 'Brouillon'
-    default: return status
+function getProductStatusLabel(product: Product): string {
+  // Mapping des statuts produit vers les labels affichés
+  if (product.status) {
+    switch (product.status) {
+      case 'active': return 'Actif'
+      case 'inactive': return 'Inactif'
+      case 'draft': return 'Brouillon'
+      default: return 'Inconnu'
+    }
   }
+  if (product.isActive !== undefined) {
+    return product.isActive ? 'Actif' : 'Inactif'
+  }
+  return 'Brouillon'
 }
 
-function formatPrice(price: number | undefined | null): string {
-  if (price === null || price === undefined || isNaN(price)) {
-    return 'N/A'
-  }
+function formatPrice(price: number): string {
   return new Intl.NumberFormat('fr-FR', {
-    style: 'currency',
-    currency: 'XOF'
-  }).format(price)
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0
+  }).format(price) + ' XOF'
 }
 
-// Lifecycle
-onMounted(async () => {
-  await Promise.all([
-    fetchProducts(),
-    fetchCategories()
-  ])
+// ===== LIFECYCLE =====
+// Sync with Pinia store for cross-component state sharing
+watchEffect(() => {
+  if (data.value) {
+    // Update store with fresh data (will trigger global event bus)
+    productStore.products = data.value
+  }
+})
+
+// Handle real-time updates (if SSE is configured)
+onMounted(() => {
+  // Listen for product updates from other interfaces
+  const eventBus = useGlobalEventBus()
+
+  eventBus.on('product.updated', () => {
+    refetch()
+  })
+
+  eventBus.on('product.created', () => {
+    refetch()
+  })
+
+  eventBus.on('product.deleted', () => {
+    refetch()
+  })
 })
 </script>
