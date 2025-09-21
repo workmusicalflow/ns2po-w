@@ -1,22 +1,28 @@
 /**
  * API Route: GET /api/campaign-bundles/[id]
  * Récupère un campaign bundle spécifique par ID avec stratégie Turso-first → Fallback statique
+ * SOLID Architecture - API Layer with Type-safe Bundle Adapter
  */
 
-import { getDatabase } from "~/server/utils/database";
-import type { BundleApiResponse } from "@ns2po/types";
+import { getDatabase } from "../../utils/database";
+import type { BundleApiResponse, CampaignBundle, BundleProduct as ExternalBundleProduct } from "@ns2po/types";
+import {
+  adaptCampaignBundleToBundle,
+  adaptCampaignBundleToAggregate,
+  adaptExternalBundleProduct,
+  safeAdaptCampaignBundle,
+  debugBundleTransformation
+} from "../../../utils/BundleAdapter";
+import type { Bundle, BundleAggregate } from "../../../types/domain/Bundle";
 
-// Fallback statique pour un bundle individuel
-const STATIC_BUNDLE_FALLBACK = {
+// Fallback statique pour un bundle individuel (format CampaignBundle)
+const STATIC_CAMPAIGN_BUNDLE_FALLBACK: CampaignBundle = {
   id: 'pack-starter',
   name: 'Pack Starter Campagne',
   description: 'Pack essentiel pour débuter votre campagne',
   targetAudience: 'local',
   budgetRange: 'starter',
-  products: [
-    { id: 'static-1', name: 'T-Shirt Personnalisé', basePrice: 5000, quantity: 100, subtotal: 500000 },
-    { id: 'static-3', name: 'Stylo Publicitaire', basePrice: 500, quantity: 500, subtotal: 250000 }
-  ],
+  products: [], // Will be populated separately
   estimatedTotal: 750000,
   originalTotal: 900000,
   savings: 150000,
@@ -27,6 +33,23 @@ const STATIC_BUNDLE_FALLBACK = {
   createdAt: new Date().toISOString(),
   updatedAt: new Date().toISOString()
 }
+
+const STATIC_BUNDLE_PRODUCTS: ExternalBundleProduct[] = [
+  {
+    id: 'prod-tshirt-001',
+    name: 'T-Shirt Personnalisé',
+    basePrice: 5000,
+    quantity: 100,
+    subtotal: 500000
+  },
+  {
+    id: 'prod-stylo-001',
+    name: 'Stylo Publicitaire',
+    basePrice: 500,
+    quantity: 500,
+    subtotal: 250000
+  }
+]
 
 export default defineEventHandler(async (event): Promise<BundleApiResponse> => {
   const startTime = Date.now()
@@ -42,7 +65,7 @@ export default defineEventHandler(async (event): Promise<BundleApiResponse> => {
   console.log(`📦 GET /api/campaign-bundles/${id} - Début récupération`)
 
   try {
-    let bundle;
+    let bundleAggregate: BundleAggregate | null = null;
     let source = 'unknown';
 
     // 1. Priorité : Turso Database
@@ -55,11 +78,11 @@ export default defineEventHandler(async (event): Promise<BundleApiResponse> => {
         const bundleResult = await tursoClient.execute({
           sql: `
             SELECT
-              cb.id, cb.name, cb.description, cb.target_audience as targetAudience,
-              cb.base_price as basePrice, cb.discount_percentage as discountPercentage,
-              cb.final_price as finalPrice, cb.is_active as isActive,
-              cb.display_order as displayOrder, cb.icon, cb.color, cb.features,
-              cb.created_at as createdAt, cb.updated_at as updatedAt
+              cb.id, cb.name, cb.description, cb.target_audience,
+              cb.base_price, cb.discount_percentage,
+              cb.final_price as estimated_total, cb.is_active,
+              cb.display_order, cb.icon, cb.color, cb.features,
+              cb.created_at, cb.updated_at
             FROM campaign_bundles cb
             WHERE cb.is_active = 1 AND (cb.id = ? OR cb.name LIKE ?)
             LIMIT 1
@@ -80,11 +103,15 @@ export default defineEventHandler(async (event): Promise<BundleApiResponse> => {
         const productsResult = await tursoClient.execute({
           sql: `
             SELECT
-              bp.product_id, p.name as product_name,
-              COALESCE(bp.custom_price, p.base_price) as basePrice,
+              bp.product_id, p.name as product_name, p.description as product_description,
+              p.reference as product_reference,
+              COALESCE(bp.custom_price, p.base_price) as base_price,
+              COALESCE(bp.custom_price, p.base_price) as unit_price,
+              COALESCE(bp.custom_price, p.base_price) as price,
               bp.quantity,
               (COALESCE(bp.custom_price, p.base_price) * bp.quantity) as subtotal,
-              bp.is_required
+              bp.is_required, p.image_url, p.category,
+              bp.created_at as bp_created_at, bp.updated_at as bp_updated_at
             FROM bundle_products bp
             LEFT JOIN products p ON bp.product_id = p.id
             WHERE bp.bundle_id = ?
@@ -93,58 +120,66 @@ export default defineEventHandler(async (event): Promise<BundleApiResponse> => {
           args: [row.id]
         })
 
-        const products = productsResult.rows.map((productRow: any) => ({
-          id: productRow.product_id,
-          name: productRow.product_name,
-          basePrice: Number(productRow.basePrice) || 0,
-          quantity: Number(productRow.quantity) || 1,
-          subtotal: Number(productRow.subtotal) || 0,
-          isRequired: Boolean(productRow.is_required)
-        }))
-
-        // Calculer les totaux
-        const estimatedTotal = Number(row.finalPrice) || 0
-        const originalTotal = products.reduce((sum, p) => sum + p.subtotal, 0)
-        const savings = originalTotal - estimatedTotal
-
-        bundle = {
+        // Transform raw data to CampaignBundle format
+        const campaignBundle: CampaignBundle = {
           id: String(row.id),
           name: row.name,
           description: row.description || '',
-          targetAudience: row.targetAudience,
-          budgetRange: estimatedTotal < 20000 ? 'starter' : estimatedTotal < 50000 ? 'standard' : 'premium',
-          products,
-          estimatedTotal,
-          originalTotal,
-          savings: Math.max(0, savings),
+          targetAudience: row.target_audience || 'general',
+          budgetRange: row.estimated_total < 20000 ? 'starter' : row.estimated_total < 50000 ? 'standard' : 'premium',
+          products: [], // Will be set after transformation
+          estimatedTotal: Number(row.estimated_total) || 0,
+          originalTotal: 0, // Will be calculated from products
+          savings: 0, // Will be calculated
           popularity: 90,
-          isActive: Boolean(row.isActive),
-          isFeatured: row.displayOrder <= 3,
+          isActive: Boolean(row.is_active),
+          isFeatured: Number(row.display_order) <= 3,
           tags: row.features ? JSON.parse(row.features) : [],
-          createdAt: row.createdAt,
-          updatedAt: row.updatedAt,
-          icon: row.icon,
-          color: row.color
+          createdAt: row.created_at,
+          updatedAt: row.updated_at
         }
+
+        // Transform products to external format (matching @ns2po/types BundleProduct)
+        const externalProducts: ExternalBundleProduct[] = productsResult.rows.map((productRow: any) => ({
+          id: productRow.product_id,
+          name: productRow.product_name || 'Produit sans nom',
+          basePrice: Number(productRow.base_price) || 0,
+          quantity: Number(productRow.quantity) || 1,
+          subtotal: Number(productRow.subtotal) || 0
+        }))
+
+        // Calculate totals
+        const originalTotal = externalProducts.reduce((sum, p) => sum + (p.basePrice * p.quantity), 0)
+        campaignBundle.originalTotal = originalTotal
+        campaignBundle.savings = Math.max(0, originalTotal - campaignBundle.estimatedTotal)
+
+        // Use BundleAdapter to create type-safe aggregate
+        bundleAggregate = adaptCampaignBundleToAggregate(campaignBundle, externalProducts)
 
         source = 'turso'
         const duration = Date.now() - startTime
         console.log(`✅ Turso OK: Bundle ${id} trouvé en ${duration}ms`)
+
+        // Debug transformation in development
+        if (process.env.NODE_ENV === 'development') {
+          const debug = debugBundleTransformation(campaignBundle)
+          console.log(`🔍 Bundle transformation debug:`, debug.mapping)
+        }
 
       } catch (tursoError) {
         console.warn(`⚠️ Turso failed pour bundle ${id}, using static fallback...`, tursoError)
       }
     }
 
-    // 2. Fallback final : Données statiques
-    if (!bundle) {
-      bundle = { ...STATIC_BUNDLE_FALLBACK }
+    // 2. Fallback final : Données statiques avec BundleAdapter
+    if (!bundleAggregate) {
+      bundleAggregate = adaptCampaignBundleToAggregate(STATIC_CAMPAIGN_BUNDLE_FALLBACK, STATIC_BUNDLE_PRODUCTS)
       source = 'static'
       const duration = Date.now() - startTime
       console.log(`🛡️ Fallback statique: Bundle ${id} en ${duration}ms`)
     }
 
-    console.log(`✅ Bundle récupéré: ${bundle.name} (${bundle.products.length} produits)`)
+    console.log(`✅ Bundle récupéré: ${bundleAggregate.name} (${bundleAggregate.products.length} produits)`)
 
     // Cache headers optimisés selon la source
     if (source === 'turso') {
@@ -153,24 +188,28 @@ export default defineEventHandler(async (event): Promise<BundleApiResponse> => {
       setHeader(event, "Cache-Control", "public, max-age=60") // 1 minute pour fallback
     }
     setHeader(event, "CDN-Cache-Control", "public, max-age=3600") // 1 heure sur CDN
-    setHeader(event, "ETag", `"bundle-${bundle.id}-${bundle.updatedAt}"`)
+    setHeader(event, "ETag", `"bundle-${bundleAggregate.id}-${bundleAggregate.updatedAt}"`)
 
-    const response: BundleApiResponse = {
+    const response = {
       success: true,
-      data: [bundle], // Retourner un array pour cohérence avec l'interface BundleApiResponse
+      data: bundleAggregate, // Retourner le BundleAggregate type-safe adapté
       source,
       duration: Date.now() - startTime,
-      pagination: {
-        page: 1,
-        limit: 1,
-        total: 1,
-        hasMore: false,
-      },
+      // Meta information for debugging and monitoring
+      meta: {
+        adapter_version: '1.0.0',
+        total_products: bundleAggregate.totalProducts,
+        total_quantity: bundleAggregate.totalQuantity,
+        data_flow: `Database → CampaignBundle → BundleAdapter → BundleAggregate`
+      }
     }
 
     if (source === 'static') {
       response.warning = 'Service dégradé - données limitées'
     }
+
+    // Performance metrics
+    console.log(`⚡ Bundle API Performance: ${response.duration}ms (${source})`)
 
     return response
 

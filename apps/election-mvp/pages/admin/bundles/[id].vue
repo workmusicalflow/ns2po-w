@@ -187,7 +187,9 @@
               </div>
               <div>
                 <h3 class="text-sm font-medium text-gray-900">{{ product.name }}</h3>
-                <p class="text-sm text-gray-500">{{ formatPrice(product.price) }}</p>
+                <p class="text-sm" :class="product.price && product.price > 0 ? 'text-gray-500' : 'text-red-500'">
+                  {{ product.price && product.price > 0 ? formatPrice(product.price) : 'Prix non défini' }}
+                </p>
               </div>
             </div>
             <div class="flex items-center space-x-4">
@@ -300,8 +302,13 @@
           <div
             v-for="product in filteredAvailableProducts"
             :key="product.id"
-            class="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 cursor-pointer"
-            @click="addProduct(product)"
+            :class="[
+              'border border-gray-200 rounded-lg p-4',
+              product.price && product.price > 0
+                ? 'hover:bg-gray-50 cursor-pointer'
+                : 'bg-gray-50 cursor-not-allowed opacity-60'
+            ]"
+            @click="product.price && product.price > 0 ? addProduct(product) : null"
           >
             <div class="flex items-center space-x-3">
               <img
@@ -318,7 +325,9 @@
               </div>
               <div class="flex-1">
                 <h3 class="text-sm font-medium text-gray-900">{{ product.name }}</h3>
-                <p class="text-sm text-gray-500">{{ formatPrice(product.price) }}</p>
+                <p class="text-sm" :class="product.price && product.price > 0 ? 'text-gray-500' : 'text-red-500'">
+                  {{ product.price && product.price > 0 ? formatPrice(product.price) : 'Prix non défini' }}
+                </p>
               </div>
               <button
                 class="text-amber-600 hover:text-amber-700"
@@ -339,8 +348,22 @@
 </template>
 
 <script setup lang="ts">
-import type { BundleApiResponse, ApiResponse, Product, BundleProduct } from "@ns2po/types"
-// Auto-imported via Nuxt 3: globalNotifications
+/**
+ * Admin Bundle Edit/Create Page - SOLID Architecture
+ * Uses VueQuery + Pinia for optimal state management and caching
+ * Synchronized with Product store for cross-interface consistency
+ */
+
+// SOLID Architecture imports
+import { useBundleQuery, useCreateBundleMutation, useUpdateBundleMutation, useDeleteBundleMutation } from '../../../composables/useBundlesQuery'
+import { useProductsQuery } from '../../../composables/useProductsQuery'
+import { useBundleCalculations } from '../../../composables/useBundleCalculations'
+import { globalNotifications } from '../../../composables/useNotifications'
+import { useBundleStore } from '../../../stores/useBundleStore'
+import { initializeGlobalEventBus, useGlobalEventBus } from '../../../stores/useGlobalEventBus'
+import { refDebounced } from '@vueuse/core'
+import type { Bundle, BundleProduct, BundleAggregate } from '../../../types/domain/Bundle'
+import type { Product } from '../../../types/domain/Product'
 
 // Layout admin
 definePageMeta({
@@ -359,14 +382,17 @@ useHead({
   title: computed(() => isNew.value ? 'Nouveau Bundle | Admin' : 'Modifier Bundle | Admin')
 })
 
-// Global notifications
+// Initialize global event bus for store synchronization
+initializeGlobalEventBus()
+
+// Global notifications (auto-imported via Nuxt 3)
 const { crudSuccess, crudError } = globalNotifications
 
-// Reactive data
-const isSubmitting = ref(false)
+// ===== REACTIVE STATE =====
 const showProductSelector = ref(false)
 const productSearch = ref('')
 const tagsInput = ref('')
+const debouncedProductSearch = refDebounced(productSearch, 300)
 
 // Form data
 const form = reactive({
@@ -392,9 +418,9 @@ const errors = reactive<Record<string, string>>({
   popularity: ''
 })
 
-// Products
-const availableProducts = ref<Product[]>([])
+// Bundle calculations composable - centralized logic
 const selectedProducts = ref<BundleProduct[]>([])
+const bundleCalculations = useBundleCalculations(selectedProducts)
 
 // Options
 const audienceOptions = [
@@ -411,18 +437,69 @@ const budgetOptions = [
   { value: 'enterprise', label: 'Enterprise (200k+ XOF)' }
 ]
 
-// Computed
-const calculatedTotal = computed(() => {
-  return selectedProducts.value.reduce((total, product) => total + product.subtotal, 0)
+// ===== VUE QUERY INTEGRATION =====
+// Bundle query (for editing existing bundles)
+const {
+  data: bundleData,
+  isLoading: bundleLoading,
+  refetch: refetchBundle
+} = useBundleQuery(bundleId, false, {
+  enabled: computed(() => !isNew.value && !!bundleId.value)
 })
 
+// Products query for selection
+const {
+  data: availableProducts,
+  isLoading: productsLoading
+} = useProductsQuery()
+
+// Bundle mutations
+const createBundleMutation = useCreateBundleMutation({
+  onSuccess: (bundle) => {
+    crudSuccess.created(bundle.name, 'bundle')
+    router.push('/admin/bundles')
+  },
+  onError: (error) => {
+    crudError.created('bundle', error.message)
+  }
+})
+
+const updateBundleMutation = useUpdateBundleMutation({
+  onSuccess: (bundle) => {
+    crudSuccess.updated(bundle.name, 'bundle')
+    router.push('/admin/bundles')
+  },
+  onError: (error) => {
+    crudError.updated('bundle', error.message)
+  }
+})
+
+const deleteBundleMutation = useDeleteBundleMutation({
+  onSuccess: () => {
+    crudSuccess.deleted('Bundle', 'bundle')
+    router.push('/admin/bundles')
+  },
+  onError: (error) => {
+    crudError.deleted('bundle', error.message)
+  }
+})
+
+// ===== PINIA STORE INTEGRATION =====
+const bundleStore = useBundleStore()
+
+// ===== COMPUTED PROPERTIES =====
+// Use centralized calculations from composable
+const calculatedTotal = bundleCalculations.estimatedTotal
+
 const filteredAvailableProducts = computed(() => {
+  if (!availableProducts.value) return []
+
   let products = availableProducts.value.filter(product =>
     !selectedProducts.value.find(selected => selected.id === product.id)
   )
 
-  if (productSearch.value) {
-    const search = productSearch.value.toLowerCase()
+  if (debouncedProductSearch.value) {
+    const search = debouncedProductSearch.value.toLowerCase()
     products = products.filter(product =>
       product.name.toLowerCase().includes(search) ||
       product.reference?.toLowerCase().includes(search)
@@ -432,77 +509,74 @@ const filteredAvailableProducts = computed(() => {
   return products
 })
 
-// Methods
-async function fetchBundle() {
-  if (isNew.value) return
+const isSubmitting = computed(() =>
+  createBundleMutation.isPending.value || updateBundleMutation.isPending.value
+)
 
-  try {
-    const response = await $fetch<BundleApiResponse>(`/api/campaign-bundles/${bundleId.value}`)
-    if (response.success && response.data) {
-      Object.assign(form, response.data)
+// Removed unused computed properties for cleaner code
 
-      // Set selected products
-      selectedProducts.value = response.data.products?.map((p: BundleProduct) => ({
-        ...p,
-        subtotal: p.quantity * p.basePrice
-      })) || []
+// ===== METHODS =====
+function initializeFormFromBundle(bundle: Bundle | BundleAggregate) {
+  // Copy form fields directly
+  Object.assign(form, {
+    name: bundle.name,
+    description: bundle.description,
+    targetAudience: bundle.targetAudience,
+    budgetRange: bundle.budgetRange,
+    estimatedTotal: bundle.estimatedTotal,
+    originalTotal: bundle.originalTotal,
+    popularity: bundle.popularity,
+    isActive: bundle.isActive,
+    isFeatured: bundle.isFeatured
+  })
 
-      // Set tags
-      tagsInput.value = response.data.tags?.join(', ') || ''
-    } else {
-      throw new Error(response.message || 'Bundle non trouvé')
-    }
-  } catch (error: any) {
-    console.error('Error fetching bundle:', error)
-    crudError.loaded('bundle', error.message || 'Impossible de charger le bundle.')
-    await router.push('/admin/bundles')
+  // Use centralized bundle calculations for products (only if BundleAggregate)
+  if ('products' in bundle && bundle.products && bundle.products.length > 0) {
+    bundleCalculations.updateProducts(bundle.products)
   }
-}
 
-async function fetchProducts() {
-  try {
-    const response = await $fetch<ApiResponse<Product[]>>('/api/products')
-    if (response.success) {
-      availableProducts.value = response.data || []
-    } else {
-      throw new Error(response.message || 'Erreur lors du chargement des produits')
-    }
-  } catch (error: any) {
-    console.error('Error fetching products:', error)
-    crudError.loaded('produits', error.message || 'Impossible de charger les produits disponibles.')
-    availableProducts.value = []
-  }
+  // Set tags
+  tagsInput.value = bundle.tags?.join(', ') || ''
 }
 
 function addProduct(product: Product) {
-  const bundleProduct = {
-    id: product.id,
+  // Use centralized bundle calculations
+  bundleCalculations.addProduct({
+    productId: product.id,
     name: product.name,
-    basePrice: product.price,
-    price: product.price,
-    image_url: product.image_url,
+    basePrice: product.price || 0,
     quantity: 1,
-    subtotal: product.price
-  }
+    subtotal: (product.price || 0) * 1
+  })
 
-  selectedProducts.value.push(bundleProduct)
-  updateCalculatedTotal()
+  // Show success notification
+  crudSuccess.created(product.name, 'produit ajouté au bundle')
 }
 
 function removeProduct(index: number) {
-  selectedProducts.value.splice(index, 1)
-  updateCalculatedTotal()
+  const product = selectedProducts.value[index]
+  const productName = product.name
+
+  // Use centralized bundle calculations
+  bundleCalculations.removeProduct(product.id)
+
+  // Show success notification
+  crudSuccess.deleted(productName, 'produit retiré du bundle')
 }
 
 function updateProductTotal(index: number) {
   const product = selectedProducts.value[index]
-  product.subtotal = product.quantity * product.basePrice
-  updateCalculatedTotal()
+  const validQuantity = product.quantity && !isNaN(product.quantity) ? product.quantity : 1
+
+  // Use centralized bundle calculations
+  bundleCalculations.updateProductQuantity(product.id, validQuantity)
+
+  // Show info notification for quantity/price updates
+  const { info } = globalNotifications
+  info('Produit mis à jour', `${product.name} - Quantité: ${validQuantity}`)
 }
 
-function updateCalculatedTotal() {
-  form.estimatedTotal = calculatedTotal.value
-}
+// Removed: updateCalculatedTotal() - now handled reactively by bundleCalculations composable
 
 function clearErrors() {
   Object.keys(errors).forEach(key => {
@@ -550,46 +624,29 @@ function validateForm(): boolean {
 async function handleSubmit() {
   if (!validateForm()) return
 
-  isSubmitting.value = true
-  try {
-    const url = isNew.value ? '/api/campaign-bundles' : `/api/campaign-bundles/${bundleId.value}`
-    const method = isNew.value ? 'POST' : 'PUT'
+  // Prepare bundle data
+  const bundleData = {
+    ...form,
+    products: selectedProducts.value.map(p => ({
+      id: p.id,
+      name: p.name,
+      basePrice: p.basePrice,
+      quantity: p.quantity,
+      subtotal: p.subtotal
+    })),
+    tags: tagsInput.value.split(',').map(tag => tag.trim()).filter(Boolean),
+    savings: form.originalTotal && form.originalTotal > form.estimatedTotal
+      ? form.originalTotal - form.estimatedTotal
+      : 0
+  }
 
-    // Prepare bundle data
-    const bundleData = {
-      ...form,
-      products: selectedProducts.value.map(p => ({
-        id: p.id,
-        name: p.name,
-        basePrice: p.basePrice,
-        quantity: p.quantity,
-        subtotal: p.subtotal
-      })),
-      tags: tagsInput.value.split(',').map(tag => tag.trim()).filter(Boolean),
-      savings: form.originalTotal && form.originalTotal > form.estimatedTotal
-        ? form.originalTotal - form.estimatedTotal
-        : 0
-    }
-
-    const response = await $fetch<ApiResponse<unknown>>(url, {
-      method,
-      body: bundleData
+  if (isNew.value) {
+    createBundleMutation.mutate(bundleData)
+  } else {
+    updateBundleMutation.mutate({
+      id: bundleId.value,
+      updates: bundleData
     })
-
-    if (response.success) {
-      const action = isNew.value ? 'créé' : 'modifié'
-      crudSuccess[isNew.value ? 'created' : 'updated'](bundleData.name, 'bundle')
-      await router.push('/admin/bundles')
-    } else {
-      throw new Error(response.message || 'Erreur lors de la sauvegarde')
-    }
-  } catch (error: any) {
-    console.error('Error saving bundle:', error)
-    const action = isNew.value ? 'création' : 'modification'
-    crudError[isNew.value ? 'created' : 'updated']('bundle',
-      error.message || `Une erreur est survenue lors de la ${action} du bundle.`)
-  } finally {
-    isSubmitting.value = false
   }
 }
 
@@ -603,21 +660,7 @@ function duplicateBundle() {
 async function deleteBundle() {
   if (!confirm(`Êtes-vous sûr de vouloir supprimer le bundle "${form.name}" ?`)) return
 
-  try {
-    const response = await $fetch<ApiResponse<unknown>>(`/api/campaign-bundles/${bundleId.value}`, {
-      method: 'DELETE'
-    })
-
-    if (response.success) {
-      crudSuccess.deleted(form.name, 'bundle')
-      await router.push('/admin/bundles')
-    } else {
-      throw new Error(response.message || 'Erreur lors de la suppression')
-    }
-  } catch (error: any) {
-    console.error('Error deleting bundle:', error)
-    crudError.deleted('bundle', error.message || 'Une erreur est survenue lors de la suppression du bundle.')
-  }
+  deleteBundleMutation.mutate(bundleId.value)
 }
 
 function formatPrice(price: number | undefined | null): string {
@@ -630,18 +673,55 @@ function formatPrice(price: number | undefined | null): string {
   }).format(price)
 }
 
-// Lifecycle
-onMounted(async () => {
-  await Promise.all([
-    fetchProducts(),
-    fetchBundle()
-  ])
+// ===== LIFECYCLE & WATCHERS =====
+// Initialize form when bundle data is loaded
+watchEffect(() => {
+  if (bundleData.value && !isNew.value) {
+    initializeFormFromBundle(bundleData.value)
+  }
 })
 
-// Watch calculated total to update form
-watch(calculatedTotal, (newTotal) => {
+// Watch calculated total to update form - using centralized calculations
+watch(() => bundleCalculations.estimatedTotal.value, (newTotal) => {
   if (selectedProducts.value.length > 0) {
     form.estimatedTotal = newTotal
   }
+})
+
+// Sync with Pinia stores for cross-component state sharing
+watchEffect(() => {
+  if (bundleData.value) {
+    bundleStore.setSelectedBundle(bundleData.value)
+  }
+})
+
+// Handle real-time updates from other interfaces
+onMounted(() => {
+  const eventBus = useGlobalEventBus()
+
+  eventBus.on('product.updated', (productId: string, updatedProduct: any) => {
+    // Update selected products if they reference the updated product
+    selectedProducts.value.forEach(bundleProduct => {
+      if (bundleProduct.id === productId) {
+        bundleProduct.name = updatedProduct.name
+        bundleProduct.basePrice = updatedProduct.basePrice || updatedProduct.price
+        bundleProduct.subtotal = bundleProduct.quantity * bundleProduct.basePrice
+      }
+    })
+  })
+
+  eventBus.on('product.deleted', (productId: string) => {
+    // Remove deleted product from selected products
+    const index = selectedProducts.value.findIndex(p => p.id === productId)
+    if (index !== -1) {
+      selectedProducts.value.splice(index, 1)
+    }
+  })
+
+  eventBus.on('bundle.updated', () => {
+    if (!isNew.value) {
+      refetchBundle()
+    }
+  })
 })
 </script>
