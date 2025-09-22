@@ -3,6 +3,8 @@
  * Provides centralized toast notifications for all admin operations
  */
 
+import { ref, readonly } from 'vue'
+
 export interface Notification {
   id: string
   type: 'success' | 'error' | 'warning' | 'info'
@@ -53,7 +55,7 @@ export const useNotifications = () => {
     notifications.value.push(notification)
 
     // Auto-remove after duration (unless persistent)
-    if (!notification.persistent && notification.duration > 0) {
+    if (!notification.persistent && notification.duration && notification.duration > 0) {
       setTimeout(() => {
         removeNotification(id)
       }, notification.duration)
@@ -180,5 +182,36 @@ export const useNotifications = () => {
   }
 }
 
-// Provide a singleton instance for global access
-export const globalNotifications = useNotifications()
+// Global instance factory (lazy initialization to avoid Pinia SSR issues)
+let _globalNotifications: ReturnType<typeof useNotifications> | null = null
+
+export const globalNotifications = {
+  get crudError() {
+    if (!_globalNotifications) _globalNotifications = useNotifications()
+    return _globalNotifications.crudError
+  },
+  get crudSuccess() {
+    if (!_globalNotifications) _globalNotifications = useNotifications()
+    return _globalNotifications.crudSuccess
+  },
+  get crudWarning() {
+    if (!_globalNotifications) _globalNotifications = useNotifications()
+    return _globalNotifications.crudWarning
+  },
+  get info() {
+    if (!_globalNotifications) _globalNotifications = useNotifications()
+    return _globalNotifications.info
+  },
+  get warning() {
+    if (!_globalNotifications) _globalNotifications = useNotifications()
+    return _globalNotifications.warning
+  },
+  get notifications() {
+    if (!_globalNotifications) _globalNotifications = useNotifications()
+    return _globalNotifications.notifications
+  },
+  get removeNotification() {
+    if (!_globalNotifications) _globalNotifications = useNotifications()
+    return _globalNotifications.removeNotification
+  }
+}

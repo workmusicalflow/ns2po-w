@@ -13,6 +13,7 @@ export type GlobalEvent =
   | { type: 'product.created'; payload: { product: any } }
   | { type: 'product.updated'; payload: { productId: string; product: any; changes: any } }
   | { type: 'product.deleted'; payload: { productId: string } }
+  | { type: 'product.deactivated'; payload: { productId: string; productName: string } }
   | { type: 'product.price_changed'; payload: { productId: string; oldPrice: number; newPrice: number } }
   | { type: 'bundle.created'; payload: { bundle: any } }
   | { type: 'bundle.updated'; payload: { bundleId: string; bundle: any } }
@@ -20,6 +21,10 @@ export type GlobalEvent =
   | { type: 'bundle.product_added'; payload: { bundleId: string; productId: string; quantity: number } }
   | { type: 'bundle.product_removed'; payload: { bundleId: string; productId: string } }
   | { type: 'bundle.recalculated'; payload: { bundleId: string; newTotal: number } }
+  | { type: 'bundle.integrity.issues_found'; payload: { bundleId: string; issues: string[]; orphanedProducts: string[] } }
+  | { type: 'bundle.integrity.cleanup_completed'; payload: { bundleId: string; removedProducts: string[]; cleanupCount: number } }
+  | { type: 'product.reference.validated'; payload: { productId: string; isValid: boolean; issues: any[] } }
+  | { type: 'product.reference.orphaned'; payload: { productId: string; bundleIds: string[]; reason: string } }
 
 // Event Listener Type
 export type EventListener<T = any> = (event: GlobalEvent & { type: T }) => void | Promise<void>
@@ -123,6 +128,14 @@ export const useGlobalEventBus = defineStore('globalEventBus', {
 
     // Store Synchronization Setup
     initializeStoreSynchronization(): void {
+      // Only initialize on client side to avoid Pinia SSR issues
+      if (typeof window === 'undefined') {
+        if (this.isDebugMode) {
+          console.log('[EventBus] Skipping store synchronization on server side')
+        }
+        return
+      }
+
       const productStore = useProductStore()
       const bundleStore = useBundleStore()
 
@@ -264,6 +277,12 @@ let isInitialized = false
 export function initializeGlobalEventBus() {
   if (isInitialized) return
 
+  // Only initialize on client side to avoid Pinia SSR issues
+  if (typeof window === 'undefined') {
+    console.log('[EventBus] Skipping initialization on server side')
+    return
+  }
+
   const eventBus = useGlobalEventBus()
   eventBus.initializeStoreSynchronization()
   isInitialized = true
@@ -271,6 +290,26 @@ export function initializeGlobalEventBus() {
 
 // Export helper function for easier event emission
 export function useEventEmitter() {
+  // Only on client side to avoid Pinia SSR issues
+  if (typeof window === 'undefined') {
+    // Return a no-op implementation for SSR
+    return {
+      product: {
+        created: () => {},
+        updated: () => {},
+        deleted: () => {}
+      },
+      bundle: {
+        created: () => {},
+        updated: () => {},
+        deleted: () => {},
+        productAdded: () => {},
+        productRemoved: () => {},
+        recalculated: () => {}
+      }
+    }
+  }
+
   const eventBus = useGlobalEventBus()
 
   return {
