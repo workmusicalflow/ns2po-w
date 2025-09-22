@@ -68,6 +68,7 @@ export default defineNuxtConfig({
   modules: [
     "@nuxtjs/tailwindcss",
     "@nuxtjs/cloudinary",
+    "@nuxt/image",
     "@nuxt/icon",
     "@pinia/nuxt",
     "@nuxt/devtools",
@@ -185,9 +186,8 @@ export default defineNuxtConfig({
     cloudName: process.env.CLOUDINARY_CLOUD_NAME,
   },
 
-  // Configuration Cloudinary via @nuxtjs/cloudinary
-  // Note: @nuxt/image retiré temporairement pour éviter les erreurs TypeScript
-  // image: {
+  // Configuration Cloudinary via @nuxtjs/cloudinary et @nuxt/image
+  image: {
     cloudinary: {
       baseURL: `https://res.cloudinary.com/${process.env.CLOUDINARY_CLOUD_NAME}/image/upload/`,
     },
@@ -229,7 +229,7 @@ export default defineNuxtConfig({
         },
       },
     },
-  // },
+  },
 
   // App configuration
   app: {

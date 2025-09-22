@@ -427,5 +427,19 @@ export class ProductService {
   }
 }
 
-// Export singleton instance
-export const productService = new ProductService()
+// Export singleton instance with lazy initialization
+let _productService: ProductService | null = null
+
+export const getProductService = (): ProductService => {
+  if (!_productService) {
+    _productService = new ProductService()
+  }
+  return _productService
+}
+
+// Keep backward compatibility with proxy for lazy initialization
+export const productService = new Proxy({} as ProductService, {
+  get(target, prop) {
+    return getProductService()[prop as keyof ProductService]
+  }
+})
