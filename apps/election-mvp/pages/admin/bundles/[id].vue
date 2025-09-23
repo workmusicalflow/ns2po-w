@@ -22,19 +22,21 @@
     </div>
 
     <!-- Form -->
-    <form @submit.prevent="handleSubmit" class="space-y-8">
+    <form class="space-y-8" @submit.prevent="handleSubmit">
       <!-- Basic Information -->
       <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <h2 class="text-lg font-medium text-gray-900 mb-6">Informations générales</h2>
+        <h2 class="text-lg font-medium text-gray-900 mb-6">
+          Informations générales
+        </h2>
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <!-- Bundle Name -->
           <AdminFormField
             id="name"
+            v-model="form.name"
             type="text"
             label="Nom du bundle"
             placeholder="Ex: Pack Campagne Municipale"
-            v-model="form.name"
             :error="errors.name"
             required
           />
@@ -42,9 +44,9 @@
           <!-- Target Audience -->
           <AdminFormField
             id="targetAudience"
+            v-model="form.targetAudience"
             type="select"
             label="Audience Cible"
-            v-model="form.targetAudience"
             :options="audienceOptions"
             :error="errors.targetAudience"
             required
@@ -53,9 +55,9 @@
           <!-- Budget Range -->
           <AdminFormField
             id="budgetRange"
+            v-model="form.budgetRange"
             type="select"
             label="Gamme de Budget"
-            v-model="form.budgetRange"
             :options="budgetOptions"
             :error="errors.budgetRange"
             required
@@ -64,10 +66,10 @@
           <!-- Popularity Score -->
           <AdminFormField
             id="popularity"
+            v-model="form.popularity"
             type="number"
             label="Score de Popularité"
             placeholder="0-10"
-            v-model="form.popularity"
             :error="errors.popularity"
             help-text="Score de 0 à 10 pour le classement"
           />
@@ -75,10 +77,10 @@
           <!-- Estimated Total -->
           <AdminFormField
             id="estimatedTotal"
+            v-model="form.estimatedTotal"
             type="number"
             label="Prix Total Estimé (XOF)"
             placeholder="0"
-            v-model="form.estimatedTotal"
             :error="errors.estimatedTotal"
             help-text="Prix total du bundle"
             required
@@ -87,10 +89,10 @@
           <!-- Original Total -->
           <AdminFormField
             id="originalTotal"
+            v-model="form.originalTotal"
             type="number"
             label="Prix Original (XOF)"
             placeholder="0"
-            v-model="form.originalTotal"
             :error="errors.originalTotal"
             help-text="Prix avant remise (optionnel)"
           />
@@ -100,10 +102,10 @@
         <div class="mt-6">
           <AdminFormField
             id="description"
+            v-model="form.description"
             type="textarea"
             label="Description"
             placeholder="Décrivez ce pack de campagne..."
-            v-model="form.description"
             :rows="4"
             :error="errors.description"
             required
@@ -118,7 +120,7 @@
                 v-model="form.isActive"
                 type="checkbox"
                 class="rounded border-gray-300 text-amber-600 shadow-sm focus:border-amber-300 focus:ring focus:ring-amber-200 focus:ring-opacity-50"
-              />
+              >
               <span class="ml-2 text-sm text-gray-700">Bundle actif</span>
             </label>
           </div>
@@ -128,7 +130,7 @@
                 v-model="form.isFeatured"
                 type="checkbox"
                 class="rounded border-gray-300 text-amber-600 shadow-sm focus:border-amber-300 focus:ring focus:ring-amber-200 focus:ring-opacity-50"
-              />
+              >
               <span class="ml-2 text-sm text-gray-700">Bundle vedette</span>
             </label>
           </div>
@@ -144,7 +146,7 @@
             type="text"
             placeholder="municipale, affichage, flyers"
             class="block w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
-          />
+          >
           <p class="mt-1 text-xs text-gray-500">
             Utilisez des virgules pour séparer les tags
           </p>
@@ -154,11 +156,13 @@
       <!-- Product Selection -->
       <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
         <div class="flex items-center justify-between mb-6">
-          <h2 class="text-lg font-medium text-gray-900">Produits du Bundle</h2>
+          <h2 class="text-lg font-medium text-gray-900">
+            Produits du Bundle
+          </h2>
           <button
             type="button"
-            @click="showProductSelector = true"
             class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500"
+            @click="showProductSelector = true"
           >
             <Icon name="heroicons:plus" class="w-4 h-4 mr-1" />
             Ajouter Produit
@@ -178,7 +182,7 @@
                 :src="product.image_url"
                 :alt="product.name"
                 class="w-12 h-12 rounded-lg object-cover"
-              />
+              >
               <div
                 v-else
                 class="w-12 h-12 rounded-lg bg-gray-200 flex items-center justify-center"
@@ -186,9 +190,11 @@
                 <Icon name="heroicons:cube" class="w-6 h-6 text-gray-400" />
               </div>
               <div>
-                <h3 class="text-sm font-medium text-gray-900">{{ product.name }}</h3>
-                <p class="text-sm" :class="product.price && product.price > 0 ? 'text-gray-500' : 'text-red-500'">
-                  {{ product.price && product.price > 0 ? formatPrice(product.price) : 'Prix non défini' }}
+                <h3 class="text-sm font-medium text-gray-900">
+                  {{ product.name }}
+                </h3>
+                <p class="text-sm" :class="product.basePrice && product.basePrice > 0 ? 'text-gray-500' : 'text-red-500'">
+                  {{ product.basePrice && product.basePrice > 0 ? formatPrice(product.basePrice) : 'Prix non défini' }}
                 </p>
               </div>
             </div>
@@ -201,15 +207,15 @@
                   min="1"
                   class="w-20 px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
                   @input="updateProductTotal(index)"
-                />
+                >
               </div>
               <div class="text-sm font-medium text-gray-900">
                 {{ formatPrice(product.subtotal) }}
               </div>
               <button
                 type="button"
-                @click="removeProduct(index)"
                 class="text-red-600 hover:text-red-700"
+                @click="removeProduct(index)"
               >
                 <Icon name="heroicons:trash" class="w-4 h-4" />
               </button>
@@ -220,7 +226,9 @@
         <div v-else class="text-center py-8 text-gray-500">
           <Icon name="heroicons:cube" class="w-12 h-12 mx-auto mb-4 text-gray-300" />
           <p>Aucun produit sélectionné</p>
-          <p class="text-sm">Cliquez sur "Ajouter Produit" pour commencer</p>
+          <p class="text-sm">
+            Cliquez sur "Ajouter Produit" pour commencer
+          </p>
         </div>
 
         <!-- Bundle Total -->
@@ -246,11 +254,31 @@
             Annuler
           </NuxtLink>
 
+          <!-- Bouton de synchronisation manuelle avec feedback UX avancé -->
           <button
             v-if="!isNew"
             type="button"
-            @click="duplicateBundle"
+            :disabled="isSyncing"
+            :class="[
+              'inline-flex items-center px-4 py-2 text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all duration-200',
+              isSyncing
+                ? 'text-amber-700 bg-amber-50 border border-amber-200 cursor-not-allowed'
+                : 'text-green-700 bg-green-50 border border-green-200 hover:bg-green-100 focus:ring-green-500'
+            ]"
+            @click="manualSync"
+          >
+            <Icon
+              name="heroicons:arrow-path"
+              :class="['w-4 h-4 mr-2', isSyncing ? 'animate-spin' : '']"
+            />
+            {{ isSyncing ? 'Synchronisation...' : 'Synchroniser' }}
+          </button>
+
+          <button
+            v-if="!isNew"
+            type="button"
             class="px-4 py-2 text-sm font-medium text-blue-700 bg-blue-50 border border-blue-200 rounded-md hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            @click="duplicateBundle"
           >
             Dupliquer
           </button>
@@ -260,8 +288,8 @@
           <button
             v-if="!isNew"
             type="button"
-            @click="deleteBundle"
             class="px-4 py-2 text-sm font-medium text-red-700 bg-red-50 border border-red-200 rounded-md hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+            @click="deleteBundle"
           >
             Supprimer
           </button>
@@ -281,9 +309,9 @@
     <!-- Product Selector Modal -->
     <AdminModal
       :show="showProductSelector"
-      @close="showProductSelector = false"
       title="Sélectionner des Produits"
       size="xl"
+      @close="showProductSelector = false"
     >
       <div class="space-y-4">
         <!-- Search -->
@@ -293,7 +321,7 @@
             type="text"
             placeholder="Rechercher des produits..."
             class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
-          />
+          >
           <Icon name="heroicons:magnifying-glass" class="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
         </div>
 
@@ -304,11 +332,11 @@
             :key="product.id"
             :class="[
               'border border-gray-200 rounded-lg p-4',
-              product.price && product.price > 0
+              product.basePrice && product.basePrice > 0
                 ? 'hover:bg-gray-50 cursor-pointer'
                 : 'bg-gray-50 cursor-not-allowed opacity-60'
             ]"
-            @click="product.price && product.price > 0 ? addProduct(product) : null"
+            @click="product.basePrice && product.basePrice > 0 ? addProduct(product) : null"
           >
             <div class="flex items-center space-x-3">
               <img
@@ -316,7 +344,7 @@
                 :src="product.image_url"
                 :alt="product.name"
                 class="w-10 h-10 rounded object-cover"
-              />
+              >
               <div
                 v-else
                 class="w-10 h-10 rounded bg-gray-200 flex items-center justify-center"
@@ -324,9 +352,11 @@
                 <Icon name="heroicons:cube" class="w-5 h-5 text-gray-400" />
               </div>
               <div class="flex-1">
-                <h3 class="text-sm font-medium text-gray-900">{{ product.name }}</h3>
-                <p class="text-sm" :class="product.price && product.price > 0 ? 'text-gray-500' : 'text-red-500'">
-                  {{ product.price && product.price > 0 ? formatPrice(product.price) : 'Prix non défini' }}
+                <h3 class="text-sm font-medium text-gray-900">
+                  {{ product.name }}
+                </h3>
+                <p class="text-sm" :class="product.basePrice && product.basePrice > 0 ? 'text-gray-500' : 'text-red-500'">
+                  {{ product.basePrice && product.basePrice > 0 ? formatPrice(product.basePrice) : 'Prix non défini' }}
                 </p>
               </div>
               <button
@@ -358,11 +388,12 @@
 import { useBundleQuery, useCreateBundleMutation, useUpdateBundleMutation, useDeleteBundleMutation } from '../../../composables/useBundlesQuery'
 import { useProductsQuery } from '../../../composables/useProductsQuery'
 import { useBundleCalculations } from '../../../composables/useBundleCalculations'
+import { useProductReferenceValidation, useBundleProductsValidation, useProductSelectorValidation } from '../../../composables/useProductReferenceValidation'
 import { globalNotifications } from '../../../composables/useNotifications'
 import { useBundleStore } from '../../../stores/useBundleStore'
 import { initializeGlobalEventBus, useGlobalEventBus } from '../../../stores/useGlobalEventBus'
 import { refDebounced } from '@vueuse/core'
-import type { Bundle, BundleProduct, BundleAggregate } from '../../../types/domain/Bundle'
+import type { Bundle, BundleProduct, BundleAggregate, BundleTargetAudience, BundleBudgetRange } from '../../../types/domain/Bundle'
 import type { Product } from '../../../types/domain/Product'
 
 // Layout admin
@@ -382,16 +413,27 @@ useHead({
   title: computed(() => isNew.value ? 'Nouveau Bundle | Admin' : 'Modifier Bundle | Admin')
 })
 
-// Initialize global event bus for store synchronization
-initializeGlobalEventBus()
+// Initialize global event bus and notifications ONLY on client
+let crudSuccess: typeof globalNotifications.crudSuccess | undefined
+let crudError: typeof globalNotifications.crudError | undefined
+let info: typeof globalNotifications.info | undefined
+let warn: typeof globalNotifications.warn | undefined
 
-// Global notifications (auto-imported via Nuxt 3)
-const { crudSuccess, crudError } = globalNotifications
+// Client-only initialization
+if (import.meta.client) {
+  initializeGlobalEventBus()
+  const notifications = globalNotifications
+  crudSuccess = notifications.crudSuccess
+  crudError = notifications.crudError
+  info = notifications.info
+  warn = notifications.warn
+}
 
 // ===== REACTIVE STATE =====
 const showProductSelector = ref(false)
 const productSearch = ref('')
 const tagsInput = ref('')
+const isSyncing = ref(false) // État pour la synchronisation manuelle
 const debouncedProductSearch = refDebounced(productSearch, 300)
 
 // Form data
@@ -443,9 +485,7 @@ const {
   data: bundleData,
   isLoading: bundleLoading,
   refetch: refetchBundle
-} = useBundleQuery(bundleId, false, {
-  enabled: computed(() => !isNew.value && !!bundleId.value)
-})
+} = useBundleQuery(bundleId, true)
 
 // Products query for selection
 const {
@@ -453,34 +493,44 @@ const {
   isLoading: productsLoading
 } = useProductsQuery()
 
+// 🔒 PRODUCT REFERENCE VALIDATION
+// Bundle products validation for referential integrity
+const bundleValidation = useBundleProductsValidation(bundleId, selectedProducts)
+
+// Product selector validation for safe additions
+const productSelectorValidation = useProductSelectorValidation(
+  computed(() => availableProducts.value || []),
+  selectedProducts
+)
+
 // Bundle mutations
 const createBundleMutation = useCreateBundleMutation({
   onSuccess: (bundle) => {
-    crudSuccess.created(bundle.name, 'bundle')
+    crudSuccess?.created(bundle.name, 'bundle')
     router.push('/admin/bundles')
   },
   onError: (error) => {
-    crudError.created('bundle', error.message)
+    crudError?.created('bundle', error.message)
   }
 })
 
 const updateBundleMutation = useUpdateBundleMutation({
   onSuccess: (bundle) => {
-    crudSuccess.updated(bundle.name, 'bundle')
+    crudSuccess?.updated(bundle.name, 'bundle')
     router.push('/admin/bundles')
   },
   onError: (error) => {
-    crudError.updated('bundle', error.message)
+    crudError?.updated('bundle', error.message)
   }
 })
 
 const deleteBundleMutation = useDeleteBundleMutation({
   onSuccess: () => {
-    crudSuccess.deleted('Bundle', 'bundle')
+    crudSuccess?.deleted('Bundle', 'bundle')
     router.push('/admin/bundles')
   },
   onError: (error) => {
-    crudError.deleted('bundle', error.message)
+    crudError?.deleted('bundle', error.message)
   }
 })
 
@@ -492,12 +542,14 @@ const bundleStore = useBundleStore()
 const calculatedTotal = bundleCalculations.estimatedTotal
 
 const filteredAvailableProducts = computed(() => {
-  if (!availableProducts.value) return []
+  // 🔒 Use validated products only - ensures referential integrity
+  const validProducts = productSelectorValidation.validProducts.value
 
-  let products = availableProducts.value.filter(product =>
-    !selectedProducts.value.find(selected => selected.id === product.id)
-  )
+  if (!validProducts || validProducts.length === 0) return []
 
+  let products = [...validProducts]
+
+  // Apply search filter
   if (debouncedProductSearch.value) {
     const search = debouncedProductSearch.value.toLowerCase()
     products = products.filter(product =>
@@ -539,18 +591,221 @@ function initializeFormFromBundle(bundle: Bundle | BundleAggregate) {
   tagsInput.value = bundle.tags?.join(', ') || ''
 }
 
+// 🔄 SYNCHRONISATION MANUELLE - Fonction avec feedback UX avancé
+async function manualSync() {
+  if (isSyncing.value) return // Éviter double-clic
+
+  isSyncing.value = true
+  const startTime = Date.now()
+
+  try {
+    console.log('🔄 Synchronisation manuelle initiée...')
+
+    // Étape 1: Vérifier si on a des produits à synchroniser
+    if (!selectedProducts.value || selectedProducts.value.length === 0) {
+      if (info) {
+        info('Aucun produit à synchroniser', 'Ce bundle ne contient pas de produits')
+      }
+      return
+    }
+
+    const productCount = selectedProducts.value.length
+    console.log(`📦 Synchronisation de ${productCount} produits...`)
+
+    // Étape 2: Afficher notification de début
+    if (info) {
+      info('Synchronisation en cours...', `Mise à jour de ${productCount} produit(s)`)
+    }
+
+    // Étape 3: Synchroniser chaque produit avec gestion d'erreur individuelle
+    const syncResults = await Promise.allSettled(
+      selectedProducts.value.map(async (bundleProduct, index) => {
+        try {
+          console.log(`🔍 Sync produit ${index + 1}/${productCount}: ${bundleProduct.name}`)
+
+          // Récupérer les données fraîches du produit
+          const latestProduct = await $fetch(`/api/products/${bundleProduct.id}`)
+
+          if (latestProduct) {
+            // Détecter les changements significatifs
+            const priceChanged = (latestProduct.base_price || latestProduct.price) !== bundleProduct.basePrice
+            const nameChanged = latestProduct.name !== bundleProduct.name
+            const imageChanged = latestProduct.image_url !== bundleProduct.image_url
+
+            // 🖼️ SYNCHRONISATION CLOUDINARY AVANCÉE - Enrichir avec métadonnées
+            let enrichedImages = latestProduct.images || bundleProduct.images || []
+            let cloudinarySync = false
+
+            // Si le produit a des images, synchroniser avec Cloudinary
+            if (latestProduct.images && latestProduct.images.length > 0) {
+              try {
+                // Utiliser le composable de métadonnées Cloudinary
+                const { fetchImageMetadata, getContextualTransformations } = useCloudinaryMetadata()
+
+                // Enrichir chaque image avec ses métadonnées Cloudinary
+                const enrichedImagePromises = latestProduct.images.map(async (imagePublicId: string) => {
+                  try {
+                    const imageInfo = await fetchImageMetadata(imagePublicId)
+                    if (imageInfo) {
+                      return {
+                        publicId: imagePublicId,
+                        url: getContextualTransformations(imagePublicId, 'product_card'),
+                        metadata: imageInfo.metadata,
+                        width: imageInfo.width,
+                        height: imageInfo.height,
+                        format: imageInfo.format
+                      }
+                    }
+                    return { publicId: imagePublicId, url: null }
+                  } catch (error) {
+                    console.warn(`⚠️ Cloudinary metadata sync failed for ${imagePublicId}:`, error)
+                    return { publicId: imagePublicId, url: null }
+                  }
+                })
+
+                enrichedImages = await Promise.all(enrichedImagePromises)
+                cloudinarySync = true
+                console.log(`🎨 Métadonnées Cloudinary synchronisées pour "${latestProduct.name}"`)
+              } catch (error) {
+                console.warn(`⚠️ Cloudinary sync partielle pour "${latestProduct.name}":`, error)
+              }
+            }
+
+            // Mettre à jour le produit avec synchronisation Cloudinary
+            const updatedBundleProduct = {
+              ...bundleProduct,
+              name: latestProduct.name || bundleProduct.name,
+              basePrice: latestProduct.base_price || latestProduct.price || bundleProduct.basePrice,
+              image_url: latestProduct.image_url || bundleProduct.image_url,
+              images: enrichedImages,
+              subtotal: bundleProduct.quantity * (latestProduct.base_price || latestProduct.price || bundleProduct.basePrice),
+              // Ajouter métadonnées de synchronisation
+              lastSynced: new Date().toISOString(),
+              cloudinarySync
+            }
+
+            // Log des changements détectés
+            const changes = []
+            if (priceChanged) changes.push(`prix: ${bundleProduct.basePrice}€ → ${updatedBundleProduct.basePrice}€`)
+            if (nameChanged) changes.push(`nom: "${bundleProduct.name}" → "${updatedBundleProduct.name}"`)
+            if (imageChanged) changes.push('image mise à jour')
+            if (cloudinarySync) changes.push('métadonnées Cloudinary synchronisées')
+
+            if (changes.length > 0) {
+              console.log(`✨ Changements détectés pour "${latestProduct.name}": ${changes.join(', ')}`)
+            }
+
+            return { success: true, product: updatedBundleProduct, changes, cloudinarySync }
+          }
+
+          return { success: true, product: bundleProduct, changes: [] }
+        } catch (error) {
+          console.error(`❌ Erreur sync produit ${bundleProduct.id}:`, error)
+          return { success: false, product: bundleProduct, error }
+        }
+      })
+    )
+
+    // Étape 4: Traiter les résultats et mettre à jour l'interface
+    const successful = syncResults.filter(result => result.status === 'fulfilled' && result.value.success)
+    const failed = syncResults.filter(result => result.status === 'rejected' || !result.value.success)
+
+    // Mettre à jour les produits sélectionnés
+    selectedProducts.value = syncResults.map(result => {
+      if (result.status === 'fulfilled') {
+        return result.value.product
+      }
+      return selectedProducts.value.find(p => p.id === result.value?.product?.id) || result.value?.product
+    }).filter(Boolean)
+
+    // Calculer les statistiques de synchronisation
+    const duration = Date.now() - startTime
+    const changesDetected = successful.reduce((count, result) =>
+      count + (result.value.changes?.length || 0), 0
+    )
+    const cloudinarySynced = successful.reduce((count, result) =>
+      count + (result.value.cloudinarySync ? 1 : 0), 0
+    )
+
+    console.log(`✅ Synchronisation terminée: ${successful.length}/${productCount} réussies en ${duration}ms`)
+
+    // Étape 5: Afficher les résultats avec notifications appropriées
+    if (failed.length === 0) {
+      // Succès complet
+      if (crudSuccess) {
+        const details = []
+        if (changesDetected > 0) details.push(`${changesDetected} changement(s) détecté(s)`)
+        if (cloudinarySynced > 0) details.push(`${cloudinarySynced} produit(s) avec métadonnées Cloudinary`)
+
+        crudSuccess.updated(
+          `Bundle synchronisé avec succès`,
+          `${successful.length} produit(s) synchronisé(s)${details.length > 0 ? ` - ${details.join(', ')}` : ''}`
+        )
+      }
+    } else {
+      // Succès partiel
+      if (warn) {
+        warn(
+          'Synchronisation partielle',
+          `${successful.length}/${productCount} produits synchronisés. ${failed.length} erreur(s).${cloudinarySynced > 0 ? ` ${cloudinarySynced} avec Cloudinary.` : ''}`
+        )
+      }
+    }
+
+  } catch (error) {
+    console.error('❌ Erreur globale de synchronisation:', error)
+    if (crudError) {
+      crudError.validation('Erreur de synchronisation', 'Impossible de synchroniser le bundle. Veuillez réessayer.')
+    }
+  } finally {
+    // Délai minimum pour UX (éviter le flash)
+    const minDelay = 800
+    const elapsed = Date.now() - startTime
+    if (elapsed < minDelay) {
+      await new Promise(resolve => setTimeout(resolve, minDelay - elapsed))
+    }
+
+    isSyncing.value = false
+  }
+}
+
 function addProduct(product: Product) {
+  // 🔒 STRICT VALIDATION - Check if product can be safely added
+  const canAdd = productSelectorValidation.canAddProduct(product)
+
+  if (!canAdd.canAdd) {
+    crudError?.validation(`Impossible d'ajouter le produit: ${canAdd.reason}`)
+    return
+  }
+
+  // Additional validation: ensure product exists in /admin/products interface
+  if (!product.isActive) {
+    crudError?.validation(`Le produit "${product.name}" n'est pas actif et ne peut être ajouté au bundle`)
+    return
+  }
+
+  if (!product.price || product.price <= 0) {
+    crudError?.validation(`Le produit "${product.name}" n'a pas de prix valide`)
+    return
+  }
+
   // Use centralized bundle calculations
   bundleCalculations.addProduct({
     productId: product.id,
     name: product.name,
     basePrice: product.price || 0,
     quantity: 1,
-    subtotal: (product.price || 0) * 1
+    subtotal: (product.price || 0) * 1,
+    productReference: product.reference,
+    categoryId: product.category_id,
+    image_url: product.image_url
   })
 
+  // Close product selector modal
+  showProductSelector.value = false
+
   // Show success notification
-  crudSuccess.created(product.name, 'produit ajouté au bundle')
+  crudSuccess?.created(product.name, 'produit ajouté au bundle')
 }
 
 function removeProduct(index: number) {
@@ -561,7 +816,7 @@ function removeProduct(index: number) {
   bundleCalculations.removeProduct(product.id)
 
   // Show success notification
-  crudSuccess.deleted(productName, 'produit retiré du bundle')
+  crudSuccess?.deleted(productName, 'produit retiré du bundle')
 }
 
 function updateProductTotal(index: number) {
@@ -572,8 +827,7 @@ function updateProductTotal(index: number) {
   bundleCalculations.updateProductQuantity(product.id, validQuantity)
 
   // Show info notification for quantity/price updates
-  const { info } = globalNotifications
-  info('Produit mis à jour', `${product.name} - Quantité: ${validQuantity}`)
+  info?.('Produit mis à jour', `${product.name} - Quantité: ${validQuantity}`)
 }
 
 // Removed: updateCalculatedTotal() - now handled reactively by bundleCalculations composable
@@ -624,9 +878,11 @@ function validateForm(): boolean {
 async function handleSubmit() {
   if (!validateForm()) return
 
-  // Prepare bundle data
+  // Prepare bundle data with proper type casting
   const bundleData = {
     ...form,
+    targetAudience: form.targetAudience as BundleTargetAudience,
+    budgetRange: form.budgetRange as BundleBudgetRange,
     products: selectedProducts.value.map(p => ({
       id: p.id,
       name: p.name,
@@ -696,26 +952,174 @@ watchEffect(() => {
 })
 
 // Handle real-time updates from other interfaces
-onMounted(() => {
+onMounted(async () => {
   const eventBus = useGlobalEventBus()
 
-  eventBus.on('product.updated', (productId: string, updatedProduct: any) => {
-    // Update selected products if they reference the updated product
-    selectedProducts.value.forEach(bundleProduct => {
-      if (bundleProduct.id === productId) {
-        bundleProduct.name = updatedProduct.name
-        bundleProduct.basePrice = updatedProduct.basePrice || updatedProduct.price
-        bundleProduct.subtotal = bundleProduct.quantity * bundleProduct.basePrice
+  // 🔄 AUTO-SYNCHRONISATION AU CHARGEMENT - Synchroniser immédiatement les données
+  console.log('🚀 Auto-synchronisation du bundle au chargement...')
+
+  try {
+    // Synchroniser les prix et métadonnées des produits sélectionnés
+    if (selectedProducts.value && selectedProducts.value.length > 0) {
+      console.log(`📦 Synchronisation de ${selectedProducts.value.length} produits...`)
+
+      const syncPromises = selectedProducts.value.map(async (bundleProduct) => {
+        try {
+          // Récupérer les données les plus récentes du produit
+          const latestProduct = await $fetch(`/api/products/${bundleProduct.id}`)
+
+          if (latestProduct) {
+            // Mettre à jour les données du produit dans le bundle
+            const updatedBundleProduct = {
+              ...bundleProduct,
+              name: latestProduct.name || bundleProduct.name,
+              basePrice: latestProduct.base_price || latestProduct.price || bundleProduct.basePrice,
+              image_url: latestProduct.image_url || bundleProduct.image_url,
+              images: latestProduct.images || bundleProduct.images || [],
+              subtotal: bundleProduct.quantity * (latestProduct.base_price || latestProduct.price || bundleProduct.basePrice)
+            }
+
+            console.log(`✅ Produit "${latestProduct.name}" synchronisé`)
+            return updatedBundleProduct
+          }
+
+          return bundleProduct
+        } catch (error) {
+          console.warn(`⚠️ Erreur sync produit ${bundleProduct.id}:`, error)
+          return bundleProduct // Garder les données existantes en cas d'erreur
+        }
+      })
+
+      // Attendre toutes les synchronisations
+      const syncedProducts = await Promise.all(syncPromises)
+      selectedProducts.value = syncedProducts
+
+      console.log('✅ Auto-synchronisation terminée avec succès')
+
+      // Afficher notification de synchronisation
+      if (info) {
+        info('Bundle synchronisé', `${syncedProducts.length} produits mis à jour`)
       }
+    }
+  } catch (error) {
+    console.error('❌ Erreur lors de l\'auto-synchronisation:', error)
+    if (warn) {
+      warn('Synchronisation partielle', 'Certaines données peuvent ne pas être à jour')
+    }
+  }
+
+  eventBus.on('product.updated', (event: any) => {
+    // Update selected products if they reference the updated product
+    const productId = event.payload?.productId || event.productId
+    const updatedProduct = event.payload?.product || event.updatedProduct
+
+    selectedProducts.value = selectedProducts.value.map(bundleProduct => {
+      if (bundleProduct.id === productId) {
+        return {
+          ...bundleProduct,
+          name: updatedProduct.name,
+          basePrice: updatedProduct.basePrice || updatedProduct.price,
+          subtotal: bundleProduct.quantity * (updatedProduct.basePrice || updatedProduct.price)
+        }
+      }
+      return bundleProduct
     })
   })
 
-  eventBus.on('product.deleted', (productId: string) => {
+
+  eventBus.on('product.price_changed', (event: any) => {
+    // Handle specific price changes with detailed logging
+    const productId = event.payload?.productId
+    const oldPrice = event.payload?.oldPrice
+    const newPrice = event.payload?.newPrice
+
+    selectedProducts.value = selectedProducts.value.map(bundleProduct => {
+      if (bundleProduct.id === productId) {
+        const updatedProduct = {
+          ...bundleProduct,
+          basePrice: newPrice,
+          subtotal: bundleProduct.quantity * newPrice
+        }
+
+        // Show notification for price change impact
+        info?.(`Prix mis à jour: ${bundleProduct.name}`, `${formatPrice(oldPrice)} → ${formatPrice(newPrice)}`)
+
+        return updatedProduct
+      }
+      return bundleProduct
+    })
+  })
+
+  // 🖼️ SYNCHRONISATION IMAGES CLOUDINARY - Gestion en temps réel des changements d'images
+  eventBus.on('product.image_added', (event: any) => {
+    const { productId, imagePublicId, imageUrl, metadata } = event
+
+    selectedProducts.value = selectedProducts.value.map(bundleProduct => {
+      if (bundleProduct.id === productId) {
+        const updatedImages = [...(bundleProduct.images || []), imagePublicId]
+        const updatedProduct = {
+          ...bundleProduct,
+          images: updatedImages,
+          // Update main image if it was empty
+          image_url: bundleProduct.image_url || imageUrl
+        }
+
+        // Show notification for image addition
+        info?.(`Image ajoutée: ${bundleProduct.name}`, `Nouvelle image (${metadata?.format?.toUpperCase()}, ${Math.round(metadata?.size / 1024)}KB)`)
+
+        return updatedProduct
+      }
+      return bundleProduct
+    })
+  })
+
+  eventBus.on('product.image_removed', (event: any) => {
+    const { productId, imagePublicId, remainingImages } = event
+
+    selectedProducts.value = selectedProducts.value.map(bundleProduct => {
+      if (bundleProduct.id === productId) {
+        const wasMainImage = bundleProduct.image_url?.includes(imagePublicId)
+        const updatedProduct = {
+          ...bundleProduct,
+          images: remainingImages,
+          // Update main image if the removed image was the main one
+          image_url: wasMainImage && remainingImages.length > 0
+            ? `https://res.cloudinary.com/dsrvzogof/image/upload/w_400,h_300,c_fill/${remainingImages[0]}`
+            : bundleProduct.image_url
+        }
+
+        // Show notification for image removal
+        info?.(`Image supprimée: ${bundleProduct.name}`, `Image retirée du produit`)
+
+        return updatedProduct
+      }
+      return bundleProduct
+    })
+  })
+
+  eventBus.on('product.image_metadata_updated', (event: any) => {
+    const { productId, imagePublicId, metadata } = event
+
+    selectedProducts.value = selectedProducts.value.map(bundleProduct => {
+      if (bundleProduct.id === productId && bundleProduct.image_url?.includes(imagePublicId)) {
+        // If the updated image is the main image, potentially refresh the URL with new transformations
+        const updatedProduct = {
+          ...bundleProduct,
+          // Could add logic here to apply new transformations if needed
+        }
+
+        // Show notification for metadata update
+        info?.(`Métadonnées mises à jour: ${bundleProduct.name}`, `Image "${metadata.alt || 'sans titre'}" mise à jour`)
+
+        return updatedProduct
+      }
+      return bundleProduct
+    })
+  })
+  eventBus.on('product.deleted', (event: any) => {
     // Remove deleted product from selected products
-    const index = selectedProducts.value.findIndex(p => p.id === productId)
-    if (index !== -1) {
-      selectedProducts.value.splice(index, 1)
-    }
+    const productId = event.payload?.productId || event.productId
+    selectedProducts.value = selectedProducts.value.filter(p => p.id !== productId)
   })
 
   eventBus.on('bundle.updated', () => {

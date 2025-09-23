@@ -104,14 +104,14 @@ export default defineEventHandler(async (event): Promise<BundleApiResponse> => {
           sql: `
             SELECT
               bp.product_id, p.name as product_name, p.description as product_description,
-              p.reference as product_reference,
+              p.id as product_reference,
               COALESCE(bp.custom_price, p.base_price) as base_price,
               COALESCE(bp.custom_price, p.base_price) as unit_price,
               COALESCE(bp.custom_price, p.base_price) as price,
               bp.quantity,
               (COALESCE(bp.custom_price, p.base_price) * bp.quantity) as subtotal,
               bp.is_required, p.image_url, p.category,
-              bp.created_at as bp_created_at, bp.updated_at as bp_updated_at
+              bp.created_at as bp_created_at
             FROM bundle_products bp
             LEFT JOIN products p ON bp.product_id = p.id
             WHERE bp.bundle_id = ?
