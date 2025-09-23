@@ -369,21 +369,42 @@ export function useProductSelectorValidation(
   availableProducts: Ref<Product[]>,
   selectedProducts: Ref<BundleProduct[]>
 ) {
+  // 🔧 Helper function to get product price with fallback
+  const getProductPrice = (product: Product): number => {
+    return product.price || product.basePrice || 0
+  }
+
   // Filter products that can be safely added to bundle
   const validProducts = computed(() => {
-    return availableProducts.value.filter(product => {
-      // Must be active
-      if (!product.isActive) return false
+    console.log(`🔍 [ProductSelector] Filtering ${availableProducts.value.length} available products`)
 
-      // Must have valid price
-      if (!product.price || product.price <= 0) return false
+    const filtered = availableProducts.value.filter(product => {
+      // Must be active
+      if (!product.isActive) {
+        console.log(`❌ [ProductSelector] ${product.name} - Inactive`)
+        return false
+      }
+
+      // Must have valid price (price OR basePrice)
+      const productPrice = getProductPrice(product)
+      if (productPrice <= 0) {
+        console.log(`❌ [ProductSelector] ${product.name} - Invalid price (price: ${product.price}, basePrice: ${product.basePrice})`)
+        return false
+      }
 
       // Must not already be in bundle
       const alreadySelected = selectedProducts.value.some(sp => sp.productId === product.id)
-      if (alreadySelected) return false
+      if (alreadySelected) {
+        console.log(`❌ [ProductSelector] ${product.name} - Already selected`)
+        return false
+      }
 
+      console.log(`✅ [ProductSelector] ${product.name} - Valid (price: ${productPrice})`)
       return true
     })
+
+    console.log(`✅ [ProductSelector] ${filtered.length}/${availableProducts.value.length} products passed validation`)
+    return filtered
   })
 
   const inactiveProducts = computed(() => {
@@ -392,7 +413,7 @@ export function useProductSelectorValidation(
 
   const invalidPriceProducts = computed(() => {
     return availableProducts.value.filter(product =>
-      product.isActive && (!product.price || product.price <= 0)
+      product.isActive && (getProductPrice(product) <= 0)
     )
   })
 
@@ -408,8 +429,9 @@ export function useProductSelectorValidation(
       return { canAdd: false, reason: 'Product is inactive' }
     }
 
-    if (!product.price || product.price <= 0) {
-      return { canAdd: false, reason: 'Product has no valid price' }
+    const productPrice = getProductPrice(product)
+    if (productPrice <= 0) {
+      return { canAdd: false, reason: `Product has no valid price (price: ${product.price}, basePrice: ${product.basePrice})` }
     }
 
     const alreadySelected = selectedProducts.value.some(sp => sp.productId === product.id)

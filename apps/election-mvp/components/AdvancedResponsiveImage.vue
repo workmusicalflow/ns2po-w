@@ -85,7 +85,7 @@
 
     <!-- Debug info (development only) -->
     <div 
-      v-if="showDebugInfo && process.dev"
+      v-if="showDebugInfo && $dev"
       class="debug-info"
     >
       <details class="bg-gray-900 bg-opacity-75 text-white text-xs p-2 rounded">
@@ -109,7 +109,7 @@ import type { CloudinaryTransformOptions } from '../utils/cloudinary'
 import { useCloudinaryImage } from '../composables/useCloudinaryImage'
 
 interface Props {
-  publicIdOrUrl: string
+  src: string
   alt: string
   context?: 'product' | 'gallery' | 'thumbnail' | 'hero'
   options?: CloudinaryTransformOptions
@@ -143,16 +143,36 @@ const hasError = ref(false)
 let observer: IntersectionObserver | null = null
 
 // Configuration responsive complète
-const { getResponsiveConfig } = useCloudinaryImage()
+const { getOptimizedUrl } = useCloudinaryImage()
+
+// Pour un composant simplifié, on utilise directement l'URL fournie
 const responsiveConfig = computed(() => {
-  const config = getResponsiveConfig(props.publicIdOrUrl, props.context, props.options)
-  
-  // Utiliser sizes personnalisé si fourni
-  if (props.customSizes) {
-    config.sizes = props.customSizes
+  // Si c'est une URL Cloudinary complète, on l'utilise directement
+  if (props.src.includes('cloudinary.com')) {
+    return {
+      sources: {
+        fallback: {
+          src: props.src,
+          srcset: props.src
+        }
+      },
+      sizes: props.customSizes || '100vw',
+      breakpoints: [300, 500, 800, 1200]
+    }
   }
-  
-  return config
+
+  // Si c'est un publicId, on génère l'URL optimisée
+  const optimizedUrl = getOptimizedUrl(props.src, props.options)
+  return {
+    sources: {
+      fallback: {
+        src: optimizedUrl,
+        srcset: optimizedUrl
+      }
+    },
+    sizes: props.customSizes || '100vw',
+    breakpoints: [300, 500, 800, 1200]
+  }
 })
 
 // Styles du container et placeholder

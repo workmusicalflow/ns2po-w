@@ -12,6 +12,7 @@ const STATIC_FALLBACK = [
     name: 'T-Shirt Personnalisé',
     category: 'Textile',
     basePrice: 5000,
+    price: 5000, // 🔧 FIX: Ajout du champ price pour cohérence
     minQuantity: 50,
     maxQuantity: 1000,
     description: 'T-shirt coton personnalisable avec logo',
@@ -24,6 +25,7 @@ const STATIC_FALLBACK = [
     name: 'Casquette Brodée',
     category: 'Textile',
     basePrice: 3500,
+    price: 3500, // 🔧 FIX: Ajout du champ price pour cohérence
     minQuantity: 25,
     maxQuantity: 500,
     description: 'Casquette avec broderie personnalisée',
@@ -36,6 +38,7 @@ const STATIC_FALLBACK = [
     name: 'Stylo Publicitaire',
     category: 'Bureau',
     basePrice: 500,
+    price: 500, // 🔧 FIX: Ajout du champ price pour cohérence
     minQuantity: 100,
     maxQuantity: 5000,
     description: 'Stylo personnalisé avec logo',
@@ -74,6 +77,7 @@ export default defineEventHandler(async (event) => {
           category: row.category,
           subcategory: row.subcategory,
           basePrice: Number(row.basePrice) || 0,
+          price: Number(row.basePrice) || 0, // 🔧 FIX: Ajout du champ price requis par la validation
           minQuantity: Number(row.minQuantity) || 1,
           maxQuantity: Number(row.maxQuantity) || 1000,
           unit: row.unit || 'pièce',
