@@ -11,7 +11,6 @@ export interface Bundle {
   readonly name: string
   readonly description: string
   readonly targetAudience: BundleTargetAudience
-  readonly budgetRange: BundleBudgetRange
   readonly estimatedTotal: number
   readonly originalTotal?: number
   readonly savings?: number
@@ -39,7 +38,6 @@ export interface BundleProduct {
 
 // Bundle Enums
 export type BundleTargetAudience = 'local' | 'regional' | 'national' | 'universal'
-export type BundleBudgetRange = 'starter' | 'medium' | 'premium' | 'enterprise'
 export type BundleStatus = 'active' | 'inactive' | 'draft' | 'archived'
 
 // Bundle Aggregate Root - Complete Bundle with Relations
@@ -75,7 +73,6 @@ export interface BundlePricing {
 export interface BundleFilters {
   readonly search?: string
   readonly targetAudience?: BundleTargetAudience
-  readonly budgetRange?: BundleBudgetRange
   readonly status?: BundleStatus
   readonly featured?: boolean
   readonly tags?: string[]
@@ -162,9 +159,6 @@ export function isValidTargetAudience(audience: string): audience is BundleTarge
   return ['local', 'regional', 'national', 'universal'].includes(audience)
 }
 
-export function isValidBudgetRange(range: string): range is BundleBudgetRange {
-  return ['starter', 'medium', 'premium', 'enterprise'].includes(range)
-}
 
 // Domain Validation Rules
 export const BundleValidationRules = {

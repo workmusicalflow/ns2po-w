@@ -52,16 +52,6 @@
             required
           />
 
-          <!-- Budget Range -->
-          <AdminFormField
-            id="budgetRange"
-            v-model="form.budgetRange"
-            type="select"
-            label="Gamme de Budget"
-            :options="budgetOptions"
-            :error="errors.budgetRange"
-            required
-          />
 
           <!-- Popularity Score -->
           <AdminFormField
@@ -69,9 +59,9 @@
             v-model="form.popularity"
             type="number"
             label="Score de Popularité"
-            placeholder="0-10"
+            placeholder="0-100"
             :error="errors.popularity"
-            help-text="Score de 0 à 10 pour le classement"
+            help-text="Score de 0 à 100 pour le classement"
           />
 
           <!-- Estimated Total -->
@@ -241,6 +231,44 @@
             <span class="text-sm text-gray-600">Économies:</span>
             <span class="text-sm font-medium text-green-600">{{ formatPrice(form.originalTotal - calculatedTotal) }}</span>
           </div>
+
+          <!-- Validation Status Panel - CORE 20% FIX -->
+          <div v-if="!bundleValidationState.canSave" class="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+            <div class="flex items-start space-x-3">
+              <Icon name="heroicons:exclamation-triangle" class="w-5 h-5 text-red-500 mt-0.5 flex-shrink-0" />
+              <div class="flex-1">
+                <h3 class="text-sm font-medium text-red-800 mb-2">
+                  Bundle invalide - Correction requise
+                </h3>
+                <ul class="text-sm text-red-700 space-y-1">
+                  <li v-for="violation in bundleValidationState.blockers" :key="violation" class="flex items-start space-x-2">
+                    <span class="text-red-500 mt-0.5">•</span>
+                    <span>{{ violation }}</span>
+                  </li>
+                </ul>
+                <div v-if="bundleValidationState.total !== undefined && bundleValidationState.quantity !== undefined" class="mt-3 pt-3 border-t border-red-200">
+                  <div class="grid grid-cols-2 gap-4 text-xs">
+                    <div>
+                      <span class="text-red-600 font-medium">Total actuel:</span>
+                      <span class="ml-2 text-red-800">{{ formatPrice(bundleValidationState.total) }}</span>
+                    </div>
+                    <div>
+                      <span class="text-red-600 font-medium">Quantité totale:</span>
+                      <span class="ml-2 text-red-800">{{ bundleValidationState.quantity }} articles</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Validation Success Panel -->
+          <div v-else-if="bundleValidationState.canSave && !isNew" class="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+            <div class="flex items-center space-x-2">
+              <Icon name="heroicons:check-circle" class="w-4 h-4 text-green-500" />
+              <span class="text-sm font-medium text-green-800">Bundle valide et prêt à être sauvegardé</span>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -296,11 +324,12 @@
 
           <button
             type="submit"
-            :disabled="isSubmitting"
+            :disabled="isSubmitting || !bundleValidationState.canSave"
+            :title="!bundleValidationState.canSave ? bundleValidationState.blockers.join(', ') : ''"
             class="px-6 py-2 text-sm font-medium text-white bg-amber-600 border border-transparent rounded-md hover:bg-amber-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <Icon v-if="isSubmitting" name="heroicons:arrow-path" class="w-4 h-4 mr-2 animate-spin" />
-            {{ isNew ? 'Créer le bundle' : 'Sauvegarder' }}
+            {{ !bundleValidationState.canSave ? 'Corriger pour sauvegarder' : (isNew ? 'Créer le bundle' : 'Sauvegarder') }}
           </button>
         </div>
       </div>
@@ -374,6 +403,18 @@
         </div>
       </div>
     </AdminModal>
+
+    <!-- Validation Consequences Modal - CORE 20% FIX -->
+    <ValidationConsequencesModal
+      :show="showValidationModal"
+      :product-name="validationModalData.productName"
+      :violations="validationModalData.violations"
+      :before-state="validationModalData.beforeState"
+      :after-state="validationModalData.afterState"
+      @close="showValidationModal = false"
+      @cancel="handleValidationModalCancel"
+      @confirm="handleValidationModalConfirm"
+    />
   </div>
 </template>
 
@@ -393,8 +434,10 @@ import { globalNotifications } from '../../../composables/useNotifications'
 import { useBundleStore } from '../../../stores/useBundleStore'
 import { initializeGlobalEventBus, useGlobalEventBus } from '../../../stores/useGlobalEventBus'
 import { refDebounced } from '@vueuse/core'
-import type { Bundle, BundleProduct, BundleAggregate, BundleTargetAudience, BundleBudgetRange } from '../../../types/domain/Bundle'
+import type { Bundle, BundleProduct, BundleAggregate, BundleTargetAudience } from '../../../types/domain/Bundle'
 import type { Product } from '../../../types/domain/Product'
+import { validateBundleBusinessRules } from '../../../schemas/bundle'
+import ValidationConsequencesModal from '../../../components/admin/ValidationConsequencesModal.vue'
 
 // Layout admin
 definePageMeta({
@@ -417,7 +460,7 @@ useHead({
 let crudSuccess: typeof globalNotifications.crudSuccess | undefined
 let crudError: typeof globalNotifications.crudError | undefined
 let info: typeof globalNotifications.info | undefined
-let warn: typeof globalNotifications.warn | undefined
+let warning: typeof globalNotifications.warning | undefined
 
 // Client-only initialization
 if (import.meta.client) {
@@ -426,7 +469,7 @@ if (import.meta.client) {
   crudSuccess = notifications.crudSuccess
   crudError = notifications.crudError
   info = notifications.info
-  warn = notifications.warn
+  warning = notifications.warning
 }
 
 // ===== REACTIVE STATE =====
@@ -436,12 +479,27 @@ const tagsInput = ref('')
 const isSyncing = ref(false) // État pour la synchronisation manuelle
 const debouncedProductSearch = refDebounced(productSearch, 300)
 
+// Modal de conséquences de validation - CORE 20% FIX
+const showValidationModal = ref(false)
+const validationModalData = ref<{
+  productName: string
+  violations: Array<{ type: string; label: string; message: string }>
+  beforeState: { total: number; quantity: number }
+  afterState: { total: number; quantity: number }
+  productIndex: number
+}>({
+  productName: '',
+  violations: [],
+  beforeState: { total: 0, quantity: 0 },
+  afterState: { total: 0, quantity: 0 },
+  productIndex: -1
+})
+
 // Form data
 const form = reactive({
   name: '',
   description: '',
   targetAudience: 'local',
-  budgetRange: 'starter',
   estimatedTotal: 0,
   originalTotal: 0,
   popularity: 5,
@@ -454,7 +512,6 @@ const errors = reactive<Record<string, string>>({
   name: '',
   description: '',
   targetAudience: '',
-  budgetRange: '',
   estimatedTotal: '',
   originalTotal: '',
   popularity: ''
@@ -472,12 +529,6 @@ const audienceOptions = [
   { value: 'universal', label: 'Universel' }
 ]
 
-const budgetOptions = [
-  { value: 'starter', label: 'Starter (0-10k XOF)' },
-  { value: 'medium', label: 'Medium (10k-50k XOF)' },
-  { value: 'premium', label: 'Premium (50k-200k XOF)' },
-  { value: 'enterprise', label: 'Enterprise (200k+ XOF)' }
-]
 
 // ===== VUE QUERY INTEGRATION =====
 // Bundle query (for editing existing bundles)
@@ -565,6 +616,58 @@ const isSubmitting = computed(() =>
   createBundleMutation.isPending.value || updateBundleMutation.isPending.value
 )
 
+// CORE 20% FIX - Computed property pour l'état de validation temps réel
+const bundleValidationState = computed(() => {
+  // Pas de validation si bundle en création
+  if (isNew.value) {
+    return {
+      isValid: true,
+      blockers: [],
+      canSave: true,
+      warnings: []
+    }
+  }
+
+  // Validation uniquement des produits sélectionnés
+  if (!selectedProducts.value || selectedProducts.value.length === 0) {
+    return {
+      isValid: false,
+      blockers: ['Bundle vide - aucun produit sélectionné'],
+      canSave: false,
+      warnings: []
+    }
+  }
+
+  // Calculer les totaux actuels
+  const total = selectedProducts.value.reduce((sum, p) => sum + (p.basePrice || 0) * p.quantity, 0)
+  const quantity = selectedProducts.value.reduce((sum, p) => sum + (p.quantity || 1), 0)
+
+  // Préparer l'état du bundle pour validation
+  const bundleState = {
+    name: form.name,
+    targetAudience: form.targetAudience,
+    estimatedTotal: total,
+    products: selectedProducts.value,
+    popularity: form.popularity,
+    isActive: form.isActive,
+    isFeatured: form.isFeatured,
+    originalTotal: form.originalTotal,
+    savings: form.originalTotal > total ? form.originalTotal - total : 0
+  }
+
+  // Utiliser la fonction de validation des règles business
+  const validationErrors = validateBundleBusinessRules(bundleState)
+
+  return {
+    isValid: validationErrors.length === 0,
+    blockers: validationErrors,
+    canSave: validationErrors.length === 0,
+    warnings: [],
+    total,
+    quantity
+  }
+})
+
 // Removed unused computed properties for cleaner code
 
 // ===== METHODS =====
@@ -574,7 +677,6 @@ function initializeFormFromBundle(bundle: Bundle | BundleAggregate) {
     name: bundle.name,
     description: bundle.description,
     targetAudience: bundle.targetAudience,
-    budgetRange: bundle.budgetRange,
     estimatedTotal: bundle.estimatedTotal,
     originalTotal: bundle.originalTotal,
     popularity: bundle.popularity,
@@ -744,8 +846,8 @@ async function manualSync() {
       }
     } else {
       // Succès partiel
-      if (warn) {
-        warn(
+      if (warning) {
+        warning(
           'Synchronisation partielle',
           `${successful.length}/${productCount} produits synchronisés. ${failed.length} erreur(s).${cloudinarySynced > 0 ? ` ${cloudinarySynced} avec Cloudinary.` : ''}`
         )
@@ -812,11 +914,92 @@ function removeProduct(index: number) {
   const product = selectedProducts.value[index]
   const productName = product.name
 
-  // Use centralized bundle calculations
-  bundleCalculations.removeProduct(product.id)
+  // CORE 20% FIX - Validation préventive avant suppression
+  // Calculer l'impact de la suppression AVANT de l'effectuer
+  const productsAfterRemoval = selectedProducts.value.filter((_, i) => i !== index)
 
-  // Show success notification
-  crudSuccess?.deleted(productName, 'produit retiré du bundle')
+  // Calculer les totaux après suppression
+  const newTotal = productsAfterRemoval.reduce((sum, p) => sum + (p.basePrice || 0) * p.quantity, 0)
+  const newQuantity = productsAfterRemoval.reduce((sum, p) => sum + (p.quantity || 1), 0)
+
+  // Préparer l'état du bundle après suppression pour validation
+  const bundleStateAfterRemoval = {
+    name: form.name,
+    targetAudience: form.targetAudience,
+    estimatedTotal: newTotal,
+    products: productsAfterRemoval,
+    popularity: form.popularity,
+    isActive: form.isActive,
+    isFeatured: form.isFeatured
+  }
+
+  // Valider l'état futur avec les règles business
+  const validationErrors = validateBundleBusinessRules(bundleStateAfterRemoval)
+
+  // Si la suppression créerait des violations, afficher modal de conséquences
+  if (validationErrors.length > 0) {
+    // Construire la liste des violations pour la modal (contrainte unique : quantité)
+    const violations = []
+
+    if (newQuantity < 1000) {
+      violations.push({
+        type: 'quantity',
+        label: 'Quantité insuffisante',
+        message: `${newQuantity}/1000 articles minimum requis`
+      })
+    }
+
+    // Calculer l'état actuel
+    const currentTotal = selectedProducts.value.reduce((sum, p) => sum + (p.basePrice || 0) * p.quantity, 0)
+    const currentQuantity = selectedProducts.value.reduce((sum, p) => sum + (p.quantity || 1), 0)
+
+    // Préparer les données de la modal
+    validationModalData.value = {
+      productName,
+      violations,
+      beforeState: { total: currentTotal, quantity: currentQuantity },
+      afterState: { total: newTotal, quantity: newQuantity },
+      productIndex: index
+    }
+
+    // Afficher la modal sophistiquée
+    showValidationModal.value = true
+    return
+
+  } else {
+    // Suppression sûre - aucune violation
+    bundleCalculations.removeProduct(product.id)
+
+    // Show success notification car suppression valide
+    crudSuccess?.deleted(productName, 'produit retiré du bundle')
+  }
+}
+
+// Fonctions de gestion de la modal de validation - CORE 20% FIX
+function handleValidationModalCancel() {
+  showValidationModal.value = false
+  const productName = validationModalData.value.productName
+  warning?.('Suppression annulée', `Le produit "${productName}" n'a pas été supprimé pour maintenir la validité du bundle`)
+}
+
+function handleValidationModalConfirm(forceDelete: boolean) {
+  showValidationModal.value = false
+
+  if (forceDelete) {
+    const { productIndex, productName } = validationModalData.value
+    const product = selectedProducts.value[productIndex]
+
+    // Procéder avec la suppression malgré les violations
+    bundleCalculations.removeProduct(product.id)
+
+    // Notification WARNING au lieu de SUCCESS
+    warning?.(`${productName} supprimé avec violations`, `Bundle non-publiable: corrections requises`)
+
+    // Afficher info sur les violations actuelles après un délai
+    setTimeout(() => {
+      info?.('Action requise', 'Corrigez les violations pour pouvoir sauvegarder le bundle')
+    }, 1500)
+  }
 }
 
 function updateProductTotal(index: number) {
@@ -857,18 +1040,13 @@ function validateForm(): boolean {
     isValid = false
   }
 
-  if (!form.budgetRange) {
-    errors.budgetRange = 'La gamme de budget est requise'
-    isValid = false
-  }
-
   if (form.estimatedTotal <= 0) {
     errors.estimatedTotal = 'Le prix total doit être supérieur à 0'
     isValid = false
   }
 
-  if (form.popularity < 0 || form.popularity > 10) {
-    errors.popularity = 'La popularité doit être entre 0 et 10'
+  if (form.popularity < 0 || form.popularity > 100) {
+    errors.popularity = 'La popularité doit être entre 0 et 100'
     isValid = false
   }
 
@@ -882,7 +1060,6 @@ async function handleSubmit() {
   const bundleData = {
     ...form,
     targetAudience: form.targetAudience as BundleTargetAudience,
-    budgetRange: form.budgetRange as BundleBudgetRange,
     products: selectedProducts.value.map(p => ({
       id: p.id,
       name: p.name,
@@ -939,9 +1116,8 @@ watchEffect(() => {
 
 // Watch calculated total to update form - using centralized calculations
 watch(() => bundleCalculations.estimatedTotal.value, (newTotal) => {
-  if (selectedProducts.value.length > 0) {
-    form.estimatedTotal = newTotal
-  }
+  // Always update form total, including when it's 0 (no products)
+  form.estimatedTotal = newTotal
 })
 
 // Sync with Pinia stores for cross-component state sharing
@@ -1003,8 +1179,8 @@ onMounted(async () => {
     }
   } catch (error) {
     console.error('❌ Erreur lors de l\'auto-synchronisation:', error)
-    if (warn) {
-      warn('Synchronisation partielle', 'Certaines données peuvent ne pas être à jour')
+    if (warning) {
+      warning('Synchronisation partielle', 'Certaines données peuvent ne pas être à jour')
     }
   }
 

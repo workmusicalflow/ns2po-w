@@ -25,7 +25,6 @@ export interface CampaignBundle {
   readonly name: string;
   readonly description: string;
   readonly targetAudience: BundleTargetAudience;
-  readonly budgetRange: BundleBudgetRange;
   readonly products: readonly BundleProduct[];
   readonly estimatedTotal: number;
   readonly originalTotal?: number; // Si prix de bundle différent de la somme
@@ -117,12 +116,6 @@ export const BundleTargetAudience = {
   UNIVERSAL: "universal", // Applicable à tous niveaux
 } as const;
 
-export const BundleBudgetRange = {
-  STARTER: "starter", // 0-10k XOF
-  MEDIUM: "medium", // 10k-50k XOF
-  PREMIUM: "premium", // 50k-200k XOF
-  ENTERPRISE: "enterprise", // 200k+ XOF
-} as const;
 
 export const BundleSelectionMode = {
   DIRECT: "direct", // Sélection directe du bundle
@@ -145,8 +138,6 @@ export const CartStatus = {
 export type BundleTargetAudience =
   (typeof BundleTargetAudience)[keyof typeof BundleTargetAudience];
 
-export type BundleBudgetRange =
-  (typeof BundleBudgetRange)[keyof typeof BundleBudgetRange];
 
 export type BundleSelectionMode =
   (typeof BundleSelectionMode)[keyof typeof BundleSelectionMode];
@@ -163,7 +154,6 @@ export interface BundlePreview {
   readonly estimatedTotal: number;
   readonly productCount: number;
   readonly targetAudience: BundleTargetAudience;
-  readonly budgetRange: BundleBudgetRange;
   readonly isFeatured?: boolean;
 }
 

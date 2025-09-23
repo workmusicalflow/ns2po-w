@@ -38,9 +38,6 @@ export const campaignBundleSchema = z.object({
     errorMap: () => ({ message: 'Audience cible invalide' })
   }),
 
-  budgetRange: z.enum(['starter', 'medium', 'premium', 'enterprise'], {
-    errorMap: () => ({ message: 'Gamme de budget invalide' })
-  }),
 
   products: z.array(bundleProductSchema)
     .min(1, 'Au moins un produit est requis')
@@ -62,7 +59,7 @@ export const campaignBundleSchema = z.object({
   popularity: z.number()
     .int('La popularité doit être un nombre entier')
     .min(0, 'La popularité doit être au moins 0')
-    .max(10, 'La popularité ne peut pas dépasser 10')
+    .max(100, 'La popularité ne peut pas dépasser 100')
     .default(5),
 
   isActive: z.boolean()
@@ -89,7 +86,8 @@ export type CampaignBundleInput = z.infer<typeof campaignBundleSchema>
 
 // Schema for bundle updates (all fields optional except ID)
 export const campaignBundleUpdateSchema = campaignBundleSchema.partial().extend({
-  id: z.string().min(1, 'L\'ID est requis')
+  id: z.string().min(1, 'L\'ID est requis'),
+  version: z.number().int().min(0, 'La version doit être un nombre entier positif').optional()
 })
 
 export type CampaignBundleUpdateInput = z.infer<typeof campaignBundleUpdateSchema>
@@ -98,7 +96,6 @@ export type CampaignBundleUpdateInput = z.infer<typeof campaignBundleUpdateSchem
 export const bundleFiltersSchema = z.object({
   search: z.string().optional(),
   targetAudience: z.enum(['local', 'regional', 'national', 'universal']).optional(),
-  budgetRange: z.enum(['starter', 'medium', 'premium', 'enterprise']).optional(),
   isActive: z.boolean().optional(),
   isFeatured: z.boolean().optional(),
   tags: z.array(z.string()).optional(),
@@ -271,27 +268,148 @@ export function validateBundleTotal(bundle: any): string[] {
 export function validateBundleBusinessRules(bundle: any): string[] {
   const errors: string[] = []
 
-  // Budget range validation based on estimated total
-  const budgetRanges = {
-    starter: { min: 0, max: 10000 },
-    medium: { min: 10000, max: 50000 },
-    premium: { min: 50000, max: 200000 },
-    enterprise: { min: 200000, max: Infinity }
+  // 1. Quantité minimale unique pour tous les bundles
+  if (bundle.products && bundle.products.length > 0) {
+    const totalQuantity = bundle.products.reduce((sum: number, product: any) => sum + product.quantity, 0)
+
+    if (totalQuantity < 1000) {
+      errors.push(`Quantité insuffisante: ${totalQuantity}/1000 articles minimum requis`)
+    }
+  } else {
+    errors.push('Au moins un produit est requis')
   }
 
-  const range = budgetRanges[bundle.budgetRange as keyof typeof budgetRanges]
-  if (range && (bundle.estimatedTotal < range.min || bundle.estimatedTotal > range.max)) {
-    errors.push(`Le prix total ne correspond pas à la gamme de budget ${bundle.budgetRange}`)
-  }
-
-  // Featured bundles should have high popularity
+  // 2. Featured bundles should have high popularity
   if (bundle.isFeatured && bundle.popularity < 7) {
     errors.push('Les bundles vedettes doivent avoir une popularité d\'au moins 7')
   }
 
-  // Inactive bundles cannot be featured
+  // 3. Inactive bundles cannot be featured
   if (!bundle.isActive && bundle.isFeatured) {
     errors.push('Un bundle inactif ne peut pas être en vedette')
+  }
+
+  // 4. Validation quantité maximale pour contrôle qualité
+  if (bundle.products && bundle.products.length > 0) {
+    const totalQuantity = bundle.products.reduce((sum: number, product: any) => sum + product.quantity, 0)
+
+    if (totalQuantity > 50000) {
+      errors.push('Quantité totale trop élevée (maximum: 50 000 articles)')
+    }
+  }
+
+  // 5. Price consistency validation
+  if (bundle.originalTotal && bundle.estimatedTotal && bundle.savings) {
+    const calculatedSavings = bundle.originalTotal - bundle.estimatedTotal
+    if (Math.abs(bundle.savings - calculatedSavings) > 0.01) {
+      errors.push('Les économies calculées ne correspondent pas à la différence de prix')
+    }
+
+    // Minimum discount percentage for bundles
+    const discountPercentage = (calculatedSavings / bundle.originalTotal) * 100
+    if (discountPercentage > 0 && discountPercentage < 5) {
+      errors.push('La remise doit être d\'au moins 5% pour justifier un bundle')
+    }
+
+    // Maximum discount to prevent losses
+    if (discountPercentage > 50) {
+      errors.push('La remise ne peut pas dépasser 50%')
+    }
+  }
+
+  // 6. Campaign timing validation
+  const campaignSeasons = ['standard', 'presidentielle', 'legislatives', 'municipales', 'regionales']
+  if (bundle.tags && bundle.tags.includes('election')) {
+    if (!bundle.tags.some((tag: string) => campaignSeasons.includes(tag))) {
+      errors.push('Les bundles électoraux doivent spécifier le type d\'élection')
+    }
+  }
+
+  // 7. Product diversity validation for better campaign impact
+  if (bundle.products && bundle.products.length > 0) {
+    const uniqueProductTypes = new Set()
+    bundle.products.forEach((product: any) => {
+      // Extract product type from name/category (simplified logic)
+      const productName = product.name?.toLowerCase() || ''
+      if (productName.includes('t-shirt') || productName.includes('textile')) {
+        uniqueProductTypes.add('textile')
+      } else if (productName.includes('stylo') || productName.includes('pen')) {
+        uniqueProductTypes.add('writing')
+      } else if (productName.includes('casquette') || productName.includes('cap')) {
+        uniqueProductTypes.add('headwear')
+      } else if (productName.includes('autocollant') || productName.includes('sticker')) {
+        uniqueProductTypes.add('print')
+      } else {
+        uniqueProductTypes.add('other')
+      }
+    })
+
+    // Encourager la diversité des produits pour plus d'impact
+    if (uniqueProductTypes.size < 2) {
+      errors.push('Recommandé: inclure au moins 2 types de produits différents pour plus d\'impact')
+    }
+  }
+
+  return errors
+}
+
+// Advanced validation for featured bundle limits (requires database check)
+export async function validateFeaturedBundleLimit(bundle: any, db?: any, isUpdate = false): Promise<string[]> {
+  const errors: string[] = []
+
+  // Only check if this bundle is trying to be featured
+  if (!bundle.isFeatured) {
+    return errors
+  }
+
+  // If no database provided, skip this validation
+  if (!db) {
+    return errors
+  }
+
+  try {
+    // Count currently featured bundles (excluding this one if it's an update)
+    const countQuery = isUpdate
+      ? 'SELECT COUNT(*) as count FROM campaign_bundles WHERE display_order <= 3 AND is_active = 1 AND id != ?'
+      : 'SELECT COUNT(*) as count FROM campaign_bundles WHERE display_order <= 3 AND is_active = 1'
+
+    const args = isUpdate ? [bundle.id] : []
+    const result = await db.execute({ sql: countQuery, args })
+
+    const currentFeaturedCount = Number(result.rows[0]?.count) || 0
+    const maxFeatured = 6 // Maximum featured bundles allowed
+
+    if (currentFeaturedCount >= maxFeatured) {
+      errors.push(`Limite de bundles vedettes atteinte (${maxFeatured} maximum). Retirez d'abord un bundle de la section vedette.`)
+    }
+
+    // Check for audience diversity in featured bundles
+    const audienceQuery = isUpdate
+      ? 'SELECT target_audience FROM campaign_bundles WHERE display_order <= 3 AND is_active = 1 AND id != ?'
+      : 'SELECT target_audience FROM campaign_bundles WHERE display_order <= 3 AND is_active = 1'
+
+    const audienceResult = await db.execute({ sql: audienceQuery, args })
+    const featuredAudiences = audienceResult.rows.map((row: any) => row.target_audience)
+
+    // Add current bundle's audience
+    featuredAudiences.push(bundle.targetAudience)
+
+    // Count occurrences of each audience
+    const audienceCounts = featuredAudiences.reduce((acc: any, audience: string) => {
+      acc[audience] = (acc[audience] || 0) + 1
+      return acc
+    }, {})
+
+    // Warn if too many bundles target the same audience
+    for (const [audience, count] of Object.entries(audienceCounts)) {
+      if (count > 3) {
+        errors.push(`Trop de bundles vedettes pour l'audience "${audience}" (${count}/3 maximum pour la diversité)`)
+      }
+    }
+
+  } catch (dbError) {
+    console.warn('Failed to validate featured bundle limits:', dbError)
+    // Don't fail validation if database check fails
   }
 
   return errors
