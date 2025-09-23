@@ -2,12 +2,6 @@
  * Types pour le système et les APIs
  */
 
-export interface ApiResponse<T = unknown> {
-  readonly success: boolean
-  readonly data?: T
-  readonly error?: ApiError
-  readonly meta?: ApiMeta
-}
 
 export interface ApiError {
   readonly code: string

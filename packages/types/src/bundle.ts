@@ -190,29 +190,3 @@ export interface BundleQuoteRequest {
   readonly status: "pending" | "processing" | "completed" | "expired";
 }
 
-// =====================================
-// TYPES RÉPONSE API
-// =====================================
-
-export interface BundleApiResponse {
-  readonly success: boolean;
-  readonly data?: CampaignBundle[];
-  readonly error?: string;
-  readonly pagination?: {
-    readonly page: number;
-    readonly limit: number;
-    readonly total: number;
-    readonly hasMore: boolean;
-  };
-}
-
-export interface QuoteApiResponse {
-  readonly success: boolean;
-  readonly data?: {
-    readonly quoteId: string;
-    readonly estimatedTotal: number;
-    readonly deliveryEstimate?: string;
-    readonly validUntil: string;
-  };
-  readonly error?: string;
-}

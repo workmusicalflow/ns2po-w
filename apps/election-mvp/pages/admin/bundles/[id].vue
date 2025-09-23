@@ -189,16 +189,20 @@
               </div>
             </div>
             <div class="flex items-center space-x-4">
-              <div class="flex items-center space-x-2">
-                <label class="text-sm text-gray-700">Quantité:</label>
-                <input
-                  v-model.number="product.quantity"
-                  type="number"
-                  min="1"
-                  class="w-20 px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
-                  @input="updateProductTotal(index)"
-                >
-              </div>
+              <!-- Nouveau composant QuantityInput avec UX améliorée -->
+              <QuantityInput
+                v-model="product.quantity"
+                :product-id="product.id"
+                :product-name="product.name"
+                :min="1"
+                :max="50000"
+                :step-small="10"
+                :step-large="100"
+                :presets="[1000, 2500, 5000, 10000]"
+                @update:model-value="updateProductTotal(index)"
+                @error="handleQuantityError(index, $event)"
+              />
+
               <div class="text-sm font-medium text-gray-900">
                 {{ formatPrice(product.subtotal) }}
               </div>
@@ -206,6 +210,7 @@
                 type="button"
                 class="text-red-600 hover:text-red-700"
                 @click="removeProduct(index)"
+                title="Supprimer ce produit du bundle"
               >
                 <Icon name="heroicons:trash" class="w-4 h-4" />
               </button>
@@ -221,54 +226,29 @@
           </p>
         </div>
 
-        <!-- Bundle Total -->
-        <div v-if="selectedProducts.length > 0" class="mt-6 pt-6 border-t border-gray-200">
-          <div class="flex justify-between items-center">
-            <span class="text-lg font-medium text-gray-900">Total des Produits:</span>
-            <span class="text-lg font-bold text-gray-900">{{ formatPrice(calculatedTotal) }}</span>
-          </div>
-          <div v-if="form.originalTotal && form.originalTotal > calculatedTotal" class="flex justify-between items-center mt-2">
-            <span class="text-sm text-gray-600">Économies:</span>
-            <span class="text-sm font-medium text-green-600">{{ formatPrice(form.originalTotal - calculatedTotal) }}</span>
-          </div>
+        <!-- Totalisateur amélioré avec feedback UX temps réel -->
+        <div v-if="selectedProducts.length > 0" class="mt-6">
+          <BundleTotalizer
+            :total-quantity="bundleValidationState.quantity || 0"
+            :total-price="calculatedTotal"
+            :original-price="form.originalTotal"
+            :minimum-quantity="1000"
+            :show-progress-bar="true"
+          />
+        </div>
 
-          <!-- Validation Status Panel - CORE 20% FIX -->
-          <div v-if="!bundleValidationState.canSave" class="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
-            <div class="flex items-start space-x-3">
-              <Icon name="heroicons:exclamation-triangle" class="w-5 h-5 text-red-500 mt-0.5 flex-shrink-0" />
-              <div class="flex-1">
-                <h3 class="text-sm font-medium text-red-800 mb-2">
-                  Bundle invalide - Correction requise
-                </h3>
-                <ul class="text-sm text-red-700 space-y-1">
-                  <li v-for="violation in bundleValidationState.blockers" :key="violation" class="flex items-start space-x-2">
-                    <span class="text-red-500 mt-0.5">•</span>
-                    <span>{{ violation }}</span>
-                  </li>
-                </ul>
-                <div v-if="bundleValidationState.total !== undefined && bundleValidationState.quantity !== undefined" class="mt-3 pt-3 border-t border-red-200">
-                  <div class="grid grid-cols-2 gap-4 text-xs">
-                    <div>
-                      <span class="text-red-600 font-medium">Total actuel:</span>
-                      <span class="ml-2 text-red-800">{{ formatPrice(bundleValidationState.total) }}</span>
-                    </div>
-                    <div>
-                      <span class="text-red-600 font-medium">Quantité totale:</span>
-                      <span class="ml-2 text-red-800">{{ bundleValidationState.quantity }} articles</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Validation Success Panel -->
-          <div v-else-if="bundleValidationState.canSave && !isNew" class="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+        <!-- Message d'aide si aucun produit -->
+        <div v-else class="mt-6">
+          <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
             <div class="flex items-center space-x-2">
-              <Icon name="heroicons:check-circle" class="w-4 h-4 text-green-500" />
-              <span class="text-sm font-medium text-green-800">Bundle valide et prêt à être sauvegardé</span>
+              <Icon name="heroicons:information-circle" class="w-5 h-5 text-blue-500" />
+              <span class="text-sm text-blue-700">
+                Ajoutez des produits pour voir le totalisateur et valider votre bundle.
+              </span>
             </div>
           </div>
+        </div>
+
         </div>
       </div>
 
@@ -438,6 +418,8 @@ import type { Bundle, BundleProduct, BundleAggregate, BundleTargetAudience } fro
 import type { Product } from '../../../types/domain/Product'
 import { validateBundleBusinessRules } from '../../../schemas/bundle'
 import ValidationConsequencesModal from '../../../components/admin/ValidationConsequencesModal.vue'
+import QuantityInput from '../../../components/admin/QuantityInput.vue'
+import BundleTotalizer from '../../../components/admin/BundleTotalizer.vue'
 
 // Layout admin
 definePageMeta({
@@ -972,6 +954,15 @@ function removeProduct(index: number) {
 
     // Show success notification car suppression valide
     crudSuccess?.deleted(productName, 'produit retiré du bundle')
+  }
+}
+
+// Gestionnaire d'erreur de quantité pour QuantityInput
+function handleQuantityError(index: number, hasError: boolean) {
+  // Marquer les erreurs de quantité individuelles si nécessaire
+  const product = selectedProducts.value[index]
+  if (product && hasError) {
+    console.warn(`Erreur de quantité pour le produit ${product.name}`)
   }
 }
 
