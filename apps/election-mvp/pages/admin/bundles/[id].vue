@@ -1010,6 +1010,14 @@ function updateProductTotal(index: number, newQuantity?: number) {
   // Use centralized bundle calculations
   bundleCalculations.updateProductQuantity(product.id, validQuantity)
 
+  // 🎯 SOLUTION HYBRIDE - Synchronize originalTotal with current product state
+  // Calculate originalTotal from current product configuration to maintain validation consistency
+  const newOriginalTotal = selectedProducts.value.reduce((sum, p) => sum + (p.basePrice || 0) * p.quantity, 0)
+
+  // Update form originalTotal to reflect current product state
+  // This ensures originalTotal >= estimatedTotal validation consistency
+  form.originalTotal = newOriginalTotal
+
   // Show info notification for quantity/price updates with the ACTUAL updated quantity
   // This ensures the notification shows the real new value, not stale data
   info?.('Produit mis à jour', `${product.name} - Quantité: ${validQuantity}`)
