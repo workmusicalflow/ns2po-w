@@ -3,8 +3,9 @@
  * Met à jour un campaign bundle existant avec la nouvelle structure Turso
  */
 
-import { getDatabase } from "~/server/utils/database"
-import { campaignBundleUpdateSchema, validateBundleProducts, validateBundleTotal, validateBundleBusinessRules } from "~/schemas/bundle"
+import { getDatabase } from "../../utils/database"
+import { campaignBundleUpdateSchema, validateBundleProducts, validateBundleTotal, validateBundleBusinessRules, validateFeaturedBundleLimit } from "~/schemas/bundle"
+import { broadcastSSEEvent } from '~/server/api/sse'
 import { z } from "zod"
 
 export default defineEventHandler(async (event) => {
@@ -31,14 +32,17 @@ export default defineEventHandler(async (event) => {
       validatedData = campaignBundleUpdateSchema.parse(body)
     } catch (error) {
       if (error instanceof z.ZodError) {
+        const formattedErrors = error.errors.map(err => ({
+          field: err.path.join('.'),
+          message: err.message
+        }))
+        console.error('❌ Erreurs de validation Zod:', JSON.stringify(formattedErrors, null, 2))
+
         throw createError({
           statusCode: 400,
           statusMessage: 'Données invalides',
           data: {
-            errors: error.errors.map(err => ({
-              field: err.path.join('.'),
-              message: err.message
-            }))
+            errors: formattedErrors
           }
         })
       }
@@ -54,9 +58,9 @@ export default defineEventHandler(async (event) => {
       })
     }
 
-    // Vérifier que le bundle existe
+    // Vérifier que le bundle existe et récupérer la version actuelle
     const existingBundle = await db.execute({
-      sql: 'SELECT id FROM campaign_bundles WHERE id = ?',
+      sql: 'SELECT id, version FROM campaign_bundles WHERE id = ?',
       args: [bundleId]
     })
 
@@ -67,14 +71,39 @@ export default defineEventHandler(async (event) => {
       })
     }
 
+    const currentVersion = Number(existingBundle.rows[0].version)
+
+    // Optimistic locking: vérifier la version si fournie
+    if (validatedData.version !== undefined) {
+      if (validatedData.version !== currentVersion) {
+        throw createError({
+          statusCode: 409,
+          statusMessage: 'Conflit de version détecté',
+          data: {
+            error: 'Le bundle a été modifié par un autre utilisateur',
+            currentVersion,
+            providedVersion: validatedData.version
+          }
+        })
+      }
+    }
+
     // Validations métier si des produits sont fournis
     if (validatedData.products) {
       const productErrors = validateBundleProducts(validatedData.products)
       const totalErrors = validateBundleTotal(validatedData)
       const businessErrors = validateBundleBusinessRules(validatedData)
 
-      const allErrors = [...productErrors, ...totalErrors, ...businessErrors]
+      let allErrors = [...productErrors, ...totalErrors, ...businessErrors]
+
+      // Validation des bundles vedettes pour les mises à jour
+      if (validatedData.isFeatured) {
+        const featuredErrors = await validateFeaturedBundleLimit(validatedData, db, true)
+        allErrors = [...allErrors, ...featuredErrors]
+      }
+
       if (allErrors.length > 0) {
+        console.error('❌ Erreurs de validation métier:', JSON.stringify(allErrors, null, 2))
         throw createError({
           statusCode: 400,
           statusMessage: 'Erreurs de validation métier',
@@ -150,10 +179,11 @@ export default defineEventHandler(async (event) => {
         updateArgs.push(JSON.stringify(validatedData.tags))
       }
 
-      // Toujours mettre à jour updated_at
+      // Toujours mettre à jour updated_at et incrémenter la version
       updateFields.push('updated_at = CURRENT_TIMESTAMP')
+      updateFields.push('version = version + 1')
 
-      if (updateFields.length > 1) { // Plus que juste updated_at
+      if (updateFields.length > 2) { // Plus que juste updated_at et version
         updateArgs.push(bundleId) // Pour la clause WHERE
         const sql = `UPDATE campaign_bundles SET ${updateFields.join(', ')} WHERE id = ?`
 
@@ -199,7 +229,7 @@ export default defineEventHandler(async (event) => {
           cb.base_price as basePrice, cb.discount_percentage as discountPercentage,
           cb.final_price as finalPrice, cb.is_active as isActive,
           cb.display_order as displayOrder, cb.icon, cb.color, cb.features,
-          cb.created_at as createdAt, cb.updated_at as updatedAt
+          cb.version, cb.created_at as createdAt, cb.updated_at as updatedAt
         FROM campaign_bundles cb WHERE cb.id = ?`,
         args: [bundleId]
       })
@@ -241,7 +271,7 @@ export default defineEventHandler(async (event) => {
 
       // Calculer les totaux
       const estimatedTotal = Number(bundleData.finalPrice) || 0
-      const originalTotal = products.reduce((sum, p) => sum + p.subtotal, 0)
+      const originalTotal = products.reduce((sum: number, p: any) => sum + p.subtotal, 0)
       const savings = originalTotal - estimatedTotal
 
       const response = {
@@ -265,10 +295,20 @@ export default defineEventHandler(async (event) => {
           icon: bundleData.icon,
           color: bundleData.color,
           displayOrder: bundleData.displayOrder,
-          discountPercentage: Number(bundleData.discountPercentage) || 0
+          discountPercentage: Number(bundleData.discountPercentage) || 0,
+          version: Number(bundleData.version) || 1
         },
         duration: Date.now() - startTime
       }
+
+      // Broadcast SSE event for real-time synchronization
+      console.log('📡 Émission SSE pour bundle mis à jour:', bundleData.name)
+      const broadcastResult = broadcastSSEEvent({
+        type: 'bundle:updated',
+        data: response.data,
+        timestamp: Date.now()
+      })
+      console.log('📊 Résultat broadcast SSE bundle:', broadcastResult)
 
       return response
 

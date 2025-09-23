@@ -199,7 +199,7 @@
                 :step-small="10"
                 :step-large="100"
                 :presets="[1000, 2500, 5000, 10000]"
-                @update:model-value="updateProductTotal(index)"
+                @update:model-value="(newQuantity) => updateProductTotal(index, newQuantity)"
                 @error="handleQuantityError(index, $event)"
               />
 
@@ -249,7 +249,6 @@
           </div>
         </div>
 
-        </div>
       </div>
 
       <!-- Form Actions -->
@@ -993,14 +992,26 @@ function handleValidationModalConfirm(forceDelete: boolean) {
   }
 }
 
-function updateProductTotal(index: number) {
+function updateProductTotal(index: number, newQuantity?: number) {
   const product = selectedProducts.value[index]
-  const validQuantity = product.quantity && !isNaN(product.quantity) ? product.quantity : 1
+  // Use the new quantity passed from the event, or fallback to product.quantity
+  const validQuantity = newQuantity !== undefined ? newQuantity : (product.quantity && !isNaN(product.quantity) ? product.quantity : 1)
+
+  // Update the product quantity in the local state if a new value was provided
+  if (newQuantity !== undefined) {
+    // Update the reactive object with the new quantity
+    selectedProducts.value[index] = {
+      ...product,
+      quantity: validQuantity,
+      subtotal: product.basePrice * validQuantity
+    }
+  }
 
   // Use centralized bundle calculations
   bundleCalculations.updateProductQuantity(product.id, validQuantity)
 
-  // Show info notification for quantity/price updates
+  // Show info notification for quantity/price updates with the ACTUAL updated quantity
+  // This ensures the notification shows the real new value, not stale data
   info?.('Produit mis à jour', `${product.name} - Quantité: ${validQuantity}`)
 }
 
