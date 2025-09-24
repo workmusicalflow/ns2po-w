@@ -1,16 +1,22 @@
 /**
  * API Route: DELETE /api/products/[id]
- * Supprime un produit existant de la base Turso
+ * Supprime un produit existant de la base Turso avec option de suppression des images
+ * Query params:
+ * - deleteImages=true: Supprime aussi les assets Cloudinary associés
  */
 
-import { getDatabase } from "~/server/utils/database"
+import { getDatabase } from "../../utils/database"
+import { assetService } from "../../services/assetService"
 
 export default defineEventHandler(async (event) => {
   const startTime = Date.now()
 
   try {
     const productId = getRouterParam(event, 'id')
-    console.log(`📦 DELETE /api/products/${productId} - Suppression produit`)
+    const query = getQuery(event)
+    const deleteImages = query.deleteImages === 'true'
+
+    console.log(`📦 DELETE /api/products/${productId} - Suppression produit ${deleteImages ? 'avec images' : 'sans images'}`)
 
     if (!productId) {
       throw createError({
@@ -63,6 +69,50 @@ export default defineEventHandler(async (event) => {
         })
       }
 
+      // Gestion des assets si deleteImages est activé
+      let deletedAssets: string[] = []
+      let assetsErrors: string[] = []
+
+      if (deleteImages) {
+        console.log('🖼️ Récupération des assets associés au produit...')
+
+        try {
+          const productAssets = await assetService.getAssetsByProduct(productId)
+          const allAssets = []
+
+          if (productAssets.mainImage) {
+            allAssets.push(productAssets.mainImage)
+          }
+
+          if (productAssets.galleryImages.length > 0) {
+            allAssets.push(...productAssets.galleryImages)
+          }
+
+          console.log(`🗑️ Suppression de ${allAssets.length} asset(s) associé(s)...`)
+
+          // Supprimer chaque asset
+          for (const asset of allAssets) {
+            try {
+              const deleteResult = await assetService.deleteAsset(asset.id)
+              if (deleteResult.success) {
+                deletedAssets.push(asset.id)
+                console.log(`✅ Asset supprimé: ${asset.id} (${asset.public_id})`)
+              } else {
+                assetsErrors.push(`${asset.id}: échec de suppression`)
+                console.warn(`⚠️ Échec suppression asset: ${asset.id}`)
+              }
+            } catch (assetError) {
+              assetsErrors.push(`${asset.id}: ${assetError instanceof Error ? assetError.message : 'erreur inconnue'}`)
+              console.error(`❌ Erreur suppression asset ${asset.id}:`, assetError)
+            }
+          }
+
+        } catch (assetsRetrievalError) {
+          console.warn('⚠️ Erreur lors de la récupération des assets:', assetsRetrievalError)
+          assetsErrors.push('Erreur lors de la récupération des assets')
+        }
+      }
+
       // Supprimer le produit
       await db.execute({
         sql: 'DELETE FROM products WHERE id = ?',
@@ -73,10 +123,19 @@ export default defineEventHandler(async (event) => {
 
       const response = {
         success: true,
-        message: `Produit "${productName}" supprimé avec succès`,
+        message: `Produit "${productName}" supprimé avec succès${deleteImages ? ` avec ${deletedAssets.length} asset(s)` : ''}`,
         data: {
           id: productId,
-          deletedAt: new Date().toISOString()
+          deletedAt: new Date().toISOString(),
+          ...(deleteImages && {
+            assets: {
+              deleteRequested: true,
+              deleted: deletedAssets,
+              errors: assetsErrors,
+              deletedCount: deletedAssets.length,
+              errorCount: assetsErrors.length
+            }
+          })
         },
         source: 'turso',
         duration: Date.now() - startTime
