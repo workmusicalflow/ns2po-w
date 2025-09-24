@@ -3,12 +3,16 @@
  * Crée un nouveau produit avec stratégie Turso-first
  */
 
-import { getDatabase } from "~/server/utils/database"
+import { getDatabase } from "../../utils/database"
 import { z } from "zod"
 
 // Schéma de validation pour création de produit
 const createProductSchema = z.object({
   name: z.string().min(1, "Le nom est requis").max(100, "Le nom ne peut pas dépasser 100 caractères"),
+  reference: z.string()
+    .min(3, "La référence doit contenir au moins 3 caractères")
+    .max(50, "La référence ne peut pas dépasser 50 caractères")
+    .regex(/^[A-Z0-9-_]+$/, "La référence ne peut contenir que des lettres majuscules, des chiffres, des tirets et des underscores"),
   description: z.string().optional(),
   category: z.string().min(1, "La catégorie est requise"),
   subcategory: z.string().optional(),
@@ -65,21 +69,36 @@ export default defineEventHandler(async (event) => {
     }
 
     try {
+      // Vérifier l'unicité de la référence avant insertion
+      const existingProduct = await db.execute({
+        sql: `SELECT id FROM products WHERE reference = ? LIMIT 1`,
+        args: [validatedData.reference]
+      })
+
+      if (existingProduct.rows.length > 0) {
+        throw createError({
+          statusCode: 409,
+          statusMessage: 'Référence produit déjà utilisée',
+          data: { field: 'reference', message: `La référence "${validatedData.reference}" est déjà utilisée par un autre produit.` }
+        })
+      }
+
       // Générer un ID unique pour le produit
       const productId = `prod_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
 
       // Insérer le nouveau produit
       await db.execute({
         sql: `INSERT INTO products (
-          id, name, description, category, subcategory,
+          id, name, reference, description, category, subcategory,
           base_price, min_quantity, max_quantity, unit, production_time_days,
           customizable, materials, colors, sizes,
           image_url, gallery_urls, specifications, is_active,
           created_at, updated_at
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`,
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`,
         args: [
           productId,
           validatedData.name,
+          validatedData.reference,
           validatedData.description || null,
           validatedData.category,
           validatedData.subcategory || null,
@@ -104,7 +123,7 @@ export default defineEventHandler(async (event) => {
       // Récupérer le produit créé
       const createdProductResult = await db.execute({
         sql: `SELECT
-          id, name, description, category, subcategory,
+          id, name, reference, description, category, subcategory,
           base_price as basePrice, min_quantity as minQuantity,
           max_quantity as maxQuantity, unit, production_time_days,
           customizable, materials, colors, sizes,
@@ -126,6 +145,7 @@ export default defineEventHandler(async (event) => {
       const product = {
         id: productData.id,
         name: productData.name,
+        reference: productData.reference,
         description: productData.description || '',
         category: productData.category,
         subcategory: productData.subcategory,
