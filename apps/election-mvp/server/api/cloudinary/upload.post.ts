@@ -51,22 +51,34 @@ export default defineEventHandler(async (event) => {
     // Options d'upload selon le preset
     const uploadOptions = getUploadOptionsForPreset(preset, folder)
 
-    // Upload vers Cloudinary
-    const result = await new Promise<CloudinaryUploadResult>((resolve, reject) => {
-      cloudinary.uploader.upload_stream(
-        uploadOptions,
-        (error, result) => {
-          if (error) {
-            console.error('Erreur upload Cloudinary:', error)
-            reject(error)
-          } else if (result) {
-            resolve(result as CloudinaryUploadResult)
-          } else {
-            reject(new Error('Résultat upload vide'))
+    console.log('📤 Upload vers Cloudinary...')
+
+    // Upload vers Cloudinary avec timeout
+    const result = await Promise.race([
+      new Promise<CloudinaryUploadResult>((resolve, reject) => {
+        cloudinary.uploader.upload_stream(
+          uploadOptions,
+          (error, result) => {
+            if (error) {
+              console.error('❌ Erreur upload Cloudinary:', error)
+              reject(error)
+            } else if (result) {
+              console.log('✅ Upload Cloudinary réussi:', result.public_id)
+              resolve(result as CloudinaryUploadResult)
+            } else {
+              console.error('❌ Résultat upload vide')
+              reject(new Error('Résultat upload vide'))
+            }
           }
-        }
-      ).end(fileData.data)
-    })
+        ).end(fileData.data)
+      }),
+      new Promise<never>((_, reject) => {
+        setTimeout(() => {
+          console.error('⏰ Timeout upload Cloudinary (30s)')
+          reject(new Error('Timeout - Upload vers Cloudinary trop long (30s)'))
+        }, 30000)
+      })
+    ])
 
     return {
       success: true,

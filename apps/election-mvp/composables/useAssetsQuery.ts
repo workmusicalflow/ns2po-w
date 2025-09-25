@@ -231,16 +231,18 @@ export function useUploadAssetMutation() {
       const response = await $fetch<{
         success: boolean
         data: Asset
-        message: string
+        message?: string
       }>('/api/assets', {
         method: 'POST',
-        body: formData
+        body: formData,
+        timeout: 30000 // Timeout de 30 secondes
       })
 
       if (!response.success) {
         throw new Error(response.message || 'Erreur lors de l\'upload')
       }
 
+      // L'API /api/assets retourne déjà un objet Asset complet
       return response.data
     },
     onSuccess: () => {

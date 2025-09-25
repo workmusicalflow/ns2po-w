@@ -4,8 +4,12 @@
     <div class="mb-8">
       <div class="flex items-center justify-between">
         <div>
-          <h1 class="text-2xl font-bold text-gray-900">Nouveau Produit</h1>
-          <p class="text-gray-600">Ajouter un nouveau produit au catalogue</p>
+          <h1 class="text-2xl font-bold text-gray-900">
+            Nouveau Produit
+          </h1>
+          <p class="text-gray-600">
+            Ajouter un nouveau produit au catalogue
+          </p>
         </div>
         <div class="flex items-center space-x-3">
           <NuxtLink
@@ -29,8 +33,8 @@
 </template>
 
 <script setup lang="ts">
-import { globalNotifications } from '~/composables/useNotifications'
-import ProductForm from '~/components/admin/ProductForm.vue'
+// Auto-imported via Nuxt 3: globalNotifications
+import ProductForm from '../../../components/admin/ProductForm.vue'
 
 // Layout admin
 definePageMeta({
@@ -68,22 +72,23 @@ const { crudSuccess, crudError } = globalNotifications
 // Reactive data
 const categories = ref<Category[]>([])
 
-// Methods
-const handleSubmit = async (product: Product) => {
-  try {
-    const response = await $fetch('/api/products', {
-      method: 'POST',
-      body: product
-    })
-
-    if (response.success) {
-      crudSuccess.created(product.name, 'produit')
-      await navigateTo(`/admin/products/${response.data.id}`)
-    }
-  } catch (error: any) {
+// Import the TanStack Query mutation
+const { mutate: createProduct, isPending: isCreating, error: createError } = useCreateProductMutation({
+  onSuccess: (newProduct) => {
+    crudSuccess.created(newProduct.name, 'produit')
+    // Redirection explicite vers la page d'édition du produit créé
+    navigateTo(`/admin/products/${newProduct.id}`)
+  },
+  onError: (error: any) => {
     console.error('Error creating product:', error)
     crudError.created('produit', error.message || 'Une erreur est survenue lors de la création.')
   }
+})
+
+// Methods
+const handleSubmit = async (product: Product) => {
+  if (isCreating.value) return // Prevent double submission
+  createProduct(product)
 }
 
 const handleCancel = () => {
