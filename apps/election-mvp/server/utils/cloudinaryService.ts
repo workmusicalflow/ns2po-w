@@ -142,15 +142,28 @@ class CloudinaryService {
   ): Promise<{ success: boolean; result: string }> {
     this.initializeConfig()
 
+    const invalidateOption = options.invalidate !== false // true par défaut sauf si explicitement false
+    console.log(`🗑️ Suppression Cloudinary: ${publicId} (invalidate: ${invalidateOption})`)
+
     try {
       const result = await cloudinary.uploader.destroy(publicId, {
         resource_type: options.resource_type || 'image',
         type: options.type || 'upload',
-        invalidate: options.invalidate || true
+        invalidate: invalidateOption
       })
 
+      const success = result.result === 'ok'
+      
+      if (success && invalidateOption) {
+        console.log(`✅ Asset supprimé avec invalidation CDN: ${publicId}`)
+      } else if (success) {
+        console.log(`✅ Asset supprimé sans invalidation CDN: ${publicId}`)
+      } else {
+        console.warn(`⚠️ Échec suppression Cloudinary: ${publicId} - ${result.result}`)
+      }
+
       return {
-        success: result.result === 'ok',
+        success,
         result: result.result
       }
     } catch (error) {

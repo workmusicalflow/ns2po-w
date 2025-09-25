@@ -591,7 +591,7 @@ export class BundleService {
 
   private validateQuantity(quantity: number): void {
     if (!BundleHelpers.validateProductQuantity(quantity)) {
-      throw new Error('Quantity must be a positive integer between 1 and 1000')
+      throw new Error('Quantity must be a positive integer')
     }
   }
 

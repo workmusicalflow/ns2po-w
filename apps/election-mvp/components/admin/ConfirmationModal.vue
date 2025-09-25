@@ -32,6 +32,31 @@
             {{ message }}
           </p>
 
+          <!-- Option suppression Cloudinary pour réalisations avec assets -->
+          <div v-if="showCloudinaryOption" class="mb-4">
+            <label class="flex items-start space-x-3 p-3 border border-blue-200 rounded-lg bg-blue-50 hover:bg-blue-100 transition-colors cursor-pointer">
+              <input
+                v-model="deleteFromCloudinary"
+                type="checkbox"
+                class="mt-1 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+              >
+              <div class="flex-1">
+                <div class="flex items-center space-x-2">
+                  <Icon name="heroicons:cloud" class="w-4 h-4 text-blue-600" />
+                  <span class="text-sm font-medium text-blue-900">
+                    Supprimer aussi de Cloudinary
+                  </span>
+                  <span v-if="props.cloudinaryAssetsCount" class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-200 text-blue-800">
+                    {{ props.cloudinaryAssetsCount }} asset{{ props.cloudinaryAssetsCount > 1 ? 's' : '' }}
+                  </span>
+                </div>
+                <p class="text-xs text-blue-700 mt-1">
+                  Les images seront définitivement supprimées du cloud Cloudinary
+                </p>
+              </div>
+            </label>
+          </div>
+
           <!-- Informations spécifiques par type -->
           <div v-if="details" :class="detailsClasses">
             <div class="flex items-start space-x-2">
@@ -54,7 +79,7 @@
           <button
             :class="confirmButtonClasses"
             class="px-4 py-2 text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors"
-            @click="onConfirm"
+            @click="handleConfirm"
           >
             {{ confirmText }}
           </button>
@@ -69,8 +94,9 @@ interface Props {
   show: boolean
   source: string
   itemName: string
-  onConfirm: () => void
+  onConfirm: (deleteFromCloudinary?: boolean) => void
   onCancel: () => void
+  cloudinaryAssetsCount?: number
 }
 
 const props = defineProps<Props>()
@@ -181,8 +207,20 @@ const onBackdropClick = () => {
   props.onCancel()
 }
 
+// State pour l'option Cloudinary
+const deleteFromCloudinary = ref(false)
+
+// Computed pour afficher l'option Cloudinary
+const showCloudinaryOption = computed(() => {
+  return props.cloudinaryAssetsCount && props.cloudinaryAssetsCount > 0
+})
+
+const handleConfirm = () => {
+  props.onConfirm(deleteFromCloudinary.value)
+}
+
 const onConfirm = () => {
-  props.onConfirm()
+  handleConfirm()
 }
 
 const onCancel = () => {

@@ -260,10 +260,10 @@ export function useBundleCalculations(
     updateProducts: (newProducts: BundleProduct[]) => {
       productsRef.value = newProducts
     },
-    addProduct: (product: Omit<BundleProduct, 'id'>) => {
+    addProduct: (product: Omit<BundleProduct, 'id'> & { productId: string }) => {
       const newProduct: BundleProduct = {
-        id: `product-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-        ...product
+        ...product,
+        id: product.productId // Use the real database ID instead of generating temp ID
       }
       productsRef.value = [...productsRef.value, newProduct]
     },

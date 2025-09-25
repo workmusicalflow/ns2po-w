@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS campaign_bundles (
 CREATE TABLE IF NOT EXISTS bundle_products (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   bundle_id INTEGER NOT NULL,
-  product_id INTEGER NOT NULL,
+  product_id TEXT NOT NULL,
   quantity INTEGER NOT NULL DEFAULT 1 CHECK(quantity > 0),
   custom_price REAL, -- Prix personnalisé pour ce produit dans ce bundle (optionnel)
   is_required BOOLEAN DEFAULT 1, -- Si le produit est obligatoire dans le bundle

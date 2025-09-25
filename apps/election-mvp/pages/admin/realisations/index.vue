@@ -552,6 +552,7 @@
       :show="showConfirmModal"
       :source="selectedRealisationForDelete.source"
       :item-name="selectedRealisationForDelete.title"
+      :cloudinary-assets-count="selectedRealisationForDelete.cloudinaryPublicIds?.length || 0"
       :on-confirm="confirmDelete"
       :on-cancel="closeConfirmModal"
     />
@@ -825,23 +826,25 @@ const deleteRealisation = async (realisation: Realisation) => {
   showConfirmModal.value = true
 }
 
-const confirmDelete = async () => {
+const confirmDelete = async (deleteFromCloudinary: boolean = false) => {
   if (!selectedRealisationForDelete.value) return
 
-  const realisation = selectedRealisationForDelete.value
-  const action = realisation.source === 'cloudinary-auto-discovery' ? 'désactiver' : 'supprimer'
-
   try {
-    await $fetch(`/api/realisations/${realisation.id}`, {
+    // Construire l'URL avec paramètre Cloudinary si nécessaire
+    const url = `/api/realisations/${selectedRealisationForDelete.value.id}${
+      deleteFromCloudinary ? '?deleteFromCloudinary=true' : ''
+    }`
+
+    const response = await $fetch(url, {
       method: 'DELETE'
     })
 
-    showNotification('success', `Réalisation ${action === 'désactiver' ? 'désactivée' : 'supprimée'} avec succès`)
+    // Le backend nous indique maintenant l'action effectuée via response.data.action
+    showNotification('success', response.message || 'Réalisation traitée avec succès')
     fetchRealisations()
   } catch (err: any) {
     console.error('Erreur lors de la suppression:', err)
-    const message = err.data?.message || `Erreur lors de la ${action === 'désactiver' ? 'désactivation' : 'suppression'} de la réalisation`
-    showNotification('error', message)
+    showNotification('error', err.data?.message || 'Erreur lors du traitement de la réalisation')
   } finally {
     closeConfirmModal()
   }

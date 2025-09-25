@@ -13,8 +13,7 @@ export const bundleProductSchema = z.object({
 
   quantity: z.number()
     .int('La quantité doit être un nombre entier')
-    .min(1, 'La quantité doit être au moins 1')
-    .max(1000, 'La quantité ne peut pas dépasser 1000'),
+    .min(1, 'La quantité doit être au moins 1'),
 
   subtotal: z.number()
     .min(0, 'Le sous-total ne peut pas être négatif')
@@ -49,11 +48,11 @@ export const campaignBundleSchema = z.object({
 
   estimatedTotal: z.number()
     .min(0, 'Le prix total ne peut pas être négatif')
-    .max(10000000, 'Le prix total ne peut pas dépasser 10 000 000 XOF'),
+    .max(1000000000, 'Le prix total ne peut pas dépasser 1 milliard XOF'),
 
   originalTotal: z.number()
     .min(0, 'Le prix original ne peut pas être négatif')
-    .max(10000000, 'Le prix original ne peut pas dépasser 10 000 000 XOF')
+    .max(1000000000, 'Le prix original ne peut pas dépasser 1 milliard XOF')
     .optional(),
 
   savings: z.number()
@@ -277,9 +276,6 @@ export function validateBundleBusinessRules(bundle: any): string[] {
   if (bundle.products && bundle.products.length > 0) {
     const totalQuantity = bundle.products.reduce((sum: number, product: any) => sum + product.quantity, 0)
 
-    if (totalQuantity < 1000) {
-      errors.push(`Quantité insuffisante: ${totalQuantity}/1000 articles minimum requis`)
-    }
   } else {
     errors.push('Au moins un produit est requis')
   }
@@ -298,8 +294,8 @@ export function validateBundleBusinessRules(bundle: any): string[] {
   if (bundle.products && bundle.products.length > 0) {
     const totalQuantity = bundle.products.reduce((sum: number, product: any) => sum + product.quantity, 0)
 
-    if (totalQuantity > 50000) {
-      errors.push('Quantité totale trop élevée (maximum: 50 000 articles)')
+    if (totalQuantity > 1000000) {
+      errors.push('Quantité totale trop élevée (maximum: 1 000 000 articles pour éviter les erreurs de saisie)')
     }
   }
 

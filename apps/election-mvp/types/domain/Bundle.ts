@@ -173,7 +173,7 @@ export const BundleValidationRules = {
   },
   estimatedTotal: {
     min: 0,
-    max: 50_000_000, // 50M XOF
+    max: 1_000_000_000, // 1B XOF pour permettre des quantités très élevées
     required: true
   },
   products: {
@@ -209,7 +209,7 @@ export const BundleHelpers = {
   },
 
   validateProductQuantity: (quantity: number): boolean => {
-    return Number.isInteger(quantity) && quantity > 0 && quantity <= 1000
+    return Number.isInteger(quantity) && quantity > 0
   },
 
   sanitizeProductPrice: (price: number | null | undefined): number => {

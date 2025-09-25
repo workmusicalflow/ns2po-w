@@ -13,7 +13,7 @@
               alt="NS2PO - Spécialiste publicité par l'objet"
               class="h-12 w-auto object-contain rounded"
             >
-            <span class="text-xl font-bold text-text-main">NS2PO Élections</span>
+            <span class="text-xl font-bold text-text-main">NS2PO | Élections</span>
           </NuxtLink>
 
           <!-- Navigation Menu -->

@@ -24,7 +24,7 @@
           <span class="line-reveal">Votre Campagne Électorale</span>
         </h1>
         <p class="hero-subtitle font-body">
-          Génération de devis et pré-commande de gadgets personnalisés
+          Pré-commande et création de visuels gratuits
         </p>
         <Button size="large" class="hero-cta" @click="navigateTo('/devis')">
           Demander un devis

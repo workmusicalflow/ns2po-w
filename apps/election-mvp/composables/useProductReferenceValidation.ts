@@ -449,7 +449,8 @@ export function useProductSelectorValidation(
       valid: validProducts.value.length,
       inactive: inactiveProducts.value.length,
       invalidPrice: invalidPriceProducts.value.length,
-      alreadySelected: alreadySelectedProducts.value.length
+      alreadySelected: alreadySelectedProducts.value.length,
+      filtered: availableProducts.value.length - validProducts.value.length
     }))
   }
 }
