@@ -1,8 +1,10 @@
 <template>
-  <form @submit.prevent="submitForm" class="space-y-6">
+  <form class="space-y-6" @submit.prevent="submitForm">
     <!-- Basic Information -->
     <div class="bg-white p-6 rounded-lg border border-gray-200">
-      <h3 class="text-lg font-medium text-gray-900 mb-4">Informations de base</h3>
+      <h3 class="text-lg font-medium text-gray-900 mb-4">
+        Informations de base
+      </h3>
 
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <!-- Product Name -->
@@ -21,8 +23,10 @@
             ]"
             placeholder="Ex: T-shirt personnalisé"
             @blur="validateField('name')"
-          />
-          <p v-if="errors.name" class="mt-1 text-sm text-red-600">{{ errors.name }}</p>
+          >
+          <p v-if="errors.name" class="mt-1 text-sm text-red-600">
+            {{ errors.name }}
+          </p>
         </div>
 
         <!-- Reference -->
@@ -41,11 +45,13 @@
             ]"
             placeholder="Ex: TSHIRT-001"
             @blur="validateField('reference')"
-          />
+          >
           <p class="mt-1 text-xs text-gray-500">
             Lettres majuscules, chiffres, tirets et underscores uniquement
           </p>
-          <p v-if="errors.reference" class="mt-1 text-sm text-red-600">{{ errors.reference }}</p>
+          <p v-if="errors.reference" class="mt-1 text-sm text-red-600">
+            {{ errors.reference }}
+          </p>
         </div>
       </div>
 
@@ -64,14 +70,18 @@
           ]"
           placeholder="Description détaillée du produit..."
           @blur="validateField('description')"
-        ></textarea>
-        <p v-if="errors.description" class="mt-1 text-sm text-red-600">{{ errors.description }}</p>
+        />
+        <p v-if="errors.description" class="mt-1 text-sm text-red-600">
+          {{ errors.description }}
+        </p>
       </div>
     </div>
 
     <!-- Category and Status -->
     <div class="bg-white p-6 rounded-lg border border-gray-200">
-      <h3 class="text-lg font-medium text-gray-900 mb-4">Catégorie et statut</h3>
+      <h3 class="text-lg font-medium text-gray-900 mb-4">
+        Catégorie et statut
+      </h3>
 
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <!-- Category -->
@@ -89,7 +99,9 @@
             ]"
             @change="validateField('category_id')"
           >
-            <option value="">Sélectionner une catégorie</option>
+            <option value="">
+              Sélectionner une catégorie
+            </option>
             <option
               v-for="category in categories"
               :key="category.id"
@@ -98,7 +110,9 @@
               {{ category.name }}
             </option>
           </select>
-          <p v-if="errors.category_id" class="mt-1 text-sm text-red-600">{{ errors.category_id }}</p>
+          <p v-if="errors.category_id" class="mt-1 text-sm text-red-600">
+            {{ errors.category_id }}
+          </p>
         </div>
 
         <!-- Status -->
@@ -116,18 +130,28 @@
             ]"
             @change="validateField('status')"
           >
-            <option value="active">Actif</option>
-            <option value="inactive">Inactif</option>
-            <option value="draft">Brouillon</option>
+            <option value="active">
+              Actif
+            </option>
+            <option value="inactive">
+              Inactif
+            </option>
+            <option value="draft">
+              Brouillon
+            </option>
           </select>
-          <p v-if="errors.status" class="mt-1 text-sm text-red-600">{{ errors.status }}</p>
+          <p v-if="errors.status" class="mt-1 text-sm text-red-600">
+            {{ errors.status }}
+          </p>
         </div>
       </div>
     </div>
 
     <!-- Pricing and Quantities -->
     <div class="bg-white p-6 rounded-lg border border-gray-200">
-      <h3 class="text-lg font-medium text-gray-900 mb-4">Tarification et quantités</h3>
+      <h3 class="text-lg font-medium text-gray-900 mb-4">
+        Tarification et quantités
+      </h3>
 
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <!-- Price -->
@@ -148,8 +172,10 @@
             ]"
             placeholder="0.00"
             @blur="validateField('price')"
-          />
-          <p v-if="errors.price" class="mt-1 text-sm text-red-600">{{ errors.price }}</p>
+          >
+          <p v-if="errors.price" class="mt-1 text-sm text-red-600">
+            {{ errors.price }}
+          </p>
         </div>
 
         <!-- Min Quantity -->
@@ -169,8 +195,10 @@
             ]"
             placeholder="1"
             @blur="validateField('min_quantity')"
-          />
-          <p v-if="errors.min_quantity" class="mt-1 text-sm text-red-600">{{ errors.min_quantity }}</p>
+          >
+          <p v-if="errors.min_quantity" class="mt-1 text-sm text-red-600">
+            {{ errors.min_quantity }}
+          </p>
         </div>
 
         <!-- Max Quantity -->
@@ -189,15 +217,19 @@
             ]"
             placeholder="1000"
             @blur="validateField('max_quantity')"
-          />
-          <p v-if="errors.max_quantity" class="mt-1 text-sm text-red-600">{{ errors.max_quantity }}</p>
+          >
+          <p v-if="errors.max_quantity" class="mt-1 text-sm text-red-600">
+            {{ errors.max_quantity }}
+          </p>
         </div>
       </div>
     </div>
 
     <!-- Images -->
     <div class="bg-white p-6 rounded-lg border border-gray-200">
-      <h3 class="text-lg font-medium text-gray-900 mb-4">Images du produit</h3>
+      <h3 class="text-lg font-medium text-gray-900 mb-4">
+        Images du produit
+      </h3>
 
       <!-- Current Images -->
       <div v-if="formData.images && formData.images.length > 0" class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
@@ -210,42 +242,34 @@
             :src="getImageUrl(image)"
             :alt="`Image ${index + 1}`"
             class="w-full h-24 object-cover rounded-lg"
-          />
+          >
           <button
             type="button"
-            @click="removeImage(index)"
             class="absolute top-1 right-1 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+            @click="removeImage(index)"
           >
             <Icon name="heroicons:x-mark" class="w-4 h-4" />
           </button>
         </div>
       </div>
 
-      <!-- Upload Area -->
+      <!-- Add Images Button -->
       <div class="border-2 border-dashed border-gray-300 rounded-lg p-6">
         <div class="text-center">
           <Icon name="heroicons:photo" class="mx-auto h-12 w-12 text-gray-400" />
           <div class="mt-2">
-            <input
-              ref="fileInput"
-              type="file"
-              multiple
-              accept="image/*"
-              @change="handleFileUpload"
-              class="hidden"
-            />
             <button
               type="button"
-              @click="$refs.fileInput.click()"
-              :disabled="isUploading"
-              class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
+              class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-amber-500"
+              @click="showAssetModal = true"
             >
-              <Icon v-if="isUploading" name="heroicons:arrow-path" class="w-4 h-4 mr-2 animate-spin" />
-              <Icon v-else name="heroicons:cloud-arrow-up" class="w-4 h-4 mr-2" />
-              {{ isUploading ? 'Upload en cours...' : 'Ajouter des images' }}
+              <Icon name="heroicons:plus" class="w-4 h-4 mr-2" />
+              Ajouter des images
             </button>
           </div>
-          <p class="text-xs text-gray-500 mt-1">PNG, JPG, GIF jusqu'à 10MB</p>
+          <p class="text-xs text-gray-500 mt-1">
+            Uploadez de nouvelles images ou sélectionnez depuis les assets existants
+          </p>
         </div>
       </div>
     </div>
@@ -254,8 +278,8 @@
     <div class="flex justify-end space-x-3 pt-6 border-t">
       <button
         type="button"
-        @click="$emit('cancel')"
         class="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500"
+        @click="$emit('cancel')"
       >
         Annuler
       </button>
@@ -269,11 +293,20 @@
       </button>
     </div>
   </form>
+
+  <!-- Asset Selection Modal -->
+  <AssetSelectionModal
+    :show="showAssetModal"
+    :multiple="true"
+    @close="showAssetModal = false"
+    @selected="handleAssetsSelected"
+  />
 </template>
 
 <script setup lang="ts">
-import { useFormValidation } from '~/composables/useFormValidation'
-import { globalNotifications } from '~/composables/useNotifications'
+// Auto-imported via Nuxt 3: useFormValidation, globalNotifications
+import type { Asset } from '~/composables/useAssetsQuery'
+import AssetSelectionModal from '~/components/admin/AssetSelectionModal.vue'
 
 interface Product {
   id?: string
@@ -306,6 +339,7 @@ const emit = defineEmits<{
 
 const { validateProduct } = useFormValidation()
 const { crudError } = globalNotifications
+const { emitImageAdded, emitImageRemoved } = useProductImagesEventBus()
 
 // Form state
 const formData = reactive<Product>({
@@ -323,6 +357,10 @@ const formData = reactive<Product>({
 const errors = ref<Record<string, string>>({})
 const isSubmitting = ref(false)
 const isUploading = ref(false)
+const showAssetModal = ref(false)
+
+// Template refs
+const fileInput = ref<HTMLInputElement>()
 
 // Initialize form with product data
 watchEffect(() => {
@@ -393,27 +431,37 @@ const handleFileUpload = async (event: Event) => {
         continue
       }
 
-      const formData = new FormData()
-      formData.append('file', file)
-      formData.append('upload_preset', 'products')
-      formData.append('folder', 'ns2po/products')
+      const uploadFormData = new FormData()
+      uploadFormData.append('file', file)
+      uploadFormData.append('folder', 'ns2po/products')
 
-      const response = await fetch('https://api.cloudinary.com/v1_1/dsrvzogof/image/upload', {
+      const response = await $fetch('/api/cloudinary/upload', {
         method: 'POST',
-        body: formData
+        body: uploadFormData
       })
 
-      if (!response.ok) {
+      if (!response.success) {
         throw new Error('Erreur lors de l\'upload')
       }
 
-      const data = await response.json()
+      const data = response.data
 
       // Add to form images
       if (!formData.images) {
         formData.images = []
       }
       formData.images.push(data.public_id)
+
+      // Emit image added event for real-time synchronization
+      if (formData.id) {
+        const imageUrl = getImageUrl(data.public_id)
+        emitImageAdded(formData.id, data.public_id, imageUrl, {
+          width: data.width,
+          height: data.height,
+          format: data.format,
+          size: data.bytes
+        })
+      }
     }
   } catch (error) {
     console.error('Erreur upload:', error)
@@ -426,9 +474,45 @@ const handleFileUpload = async (event: Event) => {
 }
 
 const removeImage = (index: number) => {
-  if (formData.images) {
+  if (formData.images && formData.images[index]) {
+    const removedImagePublicId = formData.images[index]
     formData.images.splice(index, 1)
+
+    // Emit image removed event for real-time synchronization
+    if (formData.id) {
+      emitImageRemoved(formData.id, removedImagePublicId, [...formData.images])
+    }
   }
+}
+
+const handleAssetsSelected = (assets: Asset[]) => {
+  if (!assets || assets.length === 0) return
+
+  // Initialize images array if needed
+  if (!formData.images) {
+    formData.images = []
+  }
+
+  // Add selected assets to form images
+  assets.forEach(asset => {
+    // Avoid duplicates
+    if (!formData.images!.includes(asset.public_id)) {
+      formData.images!.push(asset.public_id)
+
+      // Emit image added event for real-time synchronization
+      if (formData.id) {
+        const imageUrl = getImageUrl(asset.public_id)
+        emitImageAdded(formData.id, asset.public_id, imageUrl, {
+          width: asset.width || 0,
+          height: asset.height || 0,
+          format: asset.format,
+          size: asset.bytes
+        })
+      }
+    }
+  })
+
+  console.log('✅ Assets ajoutés:', assets.map(a => a.public_id))
 }
 
 const getImageUrl = (publicId: string) => {
@@ -450,14 +534,22 @@ const submitForm = async () => {
   isSubmitting.value = true
   try {
     // Transform form data to match API schema
-    const apiData = {
+    const apiData: Record<string, unknown> = {
       ...formData,
       // Map UI fields to API fields
       category: formData.category_id,
       base_price: formData.price,
+      // Transform images array to API format
+      image_url: formData.images && formData.images.length > 0
+        ? `https://res.cloudinary.com/dsrvzogof/image/upload/${formData.images[0]}`
+        : undefined,
+      gallery_urls: formData.images && formData.images.length > 1
+        ? formData.images.slice(1).map(publicId => `https://res.cloudinary.com/dsrvzogof/image/upload/${publicId}`)
+        : [],
       // Remove UI-specific fields
       category_id: undefined,
-      price: undefined
+      price: undefined,
+      images: undefined
     }
 
     // Clean undefined fields
@@ -467,7 +559,7 @@ const submitForm = async () => {
       }
     })
 
-    emit('submit', apiData)
+    emit('submit', apiData as Product)
   } catch (error) {
     console.error('Erreur soumission:', error)
   } finally {
