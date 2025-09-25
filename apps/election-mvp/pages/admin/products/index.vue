@@ -13,7 +13,7 @@
         </div>
         <NuxtLink
           to="/admin/products/new"
-          class="inline-flex items-center px-4 py-2 bg-amber-600 text-white text-sm font-medium rounded-lg hover:bg-amber-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500"
+          class="inline-flex items-center px-4 py-2 bg-accent text-white text-sm font-medium rounded-lg hover:bg-primary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent/50"
         >
           <Icon name="heroicons:plus" class="w-4 h-4 mr-2" />
           Nouveau Produit
