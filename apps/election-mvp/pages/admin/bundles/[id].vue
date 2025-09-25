@@ -322,6 +322,78 @@
       @close="showProductSelector = false"
     >
       <div class="space-y-4">
+        <!-- Diagnostic Counter with Tooltip -->
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <span class="text-sm text-gray-600">
+              {{ filteredAvailableProducts.length }} produits disponibles sur {{ productSelectorValidation.validationStats.value.total }} totaux
+            </span>
+            <HeadlessMenu as="div" class="relative inline-block">
+              <HeadlessMenuButton class="flex items-center">
+                <Icon name="heroicons:information-circle" class="w-4 h-4 text-gray-400 hover:text-gray-600 cursor-help" />
+              </HeadlessMenuButton>
+              <transition
+                enter-active-class="transition duration-100 ease-out"
+                enter-from-class="transform scale-95 opacity-0"
+                enter-to-class="transform scale-100 opacity-100"
+                leave-active-class="transition duration-75 ease-in"
+                leave-from-class="transform scale-100 opacity-100"
+                leave-to-class="transform scale-95 opacity-0"
+              >
+                <HeadlessMenuItems
+                  class="absolute z-10 mt-2 w-64 origin-top-left rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none p-3"
+                >
+                  <div class="text-xs space-y-1">
+                    <p v-if="productSelectorValidation.validationStats.value.alreadySelected > 0" class="flex items-center gap-2">
+                      <span class="w-2 h-2 bg-blue-500 rounded-full"></span>
+                      {{ productSelectorValidation.validationStats.value.alreadySelected }} déjà dans le bundle
+                    </p>
+                    <p v-if="productSelectorValidation.validationStats.value.inactive > 0" class="flex items-center gap-2">
+                      <span class="w-2 h-2 bg-gray-500 rounded-full"></span>
+                      {{ productSelectorValidation.validationStats.value.inactive }} produits inactifs
+                    </p>
+                    <p v-if="productSelectorValidation.validationStats.value.invalidPrice > 0" class="flex items-center gap-2">
+                      <span class="w-2 h-2 bg-red-500 rounded-full"></span>
+                      {{ productSelectorValidation.validationStats.value.invalidPrice }} sans prix valide
+                    </p>
+                  </div>
+                </HeadlessMenuItems>
+              </transition>
+            </HeadlessMenu>
+          </div>
+
+          <!-- Toggle to show/hide excluded products -->
+          <div class="flex items-center gap-2">
+            <input
+              type="checkbox"
+              v-model="showExcludedProducts"
+              id="show-excluded"
+              class="rounded border-gray-300 text-amber-600 focus:ring-amber-500"
+            >
+            <label for="show-excluded" class="text-sm text-gray-700 cursor-pointer">
+              Afficher les produits non disponibles
+            </label>
+          </div>
+        </div>
+
+        <!-- Feedback Message for Filtered Products -->
+        <div
+          v-if="productSelectorValidation.validationStats.value.filtered > 0 && !showExcludedProducts"
+          class="bg-amber-50 border-l-4 border-amber-400 p-3 rounded"
+        >
+          <div class="flex">
+            <Icon name="heroicons:exclamation-triangle" class="w-5 h-5 text-amber-400 flex-shrink-0" />
+            <div class="ml-3 text-sm">
+              <p class="font-medium text-amber-800">
+                {{ productSelectorValidation.validationStats.value.filtered }} produits masqués
+              </p>
+              <p class="text-amber-700 mt-1">
+                Certains produits ne sont pas disponibles car ils sont déjà dans le bundle, inactifs ou sans prix défini.
+              </p>
+            </div>
+          </div>
+        </div>
+
         <!-- Search -->
         <div class="relative">
           <input
@@ -335,45 +407,109 @@
 
         <!-- Products Grid -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-96 overflow-y-auto">
-          <div
-            v-for="product in filteredAvailableProducts"
-            :key="product.id"
-            :class="[
-              'border border-gray-200 rounded-lg p-4',
-              product.basePrice && product.basePrice > 0
-                ? 'hover:bg-gray-50 cursor-pointer'
-                : 'bg-gray-50 cursor-not-allowed opacity-60'
-            ]"
-            @click="product.basePrice && product.basePrice > 0 ? addProduct(product) : null"
-          >
-            <div class="flex items-center space-x-3">
-              <img
-                v-if="product.image_url"
-                :src="product.image_url"
-                :alt="product.name"
-                class="w-10 h-10 rounded object-cover"
-              >
-              <div
-                v-else
-                class="w-10 h-10 rounded bg-gray-200 flex items-center justify-center"
-              >
-                <Icon name="heroicons:cube" class="w-5 h-5 text-gray-400" />
+          <!-- Available products -->
+          <template v-if="!showExcludedProducts">
+            <div
+              v-for="product in filteredAvailableProducts"
+              :key="product.id"
+              :class="[
+                'border border-gray-200 rounded-lg p-4',
+                product.basePrice && product.basePrice > 0
+                  ? 'hover:bg-gray-50 cursor-pointer'
+                  : 'bg-gray-50 cursor-not-allowed opacity-60'
+              ]"
+              @click="product.basePrice && product.basePrice > 0 ? addProduct(product) : null"
+            >
+              <div class="flex items-center space-x-3">
+                <img
+                  v-if="product.image_url || (product as any).image"
+                  :src="product.image_url || (product as any).image || ''"
+                  :alt="product.name"
+                  class="w-10 h-10 rounded object-cover"
+                >
+                <div
+                  v-else
+                  class="w-10 h-10 rounded bg-gray-200 flex items-center justify-center"
+                >
+                  <Icon name="heroicons:cube" class="w-5 h-5 text-gray-400" />
+                </div>
+                <div class="flex-1">
+                  <h3 class="text-sm font-medium text-gray-900">
+                    {{ product.name }}
+                  </h3>
+                  <p class="text-sm" :class="product.basePrice && product.basePrice > 0 ? 'text-gray-500' : 'text-red-500'">
+                    {{ product.basePrice && product.basePrice > 0 ? formatPrice(product.basePrice) : 'Prix non défini' }}
+                  </p>
+                </div>
+                <button
+                  class="text-amber-600 hover:text-amber-700"
+                >
+                  <Icon name="heroicons:plus" class="w-5 h-5" />
+                </button>
               </div>
-              <div class="flex-1">
-                <h3 class="text-sm font-medium text-gray-900">
-                  {{ product.name }}
-                </h3>
-                <p class="text-sm" :class="product.basePrice && product.basePrice > 0 ? 'text-gray-500' : 'text-red-500'">
-                  {{ product.basePrice && product.basePrice > 0 ? formatPrice(product.basePrice) : 'Prix non défini' }}
-                </p>
-              </div>
-              <button
-                class="text-amber-600 hover:text-amber-700"
-              >
-                <Icon name="heroicons:plus" class="w-5 h-5" />
-              </button>
             </div>
-          </div>
+          </template>
+
+          <!-- All products including excluded ones -->
+          <template v-else>
+            <div
+              v-for="product in getDisplayProducts()"
+              :key="product.id"
+              :class="[
+                'border rounded-lg p-4 relative',
+                getProductStatus(product).canAdd
+                  ? 'border-gray-200 hover:bg-gray-50 cursor-pointer'
+                  : 'border-gray-200 bg-gray-50 opacity-60 cursor-not-allowed'
+              ]"
+              @click="getProductStatus(product).canAdd ? addProduct(product) : null"
+            >
+              <!-- Status Badge -->
+              <div v-if="!getProductStatus(product).canAdd" class="absolute top-2 right-2">
+                <span
+                  :class="[
+                    'inline-flex items-center px-2 py-1 text-xs font-medium rounded',
+                    getProductStatus(product).reason === 'Déjà dans le bundle'
+                      ? 'bg-blue-100 text-blue-800'
+                      : getProductStatus(product).reason === 'Produit inactif'
+                      ? 'bg-gray-100 text-gray-800'
+                      : 'bg-red-100 text-red-800'
+                  ]"
+                >
+                  {{ getProductStatus(product).reason }}
+                </span>
+              </div>
+
+              <div class="flex items-center space-x-3">
+                <img
+                  v-if="product.image_url || (product as any).image"
+                  :src="product.image_url || (product as any).image || ''"
+                  :alt="product.name"
+                  class="w-10 h-10 rounded object-cover"
+                >
+                <div
+                  v-else
+                  class="w-10 h-10 rounded bg-gray-200 flex items-center justify-center"
+                >
+                  <Icon name="heroicons:cube" class="w-5 h-5 text-gray-400" />
+                </div>
+                <div class="flex-1">
+                  <h3 class="text-sm font-medium text-gray-900">
+                    {{ product.name }}
+                  </h3>
+                  <p class="text-sm" :class="product.basePrice && product.basePrice > 0 || product.price > 0 ? 'text-gray-500' : 'text-red-500'">
+                    {{ product.basePrice && product.basePrice > 0 ? formatPrice(product.basePrice) : product.price && product.price > 0 ? formatPrice(product.price) : 'Prix non défini' }}
+                  </p>
+                </div>
+                <button
+                  v-if="getProductStatus(product).canAdd"
+                  class="text-amber-600 hover:text-amber-700"
+                >
+                  <Icon name="heroicons:plus" class="w-5 h-5" />
+                </button>
+                <div v-else class="w-5 h-5" />
+              </div>
+            </div>
+          </template>
         </div>
 
         <div v-if="filteredAvailableProducts.length === 0" class="text-center py-8 text-gray-500">
@@ -405,7 +541,9 @@
  */
 
 // SOLID Architecture imports
-import { useBundleQuery, useCreateBundleMutation, useUpdateBundleMutation, useDeleteBundleMutation } from '../../../composables/useBundlesQuery'
+import { useBundleQuery, useCreateBundleMutation, useUpdateBundleMutation, useDeleteBundleMutation, bundleQueryKeys } from '../../../composables/useBundlesQuery'
+import { useQueryClient } from '@tanstack/vue-query'
+import { bundleService } from '../../../services/BundleService'
 import { useProductsQuery } from '../../../composables/useProductsQuery'
 import { useBundleCalculations } from '../../../composables/useBundleCalculations'
 import { useProductReferenceValidation, useBundleProductsValidation, useProductSelectorValidation } from '../../../composables/useProductReferenceValidation'
@@ -419,6 +557,7 @@ import { validateBundleBusinessRules } from '../../../schemas/bundle'
 import ValidationConsequencesModal from '../../../components/admin/ValidationConsequencesModal.vue'
 import QuantityInput from '../../../components/admin/QuantityInput.vue'
 import BundleTotalizer from '../../../components/admin/BundleTotalizer.vue'
+import { Menu as HeadlessMenu, MenuButton as HeadlessMenuButton, MenuItems as HeadlessMenuItems } from '@headlessui/vue'
 
 // Layout admin
 definePageMeta({
@@ -455,6 +594,7 @@ if (import.meta.client) {
 
 // ===== REACTIVE STATE =====
 const showProductSelector = ref(false)
+const showExcludedProducts = ref(false)
 const productSearch = ref('')
 const tagsInput = ref('')
 const isSyncing = ref(false) // État pour la synchronisation manuelle
@@ -546,10 +686,20 @@ const createBundleMutation = useCreateBundleMutation({
   }
 })
 
+// Initialize queryClient in setup context
+const queryClient = useQueryClient()
+
 const updateBundleMutation = useUpdateBundleMutation({
-  onSuccess: (bundle) => {
+  onSuccess: async (bundle) => {
     crudSuccess?.updated(bundle.name, 'bundle')
-    router.push('/admin/bundles')
+
+    // Pre-load bundles list before navigation for instant UX (recommended by Gemini Copilot)
+    await queryClient.prefetchQuery({
+      queryKey: bundleQueryKeys.list(),
+      queryFn: () => bundleService.getBundles()
+    })
+
+    await router.push('/admin/bundles')
   },
   onError: (error) => {
     crudError?.updated('bundle', error.message)
@@ -592,6 +742,41 @@ const filteredAvailableProducts = computed(() => {
 
   return products
 })
+
+// Helper function to get all products for display when showing excluded ones
+const getDisplayProducts = (): Product[] => {
+  let products = availableProducts.value || []
+
+  // Apply search filter
+  if (debouncedProductSearch.value) {
+    const search = debouncedProductSearch.value.toLowerCase()
+    products = products.filter(product =>
+      product.name.toLowerCase().includes(search) ||
+      product.reference?.toLowerCase().includes(search)
+    )
+  }
+
+  return products
+}
+
+// Helper function to get product status
+const getProductStatus = (product: Product): { canAdd: boolean; reason?: string } => {
+  if (!product.isActive) {
+    return { canAdd: false, reason: 'Produit inactif' }
+  }
+
+  const productPrice = product.price || product.basePrice || 0
+  if (productPrice <= 0) {
+    return { canAdd: false, reason: 'Prix non défini' }
+  }
+
+  const alreadySelected = selectedProducts.value.some(sp => sp.productId === product.id)
+  if (alreadySelected) {
+    return { canAdd: false, reason: 'Déjà dans le bundle' }
+  }
+
+  return { canAdd: true }
+}
 
 const isSubmitting = computed(() =>
   createBundleMutation.isPending.value || updateBundleMutation.isPending.value

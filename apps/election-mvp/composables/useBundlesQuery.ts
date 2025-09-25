@@ -303,8 +303,18 @@ export function useUpdateBundleMutation(
       }
     },
     onSuccess: (data, _variables, context) => {
-      // Update all relevant queries
+      // 1. Update detail cache immediately (no network request)
       queryClient.setQueryData(bundleQueryKeys.detail(data.id), data)
+
+      // 2. Update list cache immediately with the modified bundle (recommended by experts)
+      queryClient.setQueryData(bundleQueryKeys.list(), (oldBundles: Bundle[] | undefined) => {
+        if (!oldBundles) return undefined
+        return oldBundles.map(bundle =>
+          bundle.id === data.id ? data : bundle
+        )
+      })
+
+      // 3. Invalidate as safety net (will refetch only if needed)
       queryClient.invalidateQueries({ queryKey: bundleQueryKeys.lists() })
       queryClient.invalidateQueries({ queryKey: bundleQueryKeys.aggregate(data.id) })
 
