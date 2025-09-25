@@ -29,9 +29,14 @@
       <!-- Turso Database -->
       <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
         <div class="flex items-center justify-between mb-4">
-          <h3 class="text-lg font-semibold text-gray-900">
-            Turso Database
-          </h3>
+          <div>
+            <h3 class="text-lg font-semibold text-gray-900">
+              Turso Database
+            </h3>
+            <p v-if="tursoStats?.connection?.databaseName" class="text-xs text-gray-500">
+              {{ tursoStats.connection.databaseName }}
+            </p>
+          </div>
           <div class="flex items-center">
             <div :class="['w-3 h-3 rounded-full mr-2', tursoStats?.connection?.healthy ? 'bg-green-500' : 'bg-red-500']" />
             <span class="text-sm text-gray-600">{{ tursoStats?.connection?.status || 'Vérification...' }}</span>
@@ -39,6 +44,9 @@
         </div>
         <p class="text-sm text-gray-600 mb-4">
           Base de données principale (SQLite Edge)
+          <span v-if="tursoStats?.connection?.host" class="text-xs text-gray-400">
+            • {{ tursoStats.connection.host }}
+          </span>
         </p>
         <div class="space-y-2">
           <div class="flex justify-between text-sm">
@@ -79,28 +87,44 @@
       <!-- Cloudinary -->
       <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
         <div class="flex items-center justify-between mb-4">
-          <h3 class="text-lg font-semibold text-gray-900">
-            Cloudinary
-          </h3>
+          <div>
+            <h3 class="text-lg font-semibold text-gray-900">
+              Cloudinary
+            </h3>
+            <p v-if="cloudinaryStats?.connection?.cloudName" class="text-xs text-gray-500">
+              {{ cloudinaryStats.connection.cloudName }}
+            </p>
+          </div>
           <div class="flex items-center">
-            <div class="w-3 h-3 bg-green-500 rounded-full mr-2" />
-            <span class="text-sm text-gray-600">Connecté</span>
+            <div :class="['w-3 h-3 rounded-full mr-2', cloudinaryStats?.connection?.healthy ? 'bg-green-500' : 'bg-red-500']" />
+            <span class="text-sm text-gray-600">{{ cloudinaryStats?.connection?.status || 'Vérification...' }}</span>
           </div>
         </div>
         <p class="text-sm text-gray-600 mb-4">
-          Gestion des médias
+          Gestion des médias NS2PO
+          <span v-if="cloudinaryStats?.performance?.responseTime" class="text-xs text-gray-400">
+            • {{ cloudinaryStats.performance.responseTime }}ms
+          </span>
         </p>
         <div class="space-y-2">
           <div class="flex justify-between text-sm">
-            <span>Images:</span>
-            <span class="text-gray-500">{{ cloudinaryStats.images }}</span>
+            <span>Images NS2PO:</span>
+            <span class="text-gray-500">{{ cloudinaryStats?.project?.totalImages || '-' }}</span>
+          </div>
+          <div class="flex justify-between text-sm">
+            <span>Taille totale:</span>
+            <span class="text-gray-500">{{ cloudinaryStats?.project?.totalSizeMB || '-' }} MB</span>
+          </div>
+          <div class="flex justify-between text-sm">
+            <span>Images récentes:</span>
+            <span class="text-gray-500">{{ cloudinaryStats?.project?.recentImages || 0 }} (7j)</span>
           </div>
           <button
             :disabled="isSyncing"
             class="w-full px-3 py-2 border border-gray-300 text-gray-700 text-sm rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-amber-500 disabled:opacity-50"
             @click="syncCloudinary"
           >
-            Synchroniser Cloudinary
+            Actualiser stats Cloudinary
           </button>
         </div>
       </div>
@@ -169,14 +193,11 @@ const { crudSuccess, crudError } = globalNotifications
 // Reactive data
 const isSyncing = ref(false)
 const tursoStats = ref(null)
+const cloudinaryStats = ref(null)
 
 const lastSyncTimes = ref({
   turso: 'Jamais',
-  cloudinary: '1 hour ago'
-})
-
-const cloudinaryStats = ref({
-  images: 234
+  cloudinary: 'Jamais'
 })
 
 const syncLogs = ref([
@@ -200,9 +221,10 @@ const syncLogs = ref([
   }
 ])
 
-// Load Turso stats on mount
+// Load stats on mount
 onMounted(() => {
   refreshTursoStats()
+  refreshCloudinaryStats()
 })
 
 // Methods
@@ -245,6 +267,19 @@ async function refreshTursoStats() {
   }
 }
 
+async function refreshCloudinaryStats() {
+  try {
+    const response = await $fetch('/api/admin/cloudinary-stats')
+    cloudinaryStats.value = response
+    lastSyncTimes.value.cloudinary = 'À l\'instant'
+    addSyncLog('Statistiques Cloudinary actualisées', 'success')
+  } catch (error) {
+    console.error('Erreur actualisation stats Cloudinary:', error)
+    crudError.updated('sync', 'Erreur lors de l\'actualisation des stats Cloudinary')
+    addSyncLog(`Erreur stats Cloudinary: ${error}`, 'error')
+  }
+}
+
 async function optimizeTursoDatabase() {
   isSyncing.value = true
   try {
@@ -277,9 +312,7 @@ async function syncCloudinary() {
   isSyncing.value = true
   try {
     crudSuccess.updated('Synchronisation Cloudinary initiée', 'sync')
-    // Simulation d'une synchronisation Cloudinary
-    await new Promise(resolve => setTimeout(resolve, 1000))
-    lastSyncTimes.value.cloudinary = 'À l\'instant'
+    await refreshCloudinaryStats()
     crudSuccess.updated('Synchronisation Cloudinary terminée', 'sync')
     addSyncLog('Synchronisation Cloudinary terminée', 'success')
   } catch (error) {

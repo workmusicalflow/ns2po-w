@@ -4,12 +4,16 @@
     <div class="mb-8">
       <div class="flex items-center justify-between">
         <div>
-          <h1 class="text-2xl font-bold text-gray-900">Gestion des Catégories</h1>
-          <p class="text-gray-600">Gérez la hiérarchie de vos catégories et sous-catégories</p>
+          <h1 class="text-2xl font-bold text-gray-900">
+            Gestion des Catégories
+          </h1>
+          <p class="text-gray-600">
+            Gérez la hiérarchie de vos catégories et sous-catégories
+          </p>
         </div>
         <button
-          @click="openCreateModal"
           class="inline-flex items-center px-4 py-2 bg-amber-600 text-white text-sm font-medium rounded-lg hover:bg-amber-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500"
+          @click="openCreateModal"
         >
           <Icon name="heroicons:plus" class="w-4 h-4 mr-2" />
           Nouvelle Catégorie
@@ -29,7 +33,7 @@
               type="text"
               placeholder="Nom, description..."
               class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
-            />
+            >
             <Icon name="heroicons:magnifying-glass" class="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
           </div>
         </div>
@@ -41,9 +45,15 @@
             v-model="filters.status"
             class="block w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
           >
-            <option value="">Tous les statuts</option>
-            <option value="active">Actives</option>
-            <option value="inactive">Inactives</option>
+            <option value="">
+              Tous les statuts
+            </option>
+            <option value="active">
+              Actives
+            </option>
+            <option value="inactive">
+              Inactives
+            </option>
           </select>
         </div>
 
@@ -54,9 +64,15 @@
             v-model="filters.type"
             class="block w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
           >
-            <option value="">Tous les types</option>
-            <option value="parent">Catégories principales</option>
-            <option value="child">Sous-catégories</option>
+            <option value="">
+              Tous les types
+            </option>
+            <option value="parent">
+              Catégories principales
+            </option>
+            <option value="child">
+              Sous-catégories
+            </option>
           </select>
         </div>
       </div>
@@ -64,9 +80,9 @@
       <!-- Action Buttons -->
       <div class="flex items-center gap-4 mt-4 pt-4 border-t border-gray-200">
         <button
-          @click="refreshCategories"
           :disabled="loading"
           class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 disabled:opacity-50"
+          @click="refreshCategories"
         >
           <Icon name="heroicons:arrow-path" class="w-4 h-4 mr-2" :class="{ 'animate-spin': loading }" />
           Actualiser
@@ -82,16 +98,20 @@
       <!-- Loading State -->
       <div v-if="loading" class="p-8 text-center">
         <Icon name="heroicons:arrow-path" class="w-8 h-8 animate-spin mx-auto text-amber-600 mb-4" />
-        <p class="text-gray-600">Chargement des catégories...</p>
+        <p class="text-gray-600">
+          Chargement des catégories...
+        </p>
       </div>
 
       <!-- Error State -->
       <div v-else-if="error" class="p-8 text-center">
         <Icon name="heroicons:exclamation-triangle" class="w-8 h-8 mx-auto text-red-600 mb-4" />
-        <p class="text-red-600 mb-4">{{ error }}</p>
+        <p class="text-red-600 mb-4">
+          {{ error }}
+        </p>
         <button
-          @click="refreshCategories"
           class="inline-flex items-center px-4 py-2 bg-amber-600 text-white text-sm font-medium rounded-lg hover:bg-amber-700"
+          @click="refreshCategories"
         >
           Réessayer
         </button>
@@ -173,7 +193,7 @@
                       'w-1.5 h-1.5 mr-1.5 rounded-full',
                       category.isActive ? 'bg-green-400' : 'bg-red-400'
                     ]"
-                  ></span>
+                  />
                   {{ category.isActive ? 'Active' : 'Inactive' }}
                 </span>
               </td>
@@ -196,24 +216,24 @@
               <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                 <div class="flex items-center justify-end space-x-2">
                   <button
-                    @click="openEditModal(category)"
                     class="text-amber-600 hover:text-amber-900 p-1 rounded hover:bg-amber-50"
                     title="Modifier"
+                    @click="openEditModal(category)"
                   >
                     <Icon name="heroicons:pencil" class="w-4 h-4" />
                   </button>
                   <button
-                    @click="duplicateCategory(category)"
                     class="text-blue-600 hover:text-blue-900 p-1 rounded hover:bg-blue-50"
                     title="Dupliquer"
+                    @click="duplicateCategory(category)"
                   >
                     <Icon name="heroicons:document-duplicate" class="w-4 h-4" />
                   </button>
                   <button
-                    @click="deleteCategory(category)"
                     :disabled="(category.subcategories && category.subcategories.length > 0)"
                     class="text-red-600 hover:text-red-900 p-1 rounded hover:bg-red-50 disabled:opacity-50 disabled:cursor-not-allowed"
                     title="Supprimer"
+                    @click="deleteCategory(category)"
                   >
                     <Icon name="heroicons:trash" class="w-4 h-4" />
                   </button>
@@ -227,11 +247,15 @@
       <!-- Empty State -->
       <div v-else class="p-8 text-center">
         <Icon name="heroicons:folder-open" class="w-12 h-12 mx-auto text-gray-400 mb-4" />
-        <h3 class="text-lg font-medium text-gray-900 mb-2">Aucune catégorie trouvée</h3>
-        <p class="text-gray-500 mb-4">Commencez par créer votre première catégorie.</p>
+        <h3 class="text-lg font-medium text-gray-900 mb-2">
+          Aucune catégorie trouvée
+        </h3>
+        <p class="text-gray-500 mb-4">
+          Commencez par créer votre première catégorie.
+        </p>
         <button
-          @click="openCreateModal"
           class="inline-flex items-center px-4 py-2 bg-amber-600 text-white text-sm font-medium rounded-lg hover:bg-amber-700"
+          @click="openCreateModal"
         >
           <Icon name="heroicons:plus" class="w-4 h-4 mr-2" />
           Créer une catégorie
@@ -247,42 +271,6 @@
       @close="closeModal"
       @saved="onCategorySaved"
     />
-
-    <!-- Notifications -->
-    <div
-      v-if="notification.show"
-      :class="[
-        'fixed top-4 right-4 z-50 max-w-sm w-full bg-white shadow-lg rounded-lg pointer-events-auto ring-1 ring-black ring-opacity-5',
-        notification.type === 'success' ? 'border-l-4 border-green-400' : 'border-l-4 border-red-400'
-      ]"
-    >
-      <div class="p-4">
-        <div class="flex items-start">
-          <div class="flex-shrink-0">
-            <Icon
-              :name="notification.type === 'success' ? 'heroicons:check-circle' : 'heroicons:x-circle'"
-              :class="[
-                'h-5 w-5',
-                notification.type === 'success' ? 'text-green-400' : 'text-red-400'
-              ]"
-            />
-          </div>
-          <div class="ml-3 w-0 flex-1">
-            <p class="text-sm font-medium text-gray-900">
-              {{ notification.message }}
-            </p>
-          </div>
-          <div class="ml-4 flex-shrink-0 flex">
-            <button
-              @click="notification.show = false"
-              class="rounded-md inline-flex text-gray-400 hover:text-gray-500"
-            >
-              <Icon name="heroicons:x-mark" class="h-5 w-5" />
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
   </div>
 </template>
 

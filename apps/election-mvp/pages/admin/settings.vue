@@ -4,13 +4,17 @@
     <div class="mb-8">
       <div class="flex items-center justify-between">
         <div>
-          <h1 class="text-2xl font-bold text-gray-900">Paramètres</h1>
-          <p class="text-gray-600">Configuration générale de l'application</p>
+          <h1 class="text-2xl font-bold text-gray-900">
+            Paramètres
+          </h1>
+          <p class="text-gray-600">
+            Configuration générale de l'application
+          </p>
         </div>
         <button
-          @click="saveSettings"
           :disabled="isSaving"
           class="inline-flex items-center px-4 py-2 bg-amber-600 text-white text-sm font-medium rounded-lg hover:bg-amber-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 disabled:opacity-50 disabled:cursor-not-allowed"
+          @click="saveSettings"
         >
           <Icon name="heroicons:check" class="w-4 h-4 mr-2" />
           {{ isSaving ? 'Sauvegarde...' : 'Sauvegarder' }}
@@ -23,7 +27,9 @@
       <!-- General Settings -->
       <div class="bg-white rounded-lg shadow-sm border border-gray-200">
         <div class="px-6 py-4 border-b border-gray-200">
-          <h3 class="text-lg font-semibold text-gray-900">Paramètres généraux</h3>
+          <h3 class="text-lg font-semibold text-gray-900">
+            Paramètres généraux
+          </h3>
         </div>
         <div class="p-6 space-y-6">
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -33,7 +39,7 @@
                 v-model="settings.appName"
                 type="text"
                 class="block w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
-              />
+              >
             </div>
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">Version</label>
@@ -42,7 +48,7 @@
                 type="text"
                 readonly
                 class="block w-full px-3 py-2 border border-gray-300 rounded-md text-sm bg-gray-50 text-gray-500"
-              />
+              >
             </div>
           </div>
 
@@ -52,7 +58,7 @@
               v-model="settings.description"
               rows="3"
               class="block w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
-            ></textarea>
+            />
           </div>
 
           <div class="flex items-center">
@@ -60,7 +66,7 @@
               v-model="settings.maintenanceMode"
               type="checkbox"
               class="h-4 w-4 text-amber-600 focus:ring-amber-500 border-gray-300 rounded"
-            />
+            >
             <label class="ml-2 block text-sm text-gray-900">
               Mode maintenance (désactive l'accès public)
             </label>
@@ -71,7 +77,9 @@
       <!-- API Configuration -->
       <div class="bg-white rounded-lg shadow-sm border border-gray-200">
         <div class="px-6 py-4 border-b border-gray-200">
-          <h3 class="text-lg font-semibold text-gray-900">Configuration API</h3>
+          <h3 class="text-lg font-semibold text-gray-900">
+            Configuration API
+          </h3>
         </div>
         <div class="p-6 space-y-6">
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -81,7 +89,7 @@
                 v-model="settings.airtable.baseId"
                 type="text"
                 class="block w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
-              />
+              >
             </div>
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">Cloudinary Cloud Name</label>
@@ -89,7 +97,7 @@
                 v-model="settings.cloudinary.cloudName"
                 type="text"
                 class="block w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
-              />
+              >
             </div>
           </div>
 
@@ -99,7 +107,7 @@
               v-model="settings.turso.databaseUrl"
               type="text"
               class="block w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
-            />
+            >
           </div>
         </div>
       </div>
@@ -107,7 +115,9 @@
       <!-- Email Configuration -->
       <div class="bg-white rounded-lg shadow-sm border border-gray-200">
         <div class="px-6 py-4 border-b border-gray-200">
-          <h3 class="text-lg font-semibold text-gray-900">Configuration Email</h3>
+          <h3 class="text-lg font-semibold text-gray-900">
+            Configuration Email
+          </h3>
         </div>
         <div class="p-6 space-y-6">
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -117,7 +127,7 @@
                 v-model="settings.smtp.host"
                 type="text"
                 class="block w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
-              />
+              >
             </div>
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">Port SMTP</label>
@@ -125,7 +135,7 @@
                 v-model="settings.smtp.port"
                 type="number"
                 class="block w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
-              />
+              >
             </div>
           </div>
 
@@ -136,7 +146,7 @@
                 v-model="settings.smtp.username"
                 type="text"
                 class="block w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
-              />
+              >
             </div>
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">Email expéditeur</label>
@@ -144,7 +154,7 @@
                 v-model="settings.smtp.from"
                 type="email"
                 class="block w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
-              />
+              >
             </div>
           </div>
 
@@ -153,7 +163,7 @@
               v-model="settings.smtp.secure"
               type="checkbox"
               class="h-4 w-4 text-amber-600 focus:ring-amber-500 border-gray-300 rounded"
-            />
+            >
             <label class="ml-2 block text-sm text-gray-900">
               Utiliser SSL/TLS
             </label>
@@ -164,7 +174,9 @@
       <!-- Cache & Performance -->
       <div class="bg-white rounded-lg shadow-sm border border-gray-200">
         <div class="px-6 py-4 border-b border-gray-200">
-          <h3 class="text-lg font-semibold text-gray-900">Cache et Performance</h3>
+          <h3 class="text-lg font-semibold text-gray-900">
+            Cache et Performance
+          </h3>
         </div>
         <div class="p-6 space-y-6">
           <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -174,7 +186,7 @@
                 v-model.number="settings.cache.apiTtl"
                 type="number"
                 class="block w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
-              />
+              >
             </div>
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">TTL Cache Images (secondes)</label>
@@ -182,7 +194,7 @@
                 v-model.number="settings.cache.imageTtl"
                 type="number"
                 class="block w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
-              />
+              >
             </div>
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">Limite par page</label>
@@ -190,7 +202,7 @@
                 v-model.number="settings.pagination.limit"
                 type="number"
                 class="block w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
-              />
+              >
             </div>
           </div>
 
@@ -200,7 +212,7 @@
                 v-model="settings.cache.enabled"
                 type="checkbox"
                 class="h-4 w-4 text-amber-600 focus:ring-amber-500 border-gray-300 rounded"
-              />
+              >
               <label class="ml-2 block text-sm text-gray-900">
                 Activer le cache
               </label>
@@ -210,7 +222,7 @@
                 v-model="settings.compression.enabled"
                 type="checkbox"
                 class="h-4 w-4 text-amber-600 focus:ring-amber-500 border-gray-300 rounded"
-              />
+              >
               <label class="ml-2 block text-sm text-gray-900">
                 Activer la compression
               </label>
@@ -223,7 +235,7 @@
 </template>
 
 <script setup lang="ts">
-import { globalNotifications } from '~/composables/useNotifications'
+// Auto-imported via Nuxt 3: globalNotifications
 
 // Layout admin
 definePageMeta({

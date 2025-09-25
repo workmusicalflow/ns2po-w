@@ -4,13 +4,13 @@
  */
 
 import { z } from 'zod'
-import { globalNotifications } from '~/composables/useNotifications'
+// Auto-imported via Nuxt 3: globalNotifications
 
 // Import all schemas
-import { campaignBundleSchema } from '~/schemas/bundle'
-import { productSchema } from '~/schemas/product'
-import { createCategorySchema, updateCategorySchema } from '~/schemas/category'
-import { createRealisationSchema, updateRealisationSchema } from '~/schemas/realisation'
+import { campaignBundleSchema } from '../schemas/bundle'
+import { productSchema } from '../schemas/product'
+import { createCategorySchema, updateCategorySchema } from '../schemas/category'
+import { createRealisationSchema, updateRealisationSchema } from '../schemas/realisation'
 
 export interface ValidationError {
   field: string

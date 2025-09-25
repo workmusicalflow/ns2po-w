@@ -51,9 +51,40 @@
 
         <!-- Upload Tab -->
         <div v-if="activeTab === 'upload'" class="space-y-6">
+          <!-- Error Messages -->
+          <div v-if="errorMessages.length > 0" class="bg-red-50 border border-red-200 rounded-md p-3">
+            <div class="flex">
+              <Icon name="heroicons:exclamation-triangle" class="w-5 h-5 text-red-400 mr-2 flex-shrink-0" />
+              <div class="flex-1">
+                <h3 class="text-sm font-medium text-red-800">Erreurs détectées :</h3>
+                <ul class="mt-2 text-sm text-red-700 list-disc list-inside">
+                  <li v-for="error in errorMessages" :key="error">{{ error }}</li>
+                </ul>
+                <button
+                  @click="errorMessages = []"
+                  class="mt-2 text-xs text-red-600 hover:text-red-800 underline"
+                >
+                  Masquer les erreurs
+                </button>
+              </div>
+            </div>
+          </div>
+
           <!-- Upload Area -->
-          <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-gray-400 transition-colors">
+          <div
+            class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-gray-400 transition-colors"
+            :class="{
+              'border-amber-500 bg-amber-50': isDragOver,
+              'border-gray-300': !isDragOver,
+              'border-red-300 bg-red-50': errorMessages.length > 0
+            }"
+            @dragover.prevent="handleDragOver"
+            @dragenter.prevent="handleDragEnter"
+            @dragleave.prevent="handleDragLeave"
+            @drop.prevent="handleDrop"
+          >
             <input
+              id="file-upload-input"
               ref="fileInput"
               type="file"
               @change="handleFileSelect"
@@ -63,17 +94,44 @@
             />
 
             <div v-if="uploadedFiles.length === 0">
-              <Icon name="heroicons:cloud-arrow-up" class="w-12 h-12 text-gray-400 mx-auto mb-4" />
+              <Icon
+                :name="isUploading ? 'heroicons:cloud-arrow-up' : 'heroicons:cloud-arrow-up'"
+                :class="[
+                  'w-12 h-12 mx-auto mb-4 transition-colors',
+                  isUploading ? 'text-amber-500 animate-bounce' : isDragOver ? 'text-amber-500' : 'text-gray-400'
+                ]"
+              />
               <p class="text-lg text-gray-600 mb-2">
-                Glissez-déposez vos images ici ou cliquez pour parcourir
+                {{
+                  isUploading
+                    ? 'Upload en cours...'
+                    : isDragOver
+                      ? 'Relâchez pour uploader'
+                      : 'Glissez-déposez vos images ici ou cliquez pour parcourir'
+                }}
               </p>
-              <button
-                @click="fileInput?.click()"
-                :disabled="isUploading"
-                class="text-amber-600 hover:text-amber-700 font-medium"
-              >
-                Parcourir les fichiers
-              </button>
+              <!-- Solution robuste: Label pour déclencher l'input file -->
+              <template v-if="!isUploading">
+                <label
+                  for="file-upload-input"
+                  :class="[
+                    'inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 transition-colors cursor-pointer',
+                    'text-white bg-amber-600 hover:bg-amber-700'
+                  ]"
+                >
+                  <Icon name="heroicons:folder-plus" class="w-4 h-4 mr-2" />
+                  Parcourir les fichiers
+                </label>
+              </template>
+              <template v-else>
+                <button
+                  disabled
+                  class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-gray-400 bg-gray-200 cursor-not-allowed"
+                >
+                  <div class="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin mr-2"></div>
+                  Upload...
+                </button>
+              </template>
               <p class="text-sm text-gray-500 mt-2">
                 PNG, JPG, WebP jusqu'à 10MB par fichier
               </p>
@@ -126,17 +184,36 @@
                   >
                     <Icon name="heroicons:check" class="w-4 h-4" />
                   </div>
+
+                  <!-- Error Indicator -->
+                  <div
+                    v-if="file.error"
+                    class="absolute top-2 left-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center"
+                    :title="file.error"
+                  >
+                    <Icon name="heroicons:exclamation-triangle" class="w-4 h-4" />
+                  </div>
+
+                  <!-- File Name -->
+                  <div class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-75 text-white p-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <p class="text-xs truncate">{{ file.name }}</p>
+                    <p v-if="file.error" class="text-xs text-red-300 truncate">{{ file.error }}</p>
+                  </div>
                 </div>
               </div>
 
-              <button
-                @click="fileInput?.click()"
-                :disabled="isUploading"
-                class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
+              <label
+                for="file-upload-input"
+                :class="[
+                  'inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium transition-colors cursor-pointer',
+                  isUploading
+                    ? 'text-gray-400 bg-gray-200 cursor-not-allowed'
+                    : 'text-gray-700 bg-white hover:bg-gray-50'
+                ]"
               >
                 <Icon name="heroicons:plus" class="w-4 h-4 mr-2" />
                 Ajouter plus d'images
-              </button>
+              </label>
             </div>
           </div>
         </div>
@@ -304,7 +381,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, reactive, nextTick } from 'vue'
 import type { Asset } from '~/composables/useAssetsQuery'
 import { useAssetsQuery, useUploadAssetMutation, getAssetTypeIcon, getAssetTypeColor } from '~/composables/useAssetsQuery'
 
@@ -329,6 +406,8 @@ const activeTab = ref<'upload' | 'select'>('select')
 const searchQuery = ref('')
 const formatFilter = ref('')
 const selectedAssets = ref<Asset[]>([])
+const isDragOver = ref(false)
+const errorMessages = ref<string[]>([])
 const uploadedFiles = ref<Array<{
   file: File
   name: string
@@ -336,10 +415,23 @@ const uploadedFiles = ref<Array<{
   uploading: boolean
   uploaded: boolean
   asset: Asset | null
+  error?: string
 }>>([])
 
 // Refs
 const fileInput = ref<HTMLInputElement | null>(null)
+
+// Méthode alternative pour déclencher l'input file si le label ne fonctionne pas
+const triggerFileInput = () => {
+  console.log('🔧 triggerFileInput appelé')
+  const input = fileInput.value || document.getElementById('file-upload-input') as HTMLInputElement
+  if (input) {
+    console.log('✅ Input trouvé, déclenchement du click')
+    input.click()
+  } else {
+    console.error('❌ Input file non trouvé')
+  }
+}
 
 // Pagination
 const pagination = ref({
@@ -404,13 +496,43 @@ const toggleAssetSelection = (asset: Asset) => {
   }
 }
 
-const handleFileSelect = async (event: Event) => {
-  const target = event.target as HTMLInputElement
-  const files = target.files
+// Drag & Drop Handlers
+const handleDragOver = (event: DragEvent) => {
+  event.preventDefault()
+  isDragOver.value = true
+}
 
+const handleDragEnter = (event: DragEvent) => {
+  event.preventDefault()
+  isDragOver.value = true
+}
+
+const handleDragLeave = (event: DragEvent) => {
+  event.preventDefault()
+  // Only set to false if we're actually leaving the drop zone
+  if (!event.currentTarget?.contains(event.relatedTarget as Node)) {
+    isDragOver.value = false
+  }
+}
+
+const handleDrop = async (event: DragEvent) => {
+  event.preventDefault()
+  isDragOver.value = false
+
+  const files = event.dataTransfer?.files
   if (!files) return
 
-  for (const file of Array.from(files)) {
+  // Process the dropped files using the same logic as file selection
+  await processFiles(Array.from(files))
+}
+
+// Shared file processing logic
+const processFiles = async (files: File[]) => {
+  console.log('🔍 processFiles appelé avec', files.length, 'fichiers')
+
+  for (const file of files) {
+    console.log('📁 Traitement du fichier:', file.name, 'Type:', file.type, 'Taille:', file.size)
+
     // Validate file
     if (!file.type.startsWith('image/')) {
       console.warn('Fichier ignoré (pas une image):', file.name)
@@ -422,28 +544,36 @@ const handleFileSelect = async (event: Event) => {
       continue
     }
 
+    console.log('✅ Fichier validé:', file.name)
+
     // Create preview
     let preview: string | null = null
     if (file.type.startsWith('image/')) {
       preview = URL.createObjectURL(file)
+      console.log('🖼️ Preview créé pour:', file.name)
     }
 
-    // Add to uploaded files
-    const uploadFile = {
+    // Add to uploaded files - Use reactive reference for Vue 3 reactivity
+    const uploadFile = reactive({
       file,
       name: file.name,
       preview,
       uploading: false,
       uploaded: false,
-      asset: null
-    }
+      asset: null as Asset | null,
+      error: undefined as string | undefined
+    })
 
     uploadedFiles.value.push(uploadFile)
+    console.log('📋 Fichier ajouté à la liste, total:', uploadedFiles.value.length)
 
-    // Start upload
+    // Start upload - Force reactivity update
     uploadFile.uploading = true
+    await nextTick()
+    console.log('🚀 Début de l\'upload pour:', file.name)
 
     try {
+      console.log('📤 Appel de uploadMutation.mutateAsync...')
       const uploadedAsset = await uploadMutation.mutateAsync({
         file,
         metadata: {
@@ -451,21 +581,45 @@ const handleFileSelect = async (event: Event) => {
         }
       })
 
+      // Force Vue reactivity update
       uploadFile.uploaded = true
       uploadFile.asset = uploadedAsset
+      uploadFile.uploading = false
 
-      console.log('✅ Asset uploadé:', uploadedAsset.public_id)
+      await nextTick() // Ensure DOM updates
+      console.log('✅ Asset uploadé avec succès:', uploadedAsset.public_id)
+      console.log('📊 État final uploadFile:', { uploaded: uploadFile.uploaded, hasAsset: !!uploadFile.asset })
+      console.log('📊 Total uploadedAssets:', uploadedAssets.value.length)
     } catch (error) {
-      console.error('❌ Erreur upload:', error)
+      console.error('❌ Erreur complète lors de l\'upload:', error)
+      console.error('❌ Type d\'erreur:', typeof error)
+      console.error('❌ Message:', error?.message)
+      console.error('❌ Stack:', error?.stack)
+
+      uploadFile.error = error?.message || 'Erreur inconnue'
+      uploadFile.uploading = false
+
       // Remove failed upload
       const index = uploadedFiles.value.indexOf(uploadFile)
       if (index > -1) {
         uploadedFiles.value.splice(index, 1)
+        console.log('🗑️ Fichier retiré de la liste après échec')
       }
-    } finally {
-      uploadFile.uploading = false
     }
   }
+
+  await nextTick() // Final reactivity update
+  console.log('🎯 processFiles terminé')
+  console.log('📊 Total final uploadedAssets:', uploadedAssets.value.length)
+}
+
+const handleFileSelect = async (event: Event) => {
+  const target = event.target as HTMLInputElement
+  const files = target.files
+
+  if (!files) return
+
+  await processFiles(Array.from(files))
 
   // Clear input
   if (target) {

@@ -1,7 +1,12 @@
 /**
- * Bundle Service - Business Logic Layer
+ * Bundle Service - Business Logic Layer (DEPRECATED)
  * SOLID Architecture - Service Layer (SRP)
- * Orchestrates Bundle operations with validation and calculation logic
+ *
+ * ⚠️ DEPRECATED: This service is being replaced by Vue Query.
+ * New implementations should use useBundlesQuery composable instead.
+ *
+ * FIXME: This service has been partially refactored to remove BundleRepository
+ * Some methods still need implementation or should be migrated to Vue Query
  */
 
 import type {
@@ -14,30 +19,68 @@ import type {
   BundleCalculation,
   BundleValidationRules
 } from '../types/domain/Bundle'
-import type { IBundleRepository } from '../types/repositories/BundleRepository'
+// NOTE: BundleRepository removed - Vue Query now handles data layer
+// import type { IBundleRepository } from '../types/repositories/BundleRepository'
 import type { Product } from '../types/domain/Product'
-import { bundleRepository } from '../repositories/BundleRepository'
+// import { bundleRepository } from '../repositories/BundleRepository'
 import { productService } from './ProductService'
 import { productReferenceValidator } from './ProductReferenceValidator'
 import { BundleValidationRules as ValidationRules, BundleHelpers } from '../types/domain/Bundle'
+import type { BundleApiResponse, SingleBundleApiResponse } from '../types/api'
 
 export class BundleService {
-  constructor(private repository: IBundleRepository = bundleRepository) {}
+  // NOTE: Repository pattern replaced by Vue Query + direct API calls
+  constructor() {}
 
   // Query Operations
   async getBundle(id: string): Promise<Bundle | null> {
     this.validateId(id)
-    return await this.repository.findById(id)
+    
+    try {
+      const response = await $fetch<SingleBundleApiResponse>(`/api/campaign-bundles/${id}`)
+      return response.success ? response.data : null
+    } catch (error) {
+      console.error(`Error fetching bundle ${id}:`, error)
+      return null
+    }
   }
 
   async getBundleAggregate(id: string): Promise<BundleAggregate | null> {
     this.validateId(id)
-    return await this.repository.findAggregateById(id)
+    
+    try {
+      const response = await $fetch<SingleBundleApiResponse>(`/api/campaign-bundles/${id}`)
+      return response.success ? response.data as BundleAggregate : null
+    } catch (error) {
+      console.error(`Error fetching bundle aggregate ${id}:`, error)
+      return null
+    }
   }
 
   async getBundles(filters?: BundleFilters, sort?: BundleSortOptions): Promise<Bundle[]> {
     this.validateFilters(filters)
-    return await this.repository.findAll(filters, sort)
+    
+    try {
+      const queryParams = new URLSearchParams()
+      
+      if (filters) {
+        if (filters.isActive !== undefined) queryParams.set('isActive', String(filters.isActive))
+        if (filters.targetAudience) queryParams.set('targetAudience', filters.targetAudience)
+        if (filters.budgetRange) queryParams.set('budgetRange', filters.budgetRange)
+        if (filters.tags?.length) queryParams.set('tags', filters.tags.join(','))
+      }
+      
+      if (sort) {
+        if (sort.field) queryParams.set('sortBy', sort.field)
+        if (sort.direction) queryParams.set('sortOrder', sort.direction)
+      }
+      
+      const response = await $fetch<BundleApiResponse>(`/api/campaign-bundles?${queryParams}`)
+      return response.success ? response.data : []
+    } catch (error) {
+      console.error('Error fetching bundles:', error)
+      return []
+    }
   }
 
   async getBundlesPaginated(
@@ -49,7 +92,20 @@ export class BundleService {
     this.validatePagination(page, limit)
     this.validateFilters(filters)
 
-    return await this.repository.findPaginated(page, limit, filters, sort)
+    // FIXME: Replace with Vue Query implementation
+    const bundles = await this.getBundles(filters, sort)
+    const startIndex = (page - 1) * limit
+    const endIndex = startIndex + limit
+
+    return {
+      data: bundles.slice(startIndex, endIndex),
+      pagination: {
+        page,
+        limit,
+        total: bundles.length,
+        hasMore: endIndex < bundles.length
+      }
+    }
   }
 
   async searchBundles(query: string, filters?: BundleFilters): Promise<Bundle[]> {
@@ -58,7 +114,14 @@ export class BundleService {
     }
 
     this.validateFilters(filters)
-    return await this.repository.search(query.trim(), filters)
+    // FIXME: Replace with Vue Query implementation
+    const bundles = await this.getBundles(filters)
+    const searchTerm = query.trim().toLowerCase()
+
+    return bundles.filter(bundle =>
+      bundle.name.toLowerCase().includes(searchTerm) ||
+      bundle.description.toLowerCase().includes(searchTerm)
+    )
   }
 
   async getBundlesByTargetAudience(audience: string): Promise<Bundle[]> {
@@ -66,7 +129,9 @@ export class BundleService {
       throw new Error('Invalid target audience')
     }
 
-    return await this.repository.findByTargetAudience(audience)
+    // FIXME: Replace with Vue Query implementation
+    const bundles = await this.getBundles()
+    return bundles.filter(bundle => bundle.targetAudience === audience)
   }
 
   async getBundlesByBudgetRange(range: string): Promise<Bundle[]> {
@@ -74,7 +139,9 @@ export class BundleService {
       throw new Error('Invalid budget range')
     }
 
-    return await this.repository.findByBudgetRange(range)
+    // FIXME: Replace with Vue Query implementation
+    const bundles = await this.getBundles()
+    return bundles.filter(bundle => bundle.budgetRange === range)
   }
 
   async getFeaturedBundles(limit?: number): Promise<Bundle[]> {
@@ -82,7 +149,10 @@ export class BundleService {
       throw new Error('Featured bundles limit must be between 1 and 50')
     }
 
-    return await this.repository.findFeatured(limit)
+    // FIXME: Replace with Vue Query implementation
+    const bundles = await this.getBundles()
+    const featured = bundles.filter(bundle => bundle.isFeatured)
+    return limit ? featured.slice(0, limit) : featured
   }
 
   async getPopularBundles(limit: number = 10): Promise<Bundle[]> {
@@ -90,7 +160,11 @@ export class BundleService {
       throw new Error('Limit must be between 1 and 100')
     }
 
-    return await this.repository.findPopularBundles(limit)
+    // FIXME: Replace with Vue Query implementation
+    const bundles = await this.getBundles()
+    return bundles
+      .sort((a, b) => b.popularity - a.popularity)
+      .slice(0, limit)
   }
 
   async getRecentBundles(limit: number = 10): Promise<Bundle[]> {
@@ -98,7 +172,11 @@ export class BundleService {
       throw new Error('Limit must be between 1 and 100')
     }
 
-    return await this.repository.findRecentBundles(limit)
+    // FIXME: Replace with Vue Query implementation
+    const bundles = await this.getBundles()
+    return bundles
+      .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
+      .slice(0, limit)
   }
 
   async getSimilarBundles(bundleId: string, limit: number = 5): Promise<Bundle[]> {
@@ -107,23 +185,44 @@ export class BundleService {
       throw new Error('Similar bundles limit must be between 1 and 20')
     }
 
-    return await this.repository.findSimilarBundles(bundleId, limit)
+    // FIXME: Replace with Vue Query implementation
+    const bundle = await this.getBundle(bundleId)
+    if (!bundle) return []
+
+    const bundles = await this.getBundles()
+    return bundles
+      .filter(b => b.id !== bundleId && b.targetAudience === bundle.targetAudience)
+      .slice(0, limit)
   }
 
   async getBundlesCount(filters?: BundleFilters): Promise<number> {
     this.validateFilters(filters)
-    return await this.repository.count(filters)
+    // FIXME: Replace with Vue Query implementation
+    const bundles = await this.getBundles(filters)
+    return bundles.length
   }
 
   async bundleExists(id: string): Promise<boolean> {
     this.validateId(id)
-    return await this.repository.exists(id)
+    // FIXME: Replace with Vue Query implementation
+    const bundle = await this.getBundle(id)
+    return bundle !== null
   }
 
   // Bundle Products Management
   async getBundleProducts(bundleId: string): Promise<BundleProduct[]> {
     this.validateId(bundleId)
-    return await this.repository.getBundleProducts(bundleId)
+    
+    try {
+      const response = await $fetch<SingleBundleApiResponse>(`/api/campaign-bundles/${bundleId}`)
+      if (response.success && response.data) {
+        return response.data.products || []
+      }
+      return []
+    } catch (error) {
+      console.error(`Error fetching bundle products for ${bundleId}:`, error)
+      return []
+    }
   }
 
   async addProductToBundle(bundleId: string, productId: string, quantity: number = 1): Promise<BundleProduct> {
@@ -153,7 +252,7 @@ export class BundleService {
     const product = validation.currentProduct!
 
     // 📋 Additional business validation for bundles
-    const existingProducts = await this.repository.getBundleProducts(bundleId)
+    const existingProducts = await this.getBundleProducts(bundleId)
     const alreadyExists = existingProducts.some(bp => bp.productId === productId)
     
     if (alreadyExists) {
@@ -172,19 +271,28 @@ export class BundleService {
       image_url: product.image_url // Support pour les images
     }
 
-    const result = await this.repository.addProductToBundle(bundleId, bundleProduct)
+    // FIXME: Replace with direct API call
+    try {
+      const response = await $fetch(`/api/campaign-bundles/${bundleId}/products`, {
+        method: 'POST',
+        body: { productId, quantity }
+      })
+      
+      // Recalculate bundle totals
+      await this.recalculateBundleTotal(bundleId)
 
-    // Recalculate bundle totals
-    await this.recalculateBundleTotal(bundleId)
+      // 📡 Emit event for cross-interface synchronization
+      this.emitBundleEvent('bundle.product.added', bundleId, { 
+        productId, 
+        productName: product.name,
+        bundleProduct: bundleProduct 
+      })
 
-    // 📡 Emit event for cross-interface synchronization
-    this.emitBundleEvent('bundle.product.added', bundleId, { 
-      productId, 
-      productName: product.name,
-      bundleProduct: result 
-    })
-
-    return result
+      return bundleProduct
+    } catch (error) {
+      console.error(`Error adding product to bundle ${bundleId}:`, error)
+      throw error
+    }
   }
 
   async updateProductInBundle(
@@ -199,7 +307,7 @@ export class BundleService {
       this.validateQuantity(updates.quantity)
 
       // Get current product to recalculate subtotal
-      const products = await this.repository.getBundleProducts(bundleId)
+      const products = await this.getBundleProducts(bundleId)
       const currentProduct = products.find(p => p.productId === productId)
 
       if (!currentProduct) {
@@ -212,33 +320,72 @@ export class BundleService {
       } as any
     }
 
-    const result = await this.repository.updateProductInBundle(bundleId, productId, updates)
+    // FIXME: Replace with direct API call
+    try {
+      const response = await $fetch(`/api/campaign-bundles/${bundleId}/products/${productId}`, {
+        method: 'PUT',
+        body: updates
+      })
 
-    // Recalculate bundle totals
-    await this.recalculateBundleTotal(bundleId)
+      // Recalculate bundle totals
+      await this.recalculateBundleTotal(bundleId)
 
-    return result
+      // Return updated product (stub)
+      const products = await this.getBundleProducts(bundleId)
+      const updatedProduct = products.find(p => p.productId === productId)
+      
+      if (!updatedProduct) {
+        throw new Error(`Failed to find updated product ${productId}`)
+      }
+
+      return updatedProduct
+    } catch (error) {
+      console.error(`Error updating product in bundle ${bundleId}:`, error)
+      throw error
+    }
   }
 
   async removeProductFromBundle(bundleId: string, productId: string): Promise<boolean> {
     this.validateId(bundleId)
     this.validateId(productId)
 
-    const result = await this.repository.removeProductFromBundle(bundleId, productId)
+    // FIXME: Replace with direct API call
+    try {
+      const response = await $fetch(`/api/campaign-bundles/${bundleId}/products/${productId}`, {
+        method: 'DELETE'
+      })
 
-    if (result) {
-      // Recalculate bundle totals
-      await this.recalculateBundleTotal(bundleId)
+      if (response.success) {
+        // Recalculate bundle totals
+        await this.recalculateBundleTotal(bundleId)
+      }
+
+      return response.success
+    } catch (error) {
+      console.error(`Error removing product from bundle ${bundleId}:`, error)
+      return false
     }
-
-    return result
   }
 
   // Command Operations
   async createBundle(bundleData: Omit<Bundle, 'id' | 'createdAt' | 'updatedAt'>): Promise<Bundle> {
     this.validateBundleData(bundleData)
 
-    return await this.repository.create(bundleData)
+    try {
+      const response = await $fetch<SingleBundleApiResponse>('/api/campaign-bundles', {
+        method: 'POST',
+        body: bundleData
+      })
+      
+      if (response.success) {
+        return response.data
+      }
+      
+      throw new Error('Failed to create bundle')
+    } catch (error) {
+      console.error('Error creating bundle:', error)
+      throw error
+    }
   }
 
   async updateBundle(
@@ -248,39 +395,65 @@ export class BundleService {
     this.validateId(id)
     this.validateBundleUpdates(updates)
 
-    return await this.repository.update(id, updates)
+    try {
+      const response = await $fetch<SingleBundleApiResponse>(`/api/campaign-bundles/${id}`, {
+        method: 'PUT',
+        body: updates
+      })
+      
+      if (response.success) {
+        return response.data
+      }
+      
+      throw new Error('Failed to update bundle')
+    } catch (error) {
+      console.error(`Error updating bundle ${id}:`, error)
+      throw error
+    }
   }
 
   async deleteBundle(id: string): Promise<boolean> {
     this.validateId(id)
 
-    // Check if bundle exists before deletion
-    const exists = await this.repository.exists(id)
-    if (!exists) {
-      throw new Error(`Bundle with id '${id}' not found`)
-    }
+    try {
+      // Check if bundle exists before deletion
+      const bundle = await this.getBundle(id)
+      if (!bundle) {
+        throw new Error(`Bundle with id '${id}' not found`)
+      }
 
-    return await this.repository.delete(id)
+      const response = await $fetch<SingleBundleApiResponse>(`/api/campaign-bundles/${id}`, {
+        method: 'DELETE'
+      })
+      
+      return response.success
+    } catch (error) {
+      console.error(`Error deleting bundle ${id}:`, error)
+      throw error
+    }
   }
 
   async activateBundle(id: string): Promise<Bundle> {
     this.validateId(id)
-    return await this.repository.activate(id)
+    // FIXME: Replace with Vue Query implementation
+    return await this.updateBundle(id, { isActive: true })
   }
 
   async deactivateBundle(id: string): Promise<Bundle> {
     this.validateId(id)
-    return await this.repository.deactivate(id)
+    // FIXME: Replace with Vue Query implementation
+    return await this.updateBundle(id, { isActive: false })
   }
 
   async setFeaturedBundle(id: string, featured: boolean): Promise<Bundle> {
     this.validateId(id)
-    return await this.repository.setFeatured(id, featured)
+    // FIXME: Replace with Vue Query implementation
+    return await this.updateBundle(id, { isFeatured: featured })
   }
 
   // Business Logic Methods
   async calculateBundleTotal(bundleId: string): Promise<BundleCalculation> {
-    const products = await this.repository.getBundleProducts(bundleId)
+    const products = await this.getBundleProducts(bundleId)
 
     const originalTotal = BundleHelpers.calculateTotal(products)
     const estimatedTotal = originalTotal * 0.9 // 10% discount for bundles
@@ -298,7 +471,12 @@ export class BundleService {
 
   async recalculateBundleTotal(bundleId: string): Promise<Bundle> {
     const calculation = await this.calculateBundleTotal(bundleId)
-    return await this.repository.updateCalculation(bundleId, calculation)
+    // FIXME: Replace with direct API call for bundle total update
+    return await this.updateBundle(bundleId, {
+      estimatedTotal: calculation.estimatedTotal,
+      originalTotal: calculation.originalTotal,
+      savings: calculation.savings
+    })
   }
 
   async duplicateBundle(id: string, newName?: string): Promise<Bundle> {
@@ -321,7 +499,7 @@ export class BundleService {
       tags: [...bundle.tags]
     }
 
-    const newBundle = await this.repository.create(duplicatedData)
+    const newBundle = await this.createBundle(duplicatedData)
 
     // Copy products if they exist
     if (bundle.products && bundle.products.length > 0) {
@@ -347,7 +525,7 @@ export class BundleService {
       }
     }
 
-    const products = await this.repository.getBundleProducts(bundleId)
+    const products = await this.getBundleProducts(bundleId)
     const issues: string[] = []
     const recommendations: string[] = []
 

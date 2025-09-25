@@ -1,0 +1,11 @@
+{
+  "id": "proj-1758479644808-8a6bce63",
+  "name": "Fix Bundle Interface UX Critical Issues",
+  "description": "Sprint d'amélioration critique de l'interface de modification de bundles - correction des bugs NaN, amélioration UX et robustesse de l'interface admin",
+  "created": "2025-09-21T18:34:04.814Z",
+  "sprints": [
+    "sprint-1758479650443-eaece477"
+  ],
+  "activeSprint": "sprint-1758479650443-eaece477",
+  "updated": "2025-09-21T18:34:10.444Z"
+}

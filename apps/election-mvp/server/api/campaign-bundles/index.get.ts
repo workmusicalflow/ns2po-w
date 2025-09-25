@@ -4,7 +4,7 @@
  */
 
 // Note: Airtable service removed - now using Turso-first → Static fallback architecture
-import { getDatabase } from "~/server/utils/database";
+import { getDatabase } from "../../utils/database";
 import type { BundleApiResponse } from "@ns2po/types";
 
 // Fallback statique pour campaign bundles
@@ -27,7 +27,8 @@ const STATIC_BUNDLES_FALLBACK = [
     isFeatured: true,
     tags: ['starter', 'essentiel'],
     createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
+    updatedAt: new Date().toISOString(),
+    version: 1
   },
   {
     id: 'pack-premium',
@@ -48,7 +49,8 @@ const STATIC_BUNDLES_FALLBACK = [
     isFeatured: true,
     tags: ['premium', 'complet'],
     createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
+    updatedAt: new Date().toISOString(),
+    version: 1
   }
 ]
 
@@ -78,7 +80,7 @@ export default defineEventHandler(async (event): Promise<BundleApiResponse> => {
             cb.base_price as basePrice, cb.discount_percentage as discountPercentage,
             cb.final_price as finalPrice, cb.is_active as isActive,
             cb.display_order as displayOrder, cb.icon, cb.color, cb.features,
-            cb.created_at as createdAt, cb.updated_at as updatedAt
+            cb.version, cb.created_at as createdAt, cb.updated_at as updatedAt
           FROM campaign_bundles cb
           WHERE cb.is_active = 1
         `
@@ -148,7 +150,8 @@ export default defineEventHandler(async (event): Promise<BundleApiResponse> => {
             createdAt: row.createdAt,
             updatedAt: row.updatedAt,
             icon: row.icon,
-            color: row.color
+            color: row.color,
+            version: Number(row.version) || 1
           }
         }))
 
@@ -213,6 +216,7 @@ export default defineEventHandler(async (event): Promise<BundleApiResponse> => {
 
     // Même en cas d'erreur critique, on retourne le fallback
     const fallbackBundles = [...STATIC_BUNDLES_FALLBACK]
+    let bundles = fallbackBundles
 
     // Appliquer les filtres sur les données statiques
     const query = getQuery(event);

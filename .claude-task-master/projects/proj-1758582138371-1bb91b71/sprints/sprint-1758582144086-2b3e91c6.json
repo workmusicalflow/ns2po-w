@@ -1,0 +1,146 @@
+{
+  "id": "sprint-1758582144086-2b3e91c6",
+  "name": "Sprint Auto-Sync Bundle Fix",
+  "startDate": "2025-09-22",
+  "endDate": "2025-09-24",
+  "goals": "Implémenter l'auto-synchronisation des données au chargement de /admin/bundles/[id] pour résoudre la désynchronisation critique avec Turso et assurer la cohérence des prix, noms et images produits",
+  "status": "active",
+  "created": "2025-09-22T23:02:24.086Z",
+  "tasks": [
+    {
+      "id": 1,
+      "title": "🔍 Analyse diagnostique approfondie du problème de synchronisation",
+      "description": "Effectuer une analyse technique complète pour identifier précisément pourquoi /admin/bundles/[id] ne charge pas les données depuis Turso alors que /admin/products fonctionne parfaitement. Inclut : vérification des composables, API calls, reactive data flow, et comparaison avec l'implémentation products qui fonctionne.",
+      "status": "completed",
+      "priority": 5,
+      "dependencies": [],
+      "created": "2025-09-22T23:02:31.215Z",
+      "updated": "2025-09-22T23:08:59.925Z",
+      "isPareto80": false
+    },
+    {
+      "id": 2,
+      "title": "🛠️ Audit du composable useBundleData et identification des failles",
+      "description": "Examiner en détail le composable useBundleData.ts pour identifier pourquoi les données ne sont pas chargées correctement dans l'interface bundle/[id]. Vérifier : les appels API, la gestion des états réactifs, les erreurs silencieuses, et comparer avec useProductsData qui fonctionne. Documenter tous les problèmes trouvés avec solutions proposées.",
+      "status": "completed",
+      "priority": 5,
+      "dependencies": [
+        1
+      ],
+      "created": "2025-09-22T23:02:39.136Z",
+      "updated": "2025-09-22T23:13:01.430Z",
+      "isPareto80": false
+    },
+    {
+      "id": 3,
+      "title": "🔧 Correction du chargement initial des données bundle",
+      "description": "Implémenter les corrections identifiées pour restaurer le chargement des données bundle au niveau de l'interface [id]. Inclut : fixation des appels API défaillants, correction des bindings réactifs, résolution des erreurs de parsing JSON, et assurance que les données bundle (nom, description, prix, produits) s'affichent correctement au chargement de la page.",
+      "status": "completed",
+      "priority": 5,
+      "dependencies": [
+        2
+      ],
+      "created": "2025-09-22T23:02:45.544Z",
+      "updated": "2025-09-22T23:20:34.353Z",
+      "isPareto80": false
+    },
+    {
+      "id": 4,
+      "title": "💰 Implémentation de la synchronisation des prix produits en temps réel",
+      "description": "Créer un système de synchronisation qui récupère automatiquement les prix actuels depuis /api/products et met à jour les prix des produits dans les bundles. Inclut : fonction syncProductPrices(), récupération des prix depuis la table products Turso, mise à jour des calculs de totaux bundle, et préservation de l'intégrité des données lors des updates.",
+      "status": "completed",
+      "priority": 4,
+      "dependencies": [
+        3
+      ],
+      "created": "2025-09-22T23:02:51.757Z",
+      "updated": "2025-09-22T23:24:32.231Z",
+      "isPareto80": false
+    },
+    {
+      "id": 5,
+      "title": "🖼️ Synchronisation des images et métadonnées produits depuis Cloudinary",
+      "description": "Implémenter la récupération automatique des images produits depuis Cloudinary et assurer la cohérence des métadonnées (noms, descriptions) avec la base Turso. Inclut : intégration avec l'API Cloudinary, mapping des images par product_id, gestion des images manquantes avec fallback, et optimisation des performances de chargement des images dans l'interface bundle.",
+      "status": "completed",
+      "priority": 3,
+      "dependencies": [
+        4
+      ],
+      "created": "2025-09-22T23:02:58.455Z",
+      "updated": "2025-09-22T23:38:50.455Z",
+      "isPareto80": false
+    },
+    {
+      "id": 6,
+      "title": "🔄 Création du bouton de synchronisation manuelle avec feedback UX",
+      "description": "Ajouter un bouton \"🔄 Synchroniser Produits\" dans l'interface /admin/bundles/[id] pour permettre une synchronisation manuelle en cas de problème. Inclut : UI/UX avec loading states, notifications de succès/erreur, progress indicators, gestion des timeouts, et logs des opérations de sync pour debugging. Le bouton doit être visible et accessible même si l'auto-sync fonctionne.",
+      "status": "pending",
+      "priority": 4,
+      "dependencies": [
+        5
+      ],
+      "created": "2025-09-22T23:03:05.775Z",
+      "updated": "2025-09-22T23:03:05.775Z",
+      "isPareto80": false
+    },
+    {
+      "id": 7,
+      "title": "⚡ Implémentation de l'auto-synchronisation au chargement avec onMounted",
+      "description": "Intégrer toutes les fonctions de synchronisation dans le lifecycle onMounted() pour assurer une synchronisation automatique à chaque chargement de page /admin/bundles/[id]. Inclut : séquencement optimal des appels (bundle data → product prices → images), gestion des erreurs avec retry logic, performance optimization pour éviter les appels redondants, et fallback graceful en cas d'échec partiel.",
+      "status": "pending",
+      "priority": 5,
+      "dependencies": [
+        6
+      ],
+      "created": "2025-09-22T23:03:13.091Z",
+      "updated": "2025-09-22T23:03:13.091Z",
+      "isPareto80": false
+    },
+    {
+      "id": 8,
+      "title": "🧪 Tests E2E complets de la synchronisation bundle avec Playwright",
+      "description": "Créer une suite de tests end-to-end pour valider que la synchronisation fonctionne parfaitement dans tous les scénarios. Inclut : test du chargement initial des données, vérification de la cohérence prix/noms/images, test du bouton sync manuel, simulation de changements de prix produits, validation des states de loading, et tests de régression pour éviter les régressions futures.",
+      "status": "pending",
+      "priority": 4,
+      "dependencies": [
+        7
+      ],
+      "created": "2025-09-22T23:03:20.429Z",
+      "updated": "2025-09-22T23:03:20.429Z",
+      "isPareto80": false
+    },
+    {
+      "id": 9,
+      "title": "📊 Validation finale et monitoring de performance",
+      "description": "Effectuer une validation complète du fix de synchronisation et mettre en place un monitoring pour éviter les régressions futures. Inclut : validation manuelle de tous les bundles existants, mesure des temps de chargement avant/après, vérification de la cohérence 100% avec /admin/products, documentation des améliorations apportées, et création d'alertes pour détecter de futures désynchronisations.",
+      "status": "pending",
+      "priority": 3,
+      "dependencies": [
+        8
+      ],
+      "created": "2025-09-22T23:03:26.757Z",
+      "updated": "2025-09-22T23:03:26.757Z",
+      "isPareto80": false
+    },
+    {
+      "id": 10,
+      "title": "🚀 Déploiement et communication des améliorations",
+      "description": "Finaliser le déploiement du fix de synchronisation et communiquer les améliorations apportées. Inclut : commit avec message détaillé des corrections, mise à jour de la documentation technique, création d'un changelog des améliorations UX, formation des utilisateurs sur les nouvelles fonctionnalités de sync, et archivage du sprint avec lessons learned pour futures optimisations.",
+      "status": "pending",
+      "priority": 2,
+      "dependencies": [
+        9
+      ],
+      "created": "2025-09-22T23:03:34.184Z",
+      "updated": "2025-09-22T23:03:34.184Z",
+      "isPareto80": true
+    }
+  ],
+  "paretoDecisions": [],
+  "metrics": {
+    "tasksCompleted": 4,
+    "tasksMovedToVault": 0,
+    "velocityPoints": 0
+  },
+  "updated": "2025-09-22T23:24:32.232Z"
+}

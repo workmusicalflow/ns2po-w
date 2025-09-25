@@ -1,8 +1,9 @@
 /**
  * API DELETE /api/assets/[id] - Suppression d'un asset
- * Supprime l'asset de la base ET de Cloudinary avec vérification d'usage
+ * Supprime l'asset de la base ET de Cloudinary avec vérification d'usage avancée
  */
 
+import { defineEventHandler, createError, getRouterParam, getQuery } from 'h3'
 import { assetService } from '../../services/assetService'
 
 export default defineEventHandler(async (event) => {
@@ -20,10 +21,10 @@ export default defineEventHandler(async (event) => {
     const query = getQuery(event)
     const force = query.force === 'true' // Pour forcer la suppression même si utilisé
 
-    console.log(`🗑️ Suppression de l'asset ${id} ${force ? '(forcée)' : '(avec vérification)'}`)
+    console.log(`🗑️ Suppression avancée de l'asset ${id} ${force ? '(forcée)' : '(avec validation)'}`)
 
-    // La suppression avec vérification d'usage est gérée par le service
-    const result = await assetService.deleteAsset(id)
+    // Utilisation de la nouvelle méthode avec validation avancée
+    const result = await assetService.deleteAssetWithValidation(id, force)
 
     return {
       success: result.success,

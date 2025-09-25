@@ -188,7 +188,7 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { useThemeAware } from '~/composables/useThemeAware'
+// Auto-imported via Nuxt 3: useThemeAware
 
 interface Product {
   id: string

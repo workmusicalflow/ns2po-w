@@ -1,0 +1,124 @@
+{
+  "id": "sprint-1758465334694-ff61b724",
+  "name": "Sprint TypeScript Stabilisation",
+  "startDate": "2025-01-21",
+  "endDate": "2025-01-22",
+  "goals": "Corriger les 287 erreurs TypeScript en 3 phases : 1) Stabilisation critique des types API et Product, 2) Amélioration qualité avec typage des refs, 3) Refactoring complexité des formulaires",
+  "status": "closed",
+  "created": "2025-09-21T14:35:34.695Z",
+  "tasks": [
+    {
+      "id": 1,
+      "title": "Créer fichier types/api.ts avec interfaces centralisées",
+      "description": "Créer ApiResponse générique, BundleApiResponse, et autres types API manquants pour typer tous les appels $fetch",
+      "status": "completed",
+      "priority": 5,
+      "dependencies": [],
+      "created": "2025-09-21T14:35:40.105Z",
+      "updated": "2025-09-21T14:37:05.783Z",
+      "isPareto80": false
+    },
+    {
+      "id": 2,
+      "title": "Synchroniser interface Product (price vs basePrice)",
+      "description": "Unifier les propriétés price/basePrice et ajouter image_url, reference manquantes",
+      "status": "completed",
+      "priority": 5,
+      "dependencies": [
+        1
+      ],
+      "created": "2025-09-21T14:35:45.365Z",
+      "updated": "2025-09-21T14:37:34.031Z",
+      "isPareto80": false
+    },
+    {
+      "id": 3,
+      "title": "Typer tous les appels $fetch avec ApiResponse",
+      "description": "Remplacer tous les $fetch non typés par $fetch<ApiResponse<T>> dans pages/admin et composables",
+      "status": "completed",
+      "priority": 4,
+      "dependencies": [
+        1,
+        2
+      ],
+      "created": "2025-09-21T14:35:50.815Z",
+      "updated": "2025-09-21T14:43:30.622Z",
+      "isPareto80": false
+    },
+    {
+      "id": 4,
+      "title": "Typer tous les refs tableaux (ref<Type[]>([]))",
+      "description": "Remplacer tous les ref([]) par ref<Type[]>([]) pour éviter les erreurs never[]",
+      "status": "completed",
+      "priority": 4,
+      "dependencies": [
+        2
+      ],
+      "created": "2025-09-21T14:35:56.285Z",
+      "updated": "2025-09-21T14:43:34.208Z",
+      "isPareto80": false
+    },
+    {
+      "id": 5,
+      "title": "Ajouter narrowing sur événements DOM",
+      "description": "Typer correctement tous les handlers d'événements avec event.target as HTMLInputElement",
+      "status": "pending",
+      "priority": 3,
+      "dependencies": [],
+      "created": "2025-09-21T14:36:02.020Z",
+      "updated": "2025-09-21T14:36:02.020Z",
+      "isPareto80": true
+    },
+    {
+      "id": 6,
+      "title": "Corriger les narrowing d'événements DOM",
+      "description": "Ajouter les assertions de type pour event.target dans tous les handlers d'événements (~45 erreurs)",
+      "status": "completed",
+      "priority": 4,
+      "dependencies": [],
+      "created": "2025-09-21T14:45:56.705Z",
+      "updated": "2025-09-21T15:02:07.439Z",
+      "isPareto80": false
+    },
+    {
+      "id": 7,
+      "title": "Corriger les propriétés manquantes sur les types",
+      "description": "Résoudre les erreurs 'Property does not exist' pour cloudinaryUrls, source, price etc",
+      "status": "completed",
+      "priority": 5,
+      "dependencies": [],
+      "created": "2025-09-21T14:46:02.011Z",
+      "updated": "2025-09-21T15:02:13.305Z",
+      "isPareto80": false
+    },
+    {
+      "id": 8,
+      "title": "Corriger les refs undefined possibles",
+      "description": "Ajouter null-safe checks pour deleteModal, fileInput et autres refs (~32 erreurs)",
+      "status": "completed",
+      "priority": 3,
+      "dependencies": [],
+      "created": "2025-09-21T14:46:06.977Z",
+      "updated": "2025-09-21T15:02:18.199Z",
+      "isPareto80": false
+    },
+    {
+      "id": 9,
+      "title": "Corriger les imports Nuxt manquants (@nuxt/image)",
+      "description": "Résoudre les erreurs 'Cannot find module #imports' et '#app/nuxt' dans @nuxt/image",
+      "status": "pending",
+      "priority": 5,
+      "dependencies": [],
+      "created": "2025-09-21T15:04:22.177Z",
+      "updated": "2025-09-21T15:04:22.177Z",
+      "isPareto80": false
+    }
+  ],
+  "paretoDecisions": [],
+  "metrics": {
+    "tasksCompleted": 7,
+    "tasksMovedToVault": 0,
+    "velocityPoints": 0
+  },
+  "updated": "2025-09-21T15:44:43.997Z"
+}

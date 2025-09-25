@@ -292,8 +292,8 @@ import type {
   Category,
   CampaignBundle,
 } from "@ns2po/types";
-import { useQuoteItems } from "~/composables/useQuoteItems";
-import { useCampaignBundles } from "~/composables/useCampaignBundles";
+// Auto-imported via Nuxt 3: useQuoteItems
+// Auto-imported via Nuxt 3: useCampaignBundles
 
 // Import du composant QuoteCalculator (sera créé si nécessaire)
 // import QuoteCalculator from '~/components/QuoteCalculator.vue'

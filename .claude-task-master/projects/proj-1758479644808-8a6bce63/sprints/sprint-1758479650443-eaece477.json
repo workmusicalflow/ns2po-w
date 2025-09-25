@@ -1,0 +1,62 @@
+{
+  "id": "sprint-1758479650443-eaece477",
+  "name": "P0 Critical Fixes - Bundle Interface",
+  "startDate": "2025-09-21",
+  "endDate": "2025-09-24",
+  "goals": "Corriger les bugs critiques P0 qui bloquent l'efficacité de l'équipe commerciale : bug calcul NaN et amélioration affichage produits",
+  "status": "active",
+  "created": "2025-09-21T18:34:10.443Z",
+  "tasks": [
+    {
+      "id": 1,
+      "title": "Corriger le bug calcul NaN avec produits sans prix",
+      "description": "Analyser et corriger le problème où les produits sans prix défini causent des erreurs NaN et cassent le calcul du total. Ajouter validation et fallback à 0.",
+      "status": "completed",
+      "priority": 5,
+      "dependencies": [],
+      "created": "2025-09-21T18:34:16.034Z",
+      "updated": "2025-09-21T18:39:50.872Z",
+      "isPareto80": false
+    },
+    {
+      "id": 2,
+      "title": "Améliorer l'affichage des produits dans la modal de sélection",
+      "description": "Afficher le prix et le statut/disponibilité des produits dans la liste de sélection pour éviter la confusion sur les produits sans prix",
+      "status": "completed",
+      "priority": 5,
+      "dependencies": [],
+      "created": "2025-09-21T18:34:21.314Z",
+      "updated": "2025-09-21T18:41:18.270Z",
+      "isPareto80": false
+    },
+    {
+      "id": 3,
+      "title": "Ajouter système de notifications pour feedback utilisateur",
+      "description": "Implémenter notifications toast pour informer l'utilisateur des actions (ajout/suppression produit, sauvegarde) et améliorer le feedback interface",
+      "status": "completed",
+      "priority": 4,
+      "dependencies": [],
+      "created": "2025-09-21T18:34:26.066Z",
+      "updated": "2025-09-21T18:45:11.203Z",
+      "isPareto80": false
+    },
+    {
+      "id": 4,
+      "title": "Ajouter validation temps réel des champs obligatoires",
+      "description": "Implémenter validation en temps réel pour les champs requis (nom, audience, budget) pour éviter les erreurs à la sauvegarde",
+      "status": "completed",
+      "priority": 3,
+      "dependencies": [],
+      "created": "2025-09-21T18:34:30.242Z",
+      "updated": "2025-09-21T18:53:12.140Z",
+      "isPareto80": false
+    }
+  ],
+  "paretoDecisions": [],
+  "metrics": {
+    "tasksCompleted": 4,
+    "tasksMovedToVault": 0,
+    "velocityPoints": 0
+  },
+  "updated": "2025-09-21T18:53:12.140Z"
+}

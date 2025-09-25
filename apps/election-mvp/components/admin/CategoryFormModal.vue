@@ -2,7 +2,7 @@
   <div class="fixed inset-0 z-50 overflow-y-auto">
     <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
       <!-- Background overlay -->
-      <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" @click="$emit('close')"></div>
+      <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" @click="$emit('close')" />
 
       <!-- Modal panel -->
       <div class="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
@@ -12,15 +12,15 @@
             {{ isEdit ? 'Modifier la catégorie' : 'Nouvelle catégorie' }}
           </h3>
           <button
-            @click="$emit('close')"
             class="text-gray-400 hover:text-gray-500"
+            @click="$emit('close')"
           >
             <Icon name="heroicons:x-mark" class="w-6 h-6" />
           </button>
         </div>
 
         <!-- Form -->
-        <form @submit.prevent="submitForm" class="space-y-6">
+        <form class="space-y-6" @submit.prevent="submitForm">
           <!-- Name -->
           <div>
             <label for="name" class="block text-sm font-medium text-gray-700 mb-1">
@@ -33,7 +33,7 @@
               required
               class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
               placeholder="Ex: TEXTILE, ACCESSOIRE..."
-            />
+            >
             <p v-if="errors.name || realTimeErrors.name" class="mt-1 text-sm text-red-600">
               {{ errors.name || realTimeErrors.name }}
             </p>
@@ -51,7 +51,7 @@
               required
               class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
               placeholder="Ex: textile, accessoire..."
-            />
+            >
             <p class="mt-1 text-xs text-gray-500">
               URL-friendly version du nom (lettres minuscules, chiffres et tirets uniquement)
             </p>
@@ -71,7 +71,7 @@
               rows="3"
               class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
               placeholder="Description de la catégorie..."
-            ></textarea>
+            />
           </div>
 
           <!-- Parent Category -->
@@ -84,7 +84,9 @@
               v-model="form.parent_id"
               class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
             >
-              <option value="">Catégorie principale</option>
+              <option value="">
+                Catégorie principale
+              </option>
               <option
                 v-for="parentCategory in availableParents"
                 :key="parentCategory.id"
@@ -110,15 +112,33 @@
                 v-model="form.icon"
                 class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
               >
-                <option value="">Aucune icône</option>
-                <option value="heroicons:shirt">👕 Textile</option>
-                <option value="heroicons:cap">🧢 Accessoire</option>
-                <option value="heroicons:pen">✏️ Bureau</option>
-                <option value="heroicons:folder">📁 Dossier</option>
-                <option value="heroicons:tag">🏷️ Tag</option>
-                <option value="heroicons:star">⭐ Étoile</option>
-                <option value="heroicons:heart">❤️ Cœur</option>
-                <option value="heroicons:gift">🎁 Cadeau</option>
+                <option value="">
+                  Aucune icône
+                </option>
+                <option value="heroicons:shirt">
+                  👕 Textile
+                </option>
+                <option value="heroicons:cap">
+                  🧢 Accessoire
+                </option>
+                <option value="heroicons:pen">
+                  ✏️ Bureau
+                </option>
+                <option value="heroicons:folder">
+                  📁 Dossier
+                </option>
+                <option value="heroicons:tag">
+                  🏷️ Tag
+                </option>
+                <option value="heroicons:star">
+                  ⭐ Étoile
+                </option>
+                <option value="heroicons:heart">
+                  ❤️ Cœur
+                </option>
+                <option value="heroicons:gift">
+                  🎁 Cadeau
+                </option>
               </select>
             </div>
 
@@ -133,13 +153,13 @@
                   v-model="form.color"
                   type="color"
                   class="h-10 w-16 border border-gray-300 rounded-md"
-                />
+                >
                 <input
                   v-model="form.color"
                   type="text"
                   placeholder="#3B82F6"
                   class="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
-                />
+                >
               </div>
               <p v-if="errors.color || realTimeErrors.color" class="mt-1 text-sm text-red-600">
                 {{ errors.color || realTimeErrors.color }}
@@ -160,7 +180,7 @@
                 type="number"
                 min="0"
                 class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
-              />
+              >
             </div>
 
             <!-- Active Status -->
@@ -170,7 +190,7 @@
                 v-model="form.is_active"
                 type="checkbox"
                 class="h-4 w-4 text-amber-600 focus:ring-amber-500 border-gray-300 rounded"
-              />
+              >
               <label for="is_active" class="ml-2 block text-sm text-gray-900">
                 Catégorie active
               </label>
@@ -179,7 +199,9 @@
 
           <!-- Preview -->
           <div v-if="form.name || form.color" class="p-4 bg-gray-50 rounded-lg">
-            <p class="text-sm font-medium text-gray-700 mb-2">Aperçu :</p>
+            <p class="text-sm font-medium text-gray-700 mb-2">
+              Aperçu :
+            </p>
             <div class="flex items-center">
               <div
                 class="h-8 w-8 rounded-lg flex items-center justify-center text-white text-sm font-medium mr-3"
@@ -189,8 +211,12 @@
                 <span v-else>{{ form.name.charAt(0) }}</span>
               </div>
               <div>
-                <div class="text-sm font-medium text-gray-900">{{ form.name || 'Nom de la catégorie' }}</div>
-                <div class="text-sm text-gray-500">{{ form.slug || 'slug-de-la-categorie' }}</div>
+                <div class="text-sm font-medium text-gray-900">
+                  {{ form.name || 'Nom de la catégorie' }}
+                </div>
+                <div class="text-sm text-gray-500">
+                  {{ form.slug || 'slug-de-la-categorie' }}
+                </div>
               </div>
             </div>
           </div>
@@ -199,8 +225,8 @@
           <div class="flex items-center justify-end space-x-3 pt-6 border-t border-gray-200">
             <button
               type="button"
-              @click="$emit('close')"
               class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500"
+              @click="$emit('close')"
             >
               Annuler
             </button>
@@ -221,7 +247,6 @@
 
 <script setup lang="ts">
 import { createCategorySchema } from '~/schemas/category'
-import { useFormValidation } from '~/composables/useFormValidation'
 
 interface Category {
   id: string
@@ -256,7 +281,7 @@ const loading = ref(false)
 const errors = ref<Record<string, string>>({})
 
 // Real-time validation setup
-const { validateWithSchema, realTimeValidation } = useFormValidation()
+const { validateWithSchema } = useFormValidation()
 const realTimeErrors = ref<Record<string, string>>({})
 
 // Form
@@ -385,8 +410,9 @@ watch(() => form.name, (newName) => {
   // Real-time validation for name
   if (newName.trim()) {
     const nameValidation = validateWithSchema(createCategorySchema.pick({ name: true }), { name: newName })
-    if (nameValidation.errors.name) {
-      realTimeErrors.value.name = nameValidation.errors.name
+    const nameError = nameValidation.errors.find(e => e.field === 'name')
+    if (nameError) {
+      realTimeErrors.value.name = nameError.message
     } else {
       delete realTimeErrors.value.name
     }
@@ -399,8 +425,9 @@ watch(() => form.slug, (newSlug) => {
   // Real-time validation for slug
   if (newSlug.trim()) {
     const slugValidation = validateWithSchema(createCategorySchema.pick({ slug: true }), { slug: newSlug })
-    if (slugValidation.errors.slug) {
-      realTimeErrors.value.slug = slugValidation.errors.slug
+    const slugError = slugValidation.errors.find(e => e.field === 'slug')
+    if (slugError) {
+      realTimeErrors.value.slug = slugError.message
     } else {
       delete realTimeErrors.value.slug
     }

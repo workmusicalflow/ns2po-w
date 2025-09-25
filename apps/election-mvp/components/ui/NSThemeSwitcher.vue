@@ -94,8 +94,8 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { useTheme } from '~/composables/useTheme'
-import type { ThemeVariant } from '~/composables/useTheme'
+// Auto-imported via Nuxt 3: useTheme
+import type { ThemeVariant } from '../../composables/useTheme'
 
 const { 
   currentTheme, 

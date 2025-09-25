@@ -60,12 +60,20 @@ export default defineEventHandler(async (event) => {
       args: []
     })
 
+    // Extract database info from environment
+    const databaseUrl = process.env.TURSO_DATABASE_URL || ''
+    const urlMatch = databaseUrl.match(/libsql:\/\/([^.]+)\.([^\/]+)/)
+    const databaseName = urlMatch?.[1] || 'unknown'
+    const host = urlMatch?.[2] || 'unknown'
+
     const stats = {
       success: true,
       connection: {
         status: 'connected',
         healthy: healthCheck.rows.length > 0,
-        lastCheck: new Date().toISOString()
+        lastCheck: new Date().toISOString(),
+        databaseName,
+        host
       },
       database: {
         totalTables: tables.length,

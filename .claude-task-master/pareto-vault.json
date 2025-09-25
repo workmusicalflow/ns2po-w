@@ -310,7 +310,264 @@
       "estimatedValue": "low",
       "revisitSuggestion": "Q3 2025 ou si besoin de migration importante",
       "archivedAt": "2025-09-20T20:43:50.078Z"
+    },
+    {
+      "id": "pv-1758414380451-6dc9b22e",
+      "originalProject": "proj-1758414306817-caf546ec",
+      "originalSprint": "sprint-1758414330414-c7d117fd",
+      "task": {
+        "id": 7,
+        "title": "Implémenter solution SSE temps réel multi-utilisateurs",
+        "description": "Créer /server/api/products/stream.get.ts avec EventStream pour voir changements autres utilisateurs en temps réel, advanced feature",
+        "status": "pending",
+        "priority": 2,
+        "dependencies": [],
+        "created": "2025-09-21T00:26:14.760Z",
+        "updated": "2025-09-21T00:26:14.760Z",
+        "isPareto80": true
+      },
+      "reason": "Amélioration 80% - Fonctionnalité temps réel multi-utilisateurs non critique pour MVP admin",
+      "tags": [
+        "realtime",
+        "sse",
+        "multi-user",
+        "enhancement"
+      ],
+      "estimatedValue": "medium",
+      "revisitSuggestion": "Après validation solution Core 20%, Sprint 3",
+      "archivedAt": "2025-09-21T00:26:20.451Z"
+    },
+    {
+      "id": "pv-1758414389663-4e90054a",
+      "originalProject": "proj-1758414306817-caf546ec",
+      "originalSprint": "sprint-1758414330414-c7d117fd",
+      "task": {
+        "id": 7,
+        "title": "Pattern provide/inject pour composants imbriqués",
+        "description": "Implémenter provide/inject réactif avec adminDataState pour synchronisation avancée composants deeply nested",
+        "status": "pending",
+        "priority": 2,
+        "dependencies": [],
+        "created": "2025-09-21T00:26:24.701Z",
+        "updated": "2025-09-21T00:26:24.701Z",
+        "isPareto80": true
+      },
+      "reason": "Amélioration 80% - Pattern avancé pour composants complexes, non requis pour CRUD basique",
+      "tags": [
+        "provide-inject",
+        "nested-components",
+        "advanced-pattern"
+      ],
+      "estimatedValue": "low",
+      "revisitSuggestion": "Si composants admin deviennent très imbriqués, Sprint 4+",
+      "archivedAt": "2025-09-21T00:26:29.664Z"
+    },
+    {
+      "id": "pv-1758426592708-b2b3f4c7",
+      "originalProject": "proj-1758426042145-29f5d07f",
+      "originalSprint": "sprint-1758426335496-e3a79f15",
+      "task": {
+        "id": 14,
+        "title": "Configurer CI/CD avec exécution automatique des tests",
+        "description": "Enhancement P1 : Automatisation pipeline CI/CD pour exécution tests à chaque commit/PR. Important pour qualité mais non bloquant pour MVP.",
+        "status": "pending",
+        "priority": 3,
+        "dependencies": [],
+        "created": "2025-09-21T03:49:38.848Z",
+        "updated": "2025-09-21T03:49:38.848Z",
+        "isPareto80": true
+      },
+      "reason": "Enhancement P1 - Important pour l'automatisation mais non critique pour MVP TDD bundles",
+      "tags": [
+        "automation",
+        "ci-cd",
+        "infrastructure"
+      ],
+      "estimatedValue": "high",
+      "revisitSuggestion": "Sprint 2 - Après implémentation Core 20%",
+      "archivedAt": "2025-09-21T03:49:52.708Z"
+    },
+    {
+      "id": "pv-1758426614377-8501c88e",
+      "originalProject": "proj-1758426042145-29f5d07f",
+      "originalSprint": "sprint-1758426335496-e3a79f15",
+      "task": {
+        "id": 14,
+        "title": "Créer tests de performance pour les requêtes complexes",
+        "description": "Enhancement P1 : Tests de charge et performance sur filtres complexes bundles. Important pour optimisation mais non critique MVP.",
+        "status": "pending",
+        "priority": 3,
+        "dependencies": [],
+        "created": "2025-09-21T03:50:03.872Z",
+        "updated": "2025-09-21T03:50:03.872Z",
+        "isPareto80": true
+      },
+      "reason": "Enhancement P1 - Tests de performance utiles mais non critiques pour MVP TDD",
+      "tags": [
+        "performance",
+        "optimization",
+        "load-testing"
+      ],
+      "estimatedValue": "medium",
+      "revisitSuggestion": "Sprint 3 - Après tests fonctionnels Core 20%",
+      "archivedAt": "2025-09-21T03:50:14.378Z"
+    },
+    {
+      "id": "pv-1758599865345-a0813ca1",
+      "originalProject": "proj-1758599576196-9c4e56d4",
+      "originalSprint": "sprint-1758599618159-71e5fb29",
+      "task": {
+        "id": 6,
+        "title": "ENHANCEMENT 80% - Système Draft/Published complet avec Pinia",
+        "description": "**CONTEXTE ARCHITECTURAL** : Système avancé de gestion d'état selon recommandation GPT-5 \"Draft vs Published Pattern\"\n\n**OBJECTIF** : Éviter conflits validation en séparant état d'édition (draft) de l'état publié\n\n**IMPLÉMENTATION TECHNIQUE** :\n```typescript\n// File: apps/election-mvp/stores/bundleEdit.ts\ninterface BundleEditStore {\n  draft: Bundle\n  published: Bundle\n  isDirty: boolean\n  validationState: {\n    blockers: ValidationError[]\n    warnings: ValidationError[]\n    canPublish: boolean\n  }\n  history: BundleState[]\n  currentHistoryIndex: number\n}\n\nconst useBundleEditStore = defineStore('bundleEdit', () => {\n  const draft = ref<Bundle>()\n  const published = ref<Bundle>()\n  \n  const isDirty = computed(() => \n    JSON.stringify(draft.value) !== JSON.stringify(published.value)\n  )\n  \n  const saveDraft = async () => {\n    // Sauvegarde état intermédiaire MÊME si invalide\n    await $fetch(`/api/campaign-bundles/${draft.value.id}/draft`, {\n      method: 'POST',\n      body: draft.value\n    })\n  }\n  \n  const publishBundle = async () => {\n    // Publication seulement si validation OK\n    if (!validationState.value.canPublish) {\n      throw new Error('Cannot publish invalid bundle')\n    }\n    \n    await $fetch(`/api/campaign-bundles/${draft.value.id}`, {\n      method: 'PUT',\n      body: draft.value\n    })\n    \n    published.value = { ...draft.value }\n  }\n  \n  return { draft, published, isDirty, saveDraft, publishBundle }\n})\n```\n\n**BÉNÉFICES** :\n- Édition non-destructive\n- Sauvegarde progressive possible\n- Séparation claire brouillon/final\n- Workflow professionnel type Google Docs\n\n**COMPLEXITÉ** : Moyenne - nécessite refactoring stores existants\n\n**VALEUR MÉTIER** : Amélioration workflow, pas critique pour fix bug",
+        "status": "pending",
+        "priority": 3,
+        "dependencies": [],
+        "created": "2025-09-23T03:56:17.929Z",
+        "updated": "2025-09-23T03:56:17.929Z",
+        "isPareto80": true
+      },
+      "reason": "Enhancement 80% - Système Draft/Published complet. Amélioration workflow avancée non-critique pour résolution du bug \"Failed to update bundle 3\". Valeur long-terme mais pas dans MVP fix.",
+      "tags": [
+        "draft-system",
+        "pinia",
+        "workflow-enhancement",
+        "ux-advanced"
+      ],
+      "estimatedValue": "medium",
+      "revisitSuggestion": "Post-fix critique - Sprint 2 architecture",
+      "archivedAt": "2025-09-23T03:57:45.345Z"
+    },
+    {
+      "id": "pv-1758599872537-e1aba32a",
+      "originalProject": "proj-1758599576196-9c4e56d4",
+      "originalSprint": "sprint-1758599618159-71e5fb29",
+      "task": {
+        "id": 7,
+        "title": "ENHANCEMENT 80% - Encapsulation backend règles métier Bundle aggregate",
+        "description": "**CONTEXTE EXPERT GEMINI** : Domain-Driven Design avec Aggregate Root pour encapsulation règles métier\n\n**OBJECTIF** : Centraliser toute logique validation dans l'entité Bundle elle-même\n\n**IMPLÉMENTATION DDD** :\n```typescript\n// File: apps/election-mvp/server/domain/Bundle.ts\nclass BundleAggregate {\n  constructor(\n    private id: string,\n    private products: BundleProduct[],\n    private budgetRange: BudgetRange,\n    private targetAudience: TargetAudience\n  ) {}\n  \n  removeProduct(productId: string): DomainResult<void> {\n    // Validation AVANT modification\n    const productsAfterRemoval = this.products.filter(p => p.id !== productId)\n    const validationResult = this.validateState({\n      ...this,\n      products: productsAfterRemoval\n    })\n    \n    if (!validationResult.isValid) {\n      return DomainResult.failure(validationResult.errors)\n    }\n    \n    // Modification seulement si validation OK\n    this.products = productsAfterRemoval\n    this.addDomainEvent(new ProductRemovedEvent(this.id, productId))\n    \n    return DomainResult.success()\n  }\n  \n  private validateState(bundle: Bundle): ValidationResult {\n    const errors = []\n    \n    // Business rules encapsulated\n    if (!this.budgetRange.isValidForTotal(bundle.total)) {\n      errors.push(new BudgetRangeViolation(bundle.total, this.budgetRange))\n    }\n    \n    if (!this.targetAudience.isValidForQuantity(bundle.totalQuantity)) {\n      errors.push(new AudienceQuantityViolation(bundle.totalQuantity, this.targetAudience))\n    }\n    \n    return { isValid: errors.length === 0, errors }\n  }\n}\n```\n\n**AVANTAGES ARCHITECTURAUX** :\n- Règles métier encapsulées\n- Fail-fast garanti\n- Cohérence transactionnelle\n- Testabilité accrue\n\n**COMPLEXITÉ** : Élevée - refactoring architectural majeur\n\n**VALEUR** : Robustesse long terme, pas critique pour fix immédiat",
+        "status": "pending",
+        "priority": 2,
+        "dependencies": [],
+        "created": "2025-09-23T03:56:31.281Z",
+        "updated": "2025-09-23T03:56:31.281Z",
+        "isPareto80": true
+      },
+      "reason": "Enhancement 80% - Architecture DDD complexe. Refactoring backend majeur non-essentiel pour fix immédiat du \"Validation Trap\". Valeur architecture long-terme.",
+      "tags": [
+        "ddd",
+        "architecture",
+        "backend-refactor",
+        "domain-driven"
+      ],
+      "estimatedValue": "high",
+      "revisitSuggestion": "Phase 3 - Refactoring architectural (2-3 semaines post-fix)",
+      "archivedAt": "2025-09-23T03:57:52.537Z"
+    },
+    {
+      "id": "pv-1758599883197-54f6926a",
+      "originalProject": "proj-1758599576196-9c4e56d4",
+      "originalSprint": "sprint-1758599618159-71e5fb29",
+      "task": {
+        "id": 8,
+        "title": "ENHANCEMENT 80% - Undo/Redo avec historique des modifications",
+        "description": "**CONTEXTE UX AVANCÉ** : Historique des actions pour récupération granulaire selon pattern GPT-5\n\n**OBJECTIF** : Permettre annulation fine des modifications avec stack d'historique\n\n**IMPLÉMENTATION** :\n```typescript\n// File: apps/election-mvp/composables/useBundleHistory.ts\ninterface BundleHistoryState {\n  state: Bundle\n  action: string\n  timestamp: Date\n  actionData?: any\n}\n\nconst useBundleHistory = () => {\n  const history = ref<BundleHistoryState[]>([])\n  const currentIndex = ref(0)\n  \n  const pushState = (state: Bundle, action: string, data?: any) => {\n    // Truncate future history if we're not at the end\n    history.value = history.value.slice(0, currentIndex.value + 1)\n    \n    history.value.push({\n      state: cloneDeep(state),\n      action,\n      timestamp: new Date(),\n      actionData: data\n    })\n    \n    currentIndex.value = history.value.length - 1\n  }\n  \n  const undo = () => {\n    if (currentIndex.value > 0) {\n      currentIndex.value--\n      return history.value[currentIndex.value].state\n    }\n  }\n  \n  const redo = () => {\n    if (currentIndex.value < history.value.length - 1) {\n      currentIndex.value++\n      return history.value[currentIndex.value].state\n    }\n  }\n  \n  return { pushState, undo, redo, canUndo, canRedo }\n}\n```\n\n**FEATURES** :\n- Toast Undo 5 secondes après action\n- Ctrl+Z / Ctrl+Y keyboard shortcuts\n- Historique visuel avec timeline\n- Revert vers n'importe quel état passé\n\n**VALEUR** : Confort utilisateur avancé, pas critique pour fix",
+        "status": "pending",
+        "priority": 2,
+        "dependencies": [],
+        "created": "2025-09-23T03:56:47.653Z",
+        "updated": "2025-09-23T03:56:47.653Z",
+        "isPareto80": true
+      },
+      "reason": "Enhancement 80% - Feature UX avancée Undo/Redo. Confort utilisateur non-critique pour résolution immédiate du \"Validation Trap\". Nice-to-have post-fix.",
+      "tags": [
+        "ux-advanced",
+        "undo-redo",
+        "user-comfort",
+        "history"
+      ],
+      "estimatedValue": "medium",
+      "revisitSuggestion": "Sprint 3 - UX enhancements après stabilisation core",
+      "archivedAt": "2025-09-23T03:58:03.197Z"
+    },
+    {
+      "id": "pv-1758599889982-de6fd25f",
+      "originalProject": "proj-1758599576196-9c4e56d4",
+      "originalSprint": "sprint-1758599618159-71e5fb29",
+      "task": {
+        "id": 9,
+        "title": "ENHANCEMENT 80% - Preview temps réel des impacts de suppression",
+        "description": "**CONTEXTE PATTERN AVANCÉ** : Validation prédictive selon Perplexity \"preview Before/After visuel\"\n\n**OBJECTIF** : Affichage en temps réel de l'impact d'une suppression AVANT confirmation\n\n**IMPLÉMENTATION** :\n```typescript\n// File: apps/election-mvp/components/admin/ProductRemovalPreview.vue\n<template>\n  <div class=\"removal-preview-tooltip\" v-show=\"hoveredProductId\">\n    <h4>Aperçu suppression {{ hoveredProduct?.name }}</h4>\n    \n    <div class=\"metrics-comparison\">\n      <div class=\"metric\">\n        <span>Budget Bundle</span>\n        <div class=\"before-after\">\n          <span class=\"current\">{{ formatPrice(currentTotal) }}</span>\n          <Icon name=\"arrow-right\" />\n          <span :class=\"previewTotal > budgetMax ? 'text-red-500' : 'text-green-500'\">\n            {{ formatPrice(previewTotal) }}\n          </span>\n        </div>\n      </div>\n      \n      <div class=\"metric\">\n        <span>Articles Total</span>\n        <div class=\"before-after\">\n          <span class=\"current\">{{ currentQuantity }}</span>\n          <Icon name=\"arrow-right\" />\n          <span :class=\"previewQuantity < quantityMin ? 'text-red-500' : 'text-green-500'\">\n            {{ previewQuantity }}\n          </span>\n        </div>\n      </div>\n    </div>\n    \n    <div v-if=\"previewViolations.length\" class=\"violations-preview\">\n      <p class=\"text-red-600\">⚠️ Rendra le bundle non-publiable</p>\n      <ul class=\"text-sm\">\n        <li v-for=\"violation in previewViolations\" :key=\"violation\">\n          {{ violation }}\n        </li>\n      </ul>\n    </div>\n    \n    <div v-else class=\"safe-removal text-green-600\">\n      ✅ Suppression sûre - bundle reste valide\n    </div>\n  </div>\n</template>\n\nconst useProductRemovalPreview = () => {\n  const hoveredProductId = ref(null)\n  \n  const previewRemoval = (productId: string) => {\n    const impact = calcProductRemovalImpact(productId)\n    return {\n      previewTotal: impact.newTotal,\n      previewQuantity: impact.newQuantity,\n      previewViolations: impact.errors\n    }\n  }\n  \n  return { hoveredProductId, previewRemoval }\n}\n```\n\n**FEATURES** :\n- Tooltip hover avec preview instantané\n- Color coding rouge/vert selon impact\n- Métriques avant/après side-by-side\n- Violations listées en temps réel\n\n**VALEUR** : UX premium, aide à la décision, mais pas critique pour fix bug",
+        "status": "pending",
+        "priority": 2,
+        "dependencies": [],
+        "created": "2025-09-23T03:57:06.910Z",
+        "updated": "2025-09-23T03:57:06.910Z",
+        "isPareto80": true
+      },
+      "reason": "Enhancement 80% - Preview temps réel avancé. Feature UX premium non-critique pour fix du \"Validation Trap\". Solution core modal suffit pour MVP fix.",
+      "tags": [
+        "ux-premium",
+        "preview",
+        "real-time",
+        "visual-feedback"
+      ],
+      "estimatedValue": "medium",
+      "revisitSuggestion": "Sprint 3 - Polish UX après validation Core 20% fonctionne",
+      "archivedAt": "2025-09-23T03:58:09.982Z"
+    },
+    {
+      "id": "pv-1758599898117-9458d046",
+      "originalProject": "proj-1758599576196-9c4e56d4",
+      "originalSprint": "sprint-1758599618159-71e5fb29",
+      "task": {
+        "id": 10,
+        "title": "ENHANCEMENT 80% - Web Workers validation complexe non-bloquante",
+        "description": "**CONTEXTE PERFORMANCE** : Perplexity recommande \"Web Workers pour validation complexe sans impact performance\"\n\n**OBJECTIF** : Déporter validation lourde en arrière-plan pour maintenir réactivité UI\n\n**IMPLÉMENTATION** :\n```typescript\n// File: apps/election-mvp/workers/bundleValidation.worker.ts\nself.onmessage = function(e) {\n  const { bundleState, validationRules } = e.data\n  \n  // Validation computationally expensive\n  const result = performComplexValidation(bundleState, validationRules)\n  \n  self.postMessage({\n    type: 'VALIDATION_COMPLETE',\n    result,\n    bundleId: bundleState.id\n  })\n}\n\nconst performComplexValidation = (bundle, rules) => {\n  // Heavy computation without blocking main thread\n  // Complex business rules, cross-references, calculations\n  return {\n    isValid: boolean,\n    errors: ValidationError[],\n    warnings: ValidationError[],\n    suggestions: string[]\n  }\n}\n\n// Main thread usage\nconst validationWorker = new Worker('/workers/bundleValidation.worker.js')\n\nconst validateInBackground = (bundleState) => {\n  validationWorker.postMessage({\n    bundleState,\n    validationRules: getValidationRules()\n  })\n}\n```\n\n**AVANTAGES** :\n- UI toujours reactive\n- Validation complexe possible\n- Pas de freeze interface\n- Scalabilité future\n\n**VALEUR** : Optimisation avancée, pas nécessaire pour fix critique",
+        "status": "pending",
+        "priority": 1,
+        "dependencies": [],
+        "created": "2025-09-23T03:57:21.728Z",
+        "updated": "2025-09-23T03:57:21.728Z",
+        "isPareto80": true
+      },
+      "reason": "Enhancement 80% - Optimisation Web Workers avancée. Performance enhancement non-critique pour fix \"Validation Trap\". Validation simple côté client suffit pour MVP.",
+      "tags": [
+        "performance",
+        "web-workers",
+        "optimization",
+        "advanced"
+      ],
+      "estimatedValue": "low",
+      "revisitSuggestion": "Future - Seulement si performance devient bottleneck",
+      "archivedAt": "2025-09-23T03:58:18.117Z"
+    },
+    {
+      "id": "pv-1758599905855-7de799c1",
+      "originalProject": "proj-1758599576196-9c4e56d4",
+      "originalSprint": "sprint-1758599618159-71e5fb29",
+      "task": {
+        "id": 11,
+        "title": "ENHANCEMENT 80% - Interface avancée debugging validation",
+        "description": "**CONTEXTE DEV EXPERIENCE** : Outils de debugging pour comprendre et tracer les règles de validation\n\n**OBJECTIF** : Panneau admin pour diagnostiquer problèmes validation en temps réel\n\n**FEATURES** :\n- Console validation avec logs détaillés  \n- Trace des règles business appliquées\n- Simulation \"what-if\" scenarios\n- Export diagnostic pour support\n\n**VALEUR** : Tooling développeur, pas critique utilisateur final",
+        "status": "pending",
+        "priority": 1,
+        "dependencies": [],
+        "created": "2025-09-23T03:57:32.982Z",
+        "updated": "2025-09-23T03:57:32.982Z",
+        "isPareto80": true
+      },
+      "reason": "Enhancement 80% - Tooling développeur debugging. Utile pour développement futur mais non-critique pour fix utilisateur final \"Validation Trap\". Console browser suffit pour debug MVP.",
+      "tags": [
+        "dev-tools",
+        "debugging",
+        "developer-experience",
+        "tooling"
+      ],
+      "estimatedValue": "low",
+      "revisitSuggestion": "Future - Si équipe grandit et debug devient complexe",
+      "archivedAt": "2025-09-23T03:58:25.855Z"
     }
   ],
-  "updated": "2025-09-20T20:43:50.078Z"
+  "updated": "2025-09-23T03:58:25.855Z"
 }

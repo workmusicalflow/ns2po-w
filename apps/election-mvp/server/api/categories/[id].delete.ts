@@ -3,7 +3,7 @@
  * Supprime une catégorie existante de la base Turso
  */
 
-import { getDatabase } from "~/server/utils/database"
+import { getDatabase } from "../../utils/database"
 
 export default defineEventHandler(async (event) => {
   const startTime = Date.now()

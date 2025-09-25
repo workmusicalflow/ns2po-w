@@ -25,14 +25,17 @@ export default defineEventHandler(async (event) => {
         const result = await tursoClient.execute({
           sql: `
             SELECT
-              id, name, description, category, subcategory,
-              base_price as basePrice, min_quantity as minQuantity,
-              max_quantity as maxQuantity, unit, production_time_days,
-              customizable, materials, colors, sizes,
-              image_url as image, gallery_urls, specifications,
-              is_active as isActive, created_at as createdAt, updated_at as updatedAt
-            FROM products
-            WHERE id = ? AND is_active = true
+              p.id, p.name, p.description, p.category, p.subcategory,
+              p.base_price as basePrice, p.min_quantity as minQuantity,
+              p.max_quantity as maxQuantity, p.unit, p.production_time_days,
+              p.customizable, p.materials, p.colors, p.sizes,
+              p.image_url as image, p.gallery_urls, p.specifications,
+              p.is_active as isActive, p.created_at as createdAt, p.updated_at as updatedAt,
+              c.id as categoryId, c.name as categoryName, c.slug as categorySlug,
+              c.description as categoryDescription, c.icon as categoryIcon, c.color as categoryColor
+            FROM products p
+            LEFT JOIN categories c ON p.category = c.id
+            WHERE p.id = ? AND p.is_active = true
           `,
           args: [id]
         })
@@ -51,6 +54,14 @@ export default defineEventHandler(async (event) => {
           description: row.description || '',
           category: row.category,
           subcategory: row.subcategory,
+          categoryDetails: row.categoryId ? {
+            id: row.categoryId,
+            name: row.categoryName,
+            slug: row.categorySlug,
+            description: row.categoryDescription,
+            icon: row.categoryIcon,
+            color: row.categoryColor
+          } : null,
           basePrice: Number(row.basePrice) || 0,
           minQuantity: Number(row.minQuantity) || 1,
           maxQuantity: Number(row.maxQuantity) || 1000,

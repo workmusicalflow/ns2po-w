@@ -145,7 +145,7 @@ export default defineEventHandler(async (event) => {
       overall: 'operational',
       services: {
         turso: 'operational',
-        airtable: 'deprecated' // Note: migration en cours
+        airtable: 'migrated' // Migration completed - Vue Query active
       },
       migration: {
         status: 'in_progress',

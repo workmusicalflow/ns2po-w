@@ -16,21 +16,29 @@
               <Icon :name="iconName" class="w-6 h-6" />
             </div>
             <div>
-              <h3 class="text-lg font-semibold">{{ title }}</h3>
-              <p class="text-sm opacity-90">{{ subtitle }}</p>
+              <h3 class="text-lg font-semibold">
+                {{ title }}
+              </h3>
+              <p class="text-sm opacity-90">
+                {{ subtitle }}
+              </p>
             </div>
           </div>
         </div>
 
         <!-- Contenu principal -->
         <div class="p-6">
-          <p class="text-gray-700 mb-4">{{ message }}</p>
+          <p class="text-gray-700 mb-4">
+            {{ message }}
+          </p>
 
           <!-- Informations spécifiques par type -->
           <div v-if="details" :class="detailsClasses">
             <div class="flex items-start space-x-2">
               <Icon :name="detailsIcon" class="w-4 h-4 mt-0.5 flex-shrink-0" />
-              <p class="text-sm">{{ details }}</p>
+              <p class="text-sm">
+                {{ details }}
+              </p>
             </div>
           </div>
         </div>
@@ -38,15 +46,15 @@
         <!-- Actions -->
         <div class="px-6 py-4 bg-gray-50 flex justify-end space-x-3">
           <button
-            @click="onCancel"
             class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors"
+            @click="onCancel"
           >
             Annuler
           </button>
           <button
-            @click="onConfirm"
             :class="confirmButtonClasses"
             class="px-4 py-2 text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors"
+            @click="onConfirm"
           >
             {{ confirmText }}
           </button>

@@ -1,138 +1,147 @@
-/**
- * Composable pour la gestion des produits
- * Utilise Turso (cache performant) + fallback Airtable
- * Structure Cloudinary: ns2po-w/products/
- */
-
-import { ref, computed, readonly } from 'vue'
-import type { Product, Category } from '@ns2po/types'
+import { useProductsStore } from '../stores/products'
 
 export const useProducts = () => {
-  // État reactif
-  const products = ref<Product[]>([])
-  const categories = ref<Category[]>([])
-  const loading = ref(false)
-  const error = ref<string | null>(null)
+  const store = useProductsStore()
 
-  /**
-   * Charge tous les produits depuis Turso (cache performant)
-   */
-  const loadProducts = async () => {
-    loading.value = true
-    error.value = null
-    
+  // Utilisation de storeToRefs pour la réactivité correcte
+  const { products, loading, error, productsCount, hasProducts, isCacheValid, isInitialized } = storeToRefs(store)
+
+  // État de loading unifié pour éviter FOEC
+  const isLoading = computed(() => {
+    // Pendant l'hydratation initiale
+    if (!isInitialized.value) return true
+    // Pendant les requêtes ultérieures
+    return loading.value
+  })
+
+  // Auto-fetch au montage du composant
+  onMounted(async () => {
     try {
-      const { data } = await $fetch<{ data: Product[] }>('/api/products/turso')
-      products.value = data
-    } catch (err) {
-      error.value = 'Erreur lors du chargement des produits'
-      console.error('Erreur loadProducts:', err)
-    } finally {
-      loading.value = false
+      await store.fetchProducts()
+    } catch (error) {
+      console.error('useProducts onMounted fetch error:', error)
+    }
+  })
+
+  // Méthodes d'interaction avec le store
+  const refresh = async (force = true) => {
+    try {
+      return await store.fetchProducts(force)
+    } catch (error) {
+      console.error('useProducts refresh error:', error)
+      throw error
     }
   }
 
-  /**
-   * Charge les catégories depuis Airtable
-   */
-  const loadCategories = async () => {
-    loading.value = true
-    error.value = null
-    
-    try {
-      const { data } = await $fetch<{ data: Category[] }>('/api/categories')
-      categories.value = data
-    } catch (err) {
-      error.value = 'Erreur lors du chargement des catégories'
-      console.error('Erreur loadCategories:', err)
-    } finally {
-      loading.value = false
-    }
+  const invalidate = () => {
+    store.invalidateProducts()
   }
 
-  /**
-   * Recherche des produits par terme
-   */
-  const searchProducts = async (query: string): Promise<Product[]> => {
-    if (!query.trim()) return []
-    
-    loading.value = true
-    error.value = null
-    
+  const clear = () => {
+    store.clearProducts()
+  }
+
+  const findById = (id: string): any | undefined => {
+    return store.findProductById(id)
+  }
+
+  // Actions CRUD avec synchronisation automatique
+  const updateProduct = async (id: string, data: any) => {
     try {
-      const { data } = await $fetch<{ data: Product[] }>(`/api/products/search`, {
-        query: { q: query }
+      const response = await $fetch<{ success: boolean; data: any }>(`/api/products/${id}`, {
+        method: 'PUT',
+        body: data
       })
-      return data
-    } catch (err) {
-      error.value = 'Erreur lors de la recherche'
-      console.error('Erreur searchProducts:', err)
-      return []
-    } finally {
-      loading.value = false
+
+      if (response.success && response.data) {
+        // Mettre à jour le store local
+        store.updateProductInStore(response.data)
+
+        // Émettre l'événement pour synchronisation inter-pages
+        const { adminEventBus } = await import('../utils/adminEventBus')
+        adminEventBus.emit('products:updated', response.data)
+
+        return response.data
+      } else {
+        throw new Error('Erreur lors de la mise à jour du produit')
+      }
+    } catch (error) {
+      console.error('useProducts updateProduct error:', error)
+      throw error
     }
   }
 
-  /**
-   * Récupère un produit par ID
-   */
-  const getProduct = async (id: string): Promise<Product | null> => {
-    loading.value = true
-    error.value = null
-    
+  const createProduct = async (data: any) => {
     try {
-      const { data } = await $fetch<{ data: Product }>(`/api/products/${id}`)
-      return data
-    } catch (err) {
-      error.value = 'Produit non trouvé'
-      console.error('Erreur getProduct:', err)
-      return null
-    } finally {
-      loading.value = false
+      const response = await $fetch<{ success: boolean; data: any }>('/api/products', {
+        method: 'POST',
+        body: data
+      })
+
+      if (response.success && response.data) {
+        // Ajouter au store local
+        store.addProductToStore(response.data)
+
+        // Émettre l'événement
+        const { adminEventBus } = await import('../utils/adminEventBus')
+        adminEventBus.emit('products:created', response.data)
+
+        return response.data
+      } else {
+        throw new Error('Erreur lors de la création du produit')
+      }
+    } catch (error) {
+      console.error('useProducts createProduct error:', error)
+      throw error
     }
   }
 
-  /**
-   * Filtre les produits par catégorie
-   */
-  const getProductsByCategory = computed(() => {
-    return (categorySlug: string) => {
-      return products.value.filter(product => 
-        product.category === categorySlug && product.isActive
-      )
+  const deleteProduct = async (id: string) => {
+    try {
+      const response = await $fetch<{ success: boolean }>(`/api/products/${id}`, {
+        method: 'DELETE'
+      })
+
+      if (response.success) {
+        // Supprimer du store local
+        store.removeProductFromStore(id)
+
+        // Émettre l'événement
+        const { adminEventBus } = await import('../utils/adminEventBus')
+        adminEventBus.emit('products:deleted', id)
+
+        return true
+      } else {
+        throw new Error('Erreur lors de la suppression du produit')
+      }
+    } catch (error) {
+      console.error('useProducts deleteProduct error:', error)
+      throw error
     }
-  })
-
-  /**
-   * Produits actifs uniquement
-   */
-  const activeProducts = computed(() => {
-    return products.value.filter(product => product.isActive)
-  })
-
-  /**
-   * Catégories actives uniquement
-   */
-  const activeCategories = computed(() => {
-    return categories.value.filter(category => category.isActive)
-  })
+  }
 
   return {
-    // État
-    products: readonly(products),
-    categories: readonly(categories),
-    loading: readonly(loading),
-    error: readonly(error),
-    
-    // Computed
-    activeProducts,
-    activeCategories,
-    getProductsByCategory,
-    
-    // Méthodes
-    loadProducts,
-    loadCategories,
-    searchProducts,
-    getProduct
+    // State réactif via storeToRefs (évite race conditions)
+    products,
+    loading,
+    error,
+    productsCount,
+    hasProducts,
+    isCacheValid,
+    isInitialized,
+    isLoading, // État de loading unifié pour UX
+
+    // Actions
+    refresh,
+    invalidate,
+    clear,
+    findById,
+    setProducts: store.setProducts, // Nouvelle action sécurisée
+    startLoading: store.startLoading, // Action pour démarrer loading
+
+    // CRUD avec synchronisation
+    updateProduct,
+    createProduct,
+    deleteProduct
   }
 }

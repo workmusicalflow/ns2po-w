@@ -1,0 +1,11 @@
+{
+  "id": "proj-1758414306817-caf546ec",
+  "name": "CMS Data Sync Solution",
+  "description": "Implémentation d'une solution robuste de synchronisation des données pour le CMS admin NS2PO, basée sur Pinia + Event Bus réactif pour résoudre les problèmes de cache avec KeepAlive",
+  "created": "2025-09-21T00:25:06.822Z",
+  "sprints": [
+    "sprint-1758414330414-c7d117fd"
+  ],
+  "activeSprint": "sprint-1758414330414-c7d117fd",
+  "updated": "2025-09-21T00:25:30.416Z"
+}

@@ -323,9 +323,12 @@ export class ProductReferenceValidator {
    * Setup automatic cache cleanup
    */
   private setupCacheCleanup(): void {
-    this.cleanupTimer = setInterval(() => {
-      this.cleanupOldEntries()
-    }, ProductReferenceConfig.cache.cleanupInterval)
+    // Only setup cleanup on client side to avoid SSR issues
+    if (typeof window !== 'undefined') {
+      this.cleanupTimer = setInterval(() => {
+        this.cleanupOldEntries()
+      }, ProductReferenceConfig.cache.cleanupInterval)
+    }
   }
 
   /**
@@ -359,7 +362,7 @@ export class ProductReferenceValidator {
    * Cleanup resources
    */
   destroy(): void {
-    if (this.cleanupTimer) {
+    if (this.cleanupTimer && typeof window !== 'undefined') {
       clearInterval(this.cleanupTimer)
       this.cleanupTimer = undefined
     }

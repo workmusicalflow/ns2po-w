@@ -38,6 +38,10 @@ export const campaignBundleSchema = z.object({
     errorMap: () => ({ message: 'Audience cible invalide' })
   }),
 
+  budgetRange: z.enum(['starter', 'standard', 'medium', 'premium', 'enterprise'], {
+    errorMap: () => ({ message: 'Budget range invalide' })
+  }),
+
 
   products: z.array(bundleProductSchema)
     .min(1, 'Au moins un produit est requis')
@@ -96,6 +100,7 @@ export type CampaignBundleUpdateInput = z.infer<typeof campaignBundleUpdateSchem
 export const bundleFiltersSchema = z.object({
   search: z.string().optional(),
   targetAudience: z.enum(['local', 'regional', 'national', 'universal']).optional(),
+  budgetRange: z.enum(['starter', 'standard', 'medium', 'premium', 'enterprise']).optional(),
   isActive: z.boolean().optional(),
   isFeatured: z.boolean().optional(),
   tags: z.array(z.string()).optional(),

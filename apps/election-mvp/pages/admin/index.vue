@@ -2,8 +2,12 @@
   <div>
     <!-- Page Header -->
     <div class="mb-8">
-      <h1 class="text-2xl font-bold text-gray-900">Dashboard</h1>
-      <p class="text-gray-600">Vue d'ensemble de votre système NS2PO</p>
+      <h1 class="text-2xl font-bold text-gray-900">
+        Dashboard
+      </h1>
+      <p class="text-gray-600">
+        Vue d'ensemble de votre système NS2PO
+      </p>
     </div>
 
     <!-- Quick Stats -->
@@ -12,8 +16,12 @@
       <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
         <div class="flex items-center justify-between">
           <div>
-            <p class="text-sm font-medium text-gray-600">Produits</p>
-            <p class="text-3xl font-bold text-gray-900">{{ stats.products || 0 }}</p>
+            <p class="text-sm font-medium text-gray-600">
+              Produits
+            </p>
+            <p class="text-3xl font-bold text-gray-900">
+              {{ stats.products || 0 }}
+            </p>
           </div>
           <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
             <Icon name="heroicons:cube" class="w-6 h-6 text-blue-600" />
@@ -28,8 +36,12 @@
       <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
         <div class="flex items-center justify-between">
           <div>
-            <p class="text-sm font-medium text-gray-600">Packs</p>
-            <p class="text-3xl font-bold text-gray-900">{{ stats.bundles || 0 }}</p>
+            <p class="text-sm font-medium text-gray-600">
+              Packs
+            </p>
+            <p class="text-3xl font-bold text-gray-900">
+              {{ stats.bundles || 0 }}
+            </p>
           </div>
           <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
             <Icon name="heroicons:archive-box" class="w-6 h-6 text-purple-600" />
@@ -44,7 +56,9 @@
       <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
         <div class="flex items-center justify-between">
           <div>
-            <p class="text-sm font-medium text-gray-600">Dernière Sync</p>
+            <p class="text-sm font-medium text-gray-600">
+              Dernière Sync
+            </p>
             <p class="text-lg font-bold text-gray-900">
               {{ syncStatus?.lastSync?.timestamp ? formatDate(syncStatus.lastSync.timestamp) : 'Jamais' }}
             </p>
@@ -72,7 +86,9 @@
       <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
         <div class="flex items-center justify-between">
           <div>
-            <p class="text-sm font-medium text-gray-600">Santé Système</p>
+            <p class="text-sm font-medium text-gray-600">
+              Santé Système
+            </p>
             <p class="text-lg font-bold text-gray-900">
               {{ healthStatus?.status === 'healthy' ? 'Excellent' : 'Attention' }}
             </p>
@@ -116,7 +132,9 @@
       <!-- Sync Management -->
       <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
         <div class="flex items-center justify-between mb-4">
-          <h3 class="text-lg font-semibold text-gray-900">Gestion Synchronisation</h3>
+          <h3 class="text-lg font-semibold text-gray-900">
+            Gestion Synchronisation
+          </h3>
           <div class="flex items-center space-x-2">
             <div
               class="w-3 h-3 rounded-full"
@@ -126,7 +144,7 @@
                 'bg-red-500': syncHealth.status === 'error',
                 'bg-gray-400': !adminSyncStatus
               }"
-            ></div>
+            />
             <span class="text-sm font-medium text-gray-600">{{ syncHealth.message }}</span>
           </div>
         </div>
@@ -135,16 +153,16 @@
           <!-- Quick Sync Actions -->
           <div class="grid grid-cols-2 gap-2">
             <button
-              @click="triggerFullSync"
               :disabled="isSyncing"
               class="px-3 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
+              @click="triggerFullSync"
             >
               {{ isSyncing ? 'En cours...' : 'Sync Complète' }}
             </button>
             <button
-              @click="triggerProductsSync"
               :disabled="isSyncing"
               class="px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
+              @click="triggerProductsSync"
             >
               Produits
             </button>
@@ -153,21 +171,35 @@
           <!-- Sync Status and Stats -->
           <div class="p-4 bg-gray-50 rounded-lg">
             <div class="flex items-center justify-between mb-2">
-              <p class="font-medium text-gray-900">Dernière synchronisation</p>
+              <p class="font-medium text-gray-900">
+                Dernière synchronisation
+              </p>
               <span class="text-sm text-gray-600">{{ timeSinceLastSync }}</span>
             </div>
             <div v-if="adminSyncStatus?.stats" class="grid grid-cols-3 gap-4 text-center text-sm">
               <div>
-                <p class="font-bold text-green-600">{{ adminSyncStatus.stats.successfulSyncs }}</p>
-                <p class="text-gray-600">Réussies</p>
+                <p class="font-bold text-green-600">
+                  {{ adminSyncStatus.stats.successfulSyncs }}
+                </p>
+                <p class="text-gray-600">
+                  Réussies
+                </p>
               </div>
               <div>
-                <p class="font-bold text-red-600">{{ adminSyncStatus.stats.failedSyncs }}</p>
-                <p class="text-gray-600">Échouées</p>
+                <p class="font-bold text-red-600">
+                  {{ adminSyncStatus.stats.failedSyncs }}
+                </p>
+                <p class="text-gray-600">
+                  Échouées
+                </p>
               </div>
               <div>
-                <p class="font-bold text-blue-600">{{ adminSyncStatus.stats.totalItemsSynced }}</p>
-                <p class="text-gray-600">Éléments</p>
+                <p class="font-bold text-blue-600">
+                  {{ adminSyncStatus.stats.totalItemsSynced }}
+                </p>
+                <p class="text-gray-600">
+                  Éléments
+                </p>
               </div>
             </div>
           </div>
@@ -175,30 +207,48 @@
           <!-- Current Sync Progress -->
           <div v-if="isSyncing" class="p-4 bg-blue-50 rounded-lg">
             <div class="flex items-center justify-between mb-2">
-              <p class="font-medium text-blue-900">Synchronisation en cours</p>
+              <p class="font-medium text-blue-900">
+                Synchronisation en cours
+              </p>
               <Icon name="heroicons:arrow-path" class="w-4 h-4 text-blue-600 animate-spin" />
             </div>
             <div class="w-full bg-blue-200 rounded-full h-2">
-              <div class="bg-blue-600 h-2 rounded-full animate-pulse"></div>
+              <div class="bg-blue-600 h-2 rounded-full animate-pulse" />
             </div>
-            <p class="text-xs text-blue-600 mt-1">Traitement des données...</p>
+            <p class="text-xs text-blue-600 mt-1">
+              Traitement des données...
+            </p>
           </div>
 
           <!-- Last Sync Result -->
           <div v-if="lastSyncResult && !isSyncing" class="p-4 bg-green-50 rounded-lg">
-            <p class="font-medium text-green-900 mb-2">Dernière synchronisation</p>
+            <p class="font-medium text-green-900 mb-2">
+              Dernière synchronisation
+            </p>
             <div class="grid grid-cols-3 gap-2 text-xs">
               <div class="text-center">
-                <p class="font-bold text-green-600">{{ lastSyncResult.products.synced }}</p>
-                <p class="text-gray-600">Produits</p>
+                <p class="font-bold text-green-600">
+                  {{ lastSyncResult.products.synced }}
+                </p>
+                <p class="text-gray-600">
+                  Produits
+                </p>
               </div>
               <div class="text-center">
-                <p class="font-bold text-purple-600">{{ lastSyncResult.bundles.synced }}</p>
-                <p class="text-gray-600">Bundles</p>
+                <p class="font-bold text-purple-600">
+                  {{ lastSyncResult.bundles.synced }}
+                </p>
+                <p class="text-gray-600">
+                  Bundles
+                </p>
               </div>
               <div class="text-center">
-                <p class="font-bold text-blue-600">{{ lastSyncResult.categories.synced }}</p>
-                <p class="text-gray-600">Catégories</p>
+                <p class="font-bold text-blue-600">
+                  {{ lastSyncResult.categories.synced }}
+                </p>
+                <p class="text-gray-600">
+                  Catégories
+                </p>
               </div>
             </div>
             <p class="text-xs text-gray-600 mt-2">
@@ -209,8 +259,8 @@
           <!-- Advanced Controls -->
           <div class="pt-4 border-t border-gray-200">
             <button
-              @click="showSyncLogs = true"
               class="w-full px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 text-sm font-medium"
+              @click="showSyncLogs = true"
             >
               Voir l'historique complet
             </button>
@@ -221,11 +271,13 @@
       <!-- Real-time System Health -->
       <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
         <div class="flex items-center justify-between mb-4">
-          <h3 class="text-lg font-semibold text-gray-900">Santé Système</h3>
+          <h3 class="text-lg font-semibold text-gray-900">
+            Santé Système
+          </h3>
           <button
-            @click="refreshHealthStatus"
             :disabled="refreshingHealth"
             class="p-2 text-gray-400 hover:text-gray-600 disabled:opacity-50"
+            @click="refreshHealthStatus"
           >
             <Icon name="heroicons:arrow-path" :class="{ 'animate-spin': refreshingHealth }" class="w-4 h-4" />
           </button>
@@ -250,10 +302,14 @@
                   'bg-red-500': service.status === 'down',
                   'bg-yellow-500': service.status === 'degraded'
                 }"
-              ></div>
+              />
               <div>
-                <p class="font-medium text-gray-900">{{ service.name }}</p>
-                <p class="text-xs text-gray-600">{{ service.responseTime }}ms</p>
+                <p class="font-medium text-gray-900">
+                  {{ service.name }}
+                </p>
+                <p class="text-xs text-gray-600">
+                  {{ service.responseTime }}ms
+                </p>
               </div>
             </div>
             <span
@@ -273,12 +329,20 @@
         <div class="mt-4 pt-4 border-t border-gray-200">
           <div class="grid grid-cols-2 gap-4 text-center">
             <div>
-              <p class="text-2xl font-bold text-gray-900">{{ healthStatus?.turso?.connections || 0 }}</p>
-              <p class="text-xs text-gray-600">Connexions Turso</p>
+              <p class="text-2xl font-bold text-gray-900">
+                {{ healthStatus?.turso?.connections || 0 }}
+              </p>
+              <p class="text-xs text-gray-600">
+                Connexions Turso
+              </p>
             </div>
             <div>
-              <p class="text-2xl font-bold text-gray-900">{{ healthStatus?.turso?.avgResponseTime || 0 }}ms</p>
-              <p class="text-xs text-gray-600">Latence moyenne</p>
+              <p class="text-2xl font-bold text-gray-900">
+                {{ healthStatus?.turso?.avgResponseTime || 0 }}ms
+              </p>
+              <p class="text-xs text-gray-600">
+                Latence moyenne
+              </p>
             </div>
           </div>
         </div>
@@ -286,7 +350,9 @@
 
       <!-- Error Monitoring -->
       <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <h3 class="text-lg font-semibold text-gray-900 mb-4">Monitoring d'Erreurs</h3>
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">
+          Monitoring d'Erreurs
+        </h3>
 
         <div class="space-y-3">
           <div class="flex items-center justify-between">
@@ -314,8 +380,8 @@
 
         <div class="mt-4 pt-4 border-t border-gray-200">
           <button
-            @click="showErrorLogs = true"
             class="w-full px-4 py-2 bg-red-50 text-red-700 rounded-lg hover:bg-red-100 text-sm font-medium"
+            @click="showErrorLogs = true"
           >
             Voir les logs d'erreurs
           </button>
@@ -328,11 +394,13 @@
       <!-- Recent Activity -->
       <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
         <div class="flex items-center justify-between mb-4">
-          <h3 class="text-lg font-semibold text-gray-900">Activité Récente</h3>
+          <h3 class="text-lg font-semibold text-gray-900">
+            Activité Récente
+          </h3>
           <button
-            @click="refreshActivity"
             :disabled="refreshingActivity"
             class="p-2 text-gray-400 hover:text-gray-600 disabled:opacity-50"
+            @click="refreshActivity"
           >
             <Icon name="heroicons:arrow-path" :class="{ 'animate-spin': refreshingActivity }" class="w-4 h-4" />
           </button>
@@ -358,18 +426,22 @@
                 'bg-yellow-500': activity.type === 'warning',
                 'bg-red-500': activity.type === 'error'
               }"
-            ></div>
+            />
             <div class="flex-1">
-              <p class="text-sm font-medium text-gray-900">{{ activity.message }}</p>
-              <p class="text-xs text-gray-600">{{ formatDate(activity.timestamp) }}</p>
+              <p class="text-sm font-medium text-gray-900">
+                {{ activity.message }}
+              </p>
+              <p class="text-xs text-gray-600">
+                {{ formatDate(activity.timestamp) }}
+              </p>
             </div>
           </div>
         </div>
 
         <div class="mt-4 pt-4 border-t border-gray-200">
           <button
-            @click="showFullLogs = true"
             class="text-sm text-amber-600 hover:text-amber-700 font-medium"
+            @click="showFullLogs = true"
           >
             Voir tous les logs →
           </button>
@@ -378,7 +450,9 @@
 
       <!-- Performance Metrics -->
       <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <h3 class="text-lg font-semibold text-gray-900 mb-4">Métriques Performance</h3>
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">
+          Métriques Performance
+        </h3>
 
         <div class="space-y-4">
           <div>
@@ -395,7 +469,7 @@
                   'bg-red-500': (performance.avgResponseTime || 0) >= 1000
                 }"
                 :style="{ width: `${Math.min((performance.avgResponseTime || 0) / 10, 100)}%` }"
-              ></div>
+              />
             </div>
           </div>
 
@@ -413,7 +487,7 @@
                   'bg-red-500': (performance.memoryUsage || 0) >= 90
                 }"
                 :style="{ width: `${performance.memoryUsage || 0}%` }"
-              ></div>
+              />
             </div>
           </div>
 
@@ -426,7 +500,7 @@
               <div
                 class="bg-blue-500 h-2 rounded-full"
                 :style="{ width: `${Math.min((performance.throughput || 0) / 10, 100)}%` }"
-              ></div>
+              />
             </div>
           </div>
         </div>
@@ -434,16 +508,28 @@
         <div class="mt-4 pt-4 border-t border-gray-200">
           <div class="grid grid-cols-3 gap-4 text-center">
             <div>
-              <p class="text-lg font-bold text-blue-600">{{ performance.uptime || '0d' }}</p>
-              <p class="text-xs text-gray-600">Uptime</p>
+              <p class="text-lg font-bold text-blue-600">
+                {{ performance.uptime || '0d' }}
+              </p>
+              <p class="text-xs text-gray-600">
+                Uptime
+              </p>
             </div>
             <div>
-              <p class="text-lg font-bold text-green-600">{{ performance.totalRequests || 0 }}</p>
-              <p class="text-xs text-gray-600">Requêtes totales</p>
+              <p class="text-lg font-bold text-green-600">
+                {{ performance.totalRequests || 0 }}
+              </p>
+              <p class="text-xs text-gray-600">
+                Requêtes totales
+              </p>
             </div>
             <div>
-              <p class="text-lg font-bold text-purple-600">{{ performance.cacheHitRate || 0 }}%</p>
-              <p class="text-xs text-gray-600">Cache hit rate</p>
+              <p class="text-lg font-bold text-purple-600">
+                {{ performance.cacheHitRate || 0 }}%
+              </p>
+              <p class="text-xs text-gray-600">
+                Cache hit rate
+              </p>
             </div>
           </div>
         </div>
@@ -454,28 +540,44 @@
     <!-- Sync Logs Modal -->
     <AdminModal
       :show="showSyncLogs"
-      @close="showSyncLogs = false"
       title="Historique des Synchronisations"
       size="xl"
+      @close="showSyncLogs = false"
     >
       <div v-if="adminSyncStatus" class="space-y-6">
         <!-- Stats résumées -->
         <div class="grid grid-cols-4 gap-4 p-4 bg-gray-50 rounded-lg">
           <div class="text-center">
-            <p class="text-2xl font-bold text-green-600">{{ adminSyncStatus.stats.successfulSyncs }}</p>
-            <p class="text-sm text-gray-600">Réussies</p>
+            <p class="text-2xl font-bold text-green-600">
+              {{ adminSyncStatus.stats.successfulSyncs }}
+            </p>
+            <p class="text-sm text-gray-600">
+              Réussies
+            </p>
           </div>
           <div class="text-center">
-            <p class="text-2xl font-bold text-red-600">{{ adminSyncStatus.stats.failedSyncs }}</p>
-            <p class="text-sm text-gray-600">Échouées</p>
+            <p class="text-2xl font-bold text-red-600">
+              {{ adminSyncStatus.stats.failedSyncs }}
+            </p>
+            <p class="text-sm text-gray-600">
+              Échouées
+            </p>
           </div>
           <div class="text-center">
-            <p class="text-2xl font-bold text-blue-600">{{ adminSyncStatus.stats.totalItemsSynced }}</p>
-            <p class="text-sm text-gray-600">Éléments</p>
+            <p class="text-2xl font-bold text-blue-600">
+              {{ adminSyncStatus.stats.totalItemsSynced }}
+            </p>
+            <p class="text-sm text-gray-600">
+              Éléments
+            </p>
           </div>
           <div class="text-center">
-            <p class="text-2xl font-bold text-amber-600">{{ adminSyncStatus.stats.successRate }}%</p>
-            <p class="text-sm text-gray-600">Taux de réussite</p>
+            <p class="text-2xl font-bold text-amber-600">
+              {{ adminSyncStatus.stats.successRate }}%
+            </p>
+            <p class="text-sm text-gray-600">
+              Taux de réussite
+            </p>
           </div>
         </div>
 
@@ -509,16 +611,28 @@
 
                 <div class="grid grid-cols-3 gap-4 text-sm">
                   <div>
-                    <p class="font-medium text-gray-900">{{ sync.itemsSynced }}</p>
-                    <p class="text-gray-600">Éléments synchronisés</p>
+                    <p class="font-medium text-gray-900">
+                      {{ sync.itemsSynced }}
+                    </p>
+                    <p class="text-gray-600">
+                      Éléments synchronisés
+                    </p>
                   </div>
                   <div>
-                    <p class="font-medium text-gray-900">{{ sync.errorsCount }}</p>
-                    <p class="text-gray-600">Erreurs</p>
+                    <p class="font-medium text-gray-900">
+                      {{ sync.errorsCount }}
+                    </p>
+                    <p class="text-gray-600">
+                      Erreurs
+                    </p>
                   </div>
                   <div>
-                    <p class="font-medium text-gray-900">{{ formatDuration(sync.duration) }}</p>
-                    <p class="text-gray-600">Durée</p>
+                    <p class="font-medium text-gray-900">
+                      {{ formatDuration(sync.duration) }}
+                    </p>
+                    <p class="text-gray-600">
+                      Durée
+                    </p>
                   </div>
                 </div>
               </div>
@@ -530,7 +644,7 @@
                   'bg-yellow-500': sync.status === 'partial',
                   'bg-red-500': sync.status === 'error'
                 }"
-              ></div>
+              />
             </div>
           </div>
         </div>
@@ -542,16 +656,16 @@
           </div>
           <div class="space-x-2">
             <button
-              @click="triggerProductsSync(); showSyncLogs = false"
               :disabled="isSyncing"
               class="px-3 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-700 disabled:opacity-50"
+              @click="triggerProductsSync(); showSyncLogs = false"
             >
               Sync Produits
             </button>
             <button
-              @click="triggerFullSync(); showSyncLogs = false"
               :disabled="isSyncing"
               class="px-3 py-1 bg-amber-600 text-white rounded text-sm hover:bg-amber-700 disabled:opacity-50"
+              @click="triggerFullSync(); showSyncLogs = false"
             >
               Sync Complète
             </button>
@@ -563,9 +677,9 @@
     <!-- Error Logs Modal -->
     <AdminModal
       :show="showErrorLogs"
-      @close="showErrorLogs = false"
       title="Logs d'Erreurs"
       size="xl"
+      @close="showErrorLogs = false"
     >
       <div class="space-y-4 max-h-96 overflow-y-auto">
         <div
@@ -575,9 +689,15 @@
         >
           <div class="flex items-start justify-between">
             <div class="flex-1">
-              <p class="font-medium text-red-900">{{ log.message }}</p>
-              <p class="text-sm text-red-600 mt-1">{{ log.stack }}</p>
-              <p class="text-xs text-red-500 mt-2">{{ formatDate(log.timestamp) }}</p>
+              <p class="font-medium text-red-900">
+                {{ log.message }}
+              </p>
+              <p class="text-sm text-red-600 mt-1">
+                {{ log.stack }}
+              </p>
+              <p class="text-xs text-red-500 mt-2">
+                {{ formatDate(log.timestamp) }}
+              </p>
             </div>
             <span class="px-2 py-1 bg-red-100 text-red-800 text-xs rounded">{{ log.level }}</span>
           </div>
@@ -588,9 +708,9 @@
     <!-- Full Logs Modal -->
     <AdminModal
       :show="showFullLogs"
-      @close="showFullLogs = false"
       title="Logs Système Complets"
       size="xl"
+      @close="showFullLogs = false"
     >
       <div class="space-y-4 max-h-96 overflow-y-auto">
         <div
@@ -606,9 +726,15 @@
         >
           <div class="flex items-start justify-between">
             <div class="flex-1">
-              <p class="font-medium text-gray-900">{{ log.message }}</p>
-              <p class="text-sm text-gray-600 mt-1">{{ log.context }}</p>
-              <p class="text-xs text-gray-500 mt-2">{{ formatDate(log.timestamp) }}</p>
+              <p class="font-medium text-gray-900">
+                {{ log.message }}
+              </p>
+              <p class="text-sm text-gray-600 mt-1">
+                {{ log.context }}
+              </p>
+              <p class="text-xs text-gray-500 mt-2">
+                {{ formatDate(log.timestamp) }}
+              </p>
             </div>
             <span
               class="px-2 py-1 text-xs rounded uppercase"

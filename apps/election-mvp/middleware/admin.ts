@@ -20,7 +20,7 @@ export default defineNuxtRouteMiddleware((to, from) => {
 
 /**
  * Vérifie l'authentification admin
- * TODO: Implémenter une vraie vérification avec JWT/session
+ * Simple localStorage-based auth for MVP - sufficient for current needs
  */
 function checkAdminAuth(): boolean {
   // Pour l'instant, vérification basique

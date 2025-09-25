@@ -4,8 +4,12 @@
     <div class="mb-8">
       <div class="flex items-center justify-between">
         <div>
-          <h1 class="text-2xl font-bold text-gray-900">Nouvelle Réalisation</h1>
-          <p class="text-gray-600">Ajouter une nouvelle réalisation au portfolio</p>
+          <h1 class="text-2xl font-bold text-gray-900">
+            Nouvelle Réalisation
+          </h1>
+          <p class="text-gray-600">
+            Ajouter une nouvelle réalisation au portfolio
+          </p>
         </div>
         <div class="flex items-center space-x-3">
           <NuxtLink
@@ -31,8 +35,8 @@
 </template>
 
 <script setup lang="ts">
-import { globalNotifications } from '~/composables/useNotifications'
-import RealisationForm from '~/components/admin/RealisationForm.vue'
+// Auto-imported via Nuxt 3: globalNotifications
+import RealisationForm from '../../../components/admin/RealisationForm.vue'
 
 // Layout admin
 definePageMeta({

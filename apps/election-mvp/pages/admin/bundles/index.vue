@@ -4,8 +4,12 @@
     <div class="mb-8">
       <div class="flex items-center justify-between">
         <div>
-          <h1 class="text-2xl font-bold text-gray-900">Gestion des Bundles</h1>
-          <p class="text-gray-600">Gérez vos packs de campagne pré-configurés</p>
+          <h1 class="text-2xl font-bold text-gray-900">
+            Gestion des Bundles
+          </h1>
+          <p class="text-gray-600">
+            Gérez vos packs de campagne pré-configurés
+          </p>
         </div>
         <NuxtLink
           to="/admin/bundles/new"
@@ -29,7 +33,7 @@
               type="text"
               placeholder="Nom, description..."
               class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
-            />
+            >
             <Icon name="heroicons:magnifying-glass" class="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
           </div>
         </div>
@@ -41,11 +45,21 @@
             v-model="filters.audience"
             class="block w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
           >
-            <option value="">Toutes les audiences</option>
-            <option value="local">Local</option>
-            <option value="regional">Régional</option>
-            <option value="national">National</option>
-            <option value="universal">Universel</option>
+            <option value="">
+              Toutes les audiences
+            </option>
+            <option value="local">
+              Local
+            </option>
+            <option value="regional">
+              Régional
+            </option>
+            <option value="national">
+              National
+            </option>
+            <option value="universal">
+              Universel
+            </option>
           </select>
         </div>
 
@@ -56,11 +70,21 @@
             v-model="filters.budget"
             class="block w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
           >
-            <option value="">Tous les budgets</option>
-            <option value="starter">Starter (0-10k XOF)</option>
-            <option value="medium">Medium (10k-50k XOF)</option>
-            <option value="premium">Premium (50k-200k XOF)</option>
-            <option value="enterprise">Enterprise (200k+ XOF)</option>
+            <option value="">
+              Tous les budgets
+            </option>
+            <option value="starter">
+              Starter (0-10k XOF)
+            </option>
+            <option value="medium">
+              Medium (10k-50k XOF)
+            </option>
+            <option value="premium">
+              Premium (50k-200k XOF)
+            </option>
+            <option value="enterprise">
+              Enterprise (200k+ XOF)
+            </option>
           </select>
         </div>
 
@@ -71,9 +95,15 @@
             v-model="filters.status"
             class="block w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
           >
-            <option value="">Tous les statuts</option>
-            <option value="active">Actif</option>
-            <option value="inactive">Inactif</option>
+            <option value="">
+              Tous les statuts
+            </option>
+            <option value="active">
+              Actif
+            </option>
+            <option value="inactive">
+              Inactif
+            </option>
           </select>
         </div>
       </div>
@@ -82,14 +112,14 @@
       <div class="flex items-center justify-between mt-4">
         <div class="flex items-center space-x-2">
           <button
-            @click="resetFilters"
             class="px-4 py-2 text-sm text-gray-600 bg-gray-100 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500"
+            @click="resetFilters"
           >
             Réinitialiser
           </button>
           <button
-            @click="exportBundles"
             class="px-4 py-2 text-sm text-amber-600 bg-amber-50 rounded-md hover:bg-amber-100 focus:outline-none focus:ring-2 focus:ring-amber-500"
+            @click="exportBundles"
           >
             Exporter
           </button>
@@ -181,7 +211,7 @@
             <div
               class="bg-amber-600 h-2 rounded-full"
               :style="{ width: `${Math.min(value * 10, 100)}%` }"
-            ></div>
+            />
           </div>
           <span class="ml-2 text-sm text-gray-500">{{ value }}</span>
         </div>
@@ -197,21 +227,21 @@
             Modifier
           </NuxtLink>
           <button
-            @click="duplicateBundle(item)"
             class="text-blue-600 hover:text-blue-700 text-sm font-medium"
+            @click="duplicateBundle(item)"
           >
             Dupliquer
           </button>
           <button
-            @click="toggleStatus(item)"
             :class="item.isActive ? 'text-red-600 hover:text-red-700' : 'text-green-600 hover:text-green-700'"
             class="text-sm font-medium"
+            @click="toggleStatus(item)"
           >
             {{ item.isActive ? 'Désactiver' : 'Activer' }}
           </button>
           <button
-            @click="deleteBundle(item)"
             class="text-red-600 hover:text-red-700 text-sm font-medium"
+            @click="deleteBundle(item)"
           >
             Supprimer
           </button>
@@ -222,8 +252,11 @@
 </template>
 
 <script setup lang="ts">
-import AdminDataTable from '~/components/admin/AdminDataTable.vue'
-import { globalNotifications } from '~/composables/useNotifications'
+import AdminDataTable from '../../../components/admin/AdminDataTable.vue'
+import type { BundleApiResponse, ApiResponse } from "@ns2po/types"
+import type { BundleAggregate, BundleTargetAudience, BundleBudgetRange } from '../../../types/domain/Bundle'
+import { globalNotifications } from '../../../composables/useNotifications'
+import { useBundlesQuery, useUpdateBundleMutation, useDeleteBundleMutation } from '../../../composables/useBundlesQuery'
 
 // Layout admin
 definePageMeta({
@@ -239,28 +272,10 @@ useHead({
 // Global notifications
 const { crudSuccess, crudError } = globalNotifications
 
-// Types
-interface Bundle {
-  id: string
-  name: string
-  description: string
-  targetAudience: 'local' | 'regional' | 'national' | 'universal'
-  budgetRange: 'starter' | 'medium' | 'premium' | 'enterprise'
-  products: any[]
-  estimatedTotal: number
-  originalTotal?: number
-  savings?: number
-  popularity: number
-  isActive: boolean
-  isFeatured?: boolean
-  tags?: string[]
-  createdAt: string
-  updatedAt: string
-}
-
-// Reactive data
-const isLoading = ref(false)
-const bundles = ref<Bundle[]>([])
+// Vue Query composables
+const { data: bundles, isLoading, error } = useBundlesQuery()
+const updateBundleMutation = useUpdateBundleMutation()
+const deleteBundleMutation = useDeleteBundleMutation()
 
 // Filters
 const filters = reactive({
@@ -336,6 +351,7 @@ const columns = [
 
 // Computed
 const filteredBundles = computed(() => {
+  if (!bundles.value) return []
   let result = [...bundles.value]
 
   // Filter by audience
@@ -357,19 +373,8 @@ const filteredBundles = computed(() => {
   return result
 })
 
-// Methods
-async function fetchBundles() {
-  isLoading.value = true
-  try {
-    const response = await $fetch('/api/campaign-bundles')
-    bundles.value = response.data || []
-  } catch (error) {
-    console.error('Error fetching bundles:', error)
-    crudError.validation('Impossible de charger les bundles')
-  } finally {
-    isLoading.value = false
-  }
-}
+// Methods - Vue Query handles data fetching automatically
+// No need for manual fetchBundles() function
 
 function resetFilters() {
   filters.search = ''
@@ -378,27 +383,83 @@ function resetFilters() {
   filters.status = ''
 }
 
-function exportBundles() {
-  // TODO: Implement export functionality
-  console.log('Export bundles')
-}
-
-function duplicateBundle(bundle: Bundle) {
-  // TODO: Implement duplicate functionality
-  console.log('Duplicate bundle:', bundle)
-}
-
-async function toggleStatus(bundle: Bundle) {
+async function exportBundles() {
   try {
-    await $fetch(`/api/campaign-bundles/${bundle.id}`, {
-      method: 'PUT',
-      body: {
-        isActive: !bundle.isActive
+    const bundlesToExport = filteredBundles.value
+
+    if (bundlesToExport.length === 0) {
+      crudError.validation('Aucun bundle à exporter')
+      return
+    }
+
+    // Create CSV content
+    const headers = ['Nom', 'Description', 'Audience', 'Budget', 'Produits', 'Prix Total', 'Statut']
+    const csvContent = [
+      headers.join(','),
+      ...bundlesToExport.map(bundle => [
+        `"${bundle.name}"`,
+        `"${bundle.description || ''}"`,
+        `"${getAudienceText(bundle.targetAudience as BundleTargetAudience)}"`,
+        `"${getBudgetText(bundle.budgetRange as BundleBudgetRange)}"`,
+        bundle.bundleProductCount || 0,
+        bundle.totalPrice || 0,
+        `"${bundle.isActive ? 'Actif' : 'Inactif'}"`
+      ].join(','))
+    ].join('\n')
+
+    // Download file
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+    const url = window.URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `bundles-${new Date().toISOString().split('T')[0]}.csv`
+    link.click()
+    window.URL.revokeObjectURL(url)
+
+    crudSuccess.created('Export CSV généré avec succès', 'export')
+  } catch (error) {
+    crudError.created('export', 'Erreur lors de l\'export')
+  }
+}
+
+async function duplicateBundle(bundle: BundleAggregate) {
+  try {
+    // Create a duplicate bundle with modified name
+    const duplicatedBundle = {
+      name: `${bundle.name} (Copie)`,
+      description: bundle.description,
+      targetAudience: bundle.targetAudience,
+      budgetRange: bundle.budgetRange,
+      isActive: false, // New bundle starts as inactive
+      displayOrder: bundle.displayOrder || 999,
+      totalPrice: bundle.totalPrice,
+      products: bundle.products || []
+    }
+
+    // Navigate to new bundle page with pre-filled data
+    await navigateTo({
+      path: '/admin/bundles/new',
+      query: {
+        duplicate: 'true',
+        data: encodeURIComponent(JSON.stringify(duplicatedBundle))
       }
     })
 
-    // Update local state
-    bundle.isActive = !bundle.isActive
+    crudSuccess.created('Redirection vers la création du bundle dupliqué', 'bundle')
+  } catch (error) {
+    console.error('Error duplicating bundle:', error)
+    crudError.validation('Erreur lors de la duplication du bundle')
+  }
+}
+
+async function toggleStatus(bundle: BundleAggregate) {
+  try {
+    await updateBundleMutation.mutateAsync({
+      id: bundle.id,
+      data: {
+        isActive: !bundle.isActive
+      }
+    })
 
     crudSuccess.updated(`Statut du bundle "${bundle.name}" modifié avec succès`, 'bundle')
   } catch (error) {
@@ -407,20 +468,11 @@ async function toggleStatus(bundle: Bundle) {
   }
 }
 
-async function deleteBundle(bundle: Bundle) {
+async function deleteBundle(bundle: BundleAggregate) {
   if (!confirm(`Êtes-vous sûr de vouloir supprimer le bundle "${bundle.name}" ?`)) return
 
   try {
-    await $fetch(`/api/campaign-bundles/${bundle.id}`, {
-      method: 'DELETE'
-    })
-
-    // Remove from local state
-    const index = bundles.value.findIndex(b => b.id === bundle.id)
-    if (index > -1) {
-      bundles.value.splice(index, 1)
-    }
-
+    await deleteBundleMutation.mutateAsync(bundle.id)
     crudSuccess.deleted(`Bundle "${bundle.name}" supprimé avec succès`, 'bundle')
   } catch (error) {
     console.error('Error deleting bundle:', error)
@@ -428,8 +480,8 @@ async function deleteBundle(bundle: Bundle) {
   }
 }
 
-function getAudienceText(audience: string): string {
-  const audienceLabels = {
+function getAudienceText(audience: BundleTargetAudience): string {
+  const audienceLabels: Record<BundleTargetAudience, string> = {
     local: 'Local',
     regional: 'Régional',
     national: 'National',
@@ -438,8 +490,8 @@ function getAudienceText(audience: string): string {
   return audienceLabels[audience] || audience
 }
 
-function getAudienceClasses(audience: string): string {
-  const audienceClasses = {
+function getAudienceClasses(audience: BundleTargetAudience): string {
+  const audienceClasses: Record<BundleTargetAudience, string> = {
     local: 'bg-blue-100 text-blue-800',
     regional: 'bg-green-100 text-green-800',
     national: 'bg-purple-100 text-purple-800',
@@ -448,8 +500,8 @@ function getAudienceClasses(audience: string): string {
   return audienceClasses[audience] || 'bg-gray-100 text-gray-800'
 }
 
-function getBudgetText(budget: string): string {
-  const budgetLabels = {
+function getBudgetText(budget: BundleBudgetRange): string {
+  const budgetLabels: Record<BundleBudgetRange, string> = {
     starter: 'Starter',
     medium: 'Medium',
     premium: 'Premium',
@@ -458,8 +510,8 @@ function getBudgetText(budget: string): string {
   return budgetLabels[budget] || budget
 }
 
-function getBudgetClasses(budget: string): string {
-  const budgetClasses = {
+function getBudgetClasses(budget: BundleBudgetRange): string {
+  const budgetClasses: Record<BundleBudgetRange, string> = {
     starter: 'bg-green-100 text-green-800',
     medium: 'bg-yellow-100 text-yellow-800',
     premium: 'bg-orange-100 text-orange-800',
@@ -478,8 +530,14 @@ function formatPrice(price: number | undefined | null): string {
   }).format(price)
 }
 
-// Lifecycle
-onMounted(async () => {
-  await fetchBundles()
+// Lifecycle - Vue Query handles data fetching automatically
+// No need for onMounted fetchBundles() call
+
+// Watch for errors
+watch(error, (newError) => {
+  if (newError) {
+    console.error('Error loading bundles:', newError)
+    crudError.validation('Impossible de charger les bundles')
+  }
 })
 </script>

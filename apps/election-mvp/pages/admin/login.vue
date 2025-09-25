@@ -17,7 +17,7 @@
 
     <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
       <div class="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
-        <form @submit.prevent="handleLogin" class="space-y-6">
+        <form class="space-y-6" @submit.prevent="handleLogin">
           <!-- Email -->
           <div>
             <label for="email" class="block text-sm font-medium text-gray-700">
@@ -32,7 +32,7 @@
                 required
                 class="block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-amber-500 focus:outline-none focus:ring-amber-500 sm:text-sm"
                 placeholder="admin@ns2po.com"
-              />
+              >
             </div>
           </div>
 
@@ -50,7 +50,7 @@
                 required
                 class="block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-amber-500 focus:outline-none focus:ring-amber-500 sm:text-sm"
                 placeholder="••••••••"
-              />
+              >
             </div>
           </div>
 
@@ -87,7 +87,9 @@
           <div class="flex items-start">
             <Icon name="heroicons:exclamation-triangle" class="w-5 h-5 text-yellow-600 mt-0.5" />
             <div class="ml-3">
-              <h3 class="text-sm font-medium text-yellow-800">Mode Développement</h3>
+              <h3 class="text-sm font-medium text-yellow-800">
+                Mode Développement
+              </h3>
               <p class="text-sm text-yellow-700 mt-1">
                 L'authentification est désactivée en développement.
                 <NuxtLink to="/admin" class="font-medium underline">

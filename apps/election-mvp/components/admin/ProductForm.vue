@@ -306,6 +306,7 @@
 <script setup lang="ts">
 // Auto-imported via Nuxt 3: useFormValidation, globalNotifications
 import type { Asset } from '~/composables/useAssetsQuery'
+import { useUploadAssetMutation } from '~/composables/useAssetsQuery'
 import AssetSelectionModal from '~/components/admin/AssetSelectionModal.vue'
 
 interface Product {
@@ -339,7 +340,6 @@ const emit = defineEmits<{
 
 const { validateProduct } = useFormValidation()
 const { crudError } = globalNotifications
-const { emitImageAdded, emitImageRemoved } = useProductImagesEventBus()
 
 // Form state
 const formData = reactive<Product>({
@@ -431,20 +431,22 @@ const handleFileUpload = async (event: Event) => {
         continue
       }
 
-      const uploadFormData = new FormData()
-      uploadFormData.append('file', file)
-      uploadFormData.append('folder', 'ns2po/products')
-
-      const response = await $fetch('/api/cloudinary/upload', {
-        method: 'POST',
-        body: uploadFormData
+      // Use the uploadMutation from useAssetsQuery for consistency
+      const uploadMutation = useUploadAssetMutation()
+      const uploadedAsset = await uploadMutation.mutateAsync({
+        file,
+        metadata: {
+          folder: 'products'
+        }
       })
 
-      if (!response.success) {
-        throw new Error('Erreur lors de l\'upload')
+      const data = {
+        public_id: uploadedAsset.public_id,
+        width: uploadedAsset.width,
+        height: uploadedAsset.height,
+        format: uploadedAsset.format,
+        bytes: uploadedAsset.bytes
       }
-
-      const data = response.data
 
       // Add to form images
       if (!formData.images) {
@@ -452,16 +454,7 @@ const handleFileUpload = async (event: Event) => {
       }
       formData.images.push(data.public_id)
 
-      // Emit image added event for real-time synchronization
-      if (formData.id) {
-        const imageUrl = getImageUrl(data.public_id)
-        emitImageAdded(formData.id, data.public_id, imageUrl, {
-          width: data.width,
-          height: data.height,
-          format: data.format,
-          size: data.bytes
-        })
-      }
+      // Image added successfully
     }
   } catch (error) {
     console.error('Erreur upload:', error)
@@ -475,13 +468,7 @@ const handleFileUpload = async (event: Event) => {
 
 const removeImage = (index: number) => {
   if (formData.images && formData.images[index]) {
-    const removedImagePublicId = formData.images[index]
     formData.images.splice(index, 1)
-
-    // Emit image removed event for real-time synchronization
-    if (formData.id) {
-      emitImageRemoved(formData.id, removedImagePublicId, [...formData.images])
-    }
   }
 }
 
@@ -498,17 +485,6 @@ const handleAssetsSelected = (assets: Asset[]) => {
     // Avoid duplicates
     if (!formData.images!.includes(asset.public_id)) {
       formData.images!.push(asset.public_id)
-
-      // Emit image added event for real-time synchronization
-      if (formData.id) {
-        const imageUrl = getImageUrl(asset.public_id)
-        emitImageAdded(formData.id, asset.public_id, imageUrl, {
-          width: asset.width || 0,
-          height: asset.height || 0,
-          format: asset.format,
-          size: asset.bytes
-        })
-      }
     }
   })
 

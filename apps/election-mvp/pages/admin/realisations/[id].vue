@@ -34,8 +34,12 @@
       <div class="flex">
         <Icon name="heroicons:x-circle" class="w-5 h-5 text-red-400" />
         <div class="ml-3">
-          <h3 class="text-sm font-medium text-red-800">Erreur</h3>
-          <p class="mt-1 text-sm text-red-700">{{ error }}</p>
+          <h3 class="text-sm font-medium text-red-800">
+            Erreur
+          </h3>
+          <p class="mt-1 text-sm text-red-700">
+            {{ error }}
+          </p>
         </div>
       </div>
     </div>
@@ -55,8 +59,8 @@
 </template>
 
 <script setup lang="ts">
-import { globalNotifications } from '~/composables/useNotifications'
-import RealisationForm from '~/components/admin/RealisationForm.vue'
+// Auto-imported via Nuxt 3: globalNotifications
+import RealisationForm from '../../../components/admin/RealisationForm.vue'
 
 // Route params
 const route = useRoute()

@@ -1,0 +1,121 @@
+{
+  "id": "sprint-1758599618159-71e5fb29",
+  "name": "Core 20% - Validation Trap Fix",
+  "startDate": "2025-09-23",
+  "endDate": "2025-09-25",
+  "goals": "Éliminer complètement l'erreur \"Failed to update bundle 3\" en implémentant la validation préventive et feedback utilisateur cohérent selon recommandations consensus experts MCP",
+  "status": "active",
+  "created": "2025-09-23T03:53:38.160Z",
+  "tasks": [
+    {
+      "id": 1,
+      "title": "CORE 20% - Validation préventive suppression produit",
+      "description": "**CONTEXTE CRITIQUE** : L'erreur \"Failed to update bundle 3\" survient car la suppression de produit est confirmée UI mais viole les règles business après coup.\n\n**PROBLÈME REPRODUCED** : \n- Bundle 3 \"national premium\" (843K F CFA, 230 articles)\n- User clique trash → Notification \"succès\" \n- User sauvegarde → HTTP 400 car budget > 200K (premium max) et articles < 1000 (national min)\n\n**SOLUTION TECHNIQUE** :\n```typescript\n// File: apps/election-mvp/pages/admin/bundles/[id].vue\n// Dans removeProduct(index: number, product: any)\n\n// AVANT suppression, calculer impact\nconst calcProductRemovalImpact = (productToRemove: any) => {\n  const newTotal = selectedProducts.value\n    .filter(p => p.id !== productToRemove.id)\n    .reduce((sum, p) => sum + (p.price || 0), 0)\n  \n  const newQuantity = selectedProducts.value\n    .filter(p => p.id !== productToRemove.id)\n    .reduce((sum, p) => sum + (p.quantity || 1), 0)\n    \n  return validateBundleConstraints({\n    ...bundle.value,\n    estimatedTotal: newTotal,\n    products: selectedProducts.value.filter(p => p.id !== productToRemove.id)\n  })\n}\n\n// Logique validation\nconst validateBundleConstraints = (bundleState) => {\n  const errors = []\n  const budgetRanges = { premium: { min: 50000, max: 200000 } }\n  const minQuantityByAudience = { national: 1000 }\n  \n  if (bundleState.estimatedTotal > budgetRanges.premium.max) {\n    errors.push(`Budget ${bundleState.estimatedTotal} F CFA dépasse premium max (200K)`)\n  }\n  \n  const totalQty = bundleState.products.reduce((sum, p) => sum + (p.quantity || 1), 0)\n  if (totalQty < minQuantityByAudience.national) {\n    errors.push(`Quantité ${totalQty} < minimum national (1000 articles)`)\n  }\n  \n  return { isValid: errors.length === 0, errors }\n}\n```\n\n**FICHIERS À MODIFIER** :\n- `apps/election-mvp/pages/admin/bundles/[id].vue` (ligne ~180 removeProduct)\n- `apps/election-mvp/schemas/bundle.ts` (extraire règles validation)\n\n**CRITÈRES ACCEPTATION** :\n✅ Calcul impact AVANT suppression\n✅ Si violation : affichage warning, pas de suppression\n✅ Si OK : suppression normale avec undo possible\n✅ Plus jamais d'erreur 400 après confirmation UI",
+      "status": "completed",
+      "priority": 5,
+      "dependencies": [],
+      "created": "2025-09-23T03:54:03.300Z",
+      "updated": "2025-09-23T18:12:12.738Z",
+      "isPareto80": false
+    },
+    {
+      "id": 2,
+      "title": "CORE 20% - Feedback utilisateur cohérent (éliminer succès trompeurs)",
+      "description": "**CONTEXTE PROBLÈME** : Notification \"Succès: produit retiré du bundle\" affichée MÊME quand l'action rend le bundle invalid → frustration utilisateur car promesse non tenue.\n\n**SOLUTION EXPERT UX (GPT-5)** : Remplacer par feedback conditionnel basé sur l'état de validation\n\n**IMPLÉMENTATION** :\n```typescript\n// File: apps/election-mvp/pages/admin/bundles/[id].vue\n// Dans removeProduct() après validation préventive\n\n// AVANT (problématique)\ncrudSuccess?.deleted(product.name, 'produit retiré du bundle')\n\n// APRÈS (solution)\nconst removeProduct = (index: number, product: any) => {\n  const validationResult = calcProductRemovalImpact(product)\n  \n  if (validationResult.isValid) {\n    // Suppression OK - bundle reste valide\n    selectedProducts.value.splice(index, 1)\n    crudSuccess?.deleted(product.name, 'produit retiré du bundle')\n    showUndoToast(product, index) // Nouveau: possibilité annulation\n  } else {\n    // Suppression créerait violations - ne pas supprimer\n    showConsequenceModal({\n      productName: product.name,\n      violations: validationResult.errors,\n      onConfirm: () => forceRemoveWithWarning(index, product),\n      onCancel: () => {} // Pas de suppression\n    })\n  }\n}\n\nconst forceRemoveWithWarning = (index: number, product: any) => {\n  selectedProducts.value.splice(index, 1)\n  // Notification WARNING, pas SUCCESS\n  showWarningNotification(\n    `${product.name} retiré. Bundle non-publiable: ${validationResult.errors.length} règles violées`,\n    { \n      action: 'Corriger maintenant',\n      onClick: () => openValidationPanel()\n    }\n  )\n}\n```\n\n**TYPES DE FEEDBACK** :\n1. **SUCCESS** : Suppression OK, bundle reste valide\n2. **WARNING** : Suppression forcée, bundle devient invalide  \n3. **BLOCKED** : Suppression refusée, modal conséquences\n4. **UNDO** : Toast 5s avec bouton \"Annuler\" pour récupération\n\n**FICHIERS MODIFIÉS** :\n- `apps/election-mvp/pages/admin/bundles/[id].vue` (removeProduct logic)\n- `apps/election-mvp/composables/useNotifications.ts` (nouveaux types)\n\n**CRITÈRES ACCEPTATION** :\n✅ Plus jamais \"Succès\" si action crée invalidité\n✅ Messages différenciés selon impact réel\n✅ Possibilité d'annulation 5s après suppression\n✅ Guidance vers résolution des violations",
+      "status": "completed",
+      "priority": 5,
+      "dependencies": [],
+      "created": "2025-09-23T03:54:31.889Z",
+      "updated": "2025-09-23T18:12:15.812Z",
+      "isPareto80": false
+    },
+    {
+      "id": 3,
+      "title": "CORE 20% - Désactivation bouton Sauvegarder si état bundle invalide",
+      "description": "**CONTEXTE EXPERT GEMINI** : \"Ne jamais laisser l'utilisateur soumettre une action qui est certainement invalide\"\n\n**PROBLÈME ACTUEL** : Bouton \"Sauvegarder\" toujours actif même quand bundle viole règles → garantit HTTP 400\n\n**SOLUTION PRÉVENTIVE** :\n```typescript\n// File: apps/election-mvp/pages/admin/bundles/[id].vue\n// Computed property pour état de validation temps réel\n\nconst bundleValidationState = computed(() => {\n  if (!selectedProducts.value?.length) {\n    return { \n      isValid: false, \n      blockers: ['Bundle vide - aucun produit sélectionné'],\n      canSave: false\n    }\n  }\n  \n  const total = selectedProducts.value.reduce((sum, p) => sum + (p.price || 0), 0)\n  const quantity = selectedProducts.value.reduce((sum, p) => sum + (p.quantity || 1), 0)\n  \n  const errors = []\n  \n  // Validation budget range (premium: 50K-200K)\n  if (bundle.value.budgetRange === 'premium') {\n    if (total < 50000) errors.push('Budget insuffisant pour premium (min: 50K F CFA)')\n    if (total > 200000) errors.push('Budget dépasse premium (max: 200K F CFA)')\n  }\n  \n  // Validation audience quantity (national: min 1000)\n  if (bundle.value.targetAudience === 'national' && quantity < 1000) {\n    errors.push(`Quantité insuffisante pour audience national (${quantity}/1000 articles)`)\n  }\n  \n  return {\n    isValid: errors.length === 0,\n    blockers: errors,\n    canSave: errors.length === 0,\n    total,\n    quantity\n  }\n})\n\n// Template: bouton conditionnel avec feedback\n<template>\n  <button \n    :disabled=\"!bundleValidationState.canSave\"\n    :class=\"bundleValidationState.canSave ? 'btn-primary' : 'btn-disabled'\"\n    @click=\"saveBundleIfValid\"\n  >\n    {{ bundleValidationState.canSave ? 'Sauvegarder' : 'Corriger pour sauvegarder' }}\n  </button>\n  \n  <!-- Panneau de validation si erreurs -->\n  <div v-if=\"!bundleValidationState.isValid\" class=\"validation-panel\">\n    <h4>⚠️ Bundle non-publiable ({{ bundleValidationState.blockers.length }} règles)</h4>\n    <ul>\n      <li v-for=\"error in bundleValidationState.blockers\" :key=\"error\">\n        {{ error }}\n      </li>\n    </ul>\n    <button @click=\"openFixPanel\">Revoir et corriger</button>\n  </div>\n</template>\n```\n\n**ÉTATS BOUTON** :\n- **ENABLED (vert)** : \"Sauvegarder\" - bundle valide\n- **DISABLED (gris)** : \"Corriger pour sauvegarder\" - violations détectées\n- **LOADING** : \"Sauvegarde...\" - en cours\n\n**INDICATEURS VISUELS** :\n- Badge rouge: \"2 bloqueurs\" \n- Tooltip: \"Budget 843K > 200K max premium\"\n- Panneau latéral: liste violations + actions\n\n**FICHIERS MODIFIÉS** :\n- `apps/election-mvp/pages/admin/bundles/[id].vue` (computed validation)\n- `apps/election-mvp/schemas/bundle.ts` (règles partagées)\n\n**CRITÈRES ACCEPTATION** :\n✅ Bouton disabled si ANY violation\n✅ Message clair du blocage\n✅ Panneau guidance vers résolution\n✅ Validation temps réel (debounce 300ms)\n✅ Zero possibilité d'erreur 400 manuelle",
+      "status": "completed",
+      "priority": 5,
+      "dependencies": [],
+      "created": "2025-09-23T03:54:55.606Z",
+      "updated": "2025-09-23T18:12:21.165Z",
+      "isPareto80": false
+    },
+    {
+      "id": 4,
+      "title": "CORE 20% - Modal conséquences avant actions destructrices",
+      "description": "**CONTEXTE PATTERN EXPERT (Perplexity)** : \"Figma utilise validation optimiste avec rollback automatique\" - Notion \"désactive dynamiquement les actions conflictuelles\"\n\n**PROBLÈME ACTUEL** : User peut supprimer produit sans comprendre l'impact sur validation → surprise et frustration\n\n**SOLUTION UX PRÉVENTIVE** :\n```typescript\n// File: apps/election-mvp/components/admin/ConsequenceModal.vue\n<template>\n  <AdminModal v-model=\"isOpen\" title=\"⚠️ Action à conséquences\">\n    <div class=\"consequence-preview\">\n      <h3>Supprimer {{ productName }} ?</h3>\n      \n      <!-- Impact preview -->\n      <div class=\"impact-summary\">\n        <div class=\"metric\">\n          <span>Budget:</span>\n          <span class=\"before\">{{ formatPrice(currentTotal) }}</span>\n          <Icon name=\"arrow-right\" />\n          <span :class=\"newTotal > budgetMax ? 'text-red-500' : 'text-green-500'\">\n            {{ formatPrice(newTotal) }}\n          </span>\n        </div>\n        \n        <div class=\"metric\">\n          <span>Articles:</span>\n          <span class=\"before\">{{ currentQuantity }}</span>\n          <Icon name=\"arrow-right\" />\n          <span :class=\"newQuantity < quantityMin ? 'text-red-500' : 'text-green-500'\">\n            {{ newQuantity }}\n          </span>\n        </div>\n      </div>\n      \n      <!-- Violations preview -->\n      <div v-if=\"violations.length\" class=\"violations-list\">\n        <h4>🚫 Cette action rendra le bundle non-publiable:</h4>\n        <ul>\n          <li v-for=\"violation in violations\" :key=\"violation\" class=\"text-red-600\">\n            {{ violation }}\n          </li>\n        </ul>\n      </div>\n      \n      <!-- Actions -->\n      <div class=\"modal-actions\">\n        <button @click=\"$emit('cancel')\" class=\"btn-secondary\">\n          Annuler\n        </button>\n        \n        <button v-if=\"violations.length\" @click=\"$emit('forceConfirm')\" class=\"btn-warning\">\n          Supprimer quand même\n        </button>\n        \n        <button v-else @click=\"$emit('confirm')\" class=\"btn-primary\">\n          Confirmer suppression\n        </button>\n      </div>\n    </div>\n  </AdminModal>\n</template>\n\n// Logic dans bundle edit page\nconst showConsequenceModal = (product) => {\n  const impact = calcProductRemovalImpact(product)\n  \n  consequenceModalData.value = {\n    isOpen: true,\n    productName: product.name,\n    currentTotal: bundleTotal.value,\n    newTotal: impact.newTotal,\n    currentQuantity: bundleQuantity.value,\n    newQuantity: impact.newQuantity,\n    violations: impact.errors,\n    budgetMax: getBudgetRangeMax(bundle.value.budgetRange),\n    quantityMin: getAudienceQuantityMin(bundle.value.targetAudience)\n  }\n}\n```\n\n**SCÉNARIOS MODAL** :\n1. **SAFE** : Aucune violation → Confirmation simple\n2. **WARNING** : Violations détectées → Preview impact + bouton \"Forcer\"\n3. **BLOCKED** : Violations critiques → Pas de bouton confirmer, guidance seulement\n\n**PATTERNS UX** :\n- Preview Before/After visuel\n- Color coding: rouge (problème), vert (OK)\n- Actions contextuelles selon gravité\n- Guidance vers alternatives\n\n**FICHIERS CRÉÉS** :\n- `apps/election-mvp/components/admin/ConsequenceModal.vue`\n- `apps/election-mvp/composables/useBundleValidation.ts`\n\n**CRITÈRES ACCEPTATION** :\n✅ Modal AVANT toute action destructrice\n✅ Preview visuel impact Before/After\n✅ Guidance différenciée selon gravité\n✅ Zero surprise - user informé des conséquences\n✅ Possibilité annulation ou force avec awareness",
+      "status": "completed",
+      "priority": 5,
+      "dependencies": [],
+      "created": "2025-09-23T03:55:26.983Z",
+      "updated": "2025-09-23T18:12:24.577Z",
+      "isPareto80": false
+    },
+    {
+      "id": 5,
+      "title": "CORE 20% - Tests E2E validation préventive (assurance qualité)",
+      "description": "**CONTEXTE QUALITÉ** : Tests critiques pour garantir que le fix \"Validation Trap\" fonctionne et ne régresse jamais\n\n**RÉFÉRENCE PLAN E2E** : `tests/e2e/plans/bundle-product-removal-persistence.md` - scénarios déjà documentés\n\n**TESTS CRITIQUES À IMPLÉMENTER** :\n```typescript\n// File: tests/e2e/bundle-validation-fix.spec.ts\nimport { test, expect } from '@playwright/test'\n\ntest.describe('Bundle Validation Prevention', () => {\n  test('CRITICAL: Should prevent invalid product removal', async ({ page }) => {\n    // Navigate to Bundle 3 (known problematic case)\n    await page.goto('/admin/bundles/3')\n    \n    // Verify initial state\n    await expect(page.locator('[data-testid=\"bundle-total\"]')).toContainText('843')\n    await expect(page.locator('[data-testid=\"product-count\"]')).toContainText('230')\n    \n    // Attempt to remove product that would violate rules\n    await page.click('[data-testid=\"remove-product-first\"]')\n    \n    // Should show consequence modal, NOT immediate removal\n    await expect(page.locator('[data-testid=\"consequence-modal\"]')).toBeVisible()\n    await expect(page.locator('[data-testid=\"violation-budget\"]')).toContainText('Budget dépasse premium')\n    await expect(page.locator('[data-testid=\"violation-quantity\"]')).toContainText('Quantité insuffisante')\n    \n    // Cancel removal\n    await page.click('[data-testid=\"modal-cancel\"]')\n    \n    // Verify product NOT removed\n    await expect(page.locator('[data-testid=\"product-count\"]')).toContainText('230')\n    \n    // Save button should remain disabled\n    await expect(page.locator('[data-testid=\"save-bundle\"]')).toBeDisabled()\n  })\n  \n  test('Should allow safe product removal', async ({ page }) => {\n    // Test with bundle that has safe margins\n    // ... similar structure but for valid removal\n  })\n  \n  test('Should never show success notification for invalid actions', async ({ page }) => {\n    // Verify feedback coherence\n    // ... test notification types match actual state\n  })\n})\n```\n\n**SCÉNARIOS OBLIGATOIRES** :\n1. **Prevention Test** : Removal blocked si violations\n2. **Consequence Modal** : Préview correct avant action\n3. **Save Button State** : Disabled avec violations\n4. **Feedback Coherence** : Pas de \"succès\" si invalid\n5. **Regression Test** : Bundle 3 specific case never fails\n\n**CONFIGURATION** :\n```typescript\n// playwright.config.ts - new test suite\n{\n  name: 'bundle-validation-critical',\n  testDir: './tests/e2e/bundle-validation',\n  retries: 2, // Critical tests need stability\n  timeout: 10000\n}\n```\n\n**CRITÈRES ACCEPTATION** :\n✅ 100% tests passent sur Bundle 3 problématique\n✅ Zero régression de l'erreur \"Failed to update bundle 3\"\n✅ Modal conséquences testée E2E\n✅ États bouton save validés automatiquement\n✅ Intégration CI/CD avec alert si régression",
+      "status": "completed",
+      "priority": 4,
+      "dependencies": [],
+      "created": "2025-09-23T03:55:52.323Z",
+      "updated": "2025-09-23T18:12:28.153Z",
+      "isPareto80": false
+    },
+    {
+      "id": 6,
+      "title": "📋 DOCUMENTATION - Context Engineering Onboarding Sprint",
+      "description": "**MISSION CRITIQUE** : Éliminer l'erreur \"Failed to update bundle 3\" - Validation Trap dans interface admin\n\n## 🎯 CONTEXTE COMPLET\n\n### 🚨 Problème Reproductible\n1. **Bundle 3** - Interface `/admin/bundles/3`\n2. **État initial** : \"national premium\" (843K F CFA, 230 articles)\n3. **Action user** : Clic trash → suppression produit → notification \"Succès\"\n4. **Tentative sauvegarde** : Clic \"Sauvegarder\" → **HTTP 400 \"Failed to update bundle 3\"**\n5. **Cause** : Violation règles business APRÈS confirmation UI\n\n### 🔍 Règles Business Critiques\n```typescript\n// apps/election-mvp/schemas/bundle.ts (ligne 276-312)\nconst budgetRanges = {\n  premium: { min: 50000, max: 200000 }  // Bundle 3 dépasse: 843K > 200K\n}\n\nconst minQuantityByAudience = {\n  national: 1000  // Bundle 3 sous minimum: 230 < 1000\n}\n```\n\n### 🏆 Solution Expert Consensus (3 MCP)\n**Validation PRÉVENTIVE** avant action destructrice (pas réactive après)\n\n## 📊 SPRINT CORE 20% - TÂCHES PRIORITAIRES\n\n### Tâche #1: Validation préventive suppression ⭐⭐⭐⭐⭐\n**File**: `apps/election-mvp/pages/admin/bundles/[id].vue`\n**Function**: `removeProduct(index: number, product: any)` (ligne ~180)\n**Action**: Calculer impact AVANT suppression, bloquer si violations\n\n### Tâche #2: Feedback utilisateur cohérent ⭐⭐⭐⭐⭐\n**Problem**: Toast \"Succès\" même si action rend bundle invalide\n**Solution**: Feedback conditionnel selon état validation\n\n### Tâche #3: Désactivation bouton Sauvegarder ⭐⭐⭐⭐⭐\n**Logic**: `computed bundleValidationState` temps réel\n**UI**: Bouton disabled + message guidance si violations\n\n### Tâche #4: Modal conséquences ⭐⭐⭐⭐⭐\n**Pattern**: Preview Before/After avant action destructrice\n**Component**: `ConsequenceModal.vue` avec impact visual\n\n### Tâche #5: Tests E2E ⭐⭐⭐⭐\n**Reference**: `tests/e2e/plans/bundle-product-removal-persistence.md`\n**Critical**: Bundle 3 scenario + regression prevention\n\n## 🏛️ ARCHITECTURE RECOMMANDÉE\n\n### Phase 1: Fix Immédiat (Core 20%)\n```typescript\n// Validation préventive pattern\nconst removeProduct = (product) => {\n  const impact = calcProductRemovalImpact(product)\n  if (impact.violations.length > 0) {\n    showConsequenceModal(impact) // Pas de suppression\n  } else {\n    commitRemoval(product) // Suppression sûre\n  }\n}\n```\n\n### Phase 2: Enhancement (Pareto Vault)\n- Système Draft/Published complet\n- Architecture DDD backend  \n- Undo/Redo avancé\n- Preview temps réel\n- Web Workers performance\n\n## 🎯 CRITÈRES DE RÉUSSITE\n\n### ✅ MUST HAVE (Sprint Core)\n- Zero erreur \"Failed to update bundle 3\" possible\n- Pas de toast \"Succès\" pour actions invalidantes\n- Bouton save disabled si violations\n- Modal preview avant actions destructrices\n\n### 🎁 NICE TO HAVE (Pareto Vault - Futur)\n- Workflow Draft/Published professionnel\n- UX premium avec preview temps réel\n- Architecture DDD robuste\n\n## 🚀 DÉMARRAGE RAPIDE\n\n1. **Checkout code** : `git checkout main`\n2. **Focus sur** : `apps/election-mvp/pages/admin/bundles/[id].vue`\n3. **Test scenario** : Bundle 3 suppression produit\n4. **Règles business** : `apps/election-mvp/schemas/bundle.ts`\n5. **E2E reference** : `tests/e2e/plans/`\n\n## 🎖️ EXPERTS CONSULTÉS\n- **Gemini Copilot** : Architecture DDD + Domain validation\n- **GPT-5 Copilot** : UX patterns + Draft/Published workflow  \n- **Perplexity Copilot** : Best practices industrie (Figma, Notion)\n\n## 🔗 LIENS CRITIQUES\n- **Error logs** : Background bash sessions (bundle dbb931)\n- **Validation rules** : `validateBundleBusinessRules()` fonction\n- **Admin interface** : `/admin/bundles/[id]` route\n- **Task Master** : `mcp__task-master-v3__next_task` pour progression\n\n**🎯 OBJECTIF : Zero \"Validation Trap\" en 48h maximum**",
+      "status": "completed",
+      "priority": 5,
+      "dependencies": [],
+      "created": "2025-09-23T03:59:14.424Z",
+      "updated": "2025-09-23T18:12:31.537Z",
+      "isPareto80": false
+    }
+  ],
+  "paretoDecisions": [
+    {
+      "taskId": 6,
+      "decision": "moved_to_vault",
+      "reason": "Enhancement 80% - Système Draft/Published complet. Amélioration workflow avancée non-critique pour résolution du bug \"Failed to update bundle 3\". Valeur long-terme mais pas dans MVP fix.",
+      "timestamp": "2025-09-23T03:57:45.344Z"
+    },
+    {
+      "taskId": 7,
+      "decision": "moved_to_vault",
+      "reason": "Enhancement 80% - Architecture DDD complexe. Refactoring backend majeur non-essentiel pour fix immédiat du \"Validation Trap\". Valeur architecture long-terme.",
+      "timestamp": "2025-09-23T03:57:52.536Z"
+    },
+    {
+      "taskId": 8,
+      "decision": "moved_to_vault",
+      "reason": "Enhancement 80% - Feature UX avancée Undo/Redo. Confort utilisateur non-critique pour résolution immédiate du \"Validation Trap\". Nice-to-have post-fix.",
+      "timestamp": "2025-09-23T03:58:03.196Z"
+    },
+    {
+      "taskId": 9,
+      "decision": "moved_to_vault",
+      "reason": "Enhancement 80% - Preview temps réel avancé. Feature UX premium non-critique pour fix du \"Validation Trap\". Solution core modal suffit pour MVP fix.",
+      "timestamp": "2025-09-23T03:58:09.981Z"
+    },
+    {
+      "taskId": 10,
+      "decision": "moved_to_vault",
+      "reason": "Enhancement 80% - Optimisation Web Workers avancée. Performance enhancement non-critique pour fix \"Validation Trap\". Validation simple côté client suffit pour MVP.",
+      "timestamp": "2025-09-23T03:58:18.116Z"
+    },
+    {
+      "taskId": 11,
+      "decision": "moved_to_vault",
+      "reason": "Enhancement 80% - Tooling développeur debugging. Utile pour développement futur mais non-critique pour fix utilisateur final \"Validation Trap\". Console browser suffit pour debug MVP.",
+      "timestamp": "2025-09-23T03:58:25.853Z"
+    }
+  ],
+  "metrics": {
+    "tasksCompleted": 6,
+    "tasksMovedToVault": 6,
+    "velocityPoints": 0
+  },
+  "updated": "2025-09-23T18:12:31.537Z"
+}

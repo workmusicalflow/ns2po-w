@@ -3,7 +3,7 @@
  * Met à jour une réalisation existante avec la stratégie Turso-first
  */
 
-import { getDatabase } from "~/server/utils/database"
+import { getDatabase } from "../../utils/database"
 import { z } from "zod"
 
 // Schéma de validation pour mise à jour de réalisation

@@ -67,6 +67,9 @@ export function useCreateProductMutation(
       // Update all relevant queries
       queryClient.invalidateQueries({ queryKey: productQueryKeys.all })
 
+      // Pre-populate the detail cache for immediate access
+      queryClient.setQueryData(productQueryKeys.detail(data.id), data)
+
       // Update Pinia store
       productStore.addProduct(data)
 
@@ -81,6 +84,9 @@ export function useCreateProductMutation(
           )
         )
       }
+
+      // Automatic navigation to edit page (product detail page)
+      navigateTo(`/admin/products/${data.id}`)
     },
     ...options
   })

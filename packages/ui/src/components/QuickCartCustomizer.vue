@@ -188,6 +188,7 @@
 
 <script setup lang="ts">
 import { computed, inject } from "vue";
+import type { Ref, ComputedRef } from "vue";
 import type {
   CampaignBundle,
   BundleProduct,

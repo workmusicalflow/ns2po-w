@@ -71,14 +71,19 @@ export interface AirtableQuoteItemCatalog {
 export interface Product {
   readonly id: string;
   readonly name: string;
+  readonly reference?: string; // Propriété ajoutée pour les formulaires admin
   readonly category: string;
+  readonly category_id?: string; // Propriété ajoutée pour la DB
   readonly basePrice: number;
+  readonly price?: number; // Alias pour unifier avec l'usage dans l'app
   readonly minQuantity: number;
   readonly maxQuantity: number;
   readonly description: string;
   readonly image?: string;
+  readonly image_url?: string; // Propriété ajoutée pour Cloudinary
   readonly tags: readonly string[];
   readonly isActive: boolean;
+  readonly status?: 'active' | 'inactive' | 'draft'; // Propriété ajoutée pour les formulaires
   readonly customizationOptions?: readonly CustomizationOption[];
 }
 

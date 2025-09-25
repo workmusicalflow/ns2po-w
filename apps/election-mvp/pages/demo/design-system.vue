@@ -507,9 +507,9 @@
 
 <script setup lang="ts">
 import { ref, computed, nextTick } from 'vue'
-import { useTheme } from '~/composables/useTheme'
-import { useThemeAware } from '~/composables/useThemeAware'
-import type { ThemeVariant } from '~/composables/useTheme'
+// Auto-imported via Nuxt 3: useTheme
+// Auto-imported via Nuxt 3: useThemeAware
+import type { ThemeVariant } from '../../composables/useTheme'
 
 // Import des composants
 import NSButton from '~/components/ui/NSButton.vue'

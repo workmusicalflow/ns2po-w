@@ -1,0 +1,11 @@
+{
+  "id": "proj-1758599576196-9c4e56d4",
+  "name": "Bundle Validation Architecture Fix",
+  "description": "Résolution critique du \"Validation Trap\" dans l'interface admin bundle (/admin/bundles/[id]) - Erreur \"Failed to update bundle 3\" après suppression produit. Implémentation des recommandations consensus des experts MCP : validation préventive, système Draft/Published, et UX guidée selon best practices industrie.",
+  "created": "2025-09-23T03:52:56.197Z",
+  "sprints": [
+    "sprint-1758599618159-71e5fb29"
+  ],
+  "activeSprint": "sprint-1758599618159-71e5fb29",
+  "updated": "2025-09-23T03:53:38.160Z"
+}

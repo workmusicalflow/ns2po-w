@@ -4,18 +4,22 @@
     <div v-if="title || $slots.header || createButton" class="px-6 py-4 border-b border-gray-200 bg-gray-50">
       <div class="flex items-center justify-between">
         <div>
-          <h3 v-if="title" class="text-lg font-medium text-gray-900">{{ title }}</h3>
-          <p v-if="description" class="text-sm text-gray-600 mt-1">{{ description }}</p>
+          <h3 v-if="title" class="text-lg font-medium text-gray-900">
+            {{ title }}
+          </h3>
+          <p v-if="description" class="text-sm text-gray-600 mt-1">
+            {{ description }}
+          </p>
         </div>
         <div class="flex items-center space-x-3">
           <!-- Standardized Create Button -->
           <button
             v-if="createButton"
-            @click="$emit('create')"
             class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-amber-600 hover:bg-amber-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500"
+            @click="$emit('create')"
           >
             <Icon name="heroicons:plus" class="w-4 h-4 mr-2" />
-            {{ createButton.text || 'Nouveau' }}
+            {{ typeof createButton === 'object' ? createButton.text : 'Nouveau' }}
           </button>
           <!-- Custom header actions -->
           <div v-if="$slots.header">
@@ -75,20 +79,43 @@
 
         <!-- Body -->
         <tbody class="bg-white divide-y divide-gray-200">
-          <tr v-if="isLoading" v-for="n in 3" :key="`loading-${n}`">
-            <td v-for="column in columns" :key="column.key" class="px-6 py-4 whitespace-nowrap">
-              <div class="animate-pulse">
-                <div class="h-4 bg-gray-200 rounded"></div>
-              </div>
-            </td>
-            <td v-if="$slots.actions || showStandardActions" class="px-6 py-4 whitespace-nowrap text-right">
-              <div class="animate-pulse">
-                <div class="h-4 w-16 bg-gray-200 rounded ml-auto"></div>
-              </div>
-            </td>
-          </tr>
+          <!-- Skeleton loading pendant initialisation (évite FOEC) -->
+          <template v-if="isLoading && !hasInitialData">
+            <tr v-for="n in 6" :key="`skeleton-${n}`">
+              <td v-for="column in columns" :key="column.key" class="px-6 py-4 whitespace-nowrap">
+                <div class="animate-pulse">
+                  <div
+                    class="bg-gray-200 rounded"
+                    :class="{
+                      'w-12 h-12 rounded-lg': column.key === 'image',
+                      'h-4 w-20': column.key === 'basePrice',
+                      'h-6 w-16 rounded-full': column.key === 'isActive',
+                      'h-4 w-32': column.key === 'name',
+                      'h-4 w-16': column.key === 'id',
+                      'h-4 w-24': column.key === 'category',
+                      'h-4 w-28': column.key === 'updatedAt',
+                      'h-4': !['image', 'basePrice', 'isActive', 'name', 'id', 'category', 'updatedAt'].includes(column.key)
+                    }"
+                  />
+                </div>
+              </td>
+              <td v-if="$slots.actions || showStandardActions" class="px-6 py-4 whitespace-nowrap text-right">
+                <div class="animate-pulse flex justify-end space-x-2">
+                  <div class="h-6 bg-gray-200 rounded w-16" />
+                  <div class="h-6 bg-gray-200 rounded w-20" />
+                  <div class="h-6 bg-gray-200 rounded w-18" />
+                </div>
+              </td>
+            </tr>
+          </template>
 
+          <!-- Données avec overlay loading pour rechargements -->
           <template v-else-if="paginatedData.length > 0">
+            <!-- Loading overlay pour actions utilisateur (quand on a déjà des données) -->
+            <div v-if="isLoading && hasInitialData" class="absolute inset-0 bg-white/70 z-10 flex items-center justify-center">
+              <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-600" />
+            </div>
+
             <tr
               v-for="(item, index) in paginatedData"
               :key="getRowKey ? getRowKey(item) : index"
@@ -114,17 +141,17 @@
                 <div v-if="showStandardActions" class="flex items-center justify-end space-x-2">
                   <button
                     v-if="allowEdit"
-                    @click="$emit('edit', item)"
                     class="inline-flex items-center px-2 py-1 border border-gray-300 rounded text-xs font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500"
                     :title="`Modifier ${getItemLabel(item)}`"
+                    @click="$emit('edit', item)"
                   >
                     <Icon name="heroicons:pencil" class="w-3 h-3" />
                   </button>
                   <button
                     v-if="allowDelete"
-                    @click="confirmDelete(item)"
                     class="inline-flex items-center px-2 py-1 border border-red-300 rounded text-xs font-medium text-red-700 bg-white hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
                     :title="`Supprimer ${getItemLabel(item)}`"
+                    @click="confirmDelete(item)"
                   >
                     <Icon name="heroicons:trash" class="w-3 h-3" />
                   </button>
@@ -137,16 +164,22 @@
             </tr>
           </template>
 
-          <!-- Empty state -->
-          <tr v-else>
-            <td :colspan="columns.length + (($slots.actions || showStandardActions) ? 1 : 0)" class="px-6 py-12 text-center">
-              <div class="flex flex-col items-center justify-center">
-                <Icon name="heroicons:document-text" class="w-12 h-12 text-gray-400 mb-4" />
-                <h3 class="text-sm font-medium text-gray-900 mb-1">{{ emptyTitle || 'Aucune donnée' }}</h3>
-                <p class="text-sm text-gray-500">{{ emptyDescription || 'Aucun élément à afficher pour le moment.' }}</p>
-              </div>
-            </td>
-          </tr>
+          <!-- Empty state - seulement si initialisé et vraiment vide -->
+          <template v-else-if="!isLoading && hasInitialData">
+            <tr>
+              <td :colspan="columns.length + (($slots.actions || showStandardActions) ? 1 : 0)" class="px-6 py-12 text-center">
+                <div class="flex flex-col items-center justify-center">
+                  <Icon name="heroicons:document-text" class="w-12 h-12 text-gray-400 mb-4" />
+                  <h3 class="text-sm font-medium text-gray-900 mb-1">
+                    {{ emptyTitle || 'Aucune donnée' }}
+                  </h3>
+                  <p class="text-sm text-gray-500">
+                    {{ emptyDescription || 'Aucun élément à afficher pour le moment.' }}
+                  </p>
+                </div>
+              </td>
+            </tr>
+          </template>
         </tbody>
       </table>
     </div>
@@ -160,9 +193,9 @@
         </div>
         <div class="flex items-center space-x-2">
           <button
-            @click="currentPage--"
             :disabled="currentPage <= 1"
             class="px-3 py-1 text-sm border border-gray-300 rounded hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+            @click="currentPage--"
           >
             Précédent
           </button>
@@ -170,9 +203,9 @@
             Page {{ currentPage }} sur {{ totalPages }}
           </span>
           <button
-            @click="currentPage++"
             :disabled="currentPage >= totalPages"
             class="px-3 py-1 text-sm border border-gray-300 rounded hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+            @click="currentPage++"
           >
             Suivant
           </button>
@@ -188,7 +221,7 @@
     >
       <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
         <!-- Background overlay -->
-        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"></div>
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
 
         <!-- Modal panel -->
         <div class="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
@@ -198,41 +231,40 @@
             </div>
             <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
               <h3 class="text-lg leading-6 font-medium text-gray-900">
-                {{ deleteModal.title || 'Confirmer la suppression' }}
+                {{ deleteModal?.title || 'Confirmer la suppression' }}
               </h3>
               <div class="mt-2">
                 <p class="text-sm text-gray-500">
-                  {{ deleteModal.message || `Êtes-vous sûr de vouloir supprimer "${getItemLabel(itemToDelete)}" ? Cette action est irréversible.` }}
+                  {{ deleteModal?.message || `Êtes-vous sûr de vouloir supprimer "${getItemLabel(itemToDelete)}" ? Cette action est irréversible.` }}
                 </p>
               </div>
             </div>
           </div>
           <div class="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
             <button
-              @click="executeDelete"
               :disabled="isDeleting"
               class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm disabled:opacity-50"
+              @click="executeDelete"
             >
               <Icon v-if="isDeleting" name="heroicons:arrow-path" class="w-4 h-4 mr-2 animate-spin" />
-              {{ deleteModal.confirmText || 'Supprimer' }}
+              {{ deleteModal?.confirmText || 'Supprimer' }}
             </button>
             <button
-              @click="cancelDelete"
               :disabled="isDeleting"
               class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 sm:mt-0 sm:w-auto sm:text-sm disabled:opacity-50"
+              @click="cancelDelete"
             >
-              {{ deleteModal.cancelText || 'Annuler' }}
+              {{ deleteModal?.cancelText || 'Annuler' }}
             </button>
           </div>
         </div>
       </div>
     </div>
-
   </div>
 </template>
 
 <script setup lang="ts">
-import { globalNotifications } from '~/composables/useNotifications'
+// Auto-imported via Nuxt 3: globalNotifications
 
 interface Column {
   key: string
@@ -260,6 +292,7 @@ interface Props {
   title?: string
   description?: string
   isLoading?: boolean
+  hasInitialData?: boolean // Pour éviter FOEC
   pageSize?: number
   showPagination?: boolean
   searchKey?: string
@@ -279,6 +312,7 @@ interface Props {
 
 const props = withDefaults(defineProps<Props>(), {
   isLoading: false,
+  hasInitialData: false, // Par défaut pas de données initiales
   pageSize: 10,
   showPagination: true,
   searchKey: '',
@@ -343,7 +377,9 @@ const totalPages = computed(() => {
 })
 
 const paginatedData = computed(() => {
-  if (!props.showPagination) return filteredData.value
+  if (!props.showPagination) {
+    return filteredData.value
+  }
 
   const start = (currentPage.value - 1) * props.pageSize
   const end = start + props.pageSize

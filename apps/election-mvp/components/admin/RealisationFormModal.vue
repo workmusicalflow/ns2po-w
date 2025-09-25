@@ -2,7 +2,7 @@
   <div class="fixed inset-0 z-50 overflow-y-auto">
     <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
       <!-- Background overlay -->
-      <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" @click="$emit('close')"></div>
+      <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" @click="$emit('close')" />
 
       <!-- Modal panel -->
       <div class="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full sm:p-6">
@@ -12,15 +12,15 @@
             {{ isEdit ? 'Modifier la réalisation' : 'Nouvelle réalisation' }}
           </h3>
           <button
-            @click="$emit('close')"
             class="text-gray-400 hover:text-gray-500"
+            @click="$emit('close')"
           >
             <Icon name="heroicons:x-mark" class="w-6 h-6" />
           </button>
         </div>
 
         <!-- Form -->
-        <form @submit.prevent="submitForm" class="space-y-6">
+        <form class="space-y-6" @submit.prevent="submitForm">
           <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <!-- Left Column -->
             <div class="space-y-6">
@@ -37,8 +37,10 @@
                   maxlength="200"
                   class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
                   placeholder="Ex: Casquettes personnalisées campagne 2024"
-                />
-                <p v-if="errors.title" class="mt-1 text-sm text-red-600">{{ errors.title }}</p>
+                >
+                <p v-if="errors.title" class="mt-1 text-sm text-red-600">
+                  {{ errors.title }}
+                </p>
               </div>
 
               <!-- Description -->
@@ -52,7 +54,7 @@
                   rows="4"
                   class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
                   placeholder="Description détaillée de la réalisation..."
-                ></textarea>
+                />
               </div>
 
               <!-- Categories -->
@@ -67,11 +69,11 @@
                     class="flex items-center space-x-2 cursor-pointer hover:bg-gray-50 p-1 rounded"
                   >
                     <input
+                      v-model="form.category_ids"
                       type="checkbox"
                       :value="category.id"
-                      v-model="form.category_ids"
                       class="rounded border-gray-300 text-amber-600 shadow-sm focus:border-amber-300 focus:ring focus:ring-amber-200 focus:ring-opacity-50"
-                    />
+                    >
                     <span class="text-sm">{{ category.name }}</span>
                   </label>
                 </div>
@@ -89,11 +91,11 @@
                     class="flex items-center space-x-2 cursor-pointer hover:bg-gray-50 p-1 rounded"
                   >
                     <input
+                      v-model="form.product_ids"
                       type="checkbox"
                       :value="product.id"
-                      v-model="form.product_ids"
                       class="rounded border-gray-300 text-amber-600 shadow-sm focus:border-amber-300 focus:ring focus:ring-amber-200 focus:ring-opacity-50"
-                    />
+                    >
                     <span class="text-sm">{{ product.name }}</span>
                   </label>
                 </div>
@@ -114,8 +116,8 @@
                       {{ tag }}
                       <button
                         type="button"
-                        @click="removeTag(index)"
                         class="ml-1 inline-flex items-center justify-center w-4 h-4 rounded-full text-amber-600 hover:bg-amber-200"
+                        @click="removeTag(index)"
                       >
                         <Icon name="heroicons:x-mark" class="w-3 h-3" />
                       </button>
@@ -128,11 +130,11 @@
                       placeholder="Ajouter un tag..."
                       class="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
                       @keyup.enter="addTag"
-                    />
+                    >
                     <button
                       type="button"
-                      @click="addTag"
                       class="px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
+                      @click="addTag"
                     >
                       Ajouter
                     </button>
@@ -160,11 +162,11 @@
                         :src="getCloudinaryUrl(publicId, 'w_150,h_150,c_fill')"
                         :alt="`Image ${index + 1}`"
                         class="w-full h-24 object-cover rounded-lg"
-                      />
+                      >
                       <button
                         type="button"
-                        @click="removeImage(index)"
                         class="absolute top-1 right-1 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                        @click="removeImage(index)"
                       >
                         <Icon name="heroicons:x-mark" class="w-4 h-4" />
                       </button>
@@ -181,19 +183,21 @@
                           type="file"
                           multiple
                           accept="image/*"
-                          @change="handleFileUpload"
                           class="hidden"
-                        />
+                          @change="handleFileUpload"
+                        >
                         <button
                           type="button"
-                          @click="$refs.fileInput.click()"
                           class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
+                          @click="$refs.fileInput.click()"
                         >
                           <Icon name="heroicons:cloud-arrow-up" class="w-4 h-4 mr-2" />
                           Ajouter des images
                         </button>
                       </div>
-                      <p class="text-xs text-gray-500 mt-1">PNG, JPG, GIF jusqu'à 10MB</p>
+                      <p class="text-xs text-gray-500 mt-1">
+                        PNG, JPG, GIF jusqu'à 10MB
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -207,15 +211,17 @@
                     <label for="is_featured" class="text-sm font-medium text-gray-700">
                       Réalisation vedette
                     </label>
-                    <p class="text-xs text-gray-500">Afficher en priorité sur le site</p>
+                    <p class="text-xs text-gray-500">
+                      Afficher en priorité sur le site
+                    </p>
                   </div>
                   <button
                     type="button"
-                    @click="form.is_featured = !form.is_featured"
                     :class="[
                       form.is_featured ? 'bg-amber-600' : 'bg-gray-200',
                       'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2'
                     ]"
+                    @click="form.is_featured = !form.is_featured"
                   >
                     <span
                       :class="[
@@ -232,15 +238,17 @@
                     <label for="is_active" class="text-sm font-medium text-gray-700">
                       Réalisation active
                     </label>
-                    <p class="text-xs text-gray-500">Visible sur le site public</p>
+                    <p class="text-xs text-gray-500">
+                      Visible sur le site public
+                    </p>
                   </div>
                   <button
                     type="button"
-                    @click="form.is_active = !form.is_active"
                     :class="[
                       form.is_active ? 'bg-green-600' : 'bg-gray-200',
                       'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2'
                     ]"
+                    @click="form.is_active = !form.is_active"
                   >
                     <span
                       :class="[
@@ -263,7 +271,7 @@
                     min="0"
                     class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
                     placeholder="0"
-                  />
+                  >
                   <p class="mt-1 text-xs text-gray-500">
                     Plus le nombre est bas, plus la réalisation apparaît en premier
                   </p>
@@ -279,9 +287,15 @@
                     v-model="form.source"
                     class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
                   >
-                    <option value="turso">Turso (Manuel)</option>
-                    <option value="airtable">Airtable (Migration)</option>
-                    <option value="cloudinary-auto-discovery">Cloudinary (Auto-découverte)</option>
+                    <option value="turso">
+                      Turso (Manuel)
+                    </option>
+                    <option value="airtable">
+                      Airtable (Migration)
+                    </option>
+                    <option value="cloudinary-auto-discovery">
+                      Cloudinary (Auto-découverte)
+                    </option>
                   </select>
                   <p class="mt-1 text-xs text-gray-500">
                     Indique l'origine de cette réalisation
@@ -295,8 +309,8 @@
           <div class="flex justify-end space-x-3 pt-6 border-t">
             <button
               type="button"
-              @click="$emit('close')"
               class="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500"
+              @click="$emit('close')"
             >
               Annuler
             </button>

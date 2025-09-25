@@ -76,7 +76,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from "vue";
-import type { CloudinaryPreset } from "~/composables/useCloudinaryImage";
+import type { CloudinaryPreset } from "../composables/useCloudinaryImage";
 
 interface Props {
   publicId: string;

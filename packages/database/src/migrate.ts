@@ -39,7 +39,8 @@ async function runMigrations() {
     const migrationFiles = [
       '001_initial_schema.sql',
       '002_simplify_payment_system.sql',
-      '003_add_products_reference.sql'
+      '003_add_products_reference.sql',
+      '004_create_assets_table.sql'
     ]
     
     console.log(`📊 ${executedMigrations.size} migrations déjà exécutées`)

@@ -1,0 +1,196 @@
+{
+  "id": "sprint-1758481749805-25efe167",
+  "name": "Core 20% - Fondations SOLID Architecture",
+  "startDate": "2025-01-21",
+  "endDate": "2025-02-07",
+  "goals": "Établir les fondations architecturales SOLID critiques : Repository Pattern, Pinia store, VueQuery, migration des deux interfaces admin avec validation TypeScript et lint E2E complète pour éviter toute régression",
+  "status": "active",
+  "created": "2025-09-21T19:09:09.807Z",
+  "tasks": [
+    {
+      "id": 1,
+      "title": "AUDIT - Architecture actuelle avec mapping dépendances",
+      "description": "**Context Engineering:**\n- Analyser /admin/products et /admin/bundles/[id] pour identifier tous les appels API directs\n- Mapper les dépendances TypeScript actuelles entre composants\n- Documenter les violations SOLID actuelles (SRP, DIP)\n- Identifier les duplications de logique métier\n- Analyser performance actuelle avec 100+ produits\n\n**Livrables:**\n- Document audit_architecture.md avec diagrammes\n- Liste exhaustive des violations SOLID\n- Mapping des appels $fetch actuels à Turso\n- Analyse impact performance",
+      "status": "completed",
+      "priority": 5,
+      "dependencies": [],
+      "created": "2025-09-21T19:09:18.227Z",
+      "updated": "2025-09-21T19:16:17.667Z",
+      "isPareto80": false
+    },
+    {
+      "id": 2,
+      "title": "TYPES - Définition TypeScript Product, Bundle et interfaces",
+      "description": "**Context Engineering:**\n- Créer types/domain/Product.ts avec interface Product complète\n- Créer types/domain/Bundle.ts avec BundleProduct et Bundle\n- Définir DTOs pour CreateProduct, UpdateProduct, CreateBundle\n- Créer interfaces Repository (ProductRepository, BundleRepository)\n- Types pour API responses avec gestion erreurs\n\n**Validation TypeScript:**\n- Compiler sans erreurs avec strict mode\n- Lint ESLint passe sur tous les nouveaux types\n- Validation Zod schemas pour runtime safety\n\n**Livrables:**\n- types/domain/ avec tous les types métier\n- types/repositories/ avec interfaces Repository\n- types/api/ avec DTOs et responses\n- Tests TypeScript dans types/__tests__/",
+      "status": "completed",
+      "priority": 5,
+      "dependencies": [],
+      "created": "2025-09-21T19:09:27.410Z",
+      "updated": "2025-09-21T19:26:56.088Z",
+      "isPareto80": false
+    },
+    {
+      "id": 3,
+      "title": "SERVICE LAYER - ProductService avec abstraction Turso (Repository Pattern)",
+      "description": "**Context Engineering:**\n- Créer repositories/ProductRepository.ts implémentant interface\n- Abstraction complète des appels $fetch vers /api/products\n- Gestion erreurs avec try/catch et types d'erreur spécifiques\n- Méthodes: findAll(), findById(), create(), update(), delete()\n- Support pagination pour 100+ produits\n\n**Validation Technique:**\n- Tests unitaires pour chaque méthode repository\n- Mock des appels API avec MSW ou équivalent\n- TypeScript strict validation\n- ESLint validation complète\n- Performance tests avec 100+ produits simulés\n\n**Livrables:**\n- repositories/ProductRepository.ts\n- repositories/__tests__/ProductRepository.test.ts\n- Documentation API repository pattern\n- Benchmarks performance",
+      "status": "completed",
+      "priority": 5,
+      "dependencies": [],
+      "created": "2025-09-21T19:09:35.570Z",
+      "updated": "2025-09-21T19:32:25.545Z",
+      "isPareto80": false
+    },
+    {
+      "id": 4,
+      "title": "PINIA STORE - Synchronisation état global Product/Bundle",
+      "description": "**Context Engineering:**\n- Créer stores/useProductStore.ts avec Pinia\n- État global : products[], loading, error states\n- Actions: fetchProducts(), addProduct(), updateProduct(), deleteProduct()\n- Getters: getProductById(), filteredProducts()\n- Synchronisation entre /admin/products et /admin/bundles/[id]\n- Cache invalidation strategy\n\n**Validation Technique:**\n- Tests stores avec @pinia/testing\n- TypeScript strict mode compliance\n- ESLint validation sur toutes actions/getters\n- Tests d'intégration synchronisation entre interfaces\n- Performance tests avec 100+ produits en store\n\n**Livrables:**\n- stores/useProductStore.ts\n- stores/__tests__/useProductStore.test.ts\n- Documentation patterns Pinia utilisés\n- Tests synchronisation état global",
+      "status": "completed",
+      "priority": 5,
+      "dependencies": [],
+      "created": "2025-09-21T19:09:42.954Z",
+      "updated": "2025-09-21T19:35:18.419Z",
+      "isPareto80": false
+    },
+    {
+      "id": 5,
+      "title": "VUEQUERY - Cache intelligent des produits",
+      "description": "**Context Engineering:**\n- Installation et configuration @tanstack/vue-query\n- Créer composables/useProductsQuery.ts avec queries\n- Cache strategy: staleTime, refetchOnWindowFocus, background refetch\n- Mutations: useCreateProduct, useUpdateProduct, useDeleteProduct\n- Optimistic updates avec rollback sur erreur\n- Integration avec Pinia pour synchronisation\n\n**Validation Technique:**\n- Tests VueQuery avec testing-utils\n- Validation cache behavior avec 100+ produits\n- Tests optimistic updates et rollback\n- TypeScript strict sur toutes queries/mutations\n- ESLint validation sur composables VueQuery\n- Performance monitoring cache hits/misses\n\n**Livrables:**\n- composables/useProductsQuery.ts\n- composables/__tests__/useProductsQuery.test.ts\n- Configuration plugins/vue-query.client.ts\n- Documentation stratégie cache",
+      "status": "completed",
+      "priority": 5,
+      "dependencies": [],
+      "created": "2025-09-21T19:09:51.695Z",
+      "updated": "2025-09-21T19:41:15.611Z",
+      "isPareto80": false
+    },
+    {
+      "id": 6,
+      "title": "MIGRATION - /admin/products vers architecture SOLID",
+      "description": "**Context Engineering:**\n- Refactoring complet pages/admin/products/index.vue\n- Remplacement appels $fetch directs par useProductStore + VueQuery\n- Integration Repository pattern via ProductRepository\n- Suppression logique CRUD dupliquée vers store Pinia\n- Gestion erreurs centralisée avec notifications\n\n**Migration Steps:**\n1. Backup components existants dans .archive/\n2. Refactor index.vue pour utiliser useProductsQuery\n3. Refactor [id].vue pour utiliser store mutations\n4. Refactor new.vue avec nouvelles actions store\n5. Tests composants avec nouvelles dépendances\n\n**Validation E2E:**\n- Tests Playwright sur toutes CRUD operations\n- Validation TypeScript sans erreurs\n- ESLint validation complete\n- Performance tests avec 100+ produits\n- Tests synchronisation avec /admin/bundles/[id]\n\n**Livrables:**\n- pages/admin/products/* refactorisées\n- Tests E2E complets dans tests/e2e/admin-products/\n- Documentation migration guide",
+      "status": "completed",
+      "priority": 5,
+      "dependencies": [],
+      "created": "2025-09-21T19:10:07.372Z",
+      "updated": "2025-09-21T19:44:52.580Z",
+      "isPareto80": false
+    },
+    {
+      "id": 7,
+      "title": "MIGRATION - /admin/bundles/[id] vers architecture SOLID",
+      "description": "**Context Engineering:**\n- Refactoring complet pages/admin/bundles/[id].vue\n- Migration logique bundle vers useBundleStore + VueQuery\n- Integration ProductRepository pour sélection produits\n- Remplacement appels API directs par mutations store\n- Synchronisation temps réel avec /admin/products via Pinia\n\n**Migration Steps:**\n1. Backup components existants dans .archive/\n2. Créer useBundleStore avec logique bundle complète  \n3. Refactor [id].vue pour utiliser store + VueQuery\n4. Migration logique calculs totaux vers getters store\n5. Integration notifications système existant\n\n**Validation Critique:**\n- Tests E2E sur ajout/suppression produits bundle\n- Validation calculs totaux avec Edge Cases\n- Tests synchronisation état avec /admin/products\n- TypeScript strict validation sur mutations\n- ESLint validation complète\n- Performance tests manipulation 20+ produits/bundle\n\n**Livrables:**\n- pages/admin/bundles/[id].vue refactorisée\n- stores/useBundleStore.ts complet\n- Tests E2E dans tests/e2e/admin-bundles/\n- Documentation synchronisation inter-interfaces",
+      "status": "completed",
+      "priority": 5,
+      "dependencies": [],
+      "created": "2025-09-21T19:10:17.919Z",
+      "updated": "2025-09-21T19:50:27.433Z",
+      "isPareto80": false
+    },
+    {
+      "id": 8,
+      "title": "VALIDATION LINT - ESLint sur toute la migration",
+      "description": "**Context Engineering:**\n- Validation ESLint complète sur tous fichiers migrés\n- Configuration rules strictes pour architecture SOLID\n- Custom rules pour Repository pattern compliance\n- Validation imports/exports entre couches\n- Prevention circular dependencies entre stores\n\n**Scope Validation:**\n- types/domain/* et types/repositories/*\n- repositories/ProductRepository.ts\n- stores/useProductStore.ts et useBundleStore.ts\n- composables/useProductsQuery.ts\n- pages/admin/products/* et pages/admin/bundles/[id].vue\n\n**Rules Configuration:**\n- @typescript-eslint/no-explicit-any stricte\n- Import/no-cycle pour éviter dépendances circulaires\n- Consistent-type-imports pour performance\n- Custom rules architecture SOLID\n\n**Validation Technique:**\n- Zero ESLint errors sur migration complète\n- Performance ESLint < 5s sur codebase complet\n- Pre-commit hooks pour validation continue\n- CI/CD integration avec fail sur lint errors\n\n**Livrables:**\n- Configuration ESLint stricte dans eslint.config.js\n- Scripts validation npm run lint:migration\n- Documentation rules architecture",
+      "status": "completed",
+      "priority": 5,
+      "dependencies": [],
+      "created": "2025-09-21T19:10:27.932Z",
+      "updated": "2025-09-21T19:58:01.729Z",
+      "isPareto80": false
+    },
+    {
+      "id": 9,
+      "title": "TESTS TYPESCRIPT - Validation E2E des nouvelles couches",
+      "description": "**Context Engineering:**\n- Tests TypeScript complets pour toutes nouvelles couches\n- Validation types avec strict mode et noImplicitAny\n- Tests runtime type safety avec Zod schemas\n- Coverage tests minimum 90% sur Repository et Stores\n- Integration tests entre couches (Repository -> Store -> Components)\n\n**Test Scope:**\n- repositories/__tests__/ProductRepository.test.ts\n- stores/__tests__/useProductStore.test.ts  \n- stores/__tests__/useBundleStore.test.ts\n- composables/__tests__/useProductsQuery.test.ts\n- types/__tests__/domain.test.ts\n\n**Validation Criteria:**\n- TypeScript compilation 0 errors avec strict: true\n- Tests coverage > 90% sur logique métier\n- Performance tests < 100ms par operation store\n- Memory leaks tests avec 1000+ operations\n- Edge cases validation (empty states, error states)\n\n**Tools Configuration:**\n- Vitest pour tests unitaires\n- @pinia/testing pour stores tests\n- MSW pour mocking API calls\n- @testing-library/vue pour composants\n\n**Livrables:**\n- Suite tests complète avec coverage reports\n- Scripts npm run test:types et test:migration\n- Documentation testing strategy",
+      "status": "pending",
+      "priority": 5,
+      "dependencies": [],
+      "created": "2025-09-21T19:10:38.619Z",
+      "updated": "2025-09-21T19:10:38.619Z",
+      "isPareto80": false
+    },
+    {
+      "id": 10,
+      "title": "TESTS E2E - Interfaces admin avec Playwright (validation critique)",
+      "description": "**Context Engineering:**\n- Tests E2E complets sur /admin/products après migration SOLID\n- Tests E2E complets sur /admin/bundles/[id] après migration SOLID  \n- Validation synchronisation état entre les deux interfaces\n- Tests performance avec 100+ produits en conditions réelles\n- Validation notifications système intégrées\n\n**Test Scenarios Critiques:**\n1. CRUD Product complet dans /admin/products\n2. Navigation /admin/products -> /admin/bundles/[id] avec synchro état\n3. Ajout produit dans bundle + vérification synchro inverse\n4. Tests simultanés sur les 2 interfaces (multi-tab)\n5. Tests performance bulk operations (20+ produits)\n\n**Validation Non-Régression:**\n- Tous workflows admin existants fonctionnels\n- Performance égale ou améliorée vs version actuelle\n- Aucune console error en production mode\n- Tests réseau lent et offline/online scenarios\n- Tests responsive design desktop/tablet\n\n**Configuration Playwright:**\n- Tests dans tests/e2e/migration-solid/\n- Screenshots et vidéos sur failures\n- Parallel execution avec workers\n- CI/CD integration obligatoire\n\n**Livrables:**\n- Suite E2E complète migration SOLID\n- Performance benchmarks avant/après\n- Documentation scénarios critiques testés",
+      "status": "pending",
+      "priority": 5,
+      "dependencies": [],
+      "created": "2025-09-21T19:10:51.927Z",
+      "updated": "2025-09-21T19:10:51.927Z",
+      "isPareto80": false
+    },
+    {
+      "id": 11,
+      "title": "COMPOSABLES - useProducts et useBundles métier",
+      "description": "**Context Engineering:**\n- Création composables métier de haut niveau\n- useProducts() : aggregation ProductRepository + VueQuery + validation\n- useBundles() : logique métier bundle avec calculs automatiques\n- Encapsulation logique complexe pour réutilisation\n- Integration avec système notifications existant\n\n**Scope P1:**\n- composables/useProducts.ts avec validation Zod\n- composables/useBundles.ts avec logique calculs\n- Tests unitaires et documentation complète\n- TypeScript strict et ESLint validation\n\n**Livrables:**\n- Composables réutilisables documentés\n- Réduction 50%+ code boilerplate dans composants",
+      "status": "pending",
+      "priority": 4,
+      "dependencies": [],
+      "created": "2025-09-21T19:11:01.898Z",
+      "updated": "2025-09-21T19:11:01.898Z",
+      "isPareto80": true
+    },
+    {
+      "id": 12,
+      "title": "PERFORMANCE - Optimisation 100+ produits (pagination, virtualisation)",
+      "description": "**Context Engineering:**\n- Analysis performance bottlenecks avec 100+ produits\n- Implementation pagination server-side pour /admin/products\n- Virtualisation UI pour longues listes (vue-virtual-scroller)\n- Lazy loading images produits avec Cloudinary optimisation\n- Debouncing recherche et filtres temps réel\n\n**Optimisations P1:**\n- Server-side pagination API endpoints\n- Client-side virtual scrolling composant\n- Image lazy loading avec intersection observer\n- Search debouncing 300ms\n- Performance monitoring dashboard\n\n**Livrables:**\n- Performance amélioration >50% sur listes produits\n- Documentation optimisations implementées",
+      "status": "pending",
+      "priority": 4,
+      "dependencies": [],
+      "created": "2025-09-21T19:11:10.634Z",
+      "updated": "2025-09-21T19:11:10.634Z",
+      "isPareto80": true
+    },
+    {
+      "id": 13,
+      "title": "DOCUMENTATION - Architecture SOLID complète",
+      "description": "**Context Engineering:**\n- Documentation complète nouvelle architecture SOLID\n- Diagrammes Repository Pattern avec mermaid\n- Guide migration pour futures interfaces\n- Best practices Pinia + VueQuery dans contexte Nuxt 3\n- Onboarding développeurs sur patterns utilisés\n\n**Documentation P1:**\n- docs/architecture/SOLID-patterns.md\n- docs/migration/repository-pattern-guide.md  \n- Diagrammes architecture avec draw.io/mermaid\n- README interfaces avec exemples code\n- Troubleshooting guide erreurs communes\n\n**Livrables:**\n- Documentation technique complète\n- Guide onboarding équipe 30min max",
+      "status": "pending",
+      "priority": 3,
+      "dependencies": [],
+      "created": "2025-09-21T19:11:19.156Z",
+      "updated": "2025-09-21T19:11:19.156Z",
+      "isPareto80": true
+    },
+    {
+      "id": 14,
+      "title": "PATTERNS AVANCÉS - Repository spécialisés (Unit of Work, Specifications)",
+      "description": "**Context Engineering:**\n- Implementation patterns Repository avancés\n- Unit of Work pattern pour transactions multiples\n- Specification pattern pour queries complexes\n- Generic Repository avec type safety TypeScript\n- Command/Query separation (CQRS léger)\n\n**Patterns P2:**\n- UnitOfWork pour cohérence transactions\n- ProductSpecifications pour filtres avancés\n- Generic Repository<T> base class\n- Cache invalidation strategies avancées\n\n**Dette Technique P2:**\n- Refactoring optionnel selon adoption équipe\n- Implementation si besoin métier émergent",
+      "status": "pending",
+      "priority": 2,
+      "dependencies": [],
+      "created": "2025-09-21T19:11:27.468Z",
+      "updated": "2025-09-21T19:11:27.468Z",
+      "isPareto80": true
+    },
+    {
+      "id": 15,
+      "title": "NUXT LAYERS - Migration architecture modulaire (P2 Future)",
+      "description": "**Context Engineering:**\n- Migration vers Nuxt 3 Layers architecture\n- Séparation domaines : layers/products/, layers/bundles/, layers/core/\n- Domain-Driven Design avec boundaries claires\n- Auto-imports et types par layer\n- Extensibilité future (layers/orders/, layers/customers/)\n\n**Architecture Layers P2:**\n- layers/core/ : types communs, utils, base repository\n- layers/products/ : logique métier produits isolée  \n- layers/bundles/ : logique métier bundles isolée\n- layers/admin/ : interfaces administration\n\n**Dette Technique P2:**\n- Migration majeure, bénéfice long terme\n- Evaluation ROI vs effort required\n- Implementation si scale team > 3 devs",
+      "status": "pending",
+      "priority": 1,
+      "dependencies": [],
+      "created": "2025-09-21T19:11:36.740Z",
+      "updated": "2025-09-21T19:11:36.740Z",
+      "isPareto80": true
+    },
+    {
+      "id": 16,
+      "title": "OPTIMISATION - Event Bus existant (Pre-Tâche #4)",
+      "description": "**Context Engineering:**\n- Audit révèle Event Bus partiel dans adminEventBus.ts\n- Étendre synchronisation existante avant refactor store Pinia\n- Éviter duplication logique avec nouveau store\n\n**Actions Rapides:**\n- Audit adminEventBus.ts existant\n- Documentation événements products:created, products:updated, products:deleted\n- Test synchronisation actuelle entre interfaces\n- Préparation migration vers store unifié\n\n**Livrables:**\n- Documentation Event Bus actuel\n- Plan transition Event Bus → Pinia Store\n- Tests synchronisation existante\n\n**Durée Estimée:** 2h (micro-tâche)",
+      "status": "pending",
+      "priority": 5,
+      "dependencies": [
+        1
+      ],
+      "created": "2025-09-21T19:21:48.601Z",
+      "updated": "2025-09-21T19:21:48.601Z",
+      "isPareto80": false
+    }
+  ],
+  "paretoDecisions": [],
+  "metrics": {
+    "tasksCompleted": 8,
+    "tasksMovedToVault": 0,
+    "velocityPoints": 0
+  },
+  "updated": "2025-09-21T19:58:01.734Z"
+}

@@ -1,0 +1,132 @@
+{
+  "id": "sprint-1758414330414-c7d117fd",
+  "name": "Core 20% - Solution Pinia + Event Bus",
+  "startDate": "2025-09-21",
+  "endDate": "2025-09-23",
+  "goals": "Implémenter la synchronisation des données admin avec Pinia store + Event Bus réactif pour résoudre définitivement les problèmes de cache KeepAlive",
+  "status": "active",
+  "created": "2025-09-21T00:25:30.414Z",
+  "tasks": [
+    {
+      "id": 1,
+      "title": "Créer le store Pinia products avec cache intelligent",
+      "description": "Implémenter stores/products.ts avec fetchProducts, invalidateProducts et cache de 30s comme recommandé par Perplexity pour éviter les problèmes KeepAlive",
+      "status": "completed",
+      "priority": 5,
+      "dependencies": [],
+      "created": "2025-09-21T00:25:42.098Z",
+      "updated": "2025-09-21T00:35:14.676Z",
+      "isPareto80": false
+    },
+    {
+      "id": 2,
+      "title": "Créer composable useProducts avec auto-fetch",
+      "description": "Implémenter composables/useProducts.ts qui wrappe le store Pinia avec auto-fetch onMounted et méthodes refresh/invalidate",
+      "status": "completed",
+      "priority": 5,
+      "dependencies": [
+        1
+      ],
+      "created": "2025-09-21T00:25:46.290Z",
+      "updated": "2025-09-21T00:36:25.428Z",
+      "isPareto80": false
+    },
+    {
+      "id": 3,
+      "title": "Implémenter Event Bus admin réactif",
+      "description": "Créer utils/adminEventBus.ts pour synchronisation events products:updated, products:invalidate entre pages admin",
+      "status": "completed",
+      "priority": 4,
+      "dependencies": [],
+      "created": "2025-09-21T00:25:50.422Z",
+      "updated": "2025-09-21T00:37:08.231Z",
+      "isPareto80": false
+    },
+    {
+      "id": 4,
+      "title": "Refactoriser /admin/products/index.vue avec nouvelle solution",
+      "description": "Remplacer useLazyAsyncData par useProducts + Event Bus, supprimer keepalive problématique, tester synchronisation",
+      "status": "completed",
+      "priority": 5,
+      "dependencies": [
+        2,
+        3
+      ],
+      "created": "2025-09-21T00:25:55.145Z",
+      "updated": "2025-09-21T00:38:10.452Z",
+      "isPareto80": false
+    },
+    {
+      "id": 5,
+      "title": "Refactoriser /admin/products/[id].vue avec notifyUpdate",
+      "description": "Intégrer adminEventBus.emit('products:updated') après updateProduct pour déclencher sync automatique vers liste",
+      "status": "completed",
+      "priority": 5,
+      "dependencies": [
+        3,
+        4
+      ],
+      "created": "2025-09-21T00:25:59.741Z",
+      "updated": "2025-09-21T00:39:32.197Z",
+      "isPareto80": false
+    },
+    {
+      "id": 6,
+      "title": "Optimiser nuxt.config.ts pour CMS admin",
+      "description": "Configurer payloadExtraction: false, app.keepalive: false, server: false pour données admin selon recommandations Perplexity",
+      "status": "pending",
+      "priority": 3,
+      "dependencies": [],
+      "created": "2025-09-21T00:26:04.089Z",
+      "updated": "2025-09-21T00:26:04.089Z",
+      "isPareto80": false
+    },
+    {
+      "id": 7,
+      "title": "Créer test E2E synchronisation produits admin",
+      "description": "Test Playwright: modifier produit /admin/products/[id] → vérifier mise à jour automatique dans /admin/products sans refresh manuel",
+      "status": "pending",
+      "priority": 4,
+      "dependencies": [
+        5
+      ],
+      "created": "2025-09-21T00:26:41.376Z",
+      "updated": "2025-09-21T00:26:41.376Z",
+      "isPareto80": false
+    },
+    {
+      "id": 8,
+      "title": "Test performance cache Pinia vs ancienne solution",
+      "description": "Benchmarker temps de synchronisation, mémoire utilisée, requêtes réseau entre solution Pinia et useLazyAsyncData",
+      "status": "pending",
+      "priority": 3,
+      "dependencies": [
+        4,
+        5
+      ],
+      "created": "2025-09-21T00:26:46.366Z",
+      "updated": "2025-09-21T00:26:46.366Z",
+      "isPareto80": false
+    }
+  ],
+  "paretoDecisions": [
+    {
+      "taskId": 7,
+      "decision": "moved_to_vault",
+      "reason": "Amélioration 80% - Fonctionnalité temps réel multi-utilisateurs non critique pour MVP admin",
+      "timestamp": "2025-09-21T00:26:20.450Z"
+    },
+    {
+      "taskId": 7,
+      "decision": "moved_to_vault",
+      "reason": "Amélioration 80% - Pattern avancé pour composants complexes, non requis pour CRUD basique",
+      "timestamp": "2025-09-21T00:26:29.662Z"
+    }
+  ],
+  "metrics": {
+    "tasksCompleted": 5,
+    "tasksMovedToVault": 2,
+    "velocityPoints": 0
+  },
+  "updated": "2025-09-21T00:39:32.197Z"
+}

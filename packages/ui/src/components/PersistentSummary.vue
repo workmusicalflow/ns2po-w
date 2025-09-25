@@ -225,6 +225,7 @@
 
 <script setup lang="ts">
 import { computed, ref, inject } from "vue";
+import type { ComputedRef, Ref } from "vue";
 import type { MultiSelectionState } from "@ns2po/types";
 
 // =====================================

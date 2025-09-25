@@ -3,8 +3,9 @@
  * Met à jour un produit existant avec la stratégie Turso-first
  */
 
-import { getDatabase } from "~/server/utils/database"
+import { getDatabase } from "../../utils/database"
 import { z } from "zod"
+import { broadcastSSEEvent } from '~/server/api/sse'
 
 // Schéma de validation pour mise à jour de produit
 const updateProductSchema = z.object({
@@ -21,7 +22,7 @@ const updateProductSchema = z.object({
   materials: z.string().optional(),
   colors: z.array(z.string()).optional(),
   sizes: z.array(z.string()).optional(),
-  image_url: z.string().url().optional(),
+  image_url: z.string().url().optional().or(z.literal('')),
   gallery_urls: z.array(z.string().url()).optional(),
   specifications: z.string().optional(),
   is_active: z.boolean().optional()
@@ -43,12 +44,15 @@ export default defineEventHandler(async (event) => {
 
     // Validation du body
     const body = await readBody(event)
+    console.log('📝 Body reçu:', JSON.stringify(body, null, 2))
 
     let validatedData
     try {
       validatedData = updateProductSchema.parse(body)
+      console.log('✅ Validation réussie:', validatedData)
     } catch (error) {
       if (error instanceof z.ZodError) {
+        console.log('❌ Erreurs de validation:', error.errors)
         throw createError({
           statusCode: 400,
           statusMessage: 'Données invalides',
@@ -243,6 +247,15 @@ export default defineEventHandler(async (event) => {
         source: 'turso',
         duration: Date.now() - startTime
       }
+
+      // Broadcast SSE event pour synchronisation temps réel
+      console.log('📡 Émission SSE pour produit mis à jour:', product.name)
+      const broadcastResult = broadcastSSEEvent({
+        type: 'product:updated',
+        data: product,
+        timestamp: Date.now()
+      })
+      console.log('📊 Résultat broadcast SSE:', broadcastResult)
 
       // Cache headers
       setHeader(event, "Cache-Control", "no-cache")

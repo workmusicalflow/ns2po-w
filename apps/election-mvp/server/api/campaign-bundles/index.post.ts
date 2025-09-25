@@ -3,8 +3,8 @@
  * Crée un nouveau campaign bundle
  */
 
-import { getDatabase } from "~/server/utils/database"
-import { campaignBundleSchema, validateBundleProducts, validateBundleTotal, validateBundleBusinessRules } from "~/schemas/bundle"
+import { getDatabase } from "../../utils/database"
+import { campaignBundleSchema, validateBundleProducts, validateBundleTotal, validateBundleBusinessRules, validateFeaturedBundleLimit } from "~/schemas/bundle"
 import { z } from "zod"
 
 export default defineEventHandler(async (event) => {
@@ -36,12 +36,22 @@ export default defineEventHandler(async (event) => {
       throw error
     }
 
+    // Accès à la base de données (nécessaire pour certaines validations)
+    const db = getDatabase()
+
     // Validations métier supplémentaires
     const productErrors = validateBundleProducts(validatedData.products)
     const totalErrors = validateBundleTotal(validatedData)
     const businessErrors = validateBundleBusinessRules(validatedData)
 
-    const allErrors = [...productErrors, ...totalErrors, ...businessErrors]
+    let allErrors = [...productErrors, ...totalErrors, ...businessErrors]
+
+    // Validation des bundles vedettes (nécessite l'accès à la base de données)
+    if (db && validatedData.isFeatured) {
+      const featuredErrors = await validateFeaturedBundleLimit(validatedData, db, false)
+      allErrors = [...allErrors, ...featuredErrors]
+    }
+
     if (allErrors.length > 0) {
       throw createError({
         statusCode: 400,
@@ -50,18 +60,17 @@ export default defineEventHandler(async (event) => {
       })
     }
 
-    // Calculs automatiques
-    const calculatedTotal = validatedData.products.reduce((total, product) => total + product.subtotal, 0)
-    const savings = (validatedData.originalTotal || 0) - calculatedTotal
-
-    // Accès à la base de données
-    const db = getDatabase()
+    // Vérifier que la base de données est disponible
     if (!db) {
       throw createError({
         statusCode: 500,
         statusMessage: 'Base de données non disponible'
       })
     }
+
+    // Calculs automatiques
+    const calculatedTotal = validatedData.products.reduce((total, product) => total + product.subtotal, 0)
+    const savings = (validatedData.originalTotal || 0) - calculatedTotal
 
     // Transaction pour créer le bundle et ses produits
     try {

@@ -13,6 +13,7 @@ export type GlobalEvent =
   | { type: 'product.created'; payload: { product: any } }
   | { type: 'product.updated'; payload: { productId: string; product: any; changes: any } }
   | { type: 'product.deleted'; payload: { productId: string } }
+  | { type: 'product.bulk_updated'; payload: { productIds: string[]; products: any[] } }
   | { type: 'product.deactivated'; payload: { productId: string; productName: string } }
   | { type: 'product.price_changed'; payload: { productId: string; oldPrice: number; newPrice: number } }
   | { type: 'bundle.created'; payload: { bundle: any } }
@@ -196,6 +197,10 @@ export const useGlobalEventBus = defineStore('globalEventBus', {
       this.emit('product.deleted', { productId })
     },
 
+    emitProductBulkUpdated(productIds: string[], products: any[]): void {
+      this.emit('product.bulk_updated', { productIds, products })
+    },
+
     emitBundleCreated(bundle: any): void {
       this.emit('bundle.created', { bundle })
     },
@@ -316,7 +321,8 @@ export function useEventEmitter() {
     product: {
       created: (product: any) => eventBus.emitProductCreated(product),
       updated: (productId: string, product: any, changes: any) => eventBus.emitProductUpdated(productId, product, changes),
-      deleted: (productId: string) => eventBus.emitProductDeleted(productId)
+      deleted: (productId: string) => eventBus.emitProductDeleted(productId),
+      bulkUpdated: (productIds: string[], products: any[]) => eventBus.emitProductBulkUpdated(productIds, products)
     },
     bundle: {
       created: (bundle: any) => eventBus.emitBundleCreated(bundle),

@@ -16,26 +16,6 @@ export interface BundleProduct {
   readonly subtotal: number; // quantity * basePrice
 }
 
-// =====================================
-// TYPES BUNDLE DE CAMPAGNE
-// =====================================
-
-export interface CampaignBundle {
-  readonly id: string;
-  readonly name: string;
-  readonly description: string;
-  readonly targetAudience: BundleTargetAudience;
-  readonly products: readonly BundleProduct[];
-  readonly estimatedTotal: number;
-  readonly originalTotal?: number; // Si prix de bundle différent de la somme
-  readonly savings?: number; // originalTotal - estimatedTotal
-  readonly popularity: number; // Score pour le tri/affichage
-  readonly isActive: boolean;
-  readonly isFeatured?: boolean;
-  readonly tags?: readonly string[];
-  readonly createdAt: string;
-  readonly updatedAt: string;
-}
 
 // =====================================
 // TYPES SÉLECTION MULTIPLE
@@ -116,6 +96,14 @@ export const BundleTargetAudience = {
   UNIVERSAL: "universal", // Applicable à tous niveaux
 } as const;
 
+export const BundleBudgetRange = {
+  STARTER: "starter", // 0-20k XOF
+  STANDARD: "standard", // 20k-50k XOF
+  MEDIUM: "medium", // 50k-100k XOF
+  PREMIUM: "premium", // 100k-500k XOF
+  ENTERPRISE: "enterprise", // 500k+ XOF
+} as const;
+
 
 export const BundleSelectionMode = {
   DIRECT: "direct", // Sélection directe du bundle
@@ -138,11 +126,35 @@ export const CartStatus = {
 export type BundleTargetAudience =
   (typeof BundleTargetAudience)[keyof typeof BundleTargetAudience];
 
+export type BundleBudgetRange =
+  (typeof BundleBudgetRange)[keyof typeof BundleBudgetRange];
 
 export type BundleSelectionMode =
   (typeof BundleSelectionMode)[keyof typeof BundleSelectionMode];
 
 export type CartStatus = (typeof CartStatus)[keyof typeof CartStatus];
+
+// =====================================
+// TYPES BUNDLE DE CAMPAGNE
+// =====================================
+
+export interface CampaignBundle {
+  readonly id: string;
+  readonly name: string;
+  readonly description: string;
+  readonly targetAudience: BundleTargetAudience;
+  readonly budgetRange: BundleBudgetRange;
+  readonly products: readonly BundleProduct[];
+  readonly estimatedTotal: number;
+  readonly originalTotal?: number; // Si prix de bundle différent de la somme
+  readonly savings?: number; // originalTotal - estimatedTotal
+  readonly popularity: number; // Score pour le tri/affichage
+  readonly isActive: boolean;
+  readonly isFeatured?: boolean;
+  readonly tags?: readonly string[];
+  readonly createdAt: string;
+  readonly updatedAt: string;
+}
 
 // =====================================
 // TYPES UTILITAIRES

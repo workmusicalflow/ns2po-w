@@ -1,8 +1,10 @@
 <template>
-  <form @submit.prevent="submitForm" class="space-y-6">
+  <form class="space-y-6" @submit.prevent="submitForm">
     <!-- Basic Information -->
     <div class="bg-white p-6 rounded-lg border border-gray-200">
-      <h3 class="text-lg font-medium text-gray-900 mb-4">Informations de base</h3>
+      <h3 class="text-lg font-medium text-gray-900 mb-4">
+        Informations de base
+      </h3>
 
       <div class="grid grid-cols-1 gap-6">
         <!-- Title -->
@@ -21,8 +23,10 @@
             ]"
             placeholder="Ex: Campagne municipale Abidjan 2024"
             @blur="validateField('title')"
-          />
-          <p v-if="errors.title" class="mt-1 text-sm text-red-600">{{ errors.title }}</p>
+          >
+          <p v-if="errors.title" class="mt-1 text-sm text-red-600">
+            {{ errors.title }}
+          </p>
         </div>
 
         <!-- Description -->
@@ -40,15 +44,19 @@
             ]"
             placeholder="Description détaillée de la réalisation..."
             @blur="validateField('description')"
-          ></textarea>
-          <p v-if="errors.description" class="mt-1 text-sm text-red-600">{{ errors.description }}</p>
+          />
+          <p v-if="errors.description" class="mt-1 text-sm text-red-600">
+            {{ errors.description }}
+          </p>
         </div>
       </div>
     </div>
 
     <!-- Images Management -->
     <div class="bg-white p-6 rounded-lg border border-gray-200">
-      <h3 class="text-lg font-medium text-gray-900 mb-4">Images de la réalisation</h3>
+      <h3 class="text-lg font-medium text-gray-900 mb-4">
+        Images de la réalisation
+      </h3>
 
       <!-- Current Images -->
       <div v-if="formData.cloudinary_public_ids && formData.cloudinary_public_ids.length > 0" class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
@@ -61,11 +69,11 @@
             :src="getCloudinaryUrl(publicId)"
             :alt="`Image ${index + 1}`"
             class="w-full h-24 object-cover rounded-lg"
-          />
+          >
           <button
             type="button"
-            @click="removeImage(index)"
             class="absolute top-1 right-1 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+            @click="removeImage(index)"
           >
             <Icon name="heroicons:x-mark" class="w-4 h-4" />
           </button>
@@ -82,30 +90,36 @@
               type="file"
               multiple
               accept="image/*"
-              @change="handleFileUpload"
               class="hidden"
-            />
+              @change="handleFileUpload"
+            >
             <button
               type="button"
-              @click="$refs.fileInput.click()"
               :disabled="isUploading"
               class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
+              @click="$refs.fileInput.click()"
             >
               <Icon v-if="isUploading" name="heroicons:arrow-path" class="w-4 h-4 mr-2 animate-spin" />
               <Icon v-else name="heroicons:cloud-arrow-up" class="w-4 h-4 mr-2" />
               {{ isUploading ? 'Upload en cours...' : 'Ajouter des images' }}
             </button>
           </div>
-          <p class="text-xs text-gray-500 mt-1">PNG, JPG, GIF jusqu'à 10MB (max 10 images)</p>
+          <p class="text-xs text-gray-500 mt-1">
+            PNG, JPG, GIF jusqu'à 10MB (max 10 images)
+          </p>
         </div>
       </div>
 
-      <p v-if="errors.cloudinary_public_ids" class="mt-2 text-sm text-red-600">{{ errors.cloudinary_public_ids }}</p>
+      <p v-if="errors.cloudinary_public_ids" class="mt-2 text-sm text-red-600">
+        {{ errors.cloudinary_public_ids }}
+      </p>
     </div>
 
     <!-- Relations Management -->
     <div class="bg-white p-6 rounded-lg border border-gray-200">
-      <h3 class="text-lg font-medium text-gray-900 mb-4">Relations et associations</h3>
+      <h3 class="text-lg font-medium text-gray-900 mb-4">
+        Relations et associations
+      </h3>
 
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <!-- Products -->
@@ -131,8 +145,12 @@
               {{ product.name }} ({{ product.reference }})
             </option>
           </select>
-          <p class="mt-1 text-xs text-gray-500">Maintenez Ctrl/Cmd pour sélectionner plusieurs produits</p>
-          <p v-if="errors.product_ids" class="mt-1 text-sm text-red-600">{{ errors.product_ids }}</p>
+          <p class="mt-1 text-xs text-gray-500">
+            Maintenez Ctrl/Cmd pour sélectionner plusieurs produits
+          </p>
+          <p v-if="errors.product_ids" class="mt-1 text-sm text-red-600">
+            {{ errors.product_ids }}
+          </p>
         </div>
 
         <!-- Categories -->
@@ -158,8 +176,12 @@
               {{ category.name }}
             </option>
           </select>
-          <p class="mt-1 text-xs text-gray-500">Maintenez Ctrl/Cmd pour sélectionner plusieurs catégories</p>
-          <p v-if="errors.category_ids" class="mt-1 text-sm text-red-600">{{ errors.category_ids }}</p>
+          <p class="mt-1 text-xs text-gray-500">
+            Maintenez Ctrl/Cmd pour sélectionner plusieurs catégories
+          </p>
+          <p v-if="errors.category_ids" class="mt-1 text-sm text-red-600">
+            {{ errors.category_ids }}
+          </p>
         </div>
       </div>
 
@@ -186,14 +208,20 @@
             {{ option.name }}
           </option>
         </select>
-        <p class="mt-1 text-xs text-gray-500">Maintenez Ctrl/Cmd pour sélectionner plusieurs options</p>
-        <p v-if="errors.customization_option_ids" class="mt-1 text-sm text-red-600">{{ errors.customization_option_ids }}</p>
+        <p class="mt-1 text-xs text-gray-500">
+          Maintenez Ctrl/Cmd pour sélectionner plusieurs options
+        </p>
+        <p v-if="errors.customization_option_ids" class="mt-1 text-sm text-red-600">
+          {{ errors.customization_option_ids }}
+        </p>
       </div>
     </div>
 
     <!-- Tags and Metadata -->
     <div class="bg-white p-6 rounded-lg border border-gray-200">
-      <h3 class="text-lg font-medium text-gray-900 mb-4">Tags et métadonnées</h3>
+      <h3 class="text-lg font-medium text-gray-900 mb-4">
+        Tags et métadonnées
+      </h3>
 
       <div class="space-y-6">
         <!-- Tags -->
@@ -211,9 +239,13 @@
             ]"
             placeholder="campagne, municipale, affichage, 2024"
             @blur="updateTags"
-          />
-          <p class="mt-1 text-xs text-gray-500">Maximum 20 tags, 30 caractères par tag</p>
-          <p v-if="errors.tags" class="mt-1 text-sm text-red-600">{{ errors.tags }}</p>
+          >
+          <p class="mt-1 text-xs text-gray-500">
+            Maximum 20 tags, 30 caractères par tag
+          </p>
+          <p v-if="errors.tags" class="mt-1 text-sm text-red-600">
+            {{ errors.tags }}
+          </p>
 
           <!-- Tags Display -->
           <div v-if="formData.tags.length > 0" class="mt-3 flex flex-wrap gap-2">
@@ -225,8 +257,8 @@
               {{ tag }}
               <button
                 type="button"
-                @click="removeTag(index)"
                 class="ml-1 inline-flex items-center justify-center w-4 h-4 rounded-full text-amber-600 hover:bg-amber-200 hover:text-amber-800 focus:outline-none"
+                @click="removeTag(index)"
               >
                 <Icon name="heroicons:x-mark" class="w-3 h-3" />
               </button>
@@ -248,18 +280,28 @@
             ]"
             @change="validateField('source')"
           >
-            <option value="turso">Turso (Base de données)</option>
-            <option value="airtable">Airtable (Legacy)</option>
-            <option value="cloudinary-auto-discovery">Cloudinary (Auto-découverte)</option>
+            <option value="turso">
+              Turso (Base de données)
+            </option>
+            <option value="airtable">
+              Airtable (Legacy)
+            </option>
+            <option value="cloudinary-auto-discovery">
+              Cloudinary (Auto-découverte)
+            </option>
           </select>
-          <p v-if="errors.source" class="mt-1 text-sm text-red-600">{{ errors.source }}</p>
+          <p v-if="errors.source" class="mt-1 text-sm text-red-600">
+            {{ errors.source }}
+          </p>
         </div>
       </div>
     </div>
 
     <!-- Display Configuration -->
     <div class="bg-white p-6 rounded-lg border border-gray-200">
-      <h3 class="text-lg font-medium text-gray-900 mb-4">Configuration d'affichage</h3>
+      <h3 class="text-lg font-medium text-gray-900 mb-4">
+        Configuration d'affichage
+      </h3>
 
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <!-- Order Position -->
@@ -279,9 +321,13 @@
             ]"
             placeholder="0"
             @blur="validateField('order_position')"
-          />
-          <p class="mt-1 text-xs text-gray-500">Plus le nombre est bas, plus la réalisation apparaît en premier</p>
-          <p v-if="errors.order_position" class="mt-1 text-sm text-red-600">{{ errors.order_position }}</p>
+          >
+          <p class="mt-1 text-xs text-gray-500">
+            Plus le nombre est bas, plus la réalisation apparaît en premier
+          </p>
+          <p v-if="errors.order_position" class="mt-1 text-sm text-red-600">
+            {{ errors.order_position }}
+          </p>
         </div>
 
         <!-- Status Options -->
@@ -292,7 +338,7 @@
               v-model="formData.is_featured"
               type="checkbox"
               class="h-4 w-4 text-amber-600 focus:ring-amber-500 border-gray-300 rounded"
-            />
+            >
             <label for="is_featured" class="ml-2 block text-sm text-gray-700">
               Réalisation vedette
             </label>
@@ -303,7 +349,7 @@
               v-model="formData.is_active"
               type="checkbox"
               class="h-4 w-4 text-amber-600 focus:ring-amber-500 border-gray-300 rounded"
-            />
+            >
             <label for="is_active" class="ml-2 block text-sm text-gray-700">
               Réalisation active
             </label>
@@ -316,8 +362,8 @@
     <div class="flex justify-end space-x-3 pt-6 border-t">
       <button
         type="button"
-        @click="$emit('cancel')"
         class="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500"
+        @click="$emit('cancel')"
       >
         Annuler
       </button>
@@ -334,8 +380,8 @@
 </template>
 
 <script setup lang="ts">
-import { useFormValidation } from '~/composables/useFormValidation'
-import { globalNotifications } from '~/composables/useNotifications'
+// Auto-imported via Nuxt 3: useFormValidation
+// Auto-imported via Nuxt 3: globalNotifications
 
 interface Product {
   id: string

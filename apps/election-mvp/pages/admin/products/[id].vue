@@ -24,17 +24,17 @@
         <div class="flex items-center space-x-3">
           <button
             v-if="!isNew"
-            @click="duplicateProduct"
             type="button"
             class="px-4 py-2 text-sm font-medium text-blue-700 bg-blue-50 border border-blue-200 rounded-md hover:bg-blue-100"
+            @click="duplicateProduct"
           >
             Dupliquer
           </button>
           <button
             v-if="!isNew"
-            @click="deleteProduct"
             type="button"
             class="px-4 py-2 text-sm font-medium text-red-700 bg-red-50 border border-red-200 rounded-md hover:bg-red-100"
+            @click="deleteProduct"
           >
             Supprimer
           </button>
@@ -48,7 +48,9 @@
       <div class="lg:col-span-2 space-y-6">
         <!-- Basic Information -->
         <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-          <h2 class="text-lg font-medium text-gray-900 mb-6">Informations générales</h2>
+          <h2 class="text-lg font-medium text-gray-900 mb-6">
+            Informations générales
+          </h2>
 
           <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <!-- Product Name -->
@@ -62,8 +64,10 @@
                 placeholder="Ex: T-shirt personnalisé"
                 class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
                 :class="{ 'border-red-300': errors.name }"
-              />
-              <p v-if="errors.name" class="mt-1 text-sm text-red-600">{{ errors.name }}</p>
+              >
+              <p v-if="errors.name" class="mt-1 text-sm text-red-600">
+                {{ errors.name }}
+              </p>
             </div>
 
             <!-- Category -->
@@ -76,12 +80,16 @@
                 class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
                 :class="{ 'border-red-300': errors.category }"
               >
-                <option value="">Sélectionner une catégorie</option>
+                <option value="">
+                  Sélectionner une catégorie
+                </option>
                 <option v-for="category in categories" :key="category.id" :value="category.name">
                   {{ category.name }}
                 </option>
               </select>
-              <p v-if="errors.category" class="mt-1 text-sm text-red-600">{{ errors.category }}</p>
+              <p v-if="errors.category" class="mt-1 text-sm text-red-600">
+                {{ errors.category }}
+              </p>
             </div>
 
             <!-- Subcategory -->
@@ -92,7 +100,7 @@
                 type="text"
                 placeholder="Ex: Vêtements"
                 class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
-              />
+              >
             </div>
 
             <!-- Base Price -->
@@ -108,8 +116,10 @@
                 placeholder="5000"
                 class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
                 :class="{ 'border-red-300': errors.base_price }"
-              />
-              <p v-if="errors.base_price" class="mt-1 text-sm text-red-600">{{ errors.base_price }}</p>
+              >
+              <p v-if="errors.base_price" class="mt-1 text-sm text-red-600">
+                {{ errors.base_price }}
+              </p>
             </div>
 
             <!-- Unit -->
@@ -119,11 +129,21 @@
                 v-model="form.unit"
                 class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
               >
-                <option value="pièce">Pièce</option>
-                <option value="lot">Lot</option>
-                <option value="m²">m²</option>
-                <option value="ml">Mètre linéaire</option>
-                <option value="kg">Kilogramme</option>
+                <option value="pièce">
+                  Pièce
+                </option>
+                <option value="lot">
+                  Lot
+                </option>
+                <option value="m²">
+                  m²
+                </option>
+                <option value="ml">
+                  Mètre linéaire
+                </option>
+                <option value="kg">
+                  Kilogramme
+                </option>
               </select>
             </div>
 
@@ -136,7 +156,7 @@
                 min="1"
                 placeholder="1"
                 class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
-              />
+              >
             </div>
 
             <div>
@@ -147,7 +167,7 @@
                 min="1"
                 placeholder="1000"
                 class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
-              />
+              >
             </div>
 
             <!-- Production Time -->
@@ -159,8 +179,10 @@
                 min="1"
                 placeholder="7"
                 class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
-              />
-              <p class="mt-1 text-xs text-gray-500">Nombre de jours nécessaires pour la production</p>
+              >
+              <p class="mt-1 text-xs text-gray-500">
+                Nombre de jours nécessaires pour la production
+              </p>
             </div>
 
             <!-- Description -->
@@ -171,14 +193,16 @@
                 rows="4"
                 placeholder="Description détaillée du produit..."
                 class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
-              ></textarea>
+              />
             </div>
           </div>
         </div>
 
         <!-- Product Options -->
         <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-          <h2 class="text-lg font-medium text-gray-900 mb-6">Options et personnalisation</h2>
+          <h2 class="text-lg font-medium text-gray-900 mb-6">
+            Options et personnalisation
+          </h2>
 
           <!-- Customizable -->
           <div class="mb-6">
@@ -187,10 +211,12 @@
                 v-model="form.customizable"
                 type="checkbox"
                 class="rounded border-gray-300 text-amber-600 focus:ring-amber-500"
-              />
+              >
               <span class="ml-2 text-sm text-gray-700">Produit personnalisable</span>
             </label>
-            <p class="mt-1 text-xs text-gray-500">Permet au client de personnaliser ce produit</p>
+            <p class="mt-1 text-xs text-gray-500">
+              Permet au client de personnaliser ce produit
+            </p>
           </div>
 
           <!-- Materials -->
@@ -201,7 +227,7 @@
               type="text"
               placeholder="Ex: Coton 100%, Polyester..."
               class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
-            />
+            >
           </div>
 
           <!-- Colors -->
@@ -210,15 +236,15 @@
             <div class="flex items-center space-x-2 mb-2">
               <input
                 v-model="newColor"
-                @keydown.enter.prevent="addColor"
                 type="text"
                 placeholder="Ajouter une couleur..."
                 class="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
-              />
+                @keydown.enter.prevent="addColor"
+              >
               <button
-                @click="addColor"
                 type="button"
                 class="px-3 py-2 bg-amber-600 text-white text-sm rounded-md hover:bg-amber-700"
+                @click="addColor"
               >
                 Ajouter
               </button>
@@ -231,9 +257,9 @@
               >
                 {{ color }}
                 <button
-                  @click="removeColor(index)"
                   type="button"
                   class="ml-1 text-blue-600 hover:text-blue-800"
+                  @click="removeColor(index)"
                 >
                   <Icon name="heroicons:x-mark" class="w-3 h-3" />
                 </button>
@@ -247,15 +273,15 @@
             <div class="flex items-center space-x-2 mb-2">
               <input
                 v-model="newSize"
-                @keydown.enter.prevent="addSize"
                 type="text"
                 placeholder="Ajouter une taille..."
                 class="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
-              />
+                @keydown.enter.prevent="addSize"
+              >
               <button
-                @click="addSize"
                 type="button"
                 class="px-3 py-2 bg-amber-600 text-white text-sm rounded-md hover:bg-amber-700"
+                @click="addSize"
               >
                 Ajouter
               </button>
@@ -268,9 +294,9 @@
               >
                 {{ size }}
                 <button
-                  @click="removeSize(index)"
                   type="button"
                   class="ml-1 text-green-600 hover:text-green-800"
+                  @click="removeSize(index)"
                 >
                   <Icon name="heroicons:x-mark" class="w-3 h-3" />
                 </button>
@@ -286,13 +312,15 @@
               rows="3"
               placeholder="Spécifications techniques détaillées..."
               class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
-            ></textarea>
+            />
           </div>
         </div>
 
         <!-- Images -->
         <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-          <h2 class="text-lg font-medium text-gray-900 mb-6">Images du produit</h2>
+          <h2 class="text-lg font-medium text-gray-900 mb-6">
+            Images du produit
+          </h2>
 
           <!-- Main Image -->
           <div class="mb-6">
@@ -304,7 +332,7 @@
                   :src="form.image_url"
                   alt="Aperçu"
                   class="w-24 h-24 rounded-lg object-cover border border-gray-300"
-                />
+                >
                 <div
                   v-else
                   class="w-24 h-24 rounded-lg bg-gray-100 border-2 border-dashed border-gray-300 flex items-center justify-center"
@@ -318,13 +346,15 @@
                   type="url"
                   placeholder="URL de l'image principale..."
                   class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
-                />
-                <p class="mt-1 text-xs text-gray-500">URL de l'image ou utilisez le bouton d'upload</p>
+                >
+                <p class="mt-1 text-xs text-gray-500">
+                  URL de l'image ou utilisez le bouton d'upload
+                </p>
               </div>
               <button
-                @click="uploadMainImage"
                 type="button"
                 class="px-4 py-2 bg-amber-600 text-white text-sm rounded-md hover:bg-amber-700"
+                @click="uploadMainImage"
               >
                 Upload
               </button>
@@ -338,15 +368,15 @@
               <div class="flex items-center space-x-2">
                 <input
                   v-model="newGalleryUrl"
-                  @keydown.enter.prevent="addGalleryImage"
                   type="url"
                   placeholder="URL de l'image à ajouter..."
                   class="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
-                />
+                  @keydown.enter.prevent="addGalleryImage"
+                >
                 <button
-                  @click="addGalleryImage"
                   type="button"
                   class="px-3 py-2 bg-amber-600 text-white text-sm rounded-md hover:bg-amber-700"
+                  @click="addGalleryImage"
                 >
                   Ajouter
                 </button>
@@ -363,11 +393,11 @@
                   :src="url"
                   :alt="`Image ${index + 1}`"
                   class="w-full h-24 rounded-lg object-cover border border-gray-300"
-                />
+                >
                 <button
-                  @click="removeGalleryImage(index)"
                   type="button"
                   class="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                  @click="removeGalleryImage(index)"
                 >
                   <Icon name="heroicons:x-mark" class="w-3 h-3" />
                 </button>
@@ -381,7 +411,9 @@
       <div class="space-y-6">
         <!-- Product Preview -->
         <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-          <h3 class="text-lg font-semibold text-gray-900 mb-4">Aperçu du produit</h3>
+          <h3 class="text-lg font-semibold text-gray-900 mb-4">
+            Aperçu du produit
+          </h3>
 
           <div class="space-y-4">
             <div class="border border-gray-200 rounded-lg p-4">
@@ -391,7 +423,7 @@
                   :src="form.image_url"
                   :alt="form.name"
                   class="w-16 h-16 rounded-lg object-cover"
-                />
+                >
                 <div
                   v-else
                   class="w-16 h-16 rounded-lg bg-gray-200 flex items-center justify-center"
@@ -399,9 +431,15 @@
                   <Icon name="heroicons:photo" class="w-8 h-8 text-gray-400" />
                 </div>
                 <div>
-                  <h4 class="font-medium text-gray-900">{{ form.name || 'Nom du produit' }}</h4>
-                  <p class="text-sm text-gray-500">{{ form.category || 'Catégorie' }}</p>
-                  <p class="text-lg font-bold text-amber-600">{{ formatPrice(form.base_price) }}</p>
+                  <h4 class="font-medium text-gray-900">
+                    {{ form.name || 'Nom du produit' }}
+                  </h4>
+                  <p class="text-sm text-gray-500">
+                    {{ form.category || 'Catégorie' }}
+                  </p>
+                  <p class="text-lg font-bold text-amber-600">
+                    {{ formatPrice(form.base_price) }}
+                  </p>
                 </div>
               </div>
 
@@ -419,7 +457,9 @@
 
         <!-- Product Settings -->
         <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-          <h3 class="text-lg font-semibold text-gray-900 mb-4">Paramètres</h3>
+          <h3 class="text-lg font-semibold text-gray-900 mb-4">
+            Paramètres
+          </h3>
 
           <div class="space-y-4">
             <div class="flex items-center justify-between">
@@ -428,7 +468,7 @@
                 v-model="form.is_active"
                 type="checkbox"
                 class="rounded border-gray-300 text-amber-600 focus:ring-amber-500"
-              />
+              >
             </div>
 
             <div class="flex items-center justify-between">
@@ -439,7 +479,9 @@
             </div>
 
             <div class="border-t pt-4">
-              <div class="text-sm text-gray-600 mb-2">Couleurs disponibles</div>
+              <div class="text-sm text-gray-600 mb-2">
+                Couleurs disponibles
+              </div>
               <div class="flex flex-wrap gap-1">
                 <span
                   v-for="color in form.colors"
@@ -453,7 +495,9 @@
             </div>
 
             <div class="border-t pt-4">
-              <div class="text-sm text-gray-600 mb-2">Tailles disponibles</div>
+              <div class="text-sm text-gray-600 mb-2">
+                Tailles disponibles
+              </div>
               <div class="flex flex-wrap gap-1">
                 <span
                   v-for="size in form.sizes"
@@ -472,18 +516,18 @@
         <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
           <div class="space-y-4">
             <button
-              @click="handleSubmit"
               :disabled="isSubmitting || !isFormValid"
               class="w-full px-4 py-2 bg-amber-600 text-white text-sm font-medium rounded-lg hover:bg-amber-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 disabled:opacity-50"
+              @click="handleSubmit"
             >
               <Icon v-if="isSubmitting" name="heroicons:arrow-path" class="w-4 h-4 mr-2 animate-spin" />
               {{ isNew ? 'Créer le produit' : 'Sauvegarder' }}
             </button>
 
             <button
-              @click="saveDraft"
               :disabled="isSubmitting"
               class="w-full px-4 py-2 border border-amber-300 text-amber-700 text-sm font-medium rounded-lg hover:bg-amber-50 disabled:opacity-50"
+              @click="saveDraft"
             >
               Sauvegarder comme brouillon
             </button>
@@ -514,6 +558,21 @@ const isNew = computed(() => {
 useHead({
   title: computed(() => isNew.value ? 'Nouveau Produit | Admin' : 'Modifier Produit | Admin')
 })
+
+// Nouvelle solution Pinia + Event Bus
+const {
+  findById: findProductById,
+  updateProduct: updateProductAction,
+  createProduct: createProductAction,
+  deleteProduct: deleteProductAction
+} = useProducts()
+
+// Event Bus pour notifications
+const { emitProductUpdated, emitProductCreated, emitProductDeleted } = useProductsEventBus()
+
+// Notifications
+// Auto-imported via Nuxt 3: globalNotifications
+const { crudSuccess, crudError } = globalNotifications
 
 // Reactive data
 const isSubmitting = ref(false)
@@ -572,33 +631,50 @@ async function fetchProduct() {
   if (!id || id === 'new') return
 
   try {
+    // Essayer de récupérer depuis le store Pinia d'abord
+    const cachedProduct = findProductById(id)
+
+    if (cachedProduct) {
+      // Utiliser les données en cache
+      mapProductToForm(cachedProduct)
+      return
+    }
+
+    // Sinon, faire un appel direct à l'API
     const response = await $fetch(`/api/products/${id}`)
     const data = response.data
+    mapProductToForm(data)
 
-    // Map response to form
-    Object.assign(form, {
-      name: data.name,
-      description: data.description || '',
-      category: data.category,
-      subcategory: data.subcategory || '',
-      base_price: data.basePrice,
-      min_quantity: data.minQuantity,
-      max_quantity: data.maxQuantity,
-      unit: data.unit,
-      production_time_days: data.productionTimeDays,
-      customizable: data.customizable,
-      materials: data.materials || '',
-      colors: data.colors || [],
-      sizes: data.sizes || [],
-      image_url: data.image || '',
-      gallery_urls: data.galleryUrls || [],
-      specifications: data.specifications || '',
-      is_active: data.isActive
-    })
   } catch (error) {
     console.error('Error fetching product:', error)
+    crudError.read('product', `Erreur lors du chargement du produit "${id}"`)
     await router.push('/admin/products')
   }
+}
+
+function mapProductToForm(data: any) {
+  // Map response to form - corriger le mapping des champs API vers form
+  const mappedPrice = data.basePrice || data.base_price || data.price || 0
+
+  Object.assign(form, {
+    name: data.name,
+    description: data.description || '',
+    category: data.categoryDetails?.name || data.category,
+    subcategory: data.subcategory || '',
+    base_price: mappedPrice, // API: basePrice → form: base_price
+    min_quantity: data.minQuantity || data.min_quantity, // API: minQuantity → form: min_quantity
+    max_quantity: data.maxQuantity || data.max_quantity, // API: maxQuantity → form: max_quantity
+    unit: data.unit || 'pièce',
+    production_time_days: data.productionTimeDays || data.production_time_days || 7, // API: productionTimeDays → form: production_time_days
+    customizable: data.customizable || false,
+    materials: data.materials || '',
+    colors: data.colors || [],
+    sizes: data.sizes || [],
+    image_url: data.image || data.image_url || '', // API: image → form: image_url
+    gallery_urls: data.galleryUrls || data.gallery_urls || [], // API: galleryUrls → form: gallery_urls
+    specifications: data.specifications || '',
+    is_active: data.isActive ?? data.is_active ?? true // API: isActive → form: is_active
+  })
 }
 
 async function fetchCategories() {
@@ -648,9 +724,46 @@ function removeGalleryImage(index: number) {
   form.gallery_urls.splice(index, 1)
 }
 
-function uploadMainImage() {
-  // TODO: Implement Cloudinary upload
-  console.log('Upload main image')
+async function uploadMainImage() {
+  const fileInput = document.createElement('input')
+  fileInput.type = 'file'
+  fileInput.accept = 'image/jpeg,image/png,image/webp,image/svg+xml'
+
+  fileInput.onchange = async (e: Event) => {
+    const target = e.target as HTMLInputElement
+    const file = target.files?.[0]
+
+    if (!file) return
+
+    try {
+      isSubmitting.value = true
+
+      // Prepare form data
+      const formData = new FormData()
+      formData.append('file', file)
+      formData.append('folder', 'ns2po-election')
+      formData.append('preset', 'product')
+
+      // Upload to Cloudinary
+      const response = await $fetch('/api/cloudinary/upload', {
+        method: 'POST',
+        body: formData
+      })
+
+      if (response.success && response.data) {
+        // Update main image URL
+        form.image_url = response.data.secure_url
+        crudSuccess.updated('Image principale mise à jour avec succès')
+      }
+    } catch (error) {
+      console.error('Error uploading image:', error)
+      crudError.validation('Erreur lors de l\'upload de l\'image')
+    } finally {
+      isSubmitting.value = false
+    }
+  }
+
+  fileInput.click()
 }
 
 function validateForm(): boolean {
@@ -666,24 +779,30 @@ async function handleSubmit() {
 
   isSubmitting.value = true
   try {
-    const url = isNew.value ? '/api/products' : `/api/products/${productId.value}`
-    const method = isNew.value ? 'POST' : 'PUT'
-
     const productData = {
       ...form
     }
 
-    const response = await $fetch(url, {
-      method,
-      body: productData
-    })
-
-    if (response.success) {
+    if (isNew.value) {
+      // Création d'un nouveau produit via le composable
+      const newProduct = await createProductAction(productData)
+      crudSuccess.created(`Produit "${newProduct.name}" créé avec succès`, 'product')
       await router.push('/admin/products')
+    } else {
+      // Mise à jour d'un produit existant via le composable
+      const updatedProduct = await updateProductAction(productId.value, productData)
+      crudSuccess.updated(`Produit "${updatedProduct.name}" mis à jour`)
+      // Rester sur la page de modification pour continuer l'édition
+      // Le store et Event Bus gèrent automatiquement la synchronisation avec la liste
     }
+
   } catch (error) {
     console.error('Error saving product:', error)
-    // TODO: Show error toast
+    if (isNew.value) {
+      crudError.created('product', `Erreur lors de la création du produit "${form.name}"`)
+    } else {
+      crudError.updated(`Erreur lors de la mise à jour du produit "${form.name}"`)
+    }
   } finally {
     isSubmitting.value = false
   }
@@ -707,17 +826,16 @@ async function deleteProduct() {
   if (!confirm(`Êtes-vous sûr de vouloir supprimer le produit "${form.name}" ?`)) return
 
   try {
-    await $fetch(`/api/products/${productId.value}`, {
-      method: 'DELETE'
-    })
-
+    // Utilise la nouvelle action du composable qui gère Event Bus automatiquement
+    await deleteProductAction(productId.value)
+    crudSuccess.deleted(`Produit "${form.name}" supprimé avec succès`, 'product')
     await router.push('/admin/products')
   } catch (error) {
     console.error('Error deleting product:', error)
     if (error.statusCode === 409) {
-      alert('Impossible de supprimer ce produit car il est utilisé dans des bundles.')
+      crudError.deleted('product', 'Impossible de supprimer ce produit car il est utilisé dans des bundles.')
     } else {
-      // TODO: Show error toast
+      crudError.deleted('product', `Erreur lors de la suppression du produit "${form.name}"`)
     }
   }
 }

@@ -4,8 +4,12 @@
     <div class="mb-8">
       <div class="flex items-center justify-between">
         <div>
-          <h1 class="text-2xl font-bold text-gray-900">Gestion des Réalisations</h1>
-          <p class="text-gray-600">Gérez vos réalisations avec Turso + Cloudinary Auto-Discovery</p>
+          <h1 class="text-2xl font-bold text-gray-900">
+            Gestion des Réalisations
+          </h1>
+          <p class="text-gray-600">
+            Gérez vos réalisations avec Turso + Cloudinary Auto-Discovery
+          </p>
 
           <!-- Légende des sources -->
           <div class="mt-3 flex items-center space-x-4 text-sm">
@@ -26,16 +30,16 @@
         </div>
         <div class="flex items-center space-x-3">
           <button
-            @click="refreshRealisations"
             :disabled="loading"
             class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 disabled:opacity-50"
+            @click="refreshRealisations"
           >
             <Icon name="heroicons:arrow-path" class="w-4 h-4 mr-2" :class="{ 'animate-spin': loading }" />
             Synchroniser
           </button>
           <button
-            @click="openCreateModal"
             class="inline-flex items-center px-4 py-2 bg-amber-600 text-white text-sm font-medium rounded-lg hover:bg-amber-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500"
+            @click="openCreateModal"
           >
             <Icon name="heroicons:plus" class="w-4 h-4 mr-2" />
             Nouvelle Réalisation
@@ -53,8 +57,12 @@
             <Icon name="heroicons:document-text" class="h-6 w-6 text-gray-600" />
           </div>
           <div class="ml-3">
-            <p class="text-sm font-medium text-gray-500">Total</p>
-            <p class="text-lg font-semibold text-gray-900">{{ stats.total }}</p>
+            <p class="text-sm font-medium text-gray-500">
+              Total
+            </p>
+            <p class="text-lg font-semibold text-gray-900">
+              {{ stats.total }}
+            </p>
           </div>
         </div>
       </div>
@@ -66,8 +74,12 @@
             <Icon name="heroicons:circle-stack" class="h-6 w-6 text-blue-600" />
           </div>
           <div class="ml-3">
-            <p class="text-sm font-medium text-gray-500">Turso</p>
-            <p class="text-lg font-semibold text-blue-900">{{ stats.turso }}</p>
+            <p class="text-sm font-medium text-gray-500">
+              Turso
+            </p>
+            <p class="text-lg font-semibold text-blue-900">
+              {{ stats.turso }}
+            </p>
           </div>
         </div>
       </div>
@@ -79,8 +91,12 @@
             <Icon name="heroicons:cloud" class="h-6 w-6 text-green-600" />
           </div>
           <div class="ml-3">
-            <p class="text-sm font-medium text-gray-500">Auto-discovery</p>
-            <p class="text-lg font-semibold text-green-900">{{ stats.autodiscovery }}</p>
+            <p class="text-sm font-medium text-gray-500">
+              Auto-discovery
+            </p>
+            <p class="text-lg font-semibold text-green-900">
+              {{ stats.autodiscovery }}
+            </p>
           </div>
         </div>
       </div>
@@ -92,8 +108,12 @@
             <Icon name="heroicons:star" class="h-6 w-6 text-amber-600" />
           </div>
           <div class="ml-3">
-            <p class="text-sm font-medium text-gray-500">En vedette</p>
-            <p class="text-lg font-semibold text-amber-900">{{ stats.featured }}</p>
+            <p class="text-sm font-medium text-gray-500">
+              En vedette
+            </p>
+            <p class="text-lg font-semibold text-amber-900">
+              {{ stats.featured }}
+            </p>
           </div>
         </div>
       </div>
@@ -111,7 +131,7 @@
               type="text"
               placeholder="Titre, tags..."
               class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
-            />
+            >
             <Icon name="heroicons:magnifying-glass" class="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
           </div>
         </div>
@@ -123,10 +143,18 @@
             v-model="filters.source"
             class="block w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
           >
-            <option value="">Toutes les sources</option>
-            <option value="turso">Turso</option>
-            <option value="cloudinary-auto-discovery">Auto-Discovery</option>
-            <option value="airtable">Airtable</option>
+            <option value="">
+              Toutes les sources
+            </option>
+            <option value="turso">
+              Turso
+            </option>
+            <option value="cloudinary-auto-discovery">
+              Auto-Discovery
+            </option>
+            <option value="airtable">
+              Airtable
+            </option>
           </select>
         </div>
 
@@ -137,10 +165,18 @@
             v-model="filters.status"
             class="block w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
           >
-            <option value="">Tous les statuts</option>
-            <option value="active">Actives</option>
-            <option value="inactive">Inactives</option>
-            <option value="featured">En vedette</option>
+            <option value="">
+              Tous les statuts
+            </option>
+            <option value="active">
+              Actives
+            </option>
+            <option value="inactive">
+              Inactives
+            </option>
+            <option value="featured">
+              En vedette
+            </option>
           </select>
         </div>
 
@@ -151,10 +187,18 @@
             v-model="filters.sort"
             class="block w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
           >
-            <option value="order">Ordre</option>
-            <option value="title">Titre</option>
-            <option value="created">Date création</option>
-            <option value="updated">Dernière modification</option>
+            <option value="order">
+              Ordre
+            </option>
+            <option value="title">
+              Titre
+            </option>
+            <option value="created">
+              Date création
+            </option>
+            <option value="updated">
+              Dernière modification
+            </option>
           </select>
         </div>
       </div>
@@ -173,8 +217,8 @@
         </div>
         <div class="flex items-center gap-2">
           <button
-            @click="toggleViewMode"
             class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+            @click="toggleViewMode"
           >
             <Icon :name="viewMode === 'grid' ? 'heroicons:list-bullet' : 'heroicons:squares-2x2'" class="w-4 h-4 mr-2" />
             {{ viewMode === 'grid' ? 'Liste' : 'Grille' }}
@@ -188,16 +232,20 @@
       <!-- Loading State -->
       <div v-if="loading" class="p-8 text-center">
         <Icon name="heroicons:arrow-path" class="w-8 h-8 animate-spin mx-auto text-amber-600 mb-4" />
-        <p class="text-gray-600">Chargement des réalisations...</p>
+        <p class="text-gray-600">
+          Chargement des réalisations...
+        </p>
       </div>
 
       <!-- Error State -->
       <div v-else-if="error" class="p-8 text-center">
         <Icon name="heroicons:exclamation-triangle" class="w-8 h-8 mx-auto text-red-600 mb-4" />
-        <p class="text-red-600 mb-4">{{ error }}</p>
+        <p class="text-red-600 mb-4">
+          {{ error }}
+        </p>
         <button
-          @click="refreshRealisations"
           class="inline-flex items-center px-4 py-2 bg-amber-600 text-white text-sm font-medium rounded-lg hover:bg-amber-700"
+          @click="refreshRealisations"
         >
           Réessayer
         </button>
@@ -218,7 +266,7 @@
                   :src="getCloudinaryUrl(realisation.cloudinaryPublicIds[0])"
                   :alt="realisation.title"
                   class="w-full h-48 object-cover"
-                />
+                >
                 <div v-if="realisation.cloudinaryPublicIds.length > 1" class="absolute bottom-2 right-2 bg-black bg-opacity-60 text-white text-xs px-2 py-1 rounded">
                   +{{ realisation.cloudinaryPublicIds.length - 1 }}
                 </div>
@@ -248,8 +296,12 @@
 
             <!-- Content -->
             <div class="p-4">
-              <h3 class="text-sm font-medium text-gray-900 mb-1 truncate">{{ realisation.title }}</h3>
-              <p v-if="realisation.description" class="text-xs text-gray-500 mb-2 line-clamp-2">{{ realisation.description }}</p>
+              <h3 class="text-sm font-medium text-gray-900 mb-1 truncate">
+                {{ realisation.title }}
+              </h3>
+              <p v-if="realisation.description" class="text-xs text-gray-500 mb-2 line-clamp-2">
+                {{ realisation.description }}
+              </p>
 
               <!-- Tags -->
               <div v-if="realisation.tags && realisation.tags.length > 0" class="mb-3">
@@ -282,30 +334,30 @@
                       'w-1.5 h-1.5 mr-1.5 rounded-full',
                       realisation.isActive ? 'bg-green-400' : 'bg-red-400'
                     ]"
-                  ></span>
+                  />
                   {{ realisation.isActive ? 'Active' : 'Inactive' }}
                 </span>
 
                 <!-- Actions -->
                 <div class="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
                   <button
-                    @click="openEditModal(realisation)"
                     class="text-amber-600 hover:text-amber-900 p-1 rounded hover:bg-amber-50"
                     title="Modifier"
+                    @click="openEditModal(realisation)"
                   >
                     <Icon name="heroicons:pencil" class="w-4 h-4" />
                   </button>
                   <button
-                    @click="duplicateRealisation(realisation)"
                     class="text-blue-600 hover:text-blue-900 p-1 rounded hover:bg-blue-50"
                     title="Dupliquer"
+                    @click="duplicateRealisation(realisation)"
                   >
                     <Icon name="heroicons:document-duplicate" class="w-4 h-4" />
                   </button>
                   <button
-                    @click="deleteRealisation(realisation)"
                     class="text-red-600 hover:text-red-900 p-1 rounded hover:bg-red-50"
                     title="Supprimer"
+                    @click="deleteRealisation(realisation)"
                   >
                     <Icon name="heroicons:trash" class="w-4 h-4" />
                   </button>
@@ -352,7 +404,7 @@
                       :src="getCloudinaryUrl(realisation.cloudinaryPublicIds[0], 'w_100,h_100,c_fill')"
                       :alt="realisation.title"
                       class="h-12 w-12 rounded-lg object-cover"
-                    />
+                    >
                     <div v-else class="h-12 w-12 rounded-lg bg-gray-200 flex items-center justify-center">
                       <Icon name="heroicons:photo" class="w-6 h-6 text-gray-400" />
                     </div>
@@ -407,7 +459,7 @@
                       'w-1.5 h-1.5 mr-1.5 rounded-full',
                       realisation.isActive ? 'bg-green-400' : 'bg-red-400'
                     ]"
-                  ></span>
+                  />
                   {{ realisation.isActive ? 'Active' : 'Inactive' }}
                 </span>
               </td>
@@ -429,23 +481,23 @@
               <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                 <div class="flex items-center justify-end space-x-2">
                   <button
-                    @click="openEditModal(realisation)"
                     class="text-amber-600 hover:text-amber-900 p-1 rounded hover:bg-amber-50"
                     title="Modifier"
+                    @click="openEditModal(realisation)"
                   >
                     <Icon name="heroicons:pencil" class="w-4 h-4" />
                   </button>
                   <button
-                    @click="duplicateRealisation(realisation)"
                     class="text-blue-600 hover:text-blue-900 p-1 rounded hover:bg-blue-50"
                     title="Dupliquer"
+                    @click="duplicateRealisation(realisation)"
                   >
                     <Icon name="heroicons:document-duplicate" class="w-4 h-4" />
                   </button>
                   <button
-                    @click="deleteRealisation(realisation)"
                     class="text-red-600 hover:text-red-900 p-1 rounded hover:bg-red-50"
                     title="Supprimer"
+                    @click="deleteRealisation(realisation)"
                   >
                     <Icon name="heroicons:trash" class="w-4 h-4" />
                   </button>
@@ -459,19 +511,23 @@
       <!-- Empty State -->
       <div v-else class="p-8 text-center">
         <Icon name="heroicons:photo" class="w-12 h-12 mx-auto text-gray-400 mb-4" />
-        <h3 class="text-lg font-medium text-gray-900 mb-2">Aucune réalisation trouvée</h3>
-        <p class="text-gray-500 mb-4">Commencez par créer votre première réalisation ou synchronisez avec Cloudinary.</p>
+        <h3 class="text-lg font-medium text-gray-900 mb-2">
+          Aucune réalisation trouvée
+        </h3>
+        <p class="text-gray-500 mb-4">
+          Commencez par créer votre première réalisation ou synchronisez avec Cloudinary.
+        </p>
         <div class="flex items-center justify-center space-x-3">
           <button
-            @click="openCreateModal"
             class="inline-flex items-center px-4 py-2 bg-amber-600 text-white text-sm font-medium rounded-lg hover:bg-amber-700"
+            @click="openCreateModal"
           >
             <Icon name="heroicons:plus" class="w-4 h-4 mr-2" />
             Créer une réalisation
           </button>
           <button
-            @click="refreshRealisations"
             class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50"
+            @click="refreshRealisations"
           >
             <Icon name="heroicons:arrow-path" class="w-4 h-4 mr-2" />
             Synchroniser
@@ -526,8 +582,8 @@
           </div>
           <div class="ml-4 flex-shrink-0 flex">
             <button
-              @click="notification.show = false"
               class="rounded-md inline-flex text-gray-400 hover:text-gray-500"
+              @click="notification.show = false"
             >
               <Icon name="heroicons:x-mark" class="h-5 w-5" />
             </button>
@@ -539,8 +595,8 @@
 </template>
 
 <script setup lang="ts">
-import RealisationFormModal from '~/components/admin/RealisationFormModal.vue'
-import AdminConfirmationModal from '~/components/admin/ConfirmationModal.vue'
+import RealisationFormModal from '../../../components/admin/RealisationFormModal.vue'
+import AdminConfirmationModal from '../../../components/admin/ConfirmationModal.vue'
 
 interface Realisation {
   id: string

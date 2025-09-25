@@ -1,7 +1,7 @@
 {
   "version": "3.0",
   "created": "2025-09-20T18:38:27.616Z",
-  "activeProject": "proj-1758400913404-2c1ac0fa",
+  "activeProject": "proj-1758599576196-9c4e56d4",
   "projects": [
     {
       "id": "bundles-crud-enhancement",
@@ -12,7 +12,41 @@
       "id": "proj-1758400913404-2c1ac0fa",
       "name": "CRUD Catégories /admin/categories",
       "path": "/Users/logansery/Documents/ns2po-w/.claude-task-master/projects/proj-1758400913404-2c1ac0fa"
+    },
+    {
+      "id": "proj-1758414306817-caf546ec",
+      "name": "CMS Data Sync Solution",
+      "path": "/Users/logansery/Documents/ns2po-w/.claude-task-master/projects/proj-1758414306817-caf546ec"
+    },
+    {
+      "id": "proj-1758426042145-29f5d07f",
+      "name": "CRUD Bundles Testing & Enhancement",
+      "path": "/Users/logansery/Documents/ns2po-w/.claude-task-master/projects/proj-1758426042145-29f5d07f"
+    },
+    {
+      "id": "proj-1758432287847-eeeb7ea9",
+      "name": "TypeScript Triage & Stabilisation NS2PO",
+      "path": "/Users/logansery/Documents/ns2po-w/.claude-task-master/projects/proj-1758432287847-eeeb7ea9"
+    },
+    {
+      "id": "proj-1758479644808-8a6bce63",
+      "name": "Fix Bundle Interface UX Critical Issues",
+      "path": "/Users/logansery/Documents/ns2po-w/.claude-task-master/projects/proj-1758479644808-8a6bce63"
+    },
+    {
+      "id": "proj-1758481738487-ab45c4e3",
+      "name": "Refonte Architecture SOLID - Product Management",
+      "path": "/Users/logansery/Documents/ns2po-w/.claude-task-master/projects/proj-1758481738487-ab45c4e3"
+    },
+    {
+      "id": "proj-1758582138371-1bb91b71",
+      "path": "/Users/logansery/Documents/ns2po-w/.claude-task-master/projects/proj-1758582138371-1bb91b71"
+    },
+    {
+      "id": "proj-1758599576196-9c4e56d4",
+      "name": "Bundle Validation Architecture Fix",
+      "path": "/Users/logansery/Documents/ns2po-w/.claude-task-master/projects/proj-1758599576196-9c4e56d4"
     }
   ],
-  "updated": "2025-09-20T20:41:53.419Z"
+  "updated": "2025-09-23T03:52:56.200Z"
 }

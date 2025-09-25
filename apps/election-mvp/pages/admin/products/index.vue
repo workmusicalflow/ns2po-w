@@ -4,8 +4,12 @@
     <div class="mb-8">
       <div class="flex items-center justify-between">
         <div>
-          <h1 class="text-2xl font-bold text-gray-900">Gestion des Produits</h1>
-          <p class="text-gray-600">Gérez votre catalogue de produits électoraux</p>
+          <h1 class="text-2xl font-bold text-gray-900">
+            Gestion des Produits
+          </h1>
+          <p class="text-gray-600">
+            Gérez votre catalogue de produits électoraux
+          </p>
         </div>
         <NuxtLink
           to="/admin/products/new"
@@ -25,12 +29,11 @@
           <label class="block text-sm font-medium text-gray-700 mb-2">Recherche</label>
           <div class="relative">
             <input
-              v-model="searchQuery"
+              v-model="filters.search"
               type="text"
               placeholder="Nom, référence..."
               class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
-              @input="handleSearchInput"
-            />
+            >
             <Icon name="heroicons:magnifying-glass" class="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
           </div>
         </div>
@@ -39,12 +42,13 @@
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-2">Catégorie</label>
           <select
-            v-model="selectedCategory"
+            v-model="filters.category"
             class="block w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
-            @change="applyFilters"
           >
-            <option value="">Toutes les catégories</option>
-            <option v-for="category in categories.data" :key="category.id" :value="category.id">
+            <option value="">
+              Toutes les catégories
+            </option>
+            <option v-for="category in categories" :key="category.id" :value="category.id">
               {{ category.name }}
             </option>
           </select>
@@ -54,29 +58,36 @@
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-2">Statut</label>
           <select
-            v-model="selectedStatus"
+            v-model="filters.status"
             class="block w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
-            @change="applyFilters"
           >
-            <option value="">Tous les statuts</option>
-            <option value="active">Actif</option>
-            <option value="inactive">Inactif</option>
-            <option value="draft">Brouillon</option>
+            <option value="">
+              Tous les statuts
+            </option>
+            <option value="active">
+              Actif
+            </option>
+            <option value="inactive">
+              Inactif
+            </option>
+            <option value="draft">
+              Brouillon
+            </option>
           </select>
         </div>
 
         <!-- Actions -->
         <div class="flex items-end space-x-2">
           <button
-            @click="resetFilters"
             class="px-4 py-2 text-sm text-gray-600 bg-gray-100 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500"
+            @click="resetFilters"
           >
             Réinitialiser
           </button>
           <button
-            @click="exportProducts"
             class="px-4 py-2 text-sm text-amber-600 bg-amber-50 rounded-md hover:bg-amber-100 focus:outline-none focus:ring-2 focus:ring-amber-500"
             :disabled="isLoading"
+            @click="exportProducts"
           >
             Exporter
           </button>
@@ -84,91 +95,50 @@
       </div>
     </div>
 
-    <!-- Loading State -->
-    <div v-if="isInitialLoading" class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-      <div class="animate-pulse space-y-4">
-        <div class="flex items-center justify-between">
-          <div class="h-4 bg-gray-200 rounded w-1/4"></div>
-          <div class="h-8 bg-gray-200 rounded w-32"></div>
-        </div>
-        <div class="space-y-3">
-          <div v-for="i in 5" :key="i" class="h-12 bg-gray-200 rounded"></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Error State -->
-    <div v-else-if="error || searchError" class="bg-red-50 border border-red-200 rounded-lg p-6 mb-6">
-      <div class="flex">
-        <Icon name="heroicons:exclamation-triangle" class="h-5 w-5 text-red-400" />
-        <div class="ml-3">
-          <h3 class="text-sm font-medium text-red-800">Erreur de chargement</h3>
-          <div class="mt-2 text-sm text-red-700">
-            <p>{{ error?.message || searchError?.message || 'Une erreur est survenue' }}</p>
-          </div>
-          <div class="mt-4">
-            <button
-              @click="refetch"
-              class="bg-red-100 px-3 py-2 rounded-md text-sm font-medium text-red-800 hover:bg-red-200"
-            >
-              Réessayer
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Data Table -->
+    <!-- Products Table -->
     <AdminDataTable
-      v-else
-      :data="displayedProducts"
+      :data="filteredProducts"
       :columns="columns"
-      :is-loading="isRefreshing"
-      :has-initial-data="!isLoading && displayedProducts.length > 0"
-      :search-key="'name'"
-      :search-value="searchQuery"
-      title="Produits"
-      description="Liste de tous les produits disponibles"
-      empty-title="Aucun produit trouvé"
-      empty-description="Commencez par créer votre premier produit."
-      :get-row-key="(item) => item.id"
+      :loading="isLoading"
+      :error="error"
     >
-      <!-- Custom slot for product image -->
+      <!-- Custom slot for image -->
       <template #cell-image="{ item }">
-        <div class="w-12 h-12 rounded-lg bg-gray-100 overflow-hidden">
+        <div class="w-12 h-12 rounded-lg overflow-hidden bg-gray-100">
           <AdvancedResponsiveImage
-            v-if="item.image_url"
-            :src="item.image_url"
+            v-if="item.image"
+            :src="item.image"
             :alt="item.name"
-            :width="48"
-            :height="48"
             class="w-full h-full object-cover"
-            preset="productCard"
           />
-          <div v-else class="w-full h-full flex items-center justify-center">
-            <Icon name="heroicons:photo" class="w-6 h-6 text-gray-400" />
+          <div v-else class="w-full h-full flex items-center justify-center text-gray-400">
+            <Icon name="heroicons:photo" class="w-6 h-6" />
           </div>
-        </div>
-      </template>
-
-      <!-- Custom slot for product name -->
-      <template #cell-name="{ item }">
-        <div>
-          <div class="font-medium text-gray-900">{{ item.name }}</div>
-          <div v-if="item.reference" class="text-sm text-gray-500">{{ item.reference }}</div>
         </div>
       </template>
 
       <!-- Custom slot for price -->
       <template #cell-price="{ item }">
-        <div class="text-right">
-          <div class="font-medium text-gray-900">
-            {{ formatPrice(item.price || item.basePrice || 0) }}
-          </div>
-          <div v-if="item.basePrice && item.price !== item.basePrice" class="text-sm text-gray-500 line-through">
-            {{ formatPrice(item.basePrice) }}
-          </div>
-        </div>
+        <span class="font-medium text-gray-900">
+          {{ formatPrice(item.price || item.basePrice) }}
+        </span>
+      </template>
+
+      <!-- Custom slot for category -->
+      <template #cell-category="{ item }">
+        <span class="text-gray-900">
+          {{ item.categoryDetails?.name || item.category || 'Non catégorisé' }}
+        </span>
+      </template>
+
+      <!-- Custom slot for bundles usage -->
+      <template #cell-bundles="{ item }">
+        <span
+          class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+          :class="getBundleUsageBadgeWrapper(item.id).class"
+        >
+          {{ getBundleUsageBadgeWrapper(item.id).text }}
+        </span>
       </template>
 
       <!-- Custom slot for status -->
@@ -178,8 +148,8 @@
         </StatusBadge>
       </template>
 
-      <!-- Custom slot for actions -->
-      <template #cell-actions="{ item }">
+      <!-- Actions slot -->
+      <template #actions="{ item }">
         <div class="flex items-center space-x-2">
           <NuxtLink
             :to="`/admin/products/${item.id}`"
@@ -187,35 +157,68 @@
           >
             Modifier
           </NuxtLink>
+
+          <!-- Bouton "Voir bundles" si le produit est utilisé -->
           <button
-            @click="handleDeleteProduct(item)"
-            class="text-red-600 hover:text-red-900 text-sm font-medium"
-            :disabled="deleteProductMutation.isPending.value"
+            v-if="!getBundleUsageBadgeWrapper(item.id).canDelete"
+            class="text-blue-600 hover:text-blue-900 text-sm font-medium"
+            @click="viewProductBundles(item)"
           >
-            {{ deleteProductMutation.isPending.value ? 'Suppression...' : 'Supprimer' }}
+            Voir bundles
+          </button>
+
+          <!-- Bouton Supprimer avec état conditionnel -->
+          <button
+            :class="[
+              'text-sm font-medium',
+              getBundleUsageBadgeWrapper(item.id).canDelete
+                ? 'text-red-600 hover:text-red-900'
+                : 'text-gray-400 cursor-not-allowed'
+            ]"
+            disabled
+            :title="!getBundleUsageBadgeWrapper(item.id).canDelete ? 'Produit utilisé dans des bundles' : ''"
+            @click="getBundleUsageBadgeWrapper(item.id).canDelete ? handleDeleteProduct(item) : null"
+          >
+            Supprimer (bientôt)
           </button>
         </div>
       </template>
     </AdminDataTable>
 
     <!-- Stats Summary -->
-    <div v-if="!isLoading && data" class="mt-6 bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+    <div v-if="!isLoading && filteredProducts" class="mt-6 bg-white p-4 rounded-lg shadow-sm border border-gray-200">
       <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
         <div>
-          <div class="text-2xl font-bold text-gray-900">{{ totalProducts }}</div>
-          <div class="text-sm text-gray-500">Produits total</div>
+          <div class="text-2xl font-bold text-gray-900">
+            {{ totalProducts }}
+          </div>
+          <div class="text-sm text-gray-500">
+            Produits total
+          </div>
         </div>
         <div>
-          <div class="text-2xl font-bold text-green-600">{{ activeProductsCount }}</div>
-          <div class="text-sm text-gray-500">Produits actifs</div>
+          <div class="text-2xl font-bold text-green-600">
+            {{ activeProductsCount }}
+          </div>
+          <div class="text-sm text-gray-500">
+            Produits actifs
+          </div>
         </div>
         <div>
-          <div class="text-2xl font-bold text-amber-600">{{ Math.round(averagePrice).toLocaleString() }} XOF</div>
-          <div class="text-sm text-gray-500">Prix moyen</div>
+          <div class="text-2xl font-bold text-amber-600">
+            {{ Math.round(averagePrice).toLocaleString() }} XOF
+          </div>
+          <div class="text-sm text-gray-500">
+            Prix moyen
+          </div>
         </div>
         <div>
-          <div class="text-2xl font-bold text-blue-600">{{ categories.data?.length || 0 }}</div>
-          <div class="text-sm text-gray-500">Catégories</div>
+          <div class="text-2xl font-bold text-blue-600">
+            {{ categories?.length || 0 }}
+          </div>
+          <div class="text-sm text-gray-500">
+            Catégories
+          </div>
         </div>
       </div>
     </div>
@@ -224,18 +227,21 @@
 
 <script setup lang="ts">
 /**
- * Admin Products List Page - SOLID Architecture
- * Uses VueQuery + Pinia for optimal state management and caching
+ * Admin Products List Page - REFACTORED
+ * SOLID Architecture - Cohérent avec l'interface Bundles
+ * Vue Query exclusif - Pas de cache manuel ni événements globaux
  */
 
 import AdminDataTable from '../../../components/admin/AdminDataTable.vue'
 import { StatusBadge } from '@ns2po/ui'
 import AdvancedResponsiveImage from '../../../components/AdvancedResponsiveImage.vue'
 
-// SOLID Architecture imports
-import { useProductsQuery, useProductSearchQuery, useDeleteProductMutation } from '../../../composables/useProductsQuery'
-import { useProductStore } from '../../../stores/useProductStore'
-import { initializeGlobalEventBus, useGlobalEventBus } from '../../../stores/useGlobalEventBus'
+// SOLID Architecture imports - Vue Query exclusif
+import { useProductsQuery, useProductSearchQuery } from '../../../composables/useProductsQuery'
+import { useCategoriesQuery } from '../../../composables/useCategoriesQuery'
+import { useMultipleProductBundleInfoQuery, useProductBundleUsageBadge, useProductBundleActions } from '../../../composables/useProductBundlesQuery'
+import { useCreateProductMutation, useUpdateProductMutation, useDeleteProductMutation } from '../../../composables/useProductMutations'
+import { globalNotifications } from '../../../composables/useNotifications'
 import { refDebounced } from '@vueuse/core'
 import type { Product, ProductFilters, ProductStatus } from '../../../types/domain/Product'
 
@@ -249,37 +255,37 @@ useHead({
   title: 'Produits | Admin'
 })
 
-// Initialize global event bus for store synchronization
-initializeGlobalEventBus()
-
-// Auto-imported via Nuxt 3: globalNotifications, useLazyAsyncData
+// Global notifications - Pattern Bundles
 const { crudSuccess, crudError } = globalNotifications
 
-// ===== REACTIVE STATE =====
-const searchQuery = ref('')
-const selectedCategory = ref('')
-const selectedStatus = ref('')
-const debouncedSearch = refDebounced(searchQuery, 300)
-
-// ===== COMPUTED FILTERS =====
-const currentFilters = computed((): ProductFilters => {
-  const filters: ProductFilters = {}
-
-  if (selectedCategory.value) {
-    filters.category = selectedCategory.value
-  }
-
-  if (selectedStatus.value) {
-    filters.status = selectedStatus.value as ProductStatus
-  }
-
-  return filters
+// ===== FILTERS - Simple et cohérent avec Bundles =====
+const filters = reactive({
+  search: '',
+  category: '',
+  status: ''
 })
 
-// ===== VUE QUERY INTEGRATION =====
-// Main products query with intelligent caching
+const debouncedSearch = refDebounced(computed(() => filters.search), 300)
+
+// ===== COMPUTED FILTERS - Simplifié =====
+const currentFilters = computed((): ProductFilters => {
+  const result: ProductFilters = {}
+
+  if (filters.category) {
+    result.category = filters.category
+  }
+
+  if (filters.status) {
+    result.status = filters.status as ProductStatus
+  }
+
+  return result
+})
+
+// ===== VUE QUERY INTEGRATION - Exclusif et cohérent =====
+// Main products query
 const {
-  data,
+  data: products,
   error,
   isLoading,
   isFetching,
@@ -295,58 +301,50 @@ const {
   enabled: computed(() => debouncedSearch.value.length >= 2)
 })
 
-// Categories query (could be moved to separate composable)
-const { data: categoriesData } = await useLazyAsyncData(
-  'categories',
-  () => $fetch('/api/categories'),
-  { default: () => ({ data: [] }) }
-)
+// Categories query - Vue Query cohérent
+const { data: categories } = useCategoriesQuery()
 
-const categories = computed(() => categoriesData.value || { data: [] })
+// ===== MUTATIONS CRUD - Vue Query intégré =====
+const createProductMutation = useCreateProductMutation()
+const updateProductMutation = useUpdateProductMutation()
+const deleteProductMutation = useDeleteProductMutation()
 
-// Delete mutation with optimistic updates
-const deleteProductMutation = useDeleteProductMutation({
-  onSuccess: (success, productId) => {
-    if (success) {
-      crudSuccess.deleted('Produit', 'product')
-    }
-  },
-  onError: (error) => {
-    crudError.deleted('product', error.message)
-  }
-})
-
-// ===== PINIA STORE INTEGRATION =====
-const productStore = useProductStore()
-
-// ===== COMPUTED PROPERTIES =====
-const displayedProducts = computed(() => {
+// ===== COMPUTED PROPERTIES - Simples et claires =====
+const filteredProducts = computed(() => {
   // Use search results if searching, otherwise use main query
   if (debouncedSearch.value.length >= 2) {
     return searchResults.value || []
   }
-  return data.value || []
+  return products.value || []
 })
 
-const isInitialLoading = computed(() =>
-  isLoading.value && !data.value
-)
+// Bundle management - Vue Query cohérent
+const productIds = computed(() => filteredProducts.value.map(p => p.id))
+const bundleQueries = useMultipleProductBundleInfoQuery(productIds)
+const { getBundleUsageBadge } = useProductBundleUsageBadge()
+const { viewProductBundles } = useProductBundleActions()
 
-const isRefreshing = computed(() =>
-  isFetching.value || isSearching.value
-)
+// Helper pour obtenir le badge bundle d'un produit spécifique
+const getBundleUsageBadgeForProduct = (productId: string) => {
+  // Les queries sont dans le même ordre que les productIds
+  const index = productIds.value.indexOf(productId)
+  if (index !== -1 && bundleQueries.value[index]) {
+    return getBundleUsageBadge(bundleQueries.value[index].data)
+  }
+  return getBundleUsageBadge(undefined)
+}
 
-const totalProducts = computed(() =>
-  productStore.totalProducts
-)
-
+// Stats computées simples
+const totalProducts = computed(() => filteredProducts.value.length)
 const activeProductsCount = computed(() =>
-  productStore.activeProductsCount
+  filteredProducts.value.filter(p => p.isActive || p.status === 'active').length
 )
-
-const averagePrice = computed(() =>
-  productStore.averagePrice
-)
+const averagePrice = computed(() => {
+  const prods = filteredProducts.value
+  if (prods.length === 0) return 0
+  const total = prods.reduce((sum, p) => sum + (p.price || p.basePrice || 0), 0)
+  return total / prods.length
+})
 
 // ===== TABLE CONFIGURATION =====
 const columns = [
@@ -373,6 +371,12 @@ const columns = [
     sortable: true
   },
   {
+    key: 'bundles',
+    label: 'Utilisé dans',
+    sortable: false,
+    class: 'w-32'
+  },
+  {
     key: 'status',
     label: 'Statut',
     sortable: true
@@ -381,34 +385,20 @@ const columns = [
     key: 'actions',
     label: 'Actions',
     sortable: false,
-    class: 'w-32'
+    class: 'w-40'
   }
 ]
 
-// ===== METHODS =====
-function handleSearchInput() {
-  // Apply filters will be triggered by computed property reactivity
-}
-
-function applyFilters() {
-  // Filters are applied automatically via computed properties
-  // Force refetch if needed
-  if (!debouncedSearch.value) {
-    refetch()
-  }
-}
-
+// ===== METHODS - Simples et focalisées =====
 function resetFilters() {
-  searchQuery.value = ''
-  selectedCategory.value = ''
-  selectedStatus.value = ''
-  refetch()
+  filters.search = ''
+  filters.category = ''
+  filters.status = ''
 }
 
 async function exportProducts() {
   try {
-    // Use current filtered products for export
-    const productsToExport = displayedProducts.value
+    const productsToExport = filteredProducts.value
 
     if (productsToExport.length === 0) {
       crudError.validation('Aucun produit à exporter')
@@ -423,8 +413,8 @@ async function exportProducts() {
         `"${product.name}"`,
         `"${product.reference || ''}"`,
         product.price || product.basePrice || 0,
-        `"${product.category || ''}"`,
-        `"${getProductStatus(product)}"`
+        `"${product.categoryDetails?.name || product.category || ''}"`,
+        `"${getProductStatusLabel(product)}"`
       ].join(','))
     ].join('\n')
 
@@ -437,22 +427,26 @@ async function exportProducts() {
     link.click()
     window.URL.revokeObjectURL(url)
 
-    crudSuccess.created('Export CSV', 'export')
+    crudSuccess.created('Export CSV généré avec succès', 'export')
   } catch (error) {
     crudError.created('export', 'Erreur lors de l\'export')
   }
 }
 
 async function handleDeleteProduct(product: Product) {
-  if (!confirm(`Êtes-vous sûr de vouloir supprimer le produit "${product.name}" ?`)) {
-    return
-  }
+  if (!confirm(`Êtes-vous sûr de vouloir supprimer le produit "${product.name}" ?`)) return
 
-  deleteProductMutation.mutate(product.id)
+  try {
+    await deleteProductMutation.mutateAsync(product.id)
+    crudSuccess.deleted(`Produit "${product.name}" supprimé avec succès`, 'product')
+  } catch (error) {
+    console.error('Error deleting product:', error)
+    crudError.deleted('product', `Erreur lors de la suppression du produit "${product.name}"`)
+  }
 }
 
+// ===== HELPER FUNCTIONS - Pures et focalisées =====
 function getProductStatus(product: Product): 'success' | 'warning' | 'error' | 'info' | 'neutral' {
-  // Mapping des statuts produit vers les statuts StatusBadge
   if (product.status) {
     switch (product.status) {
       case 'active': return 'success'
@@ -468,7 +462,6 @@ function getProductStatus(product: Product): 'success' | 'warning' | 'error' | '
 }
 
 function getProductStatusLabel(product: Product): string {
-  // Mapping des statuts produit vers les labels affichés
   if (product.status) {
     switch (product.status) {
       case 'active': return 'Actif'
@@ -483,37 +476,33 @@ function getProductStatusLabel(product: Product): string {
   return 'Brouillon'
 }
 
-function formatPrice(price: number): string {
+function formatPrice(price: number | undefined | null): string {
+  if (price === null || price === undefined || isNaN(price)) {
+    return 'N/A'
+  }
   return new Intl.NumberFormat('fr-FR', {
     minimumFractionDigits: 0,
     maximumFractionDigits: 0
   }).format(price) + ' XOF'
 }
 
-// ===== LIFECYCLE =====
-// Sync with Pinia store for cross-component state sharing
-watchEffect(() => {
-  if (data.value) {
-    // Update store with fresh data (will trigger global event bus)
-    productStore.products = data.value
+// Fonction adaptée pour usage dans template
+const getBundleUsageBadgeWrapper = (productId: string) => {
+  return getBundleUsageBadgeForProduct(productId)
+}
+
+// ===== ERROR HANDLING - Pattern Bundles =====
+watch(error, (newError) => {
+  if (newError) {
+    console.error('Error loading products:', newError)
+    crudError.validation('Impossible de charger les produits')
   }
 })
 
-// Handle real-time updates (if SSE is configured)
-onMounted(() => {
-  // Listen for product updates from other interfaces
-  const eventBus = useGlobalEventBus()
-
-  eventBus.on('product.updated', () => {
-    refetch()
-  })
-
-  eventBus.on('product.created', () => {
-    refetch()
-  })
-
-  eventBus.on('product.deleted', () => {
-    refetch()
-  })
+watch(searchError, (newError) => {
+  if (newError) {
+    console.error('Error searching products:', newError)
+    crudError.validation('Erreur lors de la recherche')
+  }
 })
 </script>

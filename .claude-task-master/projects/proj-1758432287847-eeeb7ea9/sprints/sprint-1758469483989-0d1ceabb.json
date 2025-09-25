@@ -1,0 +1,73 @@
+{
+  "id": "sprint-1758469483989-0d1ceabb",
+  "name": "TypeScript Critical Fixes - Phase 3",
+  "startDate": "2025-01-21",
+  "endDate": "2025-01-21",
+  "goals": "Corriger les erreurs TypeScript critiques qui bloquent les fonctionnalités admin et stabiliser l'application",
+  "status": "active",
+  "created": "2025-09-21T15:44:43.996Z",
+  "tasks": [
+    {
+      "id": 1,
+      "title": "Corriger FormField.vue - Props mal typées",
+      "description": "Corriger les erreurs TS2322 dans FormField.vue : Type 'string | number | boolean' not assignable to form props. Impact: tous les formulaires admin",
+      "status": "in-progress",
+      "priority": 5,
+      "dependencies": [],
+      "created": "2025-09-21T15:44:49.560Z",
+      "updated": "2025-09-21T15:45:20.358Z",
+      "isPareto80": false
+    },
+    {
+      "id": 2,
+      "title": "Corriger import createCategorySchema manquant",
+      "description": "Résoudre TS2304: Cannot find name 'createCategorySchema' dans CategoryFormModal.vue. Impact: fonctionnalité catégories cassée",
+      "status": "completed",
+      "priority": 5,
+      "dependencies": [],
+      "created": "2025-09-21T15:44:54.445Z",
+      "updated": "2025-09-21T15:48:45.752Z",
+      "isPareto80": false
+    },
+    {
+      "id": 3,
+      "title": "Corriger AdminDataTable.vue - Propriétés dupliquées",
+      "description": "Résoudre TS1117: An object literal cannot have multiple properties with the same name dans AdminDataTable.vue",
+      "status": "completed",
+      "priority": 4,
+      "dependencies": [],
+      "created": "2025-09-21T15:44:59.809Z",
+      "updated": "2025-09-21T15:57:25.390Z",
+      "isPareto80": false
+    },
+    {
+      "id": 4,
+      "title": "Corriger types API Response incohérents",
+      "description": "Résoudre les erreurs TS2430 dans types/api.ts : Interface extends incorrectly (RealisationApiResponse, SingleRealisationApiResponse)",
+      "status": "completed",
+      "priority": 4,
+      "dependencies": [],
+      "created": "2025-09-21T15:45:05.013Z",
+      "updated": "2025-09-21T16:02:57.063Z",
+      "isPareto80": false
+    },
+    {
+      "id": 5,
+      "title": "Corriger ProductForm.vue - FormData types",
+      "description": "Résoudre TS2339: Property 'images' does not exist on type 'FormData' et types d'arguments Product",
+      "status": "completed",
+      "priority": 3,
+      "dependencies": [],
+      "created": "2025-09-21T15:45:10.184Z",
+      "updated": "2025-09-21T16:06:20.206Z",
+      "isPareto80": false
+    }
+  ],
+  "paretoDecisions": [],
+  "metrics": {
+    "tasksCompleted": 4,
+    "tasksMovedToVault": 0,
+    "velocityPoints": 0
+  },
+  "updated": "2025-09-21T16:06:20.206Z"
+}

@@ -32,6 +32,7 @@ const localStarterPack: CampaignBundle = {
   description:
     "L'essentiel pour lancer votre campagne municipale. Visibilité de proximité garantie avec des produits de qualité pour marquer votre territoire.",
   targetAudience: "local",
+  budgetRange: "starter",
   products: [
     createBundleProduct(
       "casquette-001",
@@ -60,6 +61,7 @@ const localMediumPack: CampaignBundle = {
   description:
     "Pour une campagne de proximité renforcée. Équipez vos militants et créez l'effet de groupe dans votre commune.",
   targetAudience: "local",
+  budgetRange: "medium",
   products: [
     createBundleProduct("casquette-002", "Casquettes premium", 3000, 200),
     createBundleProduct(
@@ -78,6 +80,7 @@ const localMediumPack: CampaignBundle = {
   savings: 120000,
   popularity: 88,
   isActive: true,
+  isFeatured: false,
   tags: ["mobilisation", "équipe-campagne", "visibilité-renforcée"],
   createdAt: "2025-01-01T00:00:00Z",
   updatedAt: "2025-01-15T10:00:00Z",
@@ -93,6 +96,7 @@ const regionalMediumPack: CampaignBundle = {
   description:
     "Couvrez votre département avec impact. Mix optimal entre visibilité véhicule et équipement militant pour une campagne d'envergure.",
   targetAudience: "regional",
+  budgetRange: "premium",
   products: [
     createBundleProduct("casquette-003", "Casquettes brodées", 3500, 500),
     createBundleProduct("t-shirt-003", "T-shirts campagne", 4000, 300),
@@ -119,6 +123,7 @@ const regionalPremiumPack: CampaignBundle = {
   description:
     "L'arsenal complet pour dominer votre région. Equipement professionnel, supports premium et logistique complète pour une campagne victorieuse.",
   targetAudience: "regional",
+  budgetRange: "enterprise",
   products: [
     createBundleProduct(
       "casquette-004",
@@ -155,6 +160,7 @@ const nationalPremiumPack: CampaignBundle = {
   description:
     "Rayonnement national garanti. Équipement haut de gamme pour représenter votre mouvement à l'échelle du pays avec distinction.",
   targetAudience: "national",
+  budgetRange: "enterprise",
   products: [
     createBundleProduct(
       "casquette-005",
@@ -188,6 +194,7 @@ const nationalEnterprisePack: CampaignBundle = {
   description:
     "L'excellence absolue pour une campagne présidentielle. Équipement de luxe, supports média et logistique VIP pour marquer l'histoire.",
   targetAudience: "national",
+  budgetRange: "enterprise",
   products: [
     createBundleProduct("costume-001", "Costumes sur-mesure", 150000, 50),
     createBundleProduct(
@@ -225,6 +232,7 @@ const universalStarterPack: CampaignBundle = {
   description:
     "Votre première campagne ? Commencez avec les essentiels. Kit parfait pour tester l'engagement de votre base électorale.",
   targetAudience: "universal",
+  budgetRange: "starter",
   products: [
     createBundleProduct("casquette-007", "Casquettes basiques", 2000, 50),
     createBundleProduct("t-shirt-007", "T-shirts simple", 3000, 30),
@@ -248,6 +256,7 @@ const universalMediumPack: CampaignBundle = {
   description:
     "L'équilibre parfait pour toute campagne. Adaptable à tous niveaux avec un excellent rapport qualité-prix.",
   targetAudience: "universal",
+  budgetRange: "medium",
   products: [
     createBundleProduct("casquette-008", "Casquettes standard", 2800, 150),
     createBundleProduct("t-shirt-008", "T-shirts campagne", 3800, 100),

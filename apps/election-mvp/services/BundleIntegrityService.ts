@@ -6,7 +6,7 @@
 
 import { productReferenceValidator } from './ProductReferenceValidator'
 import { bundleService } from './BundleService'
-// import { productService } from './ProductService' // TODO: Uncomment when needed
+// productService not needed for current bundle integrity checks
 import type { Bundle } from '../types/domain/Bundle'
 import type {
   BundleReferenceValidation,

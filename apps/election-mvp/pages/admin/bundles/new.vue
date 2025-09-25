@@ -4,8 +4,12 @@
     <div class="mb-8">
       <div class="flex items-center justify-between">
         <div>
-          <h1 class="text-2xl font-bold text-gray-900">Nouveau Bundle</h1>
-          <p class="text-gray-600">Créer un nouveau pack de campagne pré-configuré</p>
+          <h1 class="text-2xl font-bold text-gray-900">
+            Nouveau Bundle
+          </h1>
+          <p class="text-gray-600">
+            Créer un nouveau pack de campagne pré-configuré
+          </p>
         </div>
         <div class="flex items-center space-x-3">
           <NuxtLink
@@ -29,8 +33,9 @@
 </template>
 
 <script setup lang="ts">
-import { globalNotifications } from '~/composables/useNotifications'
-import BundleForm from '~/components/admin/BundleForm.vue'
+// Auto-imported via Nuxt 3: globalNotifications
+import BundleForm from '../../../components/admin/BundleForm.vue'
+import type { ApiResponse, Product } from "@ns2po/types"
 
 // Layout admin
 definePageMeta({
@@ -85,7 +90,7 @@ const availableProducts = ref<Product[]>([])
 // Methods
 const handleSubmit = async (bundle: Bundle) => {
   try {
-    const response = await $fetch('/api/bundles', {
+    const response = await $fetch<ApiResponse<{ id: string }>>('/api/bundles', {
       method: 'POST',
       body: bundle
     })
@@ -107,7 +112,7 @@ const handleCancel = () => {
 // Fetch available products on mount
 onMounted(async () => {
   try {
-    const response = await $fetch('/api/products')
+    const response = await $fetch<ApiResponse<Product[]>>('/api/products')
     if (response.data && response.data.length > 0) {
       availableProducts.value = response.data.map((product: any) => ({
         id: product.id,

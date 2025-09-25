@@ -2,11 +2,11 @@
   <div class="relative inline-block">
     <!-- Trigger element -->
     <div
+      class="cursor-help"
       @mouseenter="showTooltip = true"
       @mouseleave="showTooltip = false"
       @focus="showTooltip = true"
       @blur="showTooltip = false"
-      class="cursor-help"
     >
       <slot />
     </div>
@@ -24,12 +24,12 @@
         :style="tooltipStyle"
         role="tooltip"
       >
-        <div v-html="content"></div>
+        <div v-html="content" />
         <!-- Tooltip arrow -->
         <div
           class="absolute w-2 h-2 bg-gray-900 transform rotate-45"
           :class="arrowClasses"
-        ></div>
+        />
       </div>
     </Teleport>
   </div>

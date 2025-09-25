@@ -1,0 +1,11 @@
+{
+  "id": "proj-1758481738487-ab45c4e3",
+  "name": "Refonte Architecture SOLID - Product Management",
+  "description": "Migration progressive vers architecture SOLID pour interfaces /admin/products et /admin/bundles/[id] avec Repository Pattern + Pinia + VueQuery, validation TypeScript E2E et lint complet pour éviter régressions",
+  "created": "2025-09-21T19:08:58.497Z",
+  "sprints": [
+    "sprint-1758481749805-25efe167"
+  ],
+  "activeSprint": "sprint-1758481749805-25efe167",
+  "updated": "2025-09-21T19:09:09.808Z"
+}

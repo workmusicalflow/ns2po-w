@@ -376,35 +376,26 @@ export function useProductSelectorValidation(
 
   // Filter products that can be safely added to bundle
   const validProducts = computed(() => {
-    console.log(`🔍 [ProductSelector] Filtering ${availableProducts.value.length} available products`)
-
-    const filtered = availableProducts.value.filter(product => {
+    return availableProducts.value.filter(product => {
       // Must be active
       if (!product.isActive) {
-        console.log(`❌ [ProductSelector] ${product.name} - Inactive`)
         return false
       }
 
       // Must have valid price (price OR basePrice)
       const productPrice = getProductPrice(product)
       if (productPrice <= 0) {
-        console.log(`❌ [ProductSelector] ${product.name} - Invalid price (price: ${product.price}, basePrice: ${product.basePrice})`)
         return false
       }
 
       // Must not already be in bundle
       const alreadySelected = selectedProducts.value.some(sp => sp.productId === product.id)
       if (alreadySelected) {
-        console.log(`❌ [ProductSelector] ${product.name} - Already selected`)
         return false
       }
 
-      console.log(`✅ [ProductSelector] ${product.name} - Valid (price: ${productPrice})`)
       return true
     })
-
-    console.log(`✅ [ProductSelector] ${filtered.length}/${availableProducts.value.length} products passed validation`)
-    return filtered
   })
 
   const inactiveProducts = computed(() => {

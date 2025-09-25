@@ -1,0 +1,11 @@
+{
+  "id": "proj-1758426042145-29f5d07f",
+  "name": "CRUD Bundles Testing & Enhancement",
+  "description": "Sprint TDD pour tester et améliorer le système CRUD bundles de l'interface admin. Approche pyramide inversée pragmatique : 60% Integration, 30% Unit, 10% E2E. Focus Core 20% sur API, filtrage, notifications temps réel, règles métier.",
+  "created": "2025-09-21T03:40:42.148Z",
+  "sprints": [
+    "sprint-1758426335496-e3a79f15"
+  ],
+  "activeSprint": "sprint-1758426335496-e3a79f15",
+  "updated": "2025-09-21T03:45:35.503Z"
+}

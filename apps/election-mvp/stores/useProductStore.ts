@@ -517,6 +517,50 @@ export const useProductStore = defineStore('products', {
         this.aggregateCache.delete(productId)
         this.searchCache.clear()
       }
+    },
+
+    // Simple mutation helpers for Vue Query mutations
+    addProduct(product: Product): void {
+      // Add to beginning of array for better UX
+      this.products.unshift(product)
+      this.totalCount += 1
+
+      // Clear caches
+      this.searchCache.clear()
+      this.aggregateCache.clear()
+    },
+
+    replaceProduct(id: string, updatedProduct: Product): void {
+      const index = this.products.findIndex(p => p.id === id)
+      if (index !== -1) {
+        this.products[index] = updatedProduct
+      }
+
+      // Update selected product if it's the same
+      if (this.selectedProduct?.id === id) {
+        this.selectedProduct = updatedProduct
+      }
+
+      // Clear caches
+      this.searchCache.clear()
+      this.aggregateCache.delete(id)
+    },
+
+    removeProduct(id: string): void {
+      const index = this.products.findIndex(p => p.id === id)
+      if (index !== -1) {
+        this.products.splice(index, 1)
+        this.totalCount -= 1
+      }
+
+      // Clear selected product if it's the deleted one
+      if (this.selectedProduct?.id === id) {
+        this.selectedProduct = null
+      }
+
+      // Clear caches
+      this.searchCache.clear()
+      this.aggregateCache.delete(id)
     }
   }
 })

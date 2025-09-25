@@ -64,6 +64,8 @@
 </template>
 
 <script setup lang="ts">
+import { computed, watch, onMounted, onBeforeUnmount } from 'vue'
+
 interface Props {
   show: boolean
   title: string

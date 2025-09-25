@@ -1,0 +1,13 @@
+{
+  "id": "proj-1758432287847-eeeb7ea9",
+  "name": "TypeScript Triage & Stabilisation NS2PO",
+  "description": "Résolution critique des 143 erreurs TypeScript pour stabiliser le serveur de développement et débloquer l'équipe admin. Focus sur imports manquants, composables, et factories de test.",
+  "created": "2025-09-21T05:24:47.848Z",
+  "sprints": [
+    "sprint-1758432312506-2a76923b",
+    "sprint-1758465334694-ff61b724",
+    "sprint-1758469483989-0d1ceabb"
+  ],
+  "activeSprint": "sprint-1758469483989-0d1ceabb",
+  "updated": "2025-09-21T15:44:43.998Z"
+}

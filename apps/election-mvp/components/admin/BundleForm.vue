@@ -1,8 +1,10 @@
 <template>
-  <form @submit.prevent="submitForm" class="space-y-6">
+  <form class="space-y-6" @submit.prevent="submitForm">
     <!-- Basic Information -->
     <div class="bg-white p-6 rounded-lg border border-gray-200">
-      <h3 class="text-lg font-medium text-gray-900 mb-4">Informations de base</h3>
+      <h3 class="text-lg font-medium text-gray-900 mb-4">
+        Informations de base
+      </h3>
 
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <!-- Bundle Name -->
@@ -21,8 +23,10 @@
             ]"
             placeholder="Ex: Pack Campagne Municipale"
             @blur="validateField('name')"
-          />
-          <p v-if="errors.name" class="mt-1 text-sm text-red-600">{{ errors.name }}</p>
+          >
+          <p v-if="errors.name" class="mt-1 text-sm text-red-600">
+            {{ errors.name }}
+          </p>
         </div>
 
         <!-- Target Audience -->
@@ -40,13 +44,25 @@
             ]"
             @change="validateField('targetAudience')"
           >
-            <option value="">Sélectionner une audience</option>
-            <option value="local">Local</option>
-            <option value="regional">Régional</option>
-            <option value="national">National</option>
-            <option value="universal">Universel</option>
+            <option value="">
+              Sélectionner une audience
+            </option>
+            <option value="local">
+              Local
+            </option>
+            <option value="regional">
+              Régional
+            </option>
+            <option value="national">
+              National
+            </option>
+            <option value="universal">
+              Universel
+            </option>
           </select>
-          <p v-if="errors.targetAudience" class="mt-1 text-sm text-red-600">{{ errors.targetAudience }}</p>
+          <p v-if="errors.targetAudience" class="mt-1 text-sm text-red-600">
+            {{ errors.targetAudience }}
+          </p>
         </div>
       </div>
 
@@ -66,14 +82,18 @@
           ]"
           placeholder="Description détaillée du bundle de campagne..."
           @blur="validateField('description')"
-        ></textarea>
-        <p v-if="errors.description" class="mt-1 text-sm text-red-600">{{ errors.description }}</p>
+        />
+        <p v-if="errors.description" class="mt-1 text-sm text-red-600">
+          {{ errors.description }}
+        </p>
       </div>
     </div>
 
     <!-- Configuration and Status -->
     <div class="bg-white p-6 rounded-lg border border-gray-200">
-      <h3 class="text-lg font-medium text-gray-900 mb-4">Configuration et statut</h3>
+      <h3 class="text-lg font-medium text-gray-900 mb-4">
+        Configuration et statut
+      </h3>
 
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <!-- Budget Range -->
@@ -91,13 +111,25 @@
             ]"
             @change="validateField('budgetRange')"
           >
-            <option value="">Sélectionner un budget</option>
-            <option value="starter">Starter (0-10k XOF)</option>
-            <option value="medium">Medium (10k-50k XOF)</option>
-            <option value="premium">Premium (50k-200k XOF)</option>
-            <option value="enterprise">Enterprise (200k+ XOF)</option>
+            <option value="">
+              Sélectionner un budget
+            </option>
+            <option value="starter">
+              Starter (0-10k XOF)
+            </option>
+            <option value="medium">
+              Medium (10k-50k XOF)
+            </option>
+            <option value="premium">
+              Premium (50k-200k XOF)
+            </option>
+            <option value="enterprise">
+              Enterprise (200k+ XOF)
+            </option>
           </select>
-          <p v-if="errors.budgetRange" class="mt-1 text-sm text-red-600">{{ errors.budgetRange }}</p>
+          <p v-if="errors.budgetRange" class="mt-1 text-sm text-red-600">
+            {{ errors.budgetRange }}
+          </p>
         </div>
 
         <!-- Popularity -->
@@ -117,8 +149,10 @@
             ]"
             placeholder="5"
             @blur="validateField('popularity')"
-          />
-          <p v-if="errors.popularity" class="mt-1 text-sm text-red-600">{{ errors.popularity }}</p>
+          >
+          <p v-if="errors.popularity" class="mt-1 text-sm text-red-600">
+            {{ errors.popularity }}
+          </p>
         </div>
 
         <!-- Status Options -->
@@ -129,7 +163,7 @@
               v-model="formData.isActive"
               type="checkbox"
               class="h-4 w-4 text-amber-600 focus:ring-amber-500 border-gray-300 rounded"
-            />
+            >
             <label for="isActive" class="ml-2 block text-sm text-gray-700">
               Bundle actif
             </label>
@@ -140,7 +174,7 @@
               v-model="formData.isFeatured"
               type="checkbox"
               class="h-4 w-4 text-amber-600 focus:ring-amber-500 border-gray-300 rounded"
-            />
+            >
             <label for="isFeatured" class="ml-2 block text-sm text-gray-700">
               Bundle vedette
             </label>
@@ -152,11 +186,13 @@
     <!-- Products Management -->
     <div class="bg-white p-6 rounded-lg border border-gray-200">
       <div class="flex items-center justify-between mb-4">
-        <h3 class="text-lg font-medium text-gray-900">Produits du bundle</h3>
+        <h3 class="text-lg font-medium text-gray-900">
+          Produits du bundle
+        </h3>
         <button
           type="button"
-          @click="addProduct"
           class="inline-flex items-center px-3 py-2 border border-amber-300 rounded-md shadow-sm text-sm font-medium text-amber-700 bg-white hover:bg-amber-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500"
+          @click="addProduct"
         >
           <Icon name="heroicons:plus" class="w-4 h-4 mr-2" />
           Ajouter un produit
@@ -179,16 +215,22 @@
               :id="`product-${index}`"
               v-model="product.id"
               required
-              @change="updateProductInfo(index)"
               class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+              @change="updateProductInfo(index)"
             >
-              <option value="">Sélectionner un produit</option>
+              <option value="">
+                Sélectionner un produit
+              </option>
               <option
                 v-for="availableProduct in availableProducts"
                 :key="availableProduct.id"
                 :value="availableProduct.id"
+                :disabled="!availableProduct.basePrice || availableProduct.basePrice <= 0"
               >
-                {{ availableProduct.name }} ({{ formatPrice(availableProduct.basePrice) }})
+                {{ availableProduct.name }}
+                {{ availableProduct.basePrice && availableProduct.basePrice > 0
+                  ? `(${formatPrice(availableProduct.basePrice)})`
+                  : '(Prix non défini)' }}
               </option>
             </select>
           </div>
@@ -205,9 +247,9 @@
               min="1"
               max="1000"
               required
-              @input="updateSubtotal(index)"
               class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
-            />
+              @input="updateSubtotal(index)"
+            >
           </div>
 
           <!-- Base Price (readonly) -->
@@ -221,7 +263,7 @@
               type="text"
               readonly
               class="block w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-500"
-            />
+            >
           </div>
 
           <!-- Subtotal (readonly) -->
@@ -236,12 +278,12 @@
                 type="text"
                 readonly
                 class="block w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-500"
-              />
+              >
             </div>
             <button
               type="button"
-              @click="removeProduct(index)"
               class="ml-2 p-2 text-red-600 hover:text-red-800 focus:outline-none"
+              @click="removeProduct(index)"
             >
               <Icon name="heroicons:trash" class="w-4 h-4" />
             </button>
@@ -252,16 +294,24 @@
       <!-- Empty state -->
       <div v-else class="text-center py-6">
         <Icon name="heroicons:cube" class="mx-auto h-12 w-12 text-gray-400" />
-        <h3 class="mt-2 text-sm font-medium text-gray-900">Aucun produit</h3>
-        <p class="mt-1 text-sm text-gray-500">Commencez par ajouter des produits à ce bundle.</p>
+        <h3 class="mt-2 text-sm font-medium text-gray-900">
+          Aucun produit
+        </h3>
+        <p class="mt-1 text-sm text-gray-500">
+          Commencez par ajouter des produits à ce bundle.
+        </p>
       </div>
 
-      <p v-if="errors.products" class="mt-2 text-sm text-red-600">{{ errors.products }}</p>
+      <p v-if="errors.products" class="mt-2 text-sm text-red-600">
+        {{ errors.products }}
+      </p>
     </div>
 
     <!-- Pricing Summary -->
     <div v-if="formData.products.length > 0" class="bg-white p-6 rounded-lg border border-gray-200">
-      <h3 class="text-lg font-medium text-gray-900 mb-4">Résumé des prix</h3>
+      <h3 class="text-lg font-medium text-gray-900 mb-4">
+        Résumé des prix
+      </h3>
 
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <!-- Estimated Total -->
@@ -275,8 +325,10 @@
             type="text"
             readonly
             class="block w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-900 font-medium"
-          />
-          <p class="mt-1 text-xs text-gray-500">Calculé automatiquement</p>
+          >
+          <p class="mt-1 text-xs text-gray-500">
+            Calculé automatiquement
+          </p>
         </div>
 
         <!-- Original Total (optional) -->
@@ -296,8 +348,10 @@
             ]"
             placeholder="0.00"
             @blur="validateField('originalTotal')"
-          />
-          <p v-if="errors.originalTotal" class="mt-1 text-sm text-red-600">{{ errors.originalTotal }}</p>
+          >
+          <p v-if="errors.originalTotal" class="mt-1 text-sm text-red-600">
+            {{ errors.originalTotal }}
+          </p>
         </div>
 
         <!-- Savings (calculated) -->
@@ -314,15 +368,19 @@
               'block w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 font-medium',
               calculatedSavings > 0 ? 'text-green-600' : 'text-gray-500'
             ]"
-          />
-          <p class="mt-1 text-xs text-gray-500">Calculé automatiquement</p>
+          >
+          <p class="mt-1 text-xs text-gray-500">
+            Calculé automatiquement
+          </p>
         </div>
       </div>
     </div>
 
     <!-- Tags -->
     <div class="bg-white p-6 rounded-lg border border-gray-200">
-      <h3 class="text-lg font-medium text-gray-900 mb-4">Tags et métadonnées</h3>
+      <h3 class="text-lg font-medium text-gray-900 mb-4">
+        Tags et métadonnées
+      </h3>
 
       <div>
         <label for="tags" class="block text-sm font-medium text-gray-700 mb-1">
@@ -338,9 +396,13 @@
           ]"
           placeholder="campagne, municipale, affichage, goodies"
           @blur="updateTags"
-        />
-        <p class="mt-1 text-xs text-gray-500">Maximum 10 tags, 50 caractères par tag</p>
-        <p v-if="errors.tags" class="mt-1 text-sm text-red-600">{{ errors.tags }}</p>
+        >
+        <p class="mt-1 text-xs text-gray-500">
+          Maximum 10 tags, 50 caractères par tag
+        </p>
+        <p v-if="errors.tags" class="mt-1 text-sm text-red-600">
+          {{ errors.tags }}
+        </p>
 
         <!-- Tags Display -->
         <div v-if="formData.tags.length > 0" class="mt-3 flex flex-wrap gap-2">
@@ -352,8 +414,8 @@
             {{ tag }}
             <button
               type="button"
-              @click="removeTag(index)"
               class="ml-1 inline-flex items-center justify-center w-4 h-4 rounded-full text-amber-600 hover:bg-amber-200 hover:text-amber-800 focus:outline-none"
+              @click="removeTag(index)"
             >
               <Icon name="heroicons:x-mark" class="w-3 h-3" />
             </button>
@@ -366,8 +428,8 @@
     <div class="flex justify-end space-x-3 pt-6 border-t">
       <button
         type="button"
-        @click="$emit('cancel')"
         class="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500"
+        @click="$emit('cancel')"
       >
         Annuler
       </button>
@@ -384,8 +446,7 @@
 </template>
 
 <script setup lang="ts">
-import { useFormValidation } from '~/composables/useFormValidation'
-import { globalNotifications } from '~/composables/useNotifications'
+// Auto-imported via Nuxt 3: useFormValidation, globalNotifications
 
 interface Product {
   id: string
@@ -612,14 +673,24 @@ const addProduct = () => {
 
   // Clear product validation error when adding a product
   delete errors.value.products
+
+  // Show success notification
+  globalNotifications.info('Nouveau produit', 'Ligne de produit ajoutée au bundle')
 }
 
 const removeProduct = (index: number) => {
+  const product = formData.products[index]
+  const productName = product.name || 'Produit'
+
   formData.products.splice(index, 1)
+
   // Validate products after removal
   if (formData.products.length === 0) {
     errors.value.products = 'Au moins un produit est requis'
   }
+
+  // Show success notification
+  globalNotifications.warning('Produit retiré', `${productName} retiré du bundle`)
 }
 
 const updateProductInfo = (index: number) => {
@@ -639,7 +710,8 @@ const updateProductInfo = (index: number) => {
 
   if (selectedProduct) {
     product.name = selectedProduct.name
-    product.basePrice = selectedProduct.basePrice
+    // Ensure price is valid, fallback to 0 if null/undefined
+    product.basePrice = selectedProduct.basePrice && !isNaN(selectedProduct.basePrice) ? selectedProduct.basePrice : 0
     console.log('✅ Product info updated:', {
       index,
       newName: product.name,
@@ -658,15 +730,19 @@ const updateProductInfo = (index: number) => {
 
 const updateSubtotal = (index: number) => {
   const product = formData.products[index]
-  const calculatedSubtotal = product.quantity * product.basePrice
+  // Ensure safe calculation with fallback values
+  const validQuantity = product.quantity && !isNaN(product.quantity) ? product.quantity : 1
+  const validBasePrice = product.basePrice && !isNaN(product.basePrice) ? product.basePrice : 0
+
+  const calculatedSubtotal = validQuantity * validBasePrice
   product.subtotal = calculatedSubtotal
 
   console.log('💰 updateSubtotal:', {
     index,
     productId: product.id,
     productName: product.name,
-    quantity: product.quantity,
-    basePrice: product.basePrice,
+    quantity: validQuantity,
+    basePrice: validBasePrice,
     calculatedSubtotal,
     subtotal: product.subtotal
   })

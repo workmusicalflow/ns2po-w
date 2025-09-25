@@ -164,26 +164,42 @@ export class ProductService {
       throw new Error(`Product with id '${id}' not found`)
     }
 
-    const success = await this.repository.delete(id)
+    try {
+      const success = await this.repository.delete(id)
 
-    if (success) {
-      // 🔄 Emit product.deleted event FIRST
-      this.eventEmitter?.product.deleted(id)
+      if (success) {
+        // 🔄 Emit product.deleted event FIRST
+        this.eventEmitter?.product.deleted(id)
 
-      // 🧹 Trigger automatic bundle cleanup (async, non-blocking)
-      setTimeout(async () => {
-        try {
-          await bundleIntegrityService.handleProductDeleted(id)
-          console.log(`🧹 Bundle cleanup completed for deleted product: ${id}`)
-        } catch (error) {
-          console.error(`❌ Bundle cleanup failed for deleted product ${id}:`, error)
-        }
-      }, 100)
+        // 🧹 Trigger automatic bundle cleanup (async, non-blocking)
+        setTimeout(async () => {
+          try {
+            await bundleIntegrityService.handleProductDeleted(id)
+            console.log(`🧹 Bundle cleanup completed for deleted product: ${id}`)
+          } catch (error) {
+            console.error(`❌ Bundle cleanup failed for deleted product ${id}:`, error)
+          }
+        }, 100)
 
-      console.log(`🗑️ Product deleted: ${product.name} (ID: ${id})`)
+        console.log(`🗑️ Product deleted: ${product.name} (ID: ${id})`)
+      }
+
+      return success
+    } catch (error: any) {
+      // 🔒 Handle referential integrity errors with enhanced details
+      if (error.statusCode === 409) {
+        // This is a referential integrity error from the API
+        const enhancedError = new Error(error.statusMessage || error.message)
+        enhancedError.name = 'ReferentialIntegrityError'
+        ;(enhancedError as any).statusCode = 409
+        ;(enhancedError as any).data = error.data || {}
+        ;(enhancedError as any).productName = product.name
+        throw enhancedError
+      }
+
+      // Re-throw other errors as-is
+      throw error
     }
-
-    return success
   }
 
   async activateProduct(id: string): Promise<Product> {

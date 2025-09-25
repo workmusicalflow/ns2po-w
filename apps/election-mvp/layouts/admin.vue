@@ -11,8 +11,12 @@
                 <span class="text-white font-bold text-sm">NS</span>
               </div>
               <div>
-                <h1 class="text-lg font-semibold text-gray-900">NS2PO Admin</h1>
-                <p class="text-xs text-gray-500">CMS d'administration</p>
+                <h1 class="text-lg font-semibold text-gray-900">
+                  NS2PO Admin
+                </h1>
+                <p class="text-xs text-gray-500">
+                  CMS d'administration
+                </p>
               </div>
             </NuxtLink>
           </div>
@@ -21,7 +25,7 @@
           <div class="flex items-center space-x-4">
             <!-- Sync Status -->
             <div class="flex items-center space-x-2 text-sm">
-              <div class="w-2 h-2 bg-green-500 rounded-full"></div>
+              <div class="w-2 h-2 bg-green-500 rounded-full" />
               <span class="text-gray-600">Sync actif</span>
             </div>
 
@@ -94,6 +98,16 @@
               <span>Réalisations</span>
             </NuxtLink>
 
+            <!-- Assets -->
+            <NuxtLink
+              to="/admin/assets"
+              class="flex items-center space-x-3 px-3 py-2 rounded-md text-sm font-medium"
+              :class="$route.path.startsWith('/admin/assets') ? 'bg-amber-100 text-amber-700' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'"
+            >
+              <Icon name="heroicons:folder" class="w-5 h-5" />
+              <span>Assets Cloudinary</span>
+            </NuxtLink>
+
             <!-- Sync Management -->
             <NuxtLink
               to="/admin/sync"
@@ -104,7 +118,7 @@
               <span>Synchronisation</span>
             </NuxtLink>
 
-            <hr class="my-4 border-gray-200" />
+            <hr class="my-4 border-gray-200">
 
             <!-- Settings -->
             <NuxtLink

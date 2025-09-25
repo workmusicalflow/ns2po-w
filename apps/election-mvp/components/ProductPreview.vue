@@ -44,7 +44,7 @@
                 min="0"
                 :max="canvasWidth - logo.width"
                 class="control-slider"
-                @input="updateLogo(index, { x: Number($event.target.value) })"
+                @input="updateLogo(index, { x: Number(($event.target as HTMLInputElement).value) })"
               >
 
               <label class="control-label">Y: {{ Math.round(logo.y) }}</label>
@@ -54,7 +54,7 @@
                 min="0"
                 :max="canvasHeight - logo.height"
                 class="control-slider"
-                @input="updateLogo(index, { y: Number($event.target.value) })"
+                @input="updateLogo(index, { y: Number(($event.target as HTMLInputElement).value) })"
               >
 
               <label class="control-label">Taille: {{ Math.round(logo.width) }}</label>
@@ -66,8 +66,8 @@
                 class="control-slider"
                 @input="
                   updateLogo(index, {
-                    width: Number($event.target.value),
-                    height: Number($event.target.value),
+                    width: Number(($event.target as HTMLInputElement).value),
+                    height: Number(($event.target as HTMLInputElement).value),
                   })
                 "
               >
@@ -369,7 +369,7 @@ import { ref, nextTick, watch, onMounted, onUnmounted, computed } from "vue";
 import { debounce } from "lodash-es";
 import { Button } from "@ns2po/ui";
 import CloudinaryUpload from "./CloudinaryUpload.vue";
-import { useQuoteCalculator } from "~/composables/useQuoteCalculator";
+// Auto-imported via Nuxt 3: useQuoteCalculator
 import type {
   Product,
   ProductCustomization,

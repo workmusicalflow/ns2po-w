@@ -1,0 +1,174 @@
+{
+  "id": "sprint-1758426335496-e3a79f15",
+  "name": "Sprint TDD Core 20% - Tests critiques CRUD bundles",
+  "startDate": "2025-01-21",
+  "endDate": "2025-01-28",
+  "goals": "Implémenter les tests critiques selon l'approche pyramide inversée pragmatique : 60% Integration tests (API+DB), 30% Unit tests (logique métier), 10% E2E (parcours utilisateur). Focus sur Core 20% pour ROI maximum.",
+  "status": "active",
+  "created": "2025-09-21T03:45:35.498Z",
+  "tasks": [
+    {
+      "id": 1,
+      "title": "Configurer Vitest + @nuxt/test-utils pour l'environnement de test",
+      "description": "Fondation critique : Installation et configuration de Vitest avec @nuxt/test-utils pour permettre tous les tests suivants. Setup avec environment Nuxt, mocks Turso DB, et helpers réutilisables.",
+      "status": "completed",
+      "priority": 5,
+      "dependencies": [],
+      "created": "2025-09-21T03:47:35.455Z",
+      "updated": "2025-09-21T03:54:18.232Z",
+      "isPareto80": false
+    },
+    {
+      "id": 2,
+      "title": "Créer factory de données test pour bundles avec Faker.js",
+      "description": "Infrastructure de données test : Créer BundleFactory avec Faker.js pour générer des données cohérentes pour tous les tests. Base essentielle pour éviter duplication et maintenir consistance.",
+      "status": "completed",
+      "priority": 5,
+      "dependencies": [],
+      "created": "2025-09-21T03:47:41.430Z",
+      "updated": "2025-09-21T03:56:43.160Z",
+      "isPareto80": false
+    },
+    {
+      "id": 3,
+      "title": "Tester endpoint GET /api/campaign-bundles avec filtres complexes",
+      "description": "Test d'intégration critiques (60%) : Valider les requêtes de récupération avec filtres par audience, budget, statut. Test des performances et edge cases. Fondamental pour la fiabilité du système.",
+      "status": "completed",
+      "priority": 5,
+      "dependencies": [],
+      "created": "2025-09-21T03:47:49.197Z",
+      "updated": "2025-09-21T04:07:21.541Z",
+      "isPareto80": false
+    },
+    {
+      "id": 4,
+      "title": "Tester endpoint POST /api/campaign-bundles avec validation métier",
+      "description": "Test d'intégration critique : Valider création bundles avec règles métier (produits minimum, prix cohérents, audience valide). Test validation Zod, erreurs et cas limites.",
+      "status": "completed",
+      "priority": 5,
+      "dependencies": [],
+      "created": "2025-09-21T03:47:55.749Z",
+      "updated": "2025-09-21T04:24:02.998Z",
+      "isPareto80": false
+    },
+    {
+      "id": 5,
+      "title": "Tester endpoint PUT /api/campaign-bundles avec optimistic locking",
+      "description": "Test d'intégration critique : Valider mise à jour avec gestion des conflits concurrents, versioning et rollback en cas d'erreur.",
+      "status": "completed",
+      "priority": 5,
+      "dependencies": [],
+      "created": "2025-09-21T03:48:07.275Z",
+      "updated": "2025-09-21T04:26:14.821Z",
+      "isPareto80": false
+    },
+    {
+      "id": 6,
+      "title": "Tester endpoint DELETE /api/campaign-bundles avec contraintes référentielles",
+      "description": "Test d'intégration critique : Valider suppression sécurisée avec vérification contraintes référentielles et cascade.",
+      "status": "completed",
+      "priority": 5,
+      "dependencies": [],
+      "created": "2025-09-21T03:48:16.932Z",
+      "updated": "2025-09-21T04:28:23.868Z",
+      "isPareto80": false
+    },
+    {
+      "id": 7,
+      "title": "Tester gestion d'erreurs et rollback des transactions",
+      "description": "Test d'intégration critique : Valider gestion erreurs DB, rollback automatique, états de cohérence après échecs.",
+      "status": "pending",
+      "priority": 5,
+      "dependencies": [],
+      "created": "2025-09-21T03:48:26.051Z",
+      "updated": "2025-09-21T03:48:26.051Z",
+      "isPareto80": false
+    },
+    {
+      "id": 8,
+      "title": "Tester logique de calcul des prix bundle avec remises",
+      "description": "Test unitaire critique (30%) : Valider algorithmes de calcul prix, remises cumulées, arrondis. Logique métier essentielle.",
+      "status": "pending",
+      "priority": 5,
+      "dependencies": [],
+      "created": "2025-09-21T03:48:36.056Z",
+      "updated": "2025-09-21T03:48:36.056Z",
+      "isPareto80": false
+    },
+    {
+      "id": 9,
+      "title": "Tester règles de validation métier des bundles",
+      "description": "Test unitaire critique (30%) : Valider règles business (min produits, cohérence prix, audience-budget). Cœur logique métier.",
+      "status": "pending",
+      "priority": 5,
+      "dependencies": [],
+      "created": "2025-09-21T03:48:47.867Z",
+      "updated": "2025-09-21T03:48:47.867Z",
+      "isPareto80": false
+    },
+    {
+      "id": 10,
+      "title": "Tester filtrage avancé par audience et budget",
+      "description": "Test d'intégration critique : Valider filtres combinés, performances sur gros datasets, edge cases. Fonctionnalité utilisée intensivement.",
+      "status": "pending",
+      "priority": 5,
+      "dependencies": [],
+      "created": "2025-09-21T03:48:56.505Z",
+      "updated": "2025-09-21T03:48:56.505Z",
+      "isPareto80": false
+    },
+    {
+      "id": 11,
+      "title": "Tester recherche textuelle multi-critères",
+      "description": "Test d'intégration critique : Valider recherche full-text sur nom/description, performance, tri par pertinence. Fonctionnalité utilisée quotidiennement.",
+      "status": "pending",
+      "priority": 5,
+      "dependencies": [],
+      "created": "2025-09-21T03:49:05.421Z",
+      "updated": "2025-09-21T03:49:05.421Z",
+      "isPareto80": false
+    },
+    {
+      "id": 12,
+      "title": "Ajouter tests unitaires pour formatage des prix",
+      "description": "Test unitaire critique (30%) : Valider formatage XOF, gestion null/undefined, arrondis. Fonction utilisée partout dans l'interface.",
+      "status": "pending",
+      "priority": 5,
+      "dependencies": [],
+      "created": "2025-09-21T03:49:12.656Z",
+      "updated": "2025-09-21T03:49:12.656Z",
+      "isPareto80": false
+    },
+    {
+      "id": 13,
+      "title": "Implémenter tests E2E du workflow complet création→modification→suppression",
+      "description": "Test E2E critique (10%) : Valider parcours utilisateur complet admin bundles avec Playwright. Test du happy path principal et gestion erreurs.",
+      "status": "pending",
+      "priority": 5,
+      "dependencies": [],
+      "created": "2025-09-21T03:49:20.575Z",
+      "updated": "2025-09-21T03:49:20.575Z",
+      "isPareto80": false
+    }
+  ],
+  "paretoDecisions": [
+    {
+      "taskId": 14,
+      "decision": "moved_to_vault",
+      "reason": "Enhancement P1 - Important pour l'automatisation mais non critique pour MVP TDD bundles",
+      "timestamp": "2025-09-21T03:49:52.706Z"
+    },
+    {
+      "taskId": 14,
+      "decision": "moved_to_vault",
+      "reason": "Enhancement P1 - Tests de performance utiles mais non critiques pour MVP TDD",
+      "timestamp": "2025-09-21T03:50:14.377Z"
+    }
+  ],
+  "metrics": {
+    "tasksCompleted": 6,
+    "tasksMovedToVault": 2,
+    "velocityPoints": 0
+  },
+  "updated": "2025-09-21T04:28:23.869Z"
+}

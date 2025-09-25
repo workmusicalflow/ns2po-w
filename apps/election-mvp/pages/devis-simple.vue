@@ -229,7 +229,7 @@
 
 <script setup lang="ts">
 import { ref, computed, watch } from "vue";
-import { useQuoteItems } from "~/composables/useQuoteItems";
+// Auto-imported via Nuxt 3: useQuoteItems
 import type { QuoteItemCatalog } from "@ns2po/types";
 
 // Page metadata

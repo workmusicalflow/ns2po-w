@@ -31,11 +31,59 @@ const createProductSchema = z.object({
   is_active: z.boolean().default(true)
 })
 
+/**
+ * Fonction helper pour exécuter une opération DB avec retry sur inconsistance Turso
+ * Solution tri-agent : Claude + Gemini + Perplexity
+ */
+async function executeWithTursoRetry<T>(
+  operation: () => Promise<T>,
+  operationName: string,
+  maxRetries: number = 3,
+  initialDelayMs: number = 200
+): Promise<T> {
+  let retries = 0
+
+  while (retries < maxRetries) {
+    try {
+      return await operation()
+    } catch (error: any) {
+      console.error(`${operationName} - Tentative ${retries + 1} échouée:`, error.message)
+
+      // Détecter l'erreur spécifique d'inconsistance Turso
+      if (error.message && error.message.includes("no such column: reference")) {
+        retries++
+        if (retries < maxRetries) {
+          const delay = initialDelayMs * Math.pow(2, retries - 1) // Backoff exponentiel
+          console.warn(`🔄 Inconsistance temporelle Turso détectée. Retry ${retries}/${maxRetries} dans ${delay}ms...`)
+          await new Promise(resolve => setTimeout(resolve, delay))
+          continue
+        } else {
+          // Tous les retries ont échoué
+          throw createError({
+            statusCode: 500,
+            statusMessage: 'Inconsistance de base de données persistante',
+            data: {
+              code: "TURSO_SCHEMA_MISMATCH_PERSISTENT",
+              details: `Schéma désynchronisé après ${maxRetries} tentatives - Réplicas Turso non synchronisés`,
+              retries: maxRetries
+            }
+          })
+        }
+      } else {
+        // Autres erreurs - pas de retry
+        throw error
+      }
+    }
+  }
+
+  throw new Error("Should not reach here")
+}
+
 export default defineEventHandler(async (event) => {
   const startTime = Date.now()
 
   try {
-    console.log('📦 POST /api/products - Création nouveau produit')
+    console.log('📦 POST /api/products - Création nouveau produit (avec protection Turso consistency)')
 
     // Validation du body
     const body = await readBody(event)
@@ -49,6 +97,7 @@ export default defineEventHandler(async (event) => {
           statusCode: 400,
           statusMessage: 'Données invalides',
           data: {
+            code: "VALIDATION_ERROR",
             errors: error.errors.map(err => ({
               field: err.path.join('.'),
               message: err.message
@@ -64,11 +113,13 @@ export default defineEventHandler(async (event) => {
     if (!db) {
       throw createError({
         statusCode: 500,
-        statusMessage: 'Base de données non disponible'
+        statusMessage: 'Base de données non disponible',
+        data: { code: "DATABASE_UNAVAILABLE" }
       })
     }
 
-    try {
+    // Exécution avec retry pattern pour inconsistances Turso
+    const result = await executeWithTursoRetry(async () => {
       // Vérifier l'unicité de la référence avant insertion
       const existingProduct = await db.execute({
         sql: `SELECT id FROM products WHERE reference = ? LIMIT 1`,
@@ -79,7 +130,11 @@ export default defineEventHandler(async (event) => {
         throw createError({
           statusCode: 409,
           statusMessage: 'Référence produit déjà utilisée',
-          data: { field: 'reference', message: `La référence "${validatedData.reference}" est déjà utilisée par un autre produit.` }
+          data: {
+            code: "REFERENCE_ALREADY_EXISTS",
+            field: 'reference',
+            message: `La référence "${validatedData.reference}" est déjà utilisée par un autre produit.`
+          }
         })
       }
 
@@ -167,39 +222,35 @@ export default defineEventHandler(async (event) => {
         updatedAt: productData.updatedAt
       }
 
-      const response = {
+      return {
         success: true,
         data: product,
         message: `Produit "${validatedData.name}" créé avec succès`,
-        source: 'turso',
+        source: 'turso-with-retry',
         duration: Date.now() - startTime
       }
 
-      // Cache headers
-      setHeader(event, "Cache-Control", "no-cache")
+    }, "Product Creation") // Nom de l'opération pour les logs
 
-      return response
+    // Cache headers
+    setHeader(event, "Cache-Control", "no-cache")
 
-    } catch (dbError) {
-      console.error('❌ Erreur base de données:', dbError)
-      throw createError({
-        statusCode: 500,
-        statusMessage: 'Erreur lors de la création du produit',
-        data: { error: dbError.message }
-      })
-    }
+    return result
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('❌ Erreur POST /api/products:', error)
 
+    // Les erreurs avec statusCode (createError) sont déjà bien formatées
     if (error.statusCode) {
       throw error
     }
 
+    // Erreur générique non catchée par le retry pattern
     throw createError({
       statusCode: 500,
       statusMessage: 'Erreur interne du serveur',
       data: {
+        code: "INTERNAL_SERVER_ERROR",
         error: error instanceof Error ? error.message : "Erreur inconnue",
         duration: Date.now() - startTime
       }
