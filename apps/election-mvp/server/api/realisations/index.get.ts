@@ -164,9 +164,23 @@ async function generateAutoDiscoveryRealisations(existingPublicIds: Set<string>)
 
     const cloudinaryImages = await getCloudinaryCreativeImages();
 
-    const autoDiscoveryImages = cloudinaryImages.filter(
-      (image: any) => !existingPublicIds.has(image.public_id)
-    );
+    // Récupérer les public_ids blacklistés
+    const db = getDatabase();
+    if (!db) {
+      console.warn("⚠️ Database non disponible pour auto-discovery blacklist");
+      return [];
+    }
+
+    const blacklistResult = await db.execute('SELECT public_id FROM realisation_blacklist');
+    const blacklistedPublicIds = new Set(blacklistResult.rows.map(row => row.public_id));
+
+    console.log(`🚫 ${blacklistedPublicIds.size} réalisations blacklistées`);
+
+    // CORRECTION : Transformer le public_id original pour comparaison blacklist
+    const autoDiscoveryImages = cloudinaryImages.filter((image: any) => {
+      const transformedId = `cloudinary_${image.public_id.replace(/[^a-zA-Z0-9]/g, "_")}`;
+      return !existingPublicIds.has(transformedId) && !blacklistedPublicIds.has(transformedId);
+    });
 
     const autoDiscoveryRealisations = autoDiscoveryImages.map((image: any) =>
       cloudinaryImageToHybridRealisation(image)

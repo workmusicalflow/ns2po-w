@@ -118,6 +118,16 @@
               <span>Synchronisation</span>
             </NuxtLink>
 
+            <!-- Blacklist -->
+            <NuxtLink
+              to="/admin/blacklist"
+              class="flex items-center space-x-3 px-3 py-2 rounded-md text-sm font-medium"
+              :class="$route.path.startsWith('/admin/blacklist') ? 'bg-amber-100 text-amber-700' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'"
+            >
+              <Icon name="heroicons:x-circle" class="w-5 h-5" />
+              <span>Blacklist</span>
+            </NuxtLink>
+
             <hr class="my-4 border-gray-200">
 
             <!-- Settings -->

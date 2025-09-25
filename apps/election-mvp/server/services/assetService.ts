@@ -1103,6 +1103,410 @@ class AssetService {
 }
 
 // Export du singleton
+// Domain interfaces for realisation deletion strategies
+interface IRealisationDeletionStrategy {
+  delete(realisationId: string): Promise<void>
+  canHandle(source: string): boolean
+}
+
+// =====================================================
+// CLOUDINARY DELETION STRATEGY PATTERN (Extension SOLID)
+// =====================================================
+
+/**
+ * Interface pour les stratégies de suppression Cloudinary
+ * Responsabilité unique : gestion de la suppression des assets Cloudinary
+ */
+interface ICloudinaryDeletionStrategy {
+  delete(publicIds: string[], options?: CloudinaryDeletionOptions): Promise<CloudinaryDeletionResult>
+  canHandle(source: string): boolean
+}
+
+interface CloudinaryDeletionOptions {
+  invalidate?: boolean
+  resource_type?: 'image' | 'video' | 'raw'
+  type?: 'upload' | 'private'
+  skipOnError?: boolean
+}
+
+interface CloudinaryDeletionResult {
+  totalAssets: number
+  successCount: number
+  failureCount: number
+  invalidationRequested: boolean
+  failures: Array<{publicId: string, error: string}>
+  duration: number
+}
+
+/**
+ * Stratégie de suppression réelle depuis Cloudinary
+ * Utilisée pour les réalisations que l'on souhaite supprimer définitivement
+ */
+class CloudinaryRealDeletionStrategy implements ICloudinaryDeletionStrategy {
+  
+  async delete(publicIds: string[], options: CloudinaryDeletionOptions = {}): Promise<CloudinaryDeletionResult> {
+    const startTime = Date.now()
+    const invalidationRequested = options.invalidate !== false // true par défaut
+    
+    if (publicIds.length === 0) {
+      console.log('⚠️ Aucun publicId Cloudinary à supprimer')
+      return {
+        totalAssets: 0,
+        successCount: 0,
+        failureCount: 0,
+        invalidationRequested,
+        failures: [],
+        duration: Date.now() - startTime
+      }
+    }
+
+    console.log(`🗑️ Début suppression Cloudinary: ${publicIds.length} assets (invalidate: ${invalidationRequested})`)
+    
+    const results: Array<{publicId: string, success: boolean, error?: string}> = []
+    
+    // Suppression séquentielle pour éviter la surcharge de l'API Cloudinary
+    for (const publicId of publicIds) {
+      try {
+        const result = await cloudinaryService.deleteAsset(publicId, {
+          invalidate: invalidationRequested,
+          resource_type: options.resource_type || 'image',
+          type: options.type || 'upload'
+        })
+        
+        results.push({
+          publicId,
+          success: result.success
+        })
+        
+        if (result.success) {
+          console.log(`✅ Asset Cloudinary supprimé: ${publicId}`)
+        } else {
+          console.warn(`⚠️ Échec suppression Cloudinary: ${publicId} - ${result.result}`)
+        }
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+        results.push({
+          publicId,
+          success: false,
+          error: errorMessage
+        })
+        console.error(`❌ Erreur suppression Cloudinary: ${publicId}`, error)
+        
+        // Si skipOnError est false, on peut décider d'arrêter le processus
+        if (!options.skipOnError) {
+          // Pour l'instant, on continue même en cas d'erreur pour éviter de bloquer
+          // la suppression des autres assets
+        }
+      }
+    }
+
+    // Calcul des métriques finales
+    const successCount = results.filter(r => r.success).length
+    const failureCount = results.length - successCount
+    const failures = results
+      .filter(r => !r.success)
+      .map(r => ({ publicId: r.publicId, error: r.error || 'unknown' }))
+    
+    const duration = Date.now() - startTime
+    
+    // Logging des résultats avec métriques détaillées
+    if (failureCount > 0) {
+      const failureDetails = failures.map(f => `${f.publicId}: ${f.error}`).join(', ')
+      console.warn(`⚠️ Suppression Cloudinary terminée: ${successCount}/${publicIds.length} réussies, ${failureCount} échecs`)
+      console.warn(`📊 Détails des échecs: ${failureDetails}`)
+    } else {
+      console.log(`✅ Suppression Cloudinary terminée: ${successCount}/${publicIds.length} assets supprimés avec succès`)
+    }
+    
+    console.log(`⏱️ Durée suppression Cloudinary: ${duration}ms`)
+    
+    if (invalidationRequested && successCount > 0) {
+      console.log(`🔄 Invalidation CDN demandée pour ${successCount} assets - propagation en cours...`)
+    }
+
+    return {
+      totalAssets: publicIds.length,
+      successCount,
+      failureCount,
+      invalidationRequested,
+      failures,
+      duration
+    }
+  }
+
+  canHandle(source: string): boolean {
+    // Cette stratégie peut gérer toutes les sources
+    return true
+  }
+}
+
+/**
+ * Stratégie no-op pour Cloudinary
+ * Utilisée quand on ne souhaite pas supprimer depuis Cloudinary
+ */
+class CloudinaryNoOpStrategy implements ICloudinaryDeletionStrategy {
+  
+  async delete(publicIds: string[], options: CloudinaryDeletionOptions = {}): Promise<CloudinaryDeletionResult> {
+    const startTime = Date.now()
+    console.log(`ℹ️ Suppression Cloudinary ignorée pour ${publicIds.length} assets (stratégie no-op)`)
+    
+    return {
+      totalAssets: publicIds.length,
+      successCount: 0,
+      failureCount: 0,
+      invalidationRequested: options.invalidate !== false,
+      failures: [],
+      duration: Date.now() - startTime
+    }
+  }
+
+  canHandle(source: string): boolean {
+    // Cette stratégie peut tout gérer en mode no-op
+    return true
+  }
+}
+
+/**
+ * Factory pour les stratégies de suppression Cloudinary
+ * Responsabilité unique : création des stratégies selon les besoins
+ */
+class CloudinaryDeletionStrategyFactory {
+  
+  getStrategy(deleteFromCloudinary: boolean): ICloudinaryDeletionStrategy {
+    if (deleteFromCloudinary) {
+      return new CloudinaryRealDeletionStrategy()
+    }
+    return new CloudinaryNoOpStrategy()
+  }
+}
+
+class SoftDeleteRealisationStrategy implements IRealisationDeletionStrategy {
+  constructor(private db: any) {}
+
+  canHandle(source: string): boolean {
+    return source === 'cloudinary-auto-discovery'
+  }
+
+  async delete(realisationId: string): Promise<void> {
+    await this.db.execute({
+      sql: 'UPDATE realisations SET is_active = 0, updated_at = CURRENT_TIMESTAMP WHERE id = ?',
+      args: [realisationId]
+    })
+  }
+}
+
+class HardDeleteRealisationStrategy implements IRealisationDeletionStrategy {
+  constructor(private db: any) {}
+
+  canHandle(source: string): boolean {
+    return source !== 'cloudinary-auto-discovery'
+  }
+
+  async delete(realisationId: string): Promise<void> {
+    await this.db.execute({
+      sql: 'DELETE FROM realisations WHERE id = ?',
+      args: [realisationId]
+    })
+  }
+}
+
+class RealisationDeletionStrategyFactory {
+  private strategies: IRealisationDeletionStrategy[] = []
+
+  constructor(db: any) {
+    this.strategies.push(
+      new SoftDeleteRealisationStrategy(db),
+      new HardDeleteRealisationStrategy(db)
+    )
+  }
+
+  getStrategy(source: string): IRealisationDeletionStrategy {
+    const strategy = this.strategies.find(s => s.canHandle(source))
+    if (!strategy) {
+      throw new Error(`No deletion strategy found for source: ${source}`)
+    }
+    return strategy
+  }
+}
+
+class RealisationService {
+  private deletionFactory: RealisationDeletionStrategyFactory
+  private cloudinaryFactory: CloudinaryDeletionStrategyFactory
+
+  constructor(private db: any) {
+    this.deletionFactory = new RealisationDeletionStrategyFactory(db)
+    this.cloudinaryFactory = new CloudinaryDeletionStrategyFactory()
+  }
+
+  /**
+   * Suppression orchestrée d'une réalisation (DB + Cloudinary optionnel)
+   * Architecture SOLID : séparation des responsabilités via Strategy Pattern
+   */
+  async deleteRealisation(
+    realisationId: string,
+    source: string,
+    options: {
+      deleteFromCloudinary?: boolean
+      publicIds?: string[]
+      invalidate?: boolean
+    } = {}
+  ): Promise<void> {
+    const { deleteFromCloudinary = false, publicIds = [], invalidate = true } = options
+
+    console.log(`🎨 Suppression réalisation ${realisationId} (source: ${source}, cloudinary: ${deleteFromCloudinary})`)
+
+    // ========================================
+    // PHASE 1: Suppression Cloudinary (avant DB pour récupération des publicIds)
+    // ========================================
+    if (deleteFromCloudinary && publicIds.length > 0) {
+      console.log(`☁️ Phase 1: Suppression Cloudinary de ${publicIds.length} assets`)
+      
+      try {
+        const cloudinaryStrategy = this.cloudinaryFactory.getStrategy(deleteFromCloudinary)
+        const result = await cloudinaryStrategy.delete(publicIds, {
+          invalidate,
+          resource_type: 'image',
+          skipOnError: false
+        })
+        
+        console.log(`✅ Phase 1 terminée: Suppression Cloudinary`)
+        console.log(`📊 Métriques Cloudinary: ${result.successCount}/${result.totalAssets} réussies, durée: ${result.duration}ms`)
+        
+        if (result.invalidationRequested) {
+          console.log(`🔄 Invalidation CDN activée pour ${result.successCount} assets`)
+        }
+        
+        if (result.failureCount > 0) {
+          console.warn(`⚠️ ${result.failureCount} échecs Cloudinary:`, result.failures)
+        }
+        
+      } catch (cloudinaryError) {
+        console.error('❌ Erreur Phase 1 (Cloudinary):', cloudinaryError)
+        
+        // On continue avec la suppression DB même si Cloudinary échoue
+        // Les assets orphelins pourront être nettoyés manuellement
+        console.warn('⚠️ Poursuite de la suppression DB malgré l\'échec Cloudinary')
+      }
+    }
+
+    // ========================================
+    // PHASE 2: Suppression/Désactivation base de données
+    // ========================================
+    console.log(`💾 Phase 2: Traitement base de données (source: ${source})`)
+
+    // Pour les réalisations auto-discovery, ajouter à la blacklist au lieu de supprimer de la DB
+    if (source === 'cloudinary-auto-discovery') {
+      console.log(`ℹ️ Réalisation auto-discovery: ${realisationId} - Ajout à la blacklist`)
+      
+      try {
+        // Récupérer le public_id depuis realisationId pour auto-discovery
+        const publicId = realisationId.startsWith('auto-') ? realisationId.substring(5) : realisationId
+        
+        // Ajouter à la blacklist pour éviter la re-découverte
+        await this.addToBlacklist(
+          publicId,
+          `Auto-discovery supprimée: ${publicId}`,
+          'user_deleted_auto_discovery',
+          'admin'
+        )
+        
+        console.log(`🚫 Ajouté à la blacklist: ${publicId}`)
+      } catch (blacklistError) {
+        console.error('❌ Erreur ajout blacklist:', blacklistError)
+        throw blacklistError
+      }
+      
+      if (deleteFromCloudinary) {
+        console.log(`✅ Suppression complète de la réalisation auto-discovery: ${realisationId}`)
+      } else {
+        console.log(`✅ Réalisation auto-discovery blacklistée: ${realisationId}`)
+      }
+      return
+    }
+
+    // Pour les réalisations Turso, appliquer la stratégie DB appropriée
+    try {
+      const dbStrategy = this.deletionFactory.getStrategy(source)
+      await dbStrategy.delete(realisationId)
+      console.log(`✅ Phase 2 terminée: Suppression DB`)
+    } catch (dbError) {
+      console.error('❌ Erreur Phase 2 (DB):', dbError)
+      throw dbError // On throw l'erreur DB car c'est critique
+    }
+
+    console.log(`🎉 Suppression orchestrée terminée: ${realisationId}`)
+  }
+
+  /**
+   * Obtenir la liste des éléments blacklistés
+   */
+  /**
+   * Ajouter une réalisation à la blacklist pour éviter sa re-découverte automatique
+   * Utilisé principalement pour les réalisations auto-discovery supprimées
+   */
+  async addToBlacklist(
+    publicId: string,
+    originalTitle?: string,
+    reason: string = 'user_deleted',
+    blacklistedBy: string = 'admin'
+  ): Promise<void> {
+    try {
+      console.log(`🚫 Ajout à la blacklist: ${publicId}`)
+      
+      await this.db.execute(`
+        INSERT OR REPLACE INTO realisation_blacklist 
+        (public_id, original_title, reason, blacklisted_by, blacklisted_at) 
+        VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
+      `, [publicId, originalTitle, reason, blacklistedBy])
+      
+      console.log(`✅ Blacklist mise à jour: ${publicId}`)
+    } catch (error) {
+      console.error('❌ Erreur ajout blacklist:', error)
+      throw error
+    }
+  }
+
+  /**
+   * Retirer une réalisation de la blacklist
+   */
+  async removeFromBlacklist(publicId: string): Promise<void> {
+    try {
+      console.log(`🔓 Retrait de la blacklist: ${publicId}`)
+      
+      const result = await this.db.execute(
+        'DELETE FROM realisation_blacklist WHERE public_id = ?',
+        [publicId]
+      )
+      
+      if (result.rowsAffected > 0) {
+        console.log(`✅ Retiré de la blacklist: ${publicId}`)
+      } else {
+        console.log(`ℹ️ Non trouvé dans la blacklist: ${publicId}`)
+      }
+    } catch (error) {
+      console.error('❌ Erreur retrait blacklist:', error)
+      throw error
+    }
+  }
+
+  async getBlacklistedItems(): Promise<any[]> {
+    try {
+      const result = await this.db.execute(`
+        SELECT public_id, original_title, reason, blacklisted_at, blacklisted_by
+        FROM realisation_blacklist
+        ORDER BY blacklisted_at DESC
+      `)
+      
+      return result.rows || []
+    } catch (error) {
+      console.error('❌ Erreur récupération blacklist:', error)
+      throw error
+    }
+  }
+}
+
+// Export du service de réalisation SOLID
+export { RealisationService }
 export const assetService = AssetService.getInstance()
 
 // Export des types pour utilisation externe
