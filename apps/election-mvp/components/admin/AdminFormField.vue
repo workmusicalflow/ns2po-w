@@ -105,12 +105,17 @@ const fieldId = computed(() =>
 )
 
 const inputClasses = computed(() => [
-  'block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500',
+  // Base classes with mobile-optimized touch targets (44px min height)
+  'block w-full px-3 py-3 sm:py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-colors duration-200',
+  // Mobile-specific improvements
+  'text-base sm:text-sm', // Prevent iOS zoom on focus with 16px+ font
+  'touch-manipulation', // Optimize touch interactions
+  'placeholder:text-gray-400', // Better placeholder contrast
   {
     'border-red-300 focus:ring-red-500 focus:border-red-500': props.error,
-    'border-gray-300': !props.error,
-    'bg-gray-100 cursor-not-allowed': props.disabled,
-    'bg-gray-50': props.readonly && !props.disabled
+    'border-gray-300 hover:border-gray-400 focus:border-amber-500': !props.error,
+    'bg-gray-100 cursor-not-allowed text-gray-500': props.disabled,
+    'bg-gray-50 cursor-default': props.readonly && !props.disabled
   },
   props.class
 ])

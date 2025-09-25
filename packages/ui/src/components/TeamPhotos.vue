@@ -238,7 +238,25 @@ onMounted(() => {
   nextTick(() => {
     if (props.animationEnabled) {
       // Délai pour permettre au DOM de se stabiliser
-      setTimeout(initGSAPAnimations, 500);
+      setTimeout(() => {
+        // Fallback si GSAP ne se charge pas : assure la visibilité des éléments
+        setTimeout(() => {
+          const teamMessage = document.querySelector('.team-message');
+          const photoWrappers = document.querySelectorAll('.photo-wrapper');
+
+          if (teamMessage && getComputedStyle(teamMessage).opacity === '0') {
+            (teamMessage as HTMLElement).style.opacity = '1';
+          }
+
+          photoWrappers.forEach((wrapper) => {
+            if (getComputedStyle(wrapper).opacity === '0') {
+              (wrapper as HTMLElement).style.opacity = '1';
+            }
+          });
+        }, 2000); // Fallback après 2 secondes
+
+        initGSAPAnimations();
+      }, 500);
     }
   });
 });
@@ -273,7 +291,7 @@ onMounted(() => {
 
 .team-message {
   @apply flex items-center;
-  opacity: 0; /* Sera animé par GSAP */
+  opacity: 1; /* Visible par défaut, animé par GSAP si disponible */
 }
 
 .team-message.left {
@@ -317,7 +335,7 @@ onMounted(() => {
 
 .photo-wrapper {
   @apply relative flex-shrink-0;
-  opacity: 0; /* Sera animé par GSAP */
+  opacity: 1; /* Visible par défaut, animé par GSAP si disponible */
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   /* Assure un alignement de baseline commun */
   display: flex;

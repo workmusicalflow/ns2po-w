@@ -26,6 +26,10 @@
         <p class="hero-subtitle font-body">
           Pré-commande et création de visuels gratuits
         </p>
+
+        <!-- Intégration des drapeaux des pays d'opération -->
+        <FlagsDisplay />
+
         <Button size="large" class="hero-cta" @click="navigateTo('/devis')">
           Demander un devis
         </Button>
@@ -333,7 +337,8 @@ useHead({
   line-height: 1.4;
 }
 
-.hero-cta {
+/* Spécificité élevée pour surcharger les styles du composant Button */
+button.btn.hero-cta {
   background-color: rgb(var(--color-accent)) !important;
   color: #f0f0f0 !important;
   border: none !important;
@@ -341,7 +346,7 @@ useHead({
   transition: all 0.3s ease;
 }
 
-.hero-cta:hover {
+button.btn.hero-cta:hover {
   background-color: rgb(var(--color-primary)) !important;
   transform: translateY(-2px) scale(1.02);
 }
@@ -389,7 +394,7 @@ useHead({
     line-height: 1.3;
   }
 
-  .hero-cta {
+  button.btn.hero-cta {
     margin-top: 5px;
     font-size: clamp(0.9rem, 3vw, 1.05rem);
     padding: 0.5rem 1.5rem;
@@ -424,7 +429,7 @@ useHead({
     line-height: 1.25;
   }
 
-  .hero-cta {
+  button.btn.hero-cta {
     font-size: 0.85rem;
     padding: 0.4rem 1.2rem;
   }

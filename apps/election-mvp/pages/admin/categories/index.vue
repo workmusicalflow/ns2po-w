@@ -117,9 +117,11 @@
         </button>
       </div>
 
-      <!-- Categories Table -->
-      <div v-else-if="filteredCategories.length > 0" class="overflow-x-auto">
-        <table class="min-w-full divide-y divide-gray-200">
+      <!-- Categories Table/Cards -->
+      <div v-else-if="filteredCategories.length > 0">
+        <!-- Desktop Table View -->
+        <div class="hidden md:block overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200">
           <thead class="bg-gray-50">
             <tr>
               <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -242,6 +244,106 @@
             </tr>
           </tbody>
         </table>
+        </div>
+
+        <!-- Mobile Cards View -->
+        <div class="md:hidden space-y-4 p-4">
+          <div
+            v-for="category in filteredCategories"
+            :key="category.id"
+            class="bg-white rounded-lg border border-gray-200 hover:border-gray-300 transition-colors duration-200 p-4"
+          >
+            <!-- Header avec icône et nom -->
+            <div class="flex items-start justify-between mb-3">
+              <div class="flex items-center flex-1">
+                <div
+                  class="h-10 w-10 rounded-lg flex items-center justify-center text-white text-sm font-medium mr-3 flex-shrink-0"
+                  :style="{ backgroundColor: category.color || '#6B7280' }"
+                >
+                  <Icon v-if="category.icon" :name="category.icon" class="w-5 h-5" />
+                  <span v-else>{{ category.name.charAt(0) }}</span>
+                </div>
+                <div class="min-w-0 flex-1">
+                  <h3 class="text-lg font-medium text-gray-900 truncate">{{ category.name }}</h3>
+                  <p class="text-sm text-gray-500">{{ category.slug }}</p>
+                </div>
+              </div>
+              <!-- Statut -->
+              <span
+                :class="[
+                  'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ml-2',
+                  category.isActive
+                    ? 'bg-green-100 text-green-800'
+                    : 'bg-red-100 text-red-800'
+                ]"
+              >
+                <span
+                  :class="[
+                    'w-1.5 h-1.5 mr-1.5 rounded-full',
+                    category.isActive ? 'bg-green-400' : 'bg-red-400'
+                  ]"
+                />
+                {{ category.isActive ? 'Active' : 'Inactive' }}
+              </span>
+            </div>
+
+            <!-- Description -->
+            <div v-if="category.description" class="mb-4">
+              <p class="text-sm text-gray-600">{{ category.description }}</p>
+            </div>
+
+            <!-- Informations détaillées -->
+            <div class="grid grid-cols-2 gap-4 mb-4 text-sm">
+              <div>
+                <span class="text-gray-500">Parent :</span>
+                <span v-if="category.parentName" class="ml-1 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800">
+                  {{ category.parentName }}
+                </span>
+                <span v-else class="ml-1 text-gray-400 italic">Principale</span>
+              </div>
+              <div>
+                <span class="text-gray-500">Ordre :</span>
+                <span class="ml-1 font-medium">{{ category.sortOrder }}</span>
+              </div>
+            </div>
+
+            <!-- Sous-catégories -->
+            <div class="mb-4 text-sm">
+              <span class="text-gray-500">Sous-catégories :</span>
+              <span v-if="category.subcategories && category.subcategories.length > 0" class="ml-1 inline-flex items-center text-gray-700">
+                <Icon name="heroicons:folder" class="w-4 h-4 mr-1" />
+                {{ category.subcategories.length }}
+              </span>
+              <span v-else class="ml-1 text-gray-400">Aucune</span>
+            </div>
+
+            <!-- Actions -->
+            <div class="flex items-center justify-end space-x-2 pt-3 border-t border-gray-200">
+              <button
+                class="flex items-center justify-center w-10 h-10 text-amber-600 hover:text-amber-900 hover:bg-amber-50 rounded-lg touch-manipulation transition-colors"
+                title="Modifier"
+                @click="openEditModal(category)"
+              >
+                <Icon name="heroicons:pencil" class="w-5 h-5" />
+              </button>
+              <button
+                class="flex items-center justify-center w-10 h-10 text-blue-600 hover:text-blue-900 hover:bg-blue-50 rounded-lg touch-manipulation transition-colors"
+                title="Dupliquer"
+                @click="duplicateCategory(category)"
+              >
+                <Icon name="heroicons:document-duplicate" class="w-5 h-5" />
+              </button>
+              <button
+                :disabled="(category.subcategories && category.subcategories.length > 0)"
+                class="flex items-center justify-center w-10 h-10 text-red-600 hover:text-red-900 hover:bg-red-50 rounded-lg touch-manipulation transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                title="Supprimer"
+                @click="deleteCategory(category)"
+              >
+                <Icon name="heroicons:trash" class="w-5 h-5" />
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- Empty State -->
@@ -269,7 +371,7 @@
       :category="selectedCategory"
       :categories="rootCategories"
       @close="closeModal"
-      @saved="onCategorySaved"
+      @submit="onCategorySubmit"
     />
   </div>
 </template>
@@ -425,6 +527,43 @@ const closeModal = () => {
   selectedCategory.value = null
 }
 
+const onCategorySubmit = async (formData: any) => {
+  try {
+    const categoryData = {
+      name: formData.name,
+      slug: formData.slug,
+      description: formData.description,
+      is_active: formData.isActive
+    }
+
+    if (selectedCategory.value?.id) {
+      // Update existing category
+      await $fetch(`/api/categories/${selectedCategory.value.id}`, {
+        method: 'PUT',
+        body: categoryData
+      })
+      crudSuccess.updated(formData.name, 'catégorie')
+    } else {
+      // Create new category
+      await $fetch('/api/categories', {
+        method: 'POST',
+        body: categoryData
+      })
+      crudSuccess.created(formData.name, 'catégorie')
+    }
+
+    // Use cache refresh instead of full refetch for better performance
+    await refreshCategories()
+    closeModal()
+  } catch (err: any) {
+    console.error('Erreur lors de la sauvegarde:', err)
+    const action = selectedCategory.value?.id ? 'mise à jour' : 'création'
+    const message = err.data?.message || `Erreur lors de la ${action} de la catégorie`
+    crudError.created('catégorie', message)
+  }
+}
+
+// Keep the old function for backward compatibility if needed
 const onCategorySaved = async (message: string) => {
   crudSuccess.created(message.replace('Catégorie ', ''), 'catégorie')
 

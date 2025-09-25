@@ -34,8 +34,8 @@
       <slot name="filters" />
     </div>
 
-    <!-- Table -->
-    <div class="overflow-x-auto">
+    <!-- Desktop Table View -->
+    <div class="hidden md:block overflow-x-auto">
       <table class="min-w-full divide-y divide-gray-200">
         <!-- Headers -->
         <thead class="bg-gray-50">
@@ -184,9 +184,145 @@
       </table>
     </div>
 
+    <!-- Mobile Card View -->
+    <div class="md:hidden">
+      <!-- Mobile Loading Skeleton -->
+      <div v-if="isLoading && !hasInitialData" class="space-y-3 p-4">
+        <div v-for="n in 3" :key="`mobile-skeleton-${n}`" class="bg-white rounded-lg border border-gray-200 p-4">
+          <div class="animate-pulse">
+            <div class="flex items-center space-x-3 mb-3">
+              <div class="w-12 h-12 bg-gray-200 rounded-lg" />
+              <div class="flex-1">
+                <div class="h-4 bg-gray-200 rounded w-3/4 mb-2" />
+                <div class="h-3 bg-gray-200 rounded w-1/2" />
+              </div>
+            </div>
+            <div class="space-y-2">
+              <div class="h-3 bg-gray-200 rounded w-full" />
+              <div class="h-3 bg-gray-200 rounded w-2/3" />
+            </div>
+            <div class="flex justify-between items-center mt-4">
+              <div class="h-6 bg-gray-200 rounded w-16" />
+              <div class="flex space-x-2">
+                <div class="h-8 w-16 bg-gray-200 rounded" />
+                <div class="h-8 w-16 bg-gray-200 rounded" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mobile Loading Overlay -->
+      <div v-else-if="isLoading && hasInitialData" class="relative">
+        <div class="absolute inset-0 bg-white/70 z-10 flex items-center justify-center">
+          <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-600" />
+        </div>
+      </div>
+
+      <!-- Mobile Cards Data -->
+      <div v-else-if="paginatedData.length > 0" class="space-y-3 p-4">
+        <div
+          v-for="(item, index) in paginatedData"
+          :key="getRowKey ? getRowKey(item) : index"
+          class="bg-white rounded-lg border border-gray-200 hover:border-gray-300 transition-colors duration-200"
+        >
+          <!-- Card Header with Primary Info -->
+          <div class="p-4">
+            <div class="flex items-start justify-between mb-3">
+              <!-- Primary Column (usually name/title) -->
+              <div class="flex-1">
+                <h3 class="text-sm font-medium text-gray-900 mb-1">
+                  <slot
+                    v-if="columns[0]"
+                    :name="`cell-${columns[0].key}`"
+                    :item="item"
+                    :value="getNestedValue(item, columns[0].key)"
+                    :column="columns[0]"
+                  >
+                    {{ columns[0].formatter ? columns[0].formatter(getNestedValue(item, columns[0].key), item) : getNestedValue(item, columns[0].key) }}
+                  </slot>
+                </h3>
+                <!-- Secondary info (usually ID or category) -->
+                <p v-if="columns[1]" class="text-xs text-gray-500">
+                  <slot
+                    :name="`cell-${columns[1].key}`"
+                    :item="item"
+                    :value="getNestedValue(item, columns[1].key)"
+                    :column="columns[1]"
+                  >
+                    {{ columns[1].label }}: {{ columns[1].formatter ? columns[1].formatter(getNestedValue(item, columns[1].key), item) : getNestedValue(item, columns[1].key) }}
+                  </slot>
+                </p>
+              </div>
+
+              <!-- Actions Mobile -->
+              <div v-if="$slots.actions || showStandardActions" class="flex items-center space-x-2 ml-3">
+                <!-- Standard Actions -->
+                <div v-if="showStandardActions" class="flex items-center space-x-2">
+                  <button
+                    v-if="allowEdit"
+                    class="inline-flex items-center justify-center w-8 h-8 border border-gray-300 rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 touch-manipulation"
+                    :title="`Modifier ${getItemLabel(item)}`"
+                    @click="$emit('edit', item)"
+                  >
+                    <Icon name="heroicons:pencil" class="w-4 h-4" />
+                  </button>
+                  <button
+                    v-if="allowDelete"
+                    class="inline-flex items-center justify-center w-8 h-8 border border-red-300 rounded-md text-red-700 bg-white hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 touch-manipulation"
+                    :title="`Supprimer ${getItemLabel(item)}`"
+                    @click="confirmDelete(item)"
+                  >
+                    <Icon name="heroicons:trash" class="w-4 h-4" />
+                  </button>
+                  <!-- Custom action buttons via slot -->
+                  <slot name="custom-actions" :item="item" :index="index" />
+                </div>
+                <!-- Legacy actions slot (fallback) -->
+                <slot v-else name="actions" :item="item" :index="index" />
+              </div>
+            </div>
+
+            <!-- Additional Fields (remaining columns) -->
+            <div v-if="columns.length > 2" class="space-y-2">
+              <div
+                v-for="column in columns.slice(2)"
+                :key="column.key"
+                class="flex justify-between items-center text-xs"
+              >
+                <span class="text-gray-500 font-medium">{{ column.label }}:</span>
+                <span class="text-gray-900 text-right">
+                  <slot
+                    :name="`cell-${column.key}`"
+                    :item="item"
+                    :value="getNestedValue(item, column.key)"
+                    :column="column"
+                  >
+                    {{ column.formatter ? column.formatter(getNestedValue(item, column.key), item) : getNestedValue(item, column.key) }}
+                  </slot>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mobile Empty State -->
+      <div v-else-if="!isLoading && hasInitialData" class="p-8 text-center">
+        <Icon name="heroicons:document-text" class="w-12 h-12 text-gray-400 mb-4 mx-auto" />
+        <h3 class="text-sm font-medium text-gray-900 mb-1">
+          {{ emptyTitle || 'Aucune donnée' }}
+        </h3>
+        <p class="text-sm text-gray-500">
+          {{ emptyDescription || 'Aucun élément à afficher pour le moment.' }}
+        </p>
+      </div>
+    </div>
+
     <!-- Pagination -->
-    <div v-if="showPagination && !isLoading && data.length > pageSize" class="px-6 py-3 border-t border-gray-200 bg-gray-50">
-      <div class="flex items-center justify-between">
+    <div v-if="showPagination && !isLoading && data.length > pageSize" class="px-4 md:px-6 py-3 border-t border-gray-200 bg-gray-50">
+      <!-- Desktop Pagination -->
+      <div class="hidden md:flex items-center justify-between">
         <div class="text-sm text-gray-700">
           Affichage de {{ (currentPage - 1) * pageSize + 1 }} à {{ Math.min(currentPage * pageSize, filteredData.length) }}
           sur {{ filteredData.length }} résultats
@@ -194,20 +330,77 @@
         <div class="flex items-center space-x-2">
           <button
             :disabled="currentPage <= 1"
-            class="px-3 py-1 text-sm border border-gray-300 rounded hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+            class="px-3 py-1 text-sm border border-gray-300 rounded hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
             @click="currentPage--"
           >
             Précédent
           </button>
-          <span class="text-sm text-gray-700">
+          <span class="text-sm text-gray-700 font-medium">
             Page {{ currentPage }} sur {{ totalPages }}
           </span>
           <button
             :disabled="currentPage >= totalPages"
-            class="px-3 py-1 text-sm border border-gray-300 rounded hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+            class="px-3 py-1 text-sm border border-gray-300 rounded hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
             @click="currentPage++"
           >
             Suivant
+          </button>
+        </div>
+      </div>
+
+      <!-- Mobile Pagination -->
+      <div class="md:hidden">
+        <!-- Mobile pagination info -->
+        <div class="text-center text-sm text-gray-600 mb-3">
+          Page {{ currentPage }} sur {{ totalPages }}
+          <span class="block text-xs text-gray-500 mt-1">
+            {{ filteredData.length }} résultats au total
+          </span>
+        </div>
+
+        <!-- Mobile pagination controls -->
+        <div class="flex items-center justify-center space-x-4">
+          <button
+            :disabled="currentPage <= 1"
+            class="flex items-center justify-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation transition-colors duration-200"
+            @click="currentPage--"
+          >
+            <Icon name="heroicons:chevron-left" class="w-4 h-4 mr-1" />
+            Précédent
+          </button>
+
+          <div class="flex items-center space-x-1">
+            <!-- Page numbers for mobile (condensed) -->
+            <template v-if="totalPages <= 5">
+              <button
+                v-for="page in totalPages"
+                :key="page"
+                :class="[
+                  'w-8 h-8 text-sm font-medium rounded touch-manipulation transition-colors duration-200',
+                  page === currentPage
+                    ? 'bg-amber-600 text-white'
+                    : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
+                ]"
+                @click="currentPage = page"
+              >
+                {{ page }}
+              </button>
+            </template>
+            <template v-else>
+              <!-- Condensed view for many pages -->
+              <span class="text-sm font-medium text-gray-700 px-2">
+                {{ currentPage }} / {{ totalPages }}
+              </span>
+            </template>
+          </div>
+
+          <button
+            :disabled="currentPage >= totalPages"
+            class="flex items-center justify-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation transition-colors duration-200"
+            @click="currentPage++"
+          >
+            Suivant
+            <Icon name="heroicons:chevron-right" class="w-4 h-4 ml-1" />
           </button>
         </div>
       </div>
