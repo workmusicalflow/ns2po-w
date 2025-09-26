@@ -1,21 +1,20 @@
 [build]
   # Build depuis la racine du monorepo pour pnpm workspaces
-  base = ""
+  base = "."
 
-  # Commande de build pour monorepo pnpm workspaces
-  command = "pnpm install && pnpm build --filter=@ns2po/election-mvp"
+  # Commande de build correcte pour monorepo pnpm avec --filter
+  command = "pnpm install --frozen-lockfile && pnpm --filter @ns2po/election-mvp build"
 
   # Répertoire de sortie après build
   publish = "apps/election-mvp/.output/public"
 
 [build.environment]
   # Version Node.js (utilise .nvmrc = 20.19.0)
-  NODE_VERSION = "20"
+  NODE_VERSION = "20.19.0"
   # Utiliser pnpm comme gestionnaire de packages
-  NPM_FLAGS = "--version"
-  PNPM_VERSION = "8"
-  # Flag obligatoire pour pnpm workspaces sur Netlify
-  PNPM_FLAGS = "--shamefully-hoist"
+  NPM_FLAGS = ""
+  PNPM_VERSION = "8.15.6"
+  # Pas de PNPM_FLAGS pour éviter les conflits avec workspaces
 
 # Configuration des fonctions serverless pour les API routes Nuxt
 [functions]
