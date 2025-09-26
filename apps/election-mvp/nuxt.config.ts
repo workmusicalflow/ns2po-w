@@ -104,6 +104,11 @@ export default defineNuxtConfig({
     // Preset Netlify pour déploiement avec génération statique
     preset: 'netlify',
 
+    // Désactive les features problématiques sur Netlify
+    experimental: {
+      wasm: false
+    },
+
     routeRules: {
       // Static pages - cache 1 hour
       "/": {
