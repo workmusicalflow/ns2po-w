@@ -1,0 +1,55 @@
+[build]
+  # Répertoire contenant l'application Nuxt
+  base = "apps/election-mvp"
+
+  # Commande de build pour Nuxt avec pnpm
+  command = "cd ../../ && pnpm install && pnpm build --filter=@ns2po/election-mvp"
+
+  # Répertoire de sortie après build
+  publish = "apps/election-mvp/.output/public"
+
+[build.environment]
+  # Version Node.js recommandée pour Nuxt 3
+  NODE_VERSION = "18"
+  # Utiliser pnpm comme gestionnaire de packages
+  NPM_FLAGS = "--version"
+  PNPM_VERSION = "8"
+
+# Configuration des fonctions serverless pour les API routes Nuxt
+[functions]
+  # Répertoire des fonctions générées par Nuxt
+  directory = "apps/election-mvp/.output/server"
+
+# Redirections et règles de routage pour SPA Nuxt
+[[redirects]]
+  # Redirection pour les routes Nuxt (SPA fallback)
+  from = "/*"
+  to = "/index.html"
+  status = 200
+  conditions = {Role = ["public"]}
+
+# Headers pour optimisation performance
+[[headers]]
+  for = "/_nuxt/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/api/*"
+  [headers.values]
+    Cache-Control = "no-cache"
+
+# Configuration spécifique monorepo
+[build.processing]
+  # Optimisations pour les images Cloudinary
+  skip_processing = true
+
+# Variables d'environnement pour le build (à compléter via dashboard Netlify)
+[context.production.environment]
+  NODE_ENV = "production"
+
+[context.deploy-preview.environment]
+  NODE_ENV = "production"
+
+[context.branch-deploy.environment]
+  NODE_ENV = "development"
