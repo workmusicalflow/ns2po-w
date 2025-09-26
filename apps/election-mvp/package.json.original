@@ -4,10 +4,7 @@
   "description": "NS2PO Election MVP - Application principale de gestion électorale",
   "private": true,
   "type": "module",
-  "engines": {
-    "node": ">=20.x",
-    "npm": ">=8.0.0"
-  },
+  "packageManager": "pnpm@9.1.0",
   "scripts": {
     "dev": "nuxt dev",
     "build": "nuxt build",
@@ -30,11 +27,11 @@
     "@hebilicious/vue-query-nuxt": "^0.3.0",
     "@heroicons/vue": "^2.2.0",
     "@libsql/client": "^0.15.12",
-    "@ns2po/composables": "file:../../packages/composables",
-    "@ns2po/config": "file:../../packages/config",
-    "@ns2po/database": "file:../../packages/database",
-    "@ns2po/types": "file:../../packages/types",
-    "@ns2po/ui": "file:../../packages/ui",
+    "@ns2po/composables": "workspace:*",
+    "@ns2po/config": "workspace:*",
+    "@ns2po/database": "workspace:*",
+    "@ns2po/types": "workspace:*",
+    "@ns2po/ui": "workspace:*",
     "@nuxt/icon": "1.x",
     "@nuxt/image": "^1.11.0",
     "@nuxtjs/cloudinary": "^4.0.0",
