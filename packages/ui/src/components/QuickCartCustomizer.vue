@@ -195,6 +195,7 @@ import type {
   MultiSelectionState,
   ProductSelection,
 } from "@ns2po/types";
+import QuickCartItem from "./QuickCartItem.vue";
 
 // =====================================
 // PROPS & EMITS

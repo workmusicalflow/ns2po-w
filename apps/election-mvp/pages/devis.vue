@@ -7,10 +7,154 @@
         <div class="step-content">
           <!-- Étape 1: Sélection Bundle/Packs de campagne -->
           <div v-if="currentStep === 1" class="step-panel">
-            <!-- Interface Bundle Selector -->
-            <div class="bundle-selector-interface">
-              <!-- Sélecteur de bundles -->
+
+            <!-- Toggle Bundle/Personnalisé (UX Perplexity) -->
+            <div class="flex justify-center mb-8">
+              <div class="bg-gray-100 rounded-lg p-1 inline-flex">
+                <button
+                  @click="selectionMode = 'bundle'"
+                  :class="[
+                    'px-6 py-3 rounded-md text-sm font-medium transition-all duration-200',
+                    selectionMode === 'bundle'
+                      ? 'bg-white text-accent shadow-sm'
+                      : 'text-gray-600 hover:text-gray-800'
+                  ]"
+                >
+                  📦 Packs Prêts-à-Campagne
+                </button>
+                <button
+                  @click="selectionMode = 'custom'"
+                  :class="[
+                    'px-6 py-3 rounded-md text-sm font-medium transition-all duration-200',
+                    selectionMode === 'custom'
+                      ? 'bg-white text-accent shadow-sm'
+                      : 'text-gray-600 hover:text-gray-800'
+                  ]"
+                >
+                  ⚙️ Sélection Personnalisée
+                </button>
+              </div>
+            </div>
+
+            <!-- Interface Bundle Selector (Mode Bundle) -->
+            <div v-if="selectionMode === 'bundle'" class="bundle-mode">
+
+              <!-- Message d'accroche (UX Perplexity) -->
+              <div class="text-center mb-6 md:mb-8 px-4 md:px-0">
+                <h2 class="text-xl md:text-2xl font-bold text-accent mb-2 md:mb-3 leading-tight">
+                  Nos Experts Ont Conçu Ces Packs Pour Maximiser Votre Impact Électoral
+                </h2>
+                <p class="text-sm md:text-base text-gray-600 max-w-3xl mx-auto">
+                  Gagnez du temps avec nos solutions éprouvées, utilisées par nos clients élus
+                </p>
+              </div>
+
+              <!-- Grille 3 colonnes avec Pack Pro au centre (UX Perplexity) -->
+              <div v-if="bundlesLoading" class="text-center py-12">
+                <div class="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full mx-auto mb-4"></div>
+                <p class="text-gray-600">Chargement de vos packs optimisés...</p>
+              </div>
+
+              <div v-else-if="bundlesError" class="text-center py-12">
+                <p class="text-red-600 mb-4">❌ Erreur de chargement des packs</p>
+                <p class="text-sm text-gray-500">{{ bundlesError }}</p>
+              </div>
+
+              <div v-else-if="orderedBundles.length" class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-8">
+                <div
+                  v-for="(bundle, index) in orderedBundles"
+                  :key="bundle.id"
+                  :class="[
+                    'bundle-card relative bg-white rounded-xl shadow-lg border-2 p-4 md:p-6 transition-all duration-300 cursor-pointer hover:shadow-xl',
+                    selectedBundleId === bundle.id ? 'border-primary ring-2 ring-primary ring-opacity-20' : 'border-gray-200',
+                    // Pack Pro au centre avec mise en avant (UX Perplexity)
+                    bundle.targetAudience === 'regional' ? 'transform md:scale-105 border-primary' : ''
+                  ]"
+                  @click="selectBundle(bundle.id)"
+                >
+                  <!-- Badge "Le plus choisi" pour Pack Pro (UX Perplexity) -->
+                  <div v-if="bundle.targetAudience === 'regional'" class="absolute -top-3 left-1/2 transform -translate-x-1/2">
+                    <span class="bg-accent text-white text-xs font-bold px-3 py-1 rounded-full">
+                      ⭐ Le Plus Choisi
+                    </span>
+                  </div>
+
+                  <!-- Header du bundle -->
+                  <div class="text-center mb-4">
+                    <h3 class="text-lg md:text-xl font-bold text-accent mb-2">{{ bundle.name }}</h3>
+                    <div class="text-2xl md:text-3xl font-bold text-primary mb-1">
+                      {{ formatPrice(bundle.estimatedTotal) }}
+                    </div>
+                    <div v-if="bundle.savings > 0" class="text-sm text-green-600 font-medium">
+                      Économisez {{ formatPrice(bundle.savings) }}
+                    </div>
+                  </div>
+
+                  <!-- Description -->
+                  <p class="text-gray-600 text-center mb-4">{{ bundle.description }}</p>
+
+                  <!-- Produits avec Progressive Disclosure (UX Perplexity) -->
+                  <div class="mb-6">
+                    <h4 class="text-sm font-semibold text-gray-700 mb-2">
+                      {{ bundle.products.length }} produits inclus :
+                    </h4>
+                    <ul class="text-sm text-gray-600 space-y-1">
+                      <li v-for="product in bundle.products.slice(0, 3)" :key="product.id" class="flex justify-between">
+                        <span>{{ product.name }}</span>
+                        <span class="font-medium">{{ product.quantity }}x</span>
+                      </li>
+                      <li v-if="bundle.products.length > 3"
+                          class="text-primary font-medium cursor-pointer hover:underline"
+                          @click.stop="toggleProductsExpansion(bundle.id)">
+                        {{ expandedBundle === bundle.id ? 'Voir moins' : `+ ${bundle.products.length - 3} autres produits` }}
+                      </li>
+                    </ul>
+
+                    <!-- Produits supplémentaires (Progressive Disclosure) -->
+                    <ul v-if="expandedBundle === bundle.id" class="text-sm text-gray-600 space-y-1 mt-2 pt-2 border-t border-gray-200">
+                      <li v-for="product in bundle.products.slice(3)" :key="product.id" class="flex justify-between">
+                        <span>{{ product.name }}</span>
+                        <span class="font-medium">{{ product.quantity }}x</span>
+                      </li>
+                    </ul>
+                  </div>
+
+                  <!-- Tags/Features -->
+                  <div class="mb-6">
+                    <div class="flex flex-wrap gap-2">
+                      <span v-for="tag in (bundle.tags || []).slice(0, 2)" :key="tag"
+                            class="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded-full">
+                        {{ tag }}
+                      </span>
+                    </div>
+                  </div>
+
+                  <!-- CTA Button -->
+                  <button
+                    :class="[
+                      'w-full py-3 px-4 rounded-lg font-semibold transition-all duration-200',
+                      selectedBundleId === bundle.id
+                        ? 'bg-primary text-white shadow-lg'
+                        : 'bg-gray-100 text-gray-700 hover:bg-primary hover:text-white'
+                    ]"
+                    @click.stop="selectBundle(bundle.id)"
+                  >
+                    {{ selectedBundleId === bundle.id ? '✓ Pack Sélectionné' : 'Choisir ce Pack' }}
+                  </button>
+                </div>
+              </div>
+
+              <div v-else class="text-center py-12">
+                <p class="text-gray-500 mb-4">Aucun pack disponible pour le moment</p>
+                <button @click="selectionMode = 'custom'"
+                        class="text-primary hover:text-primary-dark font-medium">
+                  → Créer un devis personnalisé
+                </button>
+              </div>
+
+              <!-- Sélecteur de bundles (Fallback si l'interface native ne fonctionne pas) -->
               <BundleSelector
+                v-if="false"
                 :bundles="filteredBundles"
                 :loading="bundlesLoading"
                 :error="bundlesError"
@@ -84,7 +228,7 @@
                   !bundleSelectionSummary ||
                     bundleSelectionSummary.totalItems === 0
                 "
-                @click="nextStep"
+                @click="navigateToConfiguration"
               >
                 Configurer la sélection ({{
                   bundleSelectionSummary?.totalItems || 0
@@ -292,8 +436,8 @@ import type {
   Category,
   CampaignBundle,
 } from "@ns2po/types";
-// Auto-imported via Nuxt 3: useQuoteItems
-// Auto-imported via Nuxt 3: useCampaignBundles
+// Import explicite du composable
+import { useCampaignBundles } from "~/composables/useCampaignBundles";
 
 // Import du composant QuoteCalculator (sera créé si nécessaire)
 // import QuoteCalculator from '~/components/QuoteCalculator.vue'
@@ -334,15 +478,14 @@ const customerInfo = ref<Partial<CustomerInfo>>({
   },
 });
 
-// Utilisation du composable useQuoteItems pour récupérer les articles depuis Airtable
-const {
-  quoteItems: availableQuoteItems,
-  loading: loadingQuoteItems,
-  error: quoteItemsError,
-  loadQuoteItems,
-  searchQuoteItems,
-  quoteItemsByCategory,
-} = useQuoteItems();
+// STUB: useQuoteItems pour futurs articles personnalisés
+// TODO: À implémenter dans future session pour sélection personnalisée avancée
+const availableQuoteItems = ref([]);
+const loadingQuoteItems = ref(false);
+const quoteItemsError = ref(null);
+const loadQuoteItems = () => console.log('🚧 STUB: loadQuoteItems - À implémenter');
+const searchQuoteItems = () => console.log('🚧 STUB: searchQuoteItems - À implémenter');
+const quoteItemsByCategory = computed(() => ({}));
 
 // Bundle Selector System - Intégration du nouveau système de packs de campagne
 const {
@@ -452,8 +595,8 @@ const inspirationContext = ref<{ realisationId: string; realisationTitle: string
 
 // Initialisation du contexte d'inspiration et chargement des articles
 onMounted(async () => {
-  // Charger les articles de devis depuis Airtable
-  await loadQuoteItems();
+  // STUB: Chargement articles de devis (remplacé par bundles)
+  // await loadQuoteItems();
 
   const inspiredBy = route.query.inspiredBy as string;
   const productId = route.query.productId as string;
@@ -676,7 +819,8 @@ const onFilterChanged = (filters: any) => {
  */
 const proceedToConfiguration = () => {
   console.log("📊 Procédure vers configuration de devis");
-  nextStep(); // Aller à l'étape de configuration
+  saveQuoteLocally(); // Sauvegarde locale avant navigation
+  navigateToConfiguration(); // STUB: Navigation vers configuration avancée
 };
 
 /**
@@ -783,6 +927,135 @@ const syncBundleToQuoteItems = () => {
     "🔄 Articles de devis synchronisés:",
     selectedQuoteItems.value.length
   );
+};
+
+// ====================================
+// VARIABLES POUR LE NOUVEAU TEMPLATE TOGGLE
+// ====================================
+
+// Mode de sélection : bundle ou custom (UX Perplexity)
+const selectionMode = ref('bundle');
+
+// Bundle expandé pour progressive disclosure
+const expandedBundle = ref<string | null>(null);
+
+// Computed pour ordonner les bundles avec Pack Pro au centre (UX Gemini)
+const orderedBundles = computed(() => {
+  const bundles = [...filteredBundles.value];
+  const proIndex = bundles.findIndex(b => b.name.toLowerCase().includes('pro'));
+
+  if (proIndex !== -1 && bundles.length === 3) {
+    // Réorganiser pour mettre Pack Pro au centre
+    const proBundleIndex = bundles.findIndex(b => b.name.toLowerCase().includes('pro'));
+    if (proBundleIndex !== -1) {
+      const proBundle = bundles.splice(proBundleIndex, 1)[0];
+      bundles.splice(1, 0, proBundle); // Insérer au milieu
+    }
+  }
+  return bundles;
+});
+
+// ====================================
+// MÉTHODES POUR LE NOUVEAU TEMPLATE
+// ====================================
+
+/**
+ * Toggle l'expansion des produits d'un bundle
+ */
+const toggleProductsExpansion = (bundleId: string) => {
+  expandedBundle.value = expandedBundle.value === bundleId ? null : bundleId;
+  console.log('🔄 Toggle expansion bundle:', bundleId, expandedBundle.value);
+};
+
+/**
+ * Formatage du prix en XOF
+ */
+const formatPrice = (price: number): string => {
+  return new Intl.NumberFormat('fr-FR', {
+    style: 'currency',
+    currency: 'XOF',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(price);
+};
+
+// ====================================
+// STUBS POUR FONCTIONNALITÉS FUTURES
+// ====================================
+
+/**
+ * STUB: Soumission du devis
+ * @description Soumettre le devis final avec informations client
+ * @todo Implémenter dans future session - formulaire client, validation, API
+ */
+const submitQuote = async (customerData: any) => {
+  console.log('🚧 STUB: submitQuote - À implémenter', customerData);
+  // TODO: Validation formulaire client
+  // TODO: Génération PDF devis
+  // TODO: Sauvegarde Turso
+  // TODO: Envoi email client
+  return { success: true, quoteId: `quote_${Date.now()}` };
+};
+
+/**
+ * STUB: Configuration avancée des produits
+ * @description Page de configuration détaillée avec personnalisation
+ * @todo Implémenter dans future session - customisation logos, couleurs, quantités
+ */
+const navigateToConfiguration = () => {
+  console.log('🚧 STUB: navigateToConfiguration - À implémenter');
+  // TODO: Navigation vers /devis/configuration
+  // TODO: Interface personnalisation logos
+  // TODO: Choix couleurs et matériaux
+  // TODO: Upload images client
+};
+
+/**
+ * STUB: Sauvegarde locale du devis
+ * @description Sauvegarder le devis en cours localement
+ * @todo Implémenter dans future session - localStorage, récupération session
+ */
+const saveQuoteLocally = () => {
+  console.log('🚧 STUB: saveQuoteLocally - À implémenter');
+  // TODO: LocalStorage avec timestamp
+  // TODO: Récupération au reload
+  // TODO: Notification "Devis sauvegardé"
+};
+
+/**
+ * STUB: Partage du devis
+ * @description Partager le devis par lien ou email
+ * @todo Implémenter dans future session - génération lien, email
+ */
+const shareQuote = async (method: 'link' | 'email' | 'whatsapp') => {
+  console.log('🚧 STUB: shareQuote - À implémenter', method);
+  // TODO: Génération lien partageable
+  // TODO: Integration WhatsApp Business
+  // TODO: Email avec PDF attaché
+};
+
+/**
+ * STUB: Historique et favoris
+ * @description Gérer l'historique des devis et favoris bundles
+ * @todo Implémenter dans future session - localStorage, UI historique
+ */
+const manageQuoteHistory = () => {
+  console.log('🚧 STUB: manageQuoteHistory - À implémenter');
+  // TODO: Liste devis précédents
+  // TODO: Marquer bundles favoris
+  // TODO: Statistiques utilisateur
+};
+
+/**
+ * STUB: Notifications de progression
+ * @description Toast notifications pour feedback utilisateur
+ * @todo Implémenter dans future session - toast system, animations
+ */
+const showProgressNotification = (message: string, type: 'success' | 'error' | 'info') => {
+  console.log(`🚧 STUB: showProgressNotification [${type}] - À implémenter:`, message);
+  // TODO: Toast notification system
+  // TODO: Animations d'entrée/sortie
+  // TODO: Queue de notifications
 };
 
 // ====================================
