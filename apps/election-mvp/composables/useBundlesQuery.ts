@@ -11,7 +11,7 @@ import {
   type UseQueryOptions,
   type UseMutationOptions
 } from '@tanstack/vue-query'
-import { isRef } from 'vue'
+import { isRef, ref, computed } from 'vue'
 import type { Ref } from 'vue'
 import type {
   Bundle,
@@ -24,6 +24,32 @@ import type {
 import { bundleService } from '../services/BundleService'
 import { useBundleStore } from '../stores/useBundleStore'
 import { useEventEmitter } from '../stores/useGlobalEventBus'
+
+// Mutation Context Types
+interface CreateBundleMutationContext {
+  previousBundles: Bundle[] | undefined
+  optimisticBundle: Bundle
+}
+
+interface UpdateBundleMutationContext {
+  previousBundle: Bundle | undefined
+  previousBundles: Bundle[] | undefined
+  id: string
+  updates: Partial<Bundle>
+}
+
+interface DeleteBundleMutationContext {
+  previousBundle: Bundle | undefined
+  previousBundles: Bundle[] | undefined
+  id: string
+}
+
+interface AddProductMutationContext {
+  previousProducts: BundleProduct[] | undefined
+  bundleId: string
+  productId: string
+  quantity: number
+}
 
 // Query Keys Factory
 export const bundleQueryKeys = {
@@ -199,7 +225,7 @@ export function useSimilarBundlesQuery(
 
 // Create Bundle Mutation
 export function useCreateBundleMutation(
-  options?: UseMutationOptions<Bundle, Error, Omit<Bundle, 'id' | 'createdAt' | 'updatedAt'>>
+  options?: UseMutationOptions<Bundle, Error, Omit<Bundle, 'id' | 'createdAt' | 'updatedAt'>, CreateBundleMutationContext>
 ) {
   const queryClient = useQueryClient()
   const bundleStore = useBundleStore()
@@ -229,7 +255,7 @@ export function useCreateBundleMutation(
         ...old
       ])
 
-      return { previousBundles, optimisticBundle }
+      return { previousBundles, optimisticBundle } as CreateBundleMutationContext
     },
     onError: (error, _variables, context) => {
       // Rollback optimistic update
@@ -262,7 +288,7 @@ export function useCreateBundleMutation(
 
 // Update Bundle Mutation
 export function useUpdateBundleMutation(
-  options?: UseMutationOptions<Bundle, Error, { id: string; updates: Partial<Bundle> }>
+  options?: UseMutationOptions<Bundle, Error, { id: string; updates: Partial<Bundle> }, UpdateBundleMutationContext>
 ) {
   const queryClient = useQueryClient()
   const bundleStore = useBundleStore()
@@ -291,7 +317,7 @@ export function useUpdateBundleMutation(
         old.map(bundle => bundle.id === id ? { ...bundle, ...updates } : bundle)
       )
 
-      return { previousBundle, previousBundles, id, updates }
+      return { previousBundle, previousBundles, id, updates } as UpdateBundleMutationContext
     },
     onError: (error, _variables, context) => {
       // Rollback optimistic updates
@@ -332,7 +358,7 @@ export function useUpdateBundleMutation(
 
 // Delete Bundle Mutation
 export function useDeleteBundleMutation(
-  options?: UseMutationOptions<boolean, Error, string>
+  options?: UseMutationOptions<boolean, Error, string, DeleteBundleMutationContext>
 ) {
   const queryClient = useQueryClient()
   const bundleStore = useBundleStore()
@@ -355,7 +381,7 @@ export function useDeleteBundleMutation(
         old.filter(bundle => bundle.id !== id)
       )
 
-      return { previousBundle, previousBundles, id }
+      return { previousBundle, previousBundles, id } as DeleteBundleMutationContext
     },
     onError: (error, id, context) => {
       // Rollback optimistic updates
@@ -386,7 +412,7 @@ export function useDeleteBundleMutation(
 
 // Add Product to Bundle Mutation
 export function useAddProductToBundleMutation(
-  options?: UseMutationOptions<BundleProduct, Error, { bundleId: string; productId: string; quantity: number }>
+  options?: UseMutationOptions<BundleProduct, Error, { bundleId: string; productId: string; quantity: number }, AddProductMutationContext>
 ) {
   const queryClient = useQueryClient()
   const bundleStore = useBundleStore()
@@ -403,7 +429,7 @@ export function useAddProductToBundleMutation(
       // Snapshot previous value
       const previousProducts = queryClient.getQueryData(bundleQueryKeys.products(bundleId))
 
-      return { previousProducts, bundleId, productId, quantity }
+      return { previousProducts, bundleId, productId, quantity } as AddProductMutationContext
     },
     onError: (error, _variables, context) => {
       // Rollback optimistic update

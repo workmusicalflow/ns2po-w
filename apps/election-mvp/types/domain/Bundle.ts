@@ -11,6 +11,8 @@ export interface Bundle {
   readonly name: string
   readonly description: string
   readonly targetAudience: BundleTargetAudience
+  readonly budgetRange: BundleBudgetRange
+  readonly category?: string
   readonly estimatedTotal: number
   readonly originalTotal?: number
   readonly savings?: number
@@ -39,6 +41,7 @@ export interface BundleProduct {
 // Bundle Enums
 export type BundleTargetAudience = 'local' | 'regional' | 'national' | 'universal'
 export type BundleStatus = 'active' | 'inactive' | 'draft' | 'archived'
+export type BundleBudgetRange = 'starter' | 'standard' | 'medium' | 'premium' | 'enterprise'
 
 // Bundle Aggregate Root - Complete Bundle with Relations
 export interface BundleAggregate extends Bundle {
@@ -157,6 +160,10 @@ export function isValidBundleProduct(obj: unknown): obj is BundleProduct {
 
 export function isValidTargetAudience(audience: string): audience is BundleTargetAudience {
   return ['local', 'regional', 'national', 'universal'].includes(audience)
+}
+
+export function isValidBudgetRange(budgetRange: string): budgetRange is BundleBudgetRange {
+  return ['starter', 'standard', 'medium', 'premium', 'enterprise'].includes(budgetRange)
 }
 
 

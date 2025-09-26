@@ -22,7 +22,7 @@ export function adaptCampaignBundleToBundle(campaignBundle: CampaignBundle): Bun
     description: campaignBundle.description || '',
 
     // Direct camelCase mapping
-    targetAudience: campaignBundle.targetAudience || 'general',
+    targetAudience: campaignBundle.targetAudience || 'local',
     budgetRange: campaignBundle.budgetRange || 'medium',
 
     // Boolean flags with defaults

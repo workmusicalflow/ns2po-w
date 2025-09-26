@@ -9,6 +9,8 @@ export default [
     ignores: [
       ".nuxt/**",
       ".output/**",
+      ".vercel/**",
+      ".archive/**",
       "dist/**",
       "node_modules/**",
       "*.d.ts",
@@ -60,6 +62,7 @@ export default [
         readMultipartFormData: "readonly",
         setResponseHeader: "readonly",
         setResponseHeaders: "readonly",
+        setHeader: "readonly",
         getRequestHeader: "readonly",
         getRequestHeaders: "readonly",
         sendRedirect: "readonly",

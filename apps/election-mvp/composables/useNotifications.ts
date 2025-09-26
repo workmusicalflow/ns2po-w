@@ -134,7 +134,21 @@ export const useNotifications = () => {
       error('Erreur réseau', message),
 
     permission: (action: string = 'cette action') =>
-      error('Accès refusé', `Vous n\'avez pas les permissions pour ${action}.`)
+      error('Accès refusé', `Vous n'avez pas les permissions pour ${action}.`)
+  }
+
+  const crudWarning = {
+    unsaved: (itemType: string = 'élément') =>
+      warning('modifications non sauvées', `Des modifications sur ${itemType} ne sont pas sauvées.`),
+
+    outdated: (itemType: string = 'données') =>
+      warning('Données obsolètes', `Les ${itemType} peuvent être obsolètes.`),
+
+    partial: (itemType: string = 'données') =>
+      warning('Chargement partiel', `Certaines ${itemType} n'ont pas pu être chargées.`),
+
+    network: (action: string = 'cette opération') =>
+      warning('Problème réseau', `${action} pourrait échouer en cas de déconnexion.`)
   }
 
   // System notifications
@@ -176,6 +190,7 @@ export const useNotifications = () => {
     // CRUD helpers
     crudSuccess,
     crudError,
+    crudWarning,
 
     // System helpers
     system

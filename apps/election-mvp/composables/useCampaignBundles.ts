@@ -28,7 +28,7 @@ export const useCampaignBundles = () => {
     // Filtrer par catégorie
     if (filters.value.category) {
       result = result.filter(b =>
-        b.category === filters.value.category
+        (b as any).category === filters.value.category
       );
     }
 
