@@ -248,7 +248,8 @@ import type { Product, ProductFilters, ProductStatus } from '../../../types/doma
 // Layout and metadata
 definePageMeta({
   layout: 'admin',
-  middleware: 'admin'
+  middleware: 'admin',
+  ssr: false
 })
 
 useHead({

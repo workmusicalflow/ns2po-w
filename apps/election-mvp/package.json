@@ -24,7 +24,6 @@
   "dependencies": {
     "@headlessui/tailwindcss": "^0.2.2",
     "@headlessui/vue": "^1.7.23",
-    "@hebilicious/vue-query-nuxt": "^0.3.0",
     "@heroicons/vue": "^2.2.0",
     "@libsql/client": "^0.15.12",
     "@ns2po/composables": "workspace:*",

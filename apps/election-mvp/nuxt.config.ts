@@ -71,30 +71,8 @@ export default defineNuxtConfig({
     "@nuxt/image",
     "@nuxt/icon",
     "@pinia/nuxt",
-    "@nuxt/devtools",
-    "@hebilicious/vue-query-nuxt"
+    "@nuxt/devtools"
   ],
-
-  // Vue Query Configuration (simple config, advanced config in vue-query.config.ts)
-  vueQuery: {
-    queryClientOptions: {
-      defaultOptions: {
-        queries: {
-          staleTime: 5 * 60 * 1000, // 5 minutes
-          gcTime: 10 * 60 * 1000, // 10 minutes
-          refetchOnWindowFocus: true,
-          refetchOnReconnect: true,
-          refetchOnMount: true,
-          throwOnError: false,
-        },
-        mutations: {
-          retry: 1,
-          retryDelay: 1000,
-          throwOnError: false,
-        }
-      }
-    }
-  },
 
   // Nitro configuration for caching and performance
   nitro: {
