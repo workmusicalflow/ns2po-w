@@ -224,7 +224,7 @@ export function useProductBundlesQuery(
   return useQuery({
     queryKey: computed(() => productQueryKeys.bundles(id.value)),
     queryFn: async () => {
-      const response = await $fetch(`/api/products/${id.value}/bundles`)
+      const response = await $fetch(`/api/products/${id.value}/bundles`) as { data: any }
       return response.data
     },
     enabled: computed(() => !!id.value),

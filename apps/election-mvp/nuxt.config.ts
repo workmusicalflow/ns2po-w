@@ -98,6 +98,12 @@ export default defineNuxtConfig({
 
   // Nitro configuration for caching and performance
   nitro: {
+    // Fix pour erreur client.manifest.mjs avec @nuxt/icon - SUPPRIMÉ selon recommandations multi-agents
+    // noExternal: ['@nuxt/icon'],
+
+    // Preset Vercel pour déploiement
+    preset: 'vercel',
+
     routeRules: {
       // Static pages - cache 1 hour
       "/": {
@@ -166,7 +172,8 @@ export default defineNuxtConfig({
   // Configuration critique pour l'hydratation selon Perplexity
   experimental: {
     payloadExtraction: false, // Désactive extraction payload si problématique
-    inlineSSRStyles: false    // Évite les conflits CSS inline
+    inlineSSRStyles: false,   // Évite les conflits CSS inline
+    appManifest: false        // Fix pour erreur client.manifest.mjs avec @nuxt/icon
   },
 
   // Configuration critique pour le debugging

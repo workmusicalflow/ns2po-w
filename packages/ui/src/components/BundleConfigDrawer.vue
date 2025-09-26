@@ -273,6 +273,7 @@ const getAudienceLabel = (audience: BundleTargetAudience): string => {
 const getBudgetLabel = (budget: BundleBudgetRange): string => {
   const labels = {
     starter: 'Starter',
+    standard: 'Standard',
     medium: 'Medium',
     premium: 'Premium',
     enterprise: 'Enterprise',
@@ -292,15 +293,15 @@ const initializeProducts = () => {
   configuredProducts.value = props.bundle.products.map(product => ({
     id: product.id,
     name: product.name,
-    description: product.description,
-    image: product.image,
-    tags: product.tags,
+    description: undefined, // BundleProduct n'a pas de description
+    image: undefined, // BundleProduct n'a pas d'image
+    tags: undefined, // BundleProduct n'a pas de tags
     basePrice: product.basePrice || 0,
-    unitPrice: product.unitPrice || product.basePrice || 0,
+    unitPrice: product.basePrice || 0, // BundleProduct n'a pas de unitPrice
     quantity: product.quantity,
-    minQuantity: product.minQuantity || 1,
-    maxQuantity: product.maxQuantity || 10000,
-    savings: product.savings || 0,
+    minQuantity: 1, // BundleProduct n'a pas de minQuantity
+    maxQuantity: 10000, // BundleProduct n'a pas de maxQuantity
+    savings: 0, // BundleProduct n'a pas de savings
   }));
 };
 

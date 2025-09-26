@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "@ns2po/types": "workspace:*",
+    "gsap": "^3.13.0",
     "vue": "^3.4.0"
   },
   "devDependencies": {

@@ -85,7 +85,7 @@ export const categoryResponseSchema = baseCategorySchema.extend({
 })
 
 // Category tree node schema (for hierarchical display)
-export const categoryTreeNodeSchema = categoryResponseSchema.extend({
+export const categoryTreeNodeSchema: z.ZodType<any> = categoryResponseSchema.extend({
   children: z.array(z.lazy(() => categoryTreeNodeSchema)).optional(),
   level: z.number().int().min(0).optional()
 })

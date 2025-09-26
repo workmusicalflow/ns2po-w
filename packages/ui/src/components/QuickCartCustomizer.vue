@@ -88,8 +88,8 @@
           :key="product.id"
           :product="product"
           :bundle-mode="true"
-          @quantity-change="updateBundleProductQuantity(product.id, $event)"
-          @remove="removeBundleProduct(product.id)"
+          @quantity-change="updateBundleProductQuantity?.(product.id, $event)"
+          @remove="removeBundleProduct?.(product.id)"
         />
       </div>
 
@@ -97,15 +97,15 @@
       <div v-else-if="selectionSummary.type === 'custom'" class="space-y-3">
         <QuickCartItem
           v-for="selection in Array.from(
-            multiSelectionState.selections.values(),
+            multiSelectionState?.selections?.values() || [],
           )"
           :key="selection.productId"
           :selection="selection"
           :bundle-mode="false"
           @quantity-change="
-            updateCustomProductQuantity(selection.productId, $event)
+            updateCustomProductQuantity?.(selection.productId, $event)
           "
-          @remove="removeFromCustomSelection(selection.productId)"
+          @remove="removeFromCustomSelection?.(selection.productId)"
         />
       </div>
     </div>

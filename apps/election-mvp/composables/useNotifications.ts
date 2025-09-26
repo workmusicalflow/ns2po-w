@@ -148,7 +148,10 @@ export const useNotifications = () => {
       warning('Chargement partiel', `Certaines ${itemType} n'ont pas pu être chargées.`),
 
     network: (action: string = 'cette opération') =>
-      warning('Problème réseau', `${action} pourrait échouer en cas de déconnexion.`)
+      warning('Problème réseau', `${action} pourrait échouer en cas de déconnexion.`),
+
+    validation: (message: string = 'Données à vérifier') =>
+      warning('Validation', message)
   }
 
   // System notifications

@@ -118,7 +118,7 @@
 
             <input
               :value="quantity"
-              @input="updateQuantity($event.target.value)"
+              @input="updateQuantity(($event.target as HTMLInputElement)?.value || '')"
               @click.stop
               :min="minQuantity"
               :max="maxQuantity"

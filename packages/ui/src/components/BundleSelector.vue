@@ -294,6 +294,7 @@ const getAudienceColor = (audience: BundleTargetAudience): string => {
 const getBudgetLabel = (budget: BundleBudgetRange): string => {
   const labels = {
     starter: "Starter",
+    standard: "Standard",
     medium: "Medium",
     premium: "Premium",
     enterprise: "Enterprise",
@@ -304,6 +305,7 @@ const getBudgetLabel = (budget: BundleBudgetRange): string => {
 const getBudgetColor = (budget: BundleBudgetRange): string => {
   const colors = {
     starter: "bg-gray-100 text-gray-700",
+    standard: "bg-blue-100 text-blue-700",
     medium: "bg-primary/20 text-primary",
     premium: "bg-accent/20 text-accent",
     enterprise: "bg-purple-100 text-purple-700",

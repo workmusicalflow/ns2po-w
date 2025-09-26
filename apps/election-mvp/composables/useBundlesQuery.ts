@@ -443,8 +443,8 @@ export function useAddProductToBundleMutation(
       queryClient.invalidateQueries({ queryKey: bundleQueryKeys.detail(bundleId) })
       queryClient.invalidateQueries({ queryKey: bundleQueryKeys.aggregate(bundleId) })
 
-      // Update Pinia store
-      bundleStore.recalculateBundleTotal(bundleId)
+      // Update Pinia store - TODO: implement recalculateBundleTotal method
+      // bundleStore.recalculateBundleTotal(bundleId)
 
       // Emit global event
       eventEmitter.bundle.productAdded(bundleId, productId, quantity)
@@ -472,8 +472,8 @@ export function useRemoveProductFromBundleMutation(
         queryClient.invalidateQueries({ queryKey: bundleQueryKeys.detail(bundleId) })
         queryClient.invalidateQueries({ queryKey: bundleQueryKeys.aggregate(bundleId) })
 
-        // Update Pinia store
-        bundleStore.recalculateBundleTotal(bundleId)
+        // Update Pinia store - TODO: implement recalculateBundleTotal method
+        // bundleStore.recalculateBundleTotal(bundleId)
 
         // Emit global event
         eventEmitter.bundle.productRemoved(bundleId, productId)

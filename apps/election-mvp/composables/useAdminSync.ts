@@ -66,13 +66,15 @@ export const useAdminSync = () => {
       isLoading.value = true
       error.value = null
 
-      const { data } = await $fetch('/api/admin/sync/status', {
+      const response = await $fetch('/api/admin/sync/status', {
+        method: 'GET',
         query: {
           limit: options.limit || 10,
           offset: options.offset || 0,
           includeDetails: options.includeDetails || false
         }
-      })
+      }) as { data: any }
+      const { data } = response
 
       syncStatus.value = data
       return data
@@ -93,13 +95,14 @@ export const useAdminSync = () => {
 
       console.log(`🔄 Déclenchement synchronisation ${syncType}...`)
 
-      const { data } = await $fetch('/api/admin/sync/trigger', {
+      const response = await $fetch('/api/admin/sync/trigger', {
         method: 'POST',
         body: {
           syncType,
           force
         }
-      })
+      }) as { data: any }
+      const { data } = response
 
       lastSyncResult.value = data
 

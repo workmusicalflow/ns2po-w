@@ -403,7 +403,7 @@ export async function validateFeaturedBundleLimit(bundle: any, db?: any, isUpdat
 
     // Warn if too many bundles target the same audience
     for (const [audience, count] of Object.entries(audienceCounts)) {
-      if (count > 3) {
+      if ((count as number) > 3) {
         errors.push(`Trop de bundles vedettes pour l'audience "${audience}" (${count}/3 maximum pour la diversité)`)
       }
     }

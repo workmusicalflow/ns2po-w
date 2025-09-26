@@ -14,6 +14,7 @@ import { productQueryKeys } from './useProductsQuery'
 import { useProductStore } from '../stores/useProductStore'
 import { useEventEmitter } from '../stores/useGlobalEventBus'
 
+
 // Create Product Mutation
 export function useCreateProductMutation(
   options?: UseMutationOptions<Product, Error, Omit<Product, 'id' | 'createdAt' | 'updatedAt'>>
@@ -59,8 +60,8 @@ export function useCreateProductMutation(
     },
     onError: (error, _variables, context) => {
       // Rollback optimistic update
-      if (context?.previousProducts) {
-        queryClient.setQueryData(productQueryKeys.list(), context.previousProducts)
+      if ((context as any)?.previousProducts) {
+        queryClient.setQueryData(productQueryKeys.list(), (context as any).previousProducts)
       }
     },
     onSuccess: (data, _variables, context) => {
@@ -77,10 +78,10 @@ export function useCreateProductMutation(
       eventEmitter.product.created(data)
 
       // Replace optimistic update with real data
-      if (context?.optimisticProduct) {
+      if ((context as any)?.optimisticProduct) {
         queryClient.setQueryData(productQueryKeys.list(), (old: Product[] = []) =>
           old.map(product =>
-            product.id === context.optimisticProduct.id ? data : product
+            product.id === (context as any).optimisticProduct.id ? data : product
           )
         )
       }
@@ -136,11 +137,11 @@ export function useUpdateProductMutation(
     },
     onError: (error, _variables, context) => {
       // Rollback optimistic updates
-      if (context?.previousProduct) {
-        queryClient.setQueryData(productQueryKeys.detail(context.id), context.previousProduct)
+      if ((context as any)?.previousProduct) {
+        queryClient.setQueryData(productQueryKeys.detail((context as any).id), (context as any).previousProduct)
       }
-      if (context?.previousProducts) {
-        queryClient.setQueryData(productQueryKeys.list(), context.previousProducts)
+      if ((context as any)?.previousProducts) {
+        queryClient.setQueryData(productQueryKeys.list(), (context as any).previousProducts)
       }
     },
     onSuccess: (data, _variables, context) => {
@@ -153,7 +154,7 @@ export function useUpdateProductMutation(
       productStore.replaceProduct(data.id, data)
 
       // Emit global event
-      eventEmitter.product.updated(data.id, data)
+      eventEmitter.product.updated(data.id, data, _variables.updates)
     },
     ...options
   })
@@ -196,8 +197,8 @@ export function useDeleteProductMutation(
     },
     onError: (error, id, context) => {
       // Rollback optimistic updates
-      if (context?.previousProducts) {
-        queryClient.setQueryData(productQueryKeys.list(), context.previousProducts)
+      if ((context as any)?.previousProducts) {
+        queryClient.setQueryData(productQueryKeys.list(), (context as any).previousProducts)
       }
     },
     onSuccess: (success, id, context) => {
@@ -255,8 +256,8 @@ export function useBulkUpdateProductsMutation(
     },
     onError: (error, _variables, context) => {
       // Rollback optimistic update
-      if (context?.previousProducts) {
-        queryClient.setQueryData(productQueryKeys.list(), context.previousProducts)
+      if ((context as any)?.previousProducts) {
+        queryClient.setQueryData(productQueryKeys.list(), (context as any).previousProducts)
       }
     },
     onSuccess: (data, { ids }) => {
@@ -272,7 +273,7 @@ export function useBulkUpdateProductsMutation(
       })
 
       // Emit global event for bulk update
-      eventEmitter.product.bulkUpdated(ids, data)
+      eventEmitter.product.bulkUpdated(data)
     },
     ...options
   })

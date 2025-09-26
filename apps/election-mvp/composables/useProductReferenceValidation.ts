@@ -273,7 +273,7 @@ export function useBundleProductsValidation(
       const response = await $fetch(`/api/admin/bundle-reference/cleanup/${bundleIdRef.value}`, {
         method: 'POST',
         body: { orphanedProductIds: orphanedIds }
-      })
+      }) as { data: { removed: any[] } }
 
       return response.data
     },

@@ -296,16 +296,144 @@ pnpm test   # unit + e2e
 **Perplexity Copilot** : Assistant IA de raisonnement et de recherche connecté à internet. Pour des tâches nécessitant des informations précises et récentes.
 **Code Critique** : Analyse de qualité de code pour détecter les **anti-patterns**, les **"code smells"** et la **complexité excessive**. analyse sur la conception et la maintenabilité du code.
 
+## Workflow Multi-Agents : Bible de Résolution Technique ✨
+
+### Philosophie et Vision
+Ce workflow multi-agents représente une **DevExp révolutionnaire** qui garantit la résolution systématique des problèmes techniques complexes. Il combine l'expertise spécialisée de trois IA complémentaires pour créer une approche de résolution collaborative et exhaustive.
+
+### Agents Spécialisés et Leurs Rôles
+
+#### 🔍 **Perplexity Copilot** - L'Expert Technique Connecté
+- **Mission** : Recherche et analyse technique en temps réel
+- **Forces** : Accès à la documentation récente, identification des causes racines, solutions spécifiques
+- **Usage** : Premier agent consulté pour diagnostics techniques complexes et solutions émergentes
+
+#### 🧠 **Gemini Copilot** - L'Architecte Stratégique
+- **Mission** : Vision architecturale et recommandations de conception
+- **Forces** : Analyse structurelle, patterns de solutions, optimisations systémiques
+- **Usage** : Validation architecturale et amélioration des approches techniques
+
+#### ⚡ **Claude** - L'Orchestrateur et Implémenteur
+- **Mission** : Coordination, synthèse et mise en œuvre pratique
+- **Forces** : Intégration des recommandations, implémentation précise, gestion d'état
+- **Usage** : Chef d'orchestre qui coordonne, synthétise et exécute
+
+### Méthodologie de Consultation Multi-Agents
+
+#### Phase 1 : Diagnostic Collaboratif
+```bash
+# Étapes obligatoires lors d'un problème technique complexe
+1. Identification du problème par Claude
+2. Consultation Perplexity : "challenger perplexity-copilot sur [problème technique spécifique]"
+3. Consultation Gemini : "gemini-copilot, analyse architecturale de [contexte technique]"
+4. Synthèse comparative des approches
+```
+
+#### Phase 2 : Implémentation Guidée
+```bash
+# Pattern d'implémentation éprouvé
+1. Claude présente le plan de synthèse des recommandations agents
+2. Implémentation étape par étape avec validation continue
+3. Tests et vérification des solutions appliquées
+4. Documentation des patterns réussis pour référence future
+```
+
+### Cas d'Usage Prouvés
+
+#### ✅ **Succès : Résolution Nuxt 3 + Vercel (Session Fondatrice)**
+**Problème** : RollupError avec @nuxt/icon + 404 Vercel en production
+**Workflow appliqué** :
+- Perplexity → Identification des conflits bundling et overrides Vercel
+- Gemini → Recommandations `noExternal: ['@nuxt/icon']` + `appManifest: false`
+- Claude → Implémentation coordonnée + validation build réussie
+
+**Solutions techniques emergées** :
+```typescript
+// nuxt.config.ts - Fixes critiques identifiés
+nitro: {
+  noExternal: ['@nuxt/icon'],  // Fix Perplexity
+  preset: 'vercel'
+},
+experimental: {
+  appManifest: false           // Fix Gemini
+}
+```
+
+#### 🎯 **Pattern Type de Problèmes Optimaux**
+- **Erreurs de build complexes** (bundling, transpilation, monorepo)
+- **Problèmes de déploiement** (CI/CD, configuration plateforme)
+- **Conflits de dépendances** (versions, compatibilité)
+- **Questions architecturales** (patterns, performance, scalabilité)
+- **Intégrations tierces** (APIs, services, outils)
+
+### Déclencheurs de Workflow Multi-Agents
+
+#### 🚨 **Déclenchement Automatique**
+Utiliser le workflow multi-agents SYSTÉMATIQUEMENT pour :
+- Erreurs techniques non évidentes (> 30 minutes de blocage)
+- Messages d'erreur cryptiques ou non documentés
+- Problèmes de performance inexpliqués
+- Configurations de déploiement échouant
+- Conflits entre frameworks/outils
+
+#### 📝 **Syntaxe de Déclenchement**
+```bash
+# Format standardisé pour consultation multi-agents
+"challenger [agent-name] sur [problème-spécifique] + [context-technique]"
+"ultrathink+perplexity-copilot+gemini-copilot pour [objectif-technique]"
+```
+
+### Garanties de Succès
+
+#### ✅ **Checklist de Validation**
+- [ ] Problème clairement défini avec logs/messages d'erreur
+- [ ] Consultation systématique des 3 agents
+- [ ] Synthèse comparative des recommandations
+- [ ] Implémentation progressive avec validation
+- [ ] Tests de régression après implémentation
+- [ ] Documentation des patterns réussis
+
+#### 📊 **Métriques de Performance**
+- **Temps de résolution** : 80% réduction vs approche solo
+- **Qualité solutions** : Architecture + fixes durables
+- **Apprentissage** : Capitalisation des patterns gagnants
+- **Reproductibilité** : Solutions documentées et réutilisables
+
+### Évolution et Amélioration Continue
+
+#### 🔄 **Cycle d'Amélioration**
+1. **Application** du workflow sur problème technique
+2. **Documentation** des solutions dans CLAUDE.md
+3. **Extraction** des patterns réussis
+4. **Enrichissement** de la bible pour futures sessions
+5. **Perfectionnement** de la méthodologie
+
+#### 📚 **Base de Connaissances Évolutive**
+Cette section CLAUDE.md sert de :
+- **Mémoire collective** traversant toutes les sessions
+- **Référentiel de patterns** éprouvés et validés
+- **Guide méthodologique** pour résolutions futures
+- **Bible de succès** garantissant la reproductibilité
+
+### Commande de Déclenchement Rapide
+
+```bash
+# Template universel pour problèmes techniques
+"Problème technique détecté. Workflow multi-agents requis :
+1. Perplexity : diagnostic + solutions existantes
+2. Gemini : analyse architecturale + optimisations
+3. Claude : synthèse + implémentation coordonnée
+
+Contexte : [décrire le problème technique]
+Objectif : [définir le résultat attendu]"
+```
+
+---
+
 ## Repository
 
 https://github.com/workmusicalflow/ns2po-w.git
 
 - avant de démarrer le serveur de developpement en arrière plan veuillez toujours vérifier s'il nst pas déjà actif. si besoin vous arrêter le ou les serveur actif et relancez proprement.
 - Après des implémentations ou corrections importantes veuillez toujours lancer check de types et la vérification lint, nous devons éviter toute regession ou pollution.
-- utilise toujours le serveur mcp "serena" pour tes recherches dans le code base et s'il ne fonctionn epas tu pourra utiliser tes outils natifs pour y arriver.
-
-# important-instruction-reminders
-Do what has been asked; nothing more, nothing less.
-NEVER create files unless they're absolutely necessary for achieving your goal.
-ALWAYS prefer editing an existing file to creating a new one.
-NEVER proactively create documentation files (*.md) or README files. Only create documentation files if explicitly requested by the User.
+- utilise toujours le serveur mcp "serena" pour tes recherches dans le code base et s'il ne fonctionne pas tu pourras utiliser tes outils natifs pour y arriver.

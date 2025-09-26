@@ -125,7 +125,7 @@ const teamPhotos: TeamPhoto[] = teamPhotosData.map((photo) => ({
 // =====================================
 
 const isMobile = computed(() => {
-  if (!process.client) return false;
+  if (typeof window === 'undefined') return false;
   return window.innerWidth <= props.breakpoint;
 });
 
@@ -165,11 +165,12 @@ const handleImageError = (event: Event) => {
  * Initialisation des animations GSAP
  */
 const initGSAPAnimations = () => {
-  if (!process.client || !props.animationEnabled) return;
+  if (typeof window === 'undefined' || !props.animationEnabled) return;
 
   // Import GSAP dynamique côté client
   import("gsap")
-    .then(({ gsap }) => {
+    .then((gsapModule) => {
+      const { gsap } = gsapModule;
       // Animation "gentle pulse" pour chaque photo
       teamPhotos.forEach((_, index) => {
         const photoElement = `.photo-${index + 1} .team-photo`;
