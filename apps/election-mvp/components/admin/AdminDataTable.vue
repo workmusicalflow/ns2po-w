@@ -457,7 +457,7 @@
 </template>
 
 <script setup lang="ts">
-// Auto-imported via Nuxt 3: globalNotifications
+import { globalNotifications } from '../../composables/useNotifications'
 
 interface Column {
   key: string
