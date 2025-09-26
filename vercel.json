@@ -1,5 +1,5 @@
 {
-  "installCommand": "pnpm install --no-frozen-lockfile",
+  "installCommand": "pnpm install --frozen-lockfile --network-timeout 300000 --fetch-retries 5",
   "buildCommand": "cd apps/election-mvp && pnpm build",
   "outputDirectory": "apps/election-mvp/.vercel/output"
 }
