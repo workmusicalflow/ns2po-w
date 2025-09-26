@@ -101,8 +101,8 @@ export default defineNuxtConfig({
     // Fix pour erreur client.manifest.mjs avec @nuxt/icon - SUPPRIMÉ selon recommandations multi-agents
     // noExternal: ['@nuxt/icon'],
 
-    // Preset Node.js pour déploiement Netlify
-    preset: 'node-server',
+    // Preset Netlify pour déploiement avec génération statique
+    preset: 'netlify',
 
     routeRules: {
       // Static pages - cache 1 hour

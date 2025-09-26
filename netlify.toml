@@ -14,6 +14,8 @@
   # Utiliser pnpm comme gestionnaire de packages
   NPM_FLAGS = "--version"
   PNPM_VERSION = "8"
+  # Flag obligatoire pour pnpm workspaces sur Netlify
+  PNPM_FLAGS = "--shamefully-hoist"
 
 # Configuration des fonctions serverless pour les API routes Nuxt
 [functions]

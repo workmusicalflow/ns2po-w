@@ -125,3 +125,6 @@ temp/
 .gemini-request-history.json
 .gemini-advanced-config.json
 .env*.local
+
+# Local Netlify folder
+.netlify
