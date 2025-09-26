@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "description": "NS2PO - Plateforme électorale numérique avec infrastructure décentralisée",
   "private": true,
-  "packageManager": "pnpm@8.15.0",
+  "packageManager": "pnpm@9.1.0",
   "workspaces": [
     "apps/*",
     "packages/*"

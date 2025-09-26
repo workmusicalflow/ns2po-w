@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "buildCommand": "pnpm build --filter=@ns2po/election-mvp",
+  "installCommand": "corepack enable && corepack prepare pnpm@9.1.0 --activate && pnpm -w install --frozen-lockfile",
+  "buildCommand": "pnpm -w --filter @ns2po/election-mvp run vercel-build",
   "outputDirectory": "apps/election-mvp/.vercel/output",
-  "installCommand": "pnpm install",
   "framework": null,
   "headers": [
     {
