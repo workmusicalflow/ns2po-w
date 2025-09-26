@@ -28,7 +28,10 @@
         </p>
 
         <!-- Intégration des drapeaux des pays d'opération -->
-        <FlagsDisplay />
+        <div class="flags-contextual">
+          <span class="flags-contextual-label">Opérant en :</span>
+          <FlagsDisplay />
+        </div>
 
         <Button size="large" class="hero-cta" @click="navigateTo('/devis')">
           Demander un devis
@@ -137,6 +140,7 @@
 
 <script setup lang="ts">
 import { Button, Card, TeamPhotos } from "@ns2po/ui";
+import FlagsDisplay from "~/components/FlagsDisplay.vue";
 import type { Realisation } from "@ns2po/types";
 
 // Gestion des réalisations
@@ -351,6 +355,38 @@ button.btn.hero-cta:hover {
   transform: translateY(-2px) scale(1.02);
 }
 
+/* Drapeaux contextuels - Intégration selon plan Gemini */
+.flags-contextual {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin: 1.5rem 0;
+  animation: flagsInScale 1.5s ease-out forwards;
+  animation-delay: 2.2s; /* Après le CTA */
+  opacity: 0;
+}
+
+.flags-contextual-label {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 1.1rem;
+  font-weight: 400;
+  white-space: nowrap;
+  font-family: var(--font-body);
+}
+
+/* Animation d'entrée pour les drapeaux */
+@keyframes flagsInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
 /* Tablettes - garde le ratio original */
 @media (max-width: 768px) and (min-width: 501px) {
   .hero-section {
@@ -360,6 +396,17 @@ button.btn.hero-cta:hover {
 
   .hero-content {
     padding: 0 20px;
+  }
+
+  /* Drapeaux sur tablettes */
+  .flags-contextual {
+    flex-direction: column;
+    gap: 0.75rem;
+    margin: 1rem 0;
+  }
+
+  .flags-contextual-label {
+    font-size: 1rem;
   }
 }
 
@@ -398,6 +445,17 @@ button.btn.hero-cta:hover {
     margin-top: 5px;
     font-size: clamp(0.9rem, 3vw, 1.05rem);
     padding: 0.5rem 1.5rem;
+  }
+
+  /* Drapeaux sur mobile */
+  .flags-contextual {
+    flex-direction: column;
+    gap: 0.5rem;
+    margin: 0.75rem 0;
+  }
+
+  .flags-contextual-label {
+    font-size: 0.9rem;
   }
 }
 

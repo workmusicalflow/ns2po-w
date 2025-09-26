@@ -39,13 +39,30 @@ export const useCampaignBundles = () => {
   const selectionSummary = computed(() => {
     const items = currentCart.value;
     const totalItems = items.length;
-    const totalPrice = items.reduce((sum, item) => sum + (item.price || 0) * (item.quantity || 1), 0);
+
+    // Calculer le prix total selon le contexte
+    let totalPrice = 0;
+    let type = 'none';
+
+    if (selectedBundle.value) {
+      // Si un bundle est sélectionné, utiliser son prix total
+      totalPrice = selectedBundle.value.estimatedTotal || 0;
+      type = 'bundle';
+    } else if (multiSelectionState.value.customProducts.length > 0) {
+      // Si sélection personnalisée, calculer le prix des produits individuels
+      totalPrice = items.reduce((sum, item) => sum + (item.price || 0) * (item.quantity || 1), 0);
+      type = 'custom';
+    }
 
     return {
       totalItems,
       totalPrice,
+      type,
+      name: selectedBundle.value?.name || 'Sélection personnalisée',
       bundles: currentBundles.value,
-      customProducts: multiSelectionState.value.customProducts
+      customProducts: multiSelectionState.value.customProducts,
+      // Calcul des économies si bundle sélectionné
+      savings: selectedBundle.value?.savings || 0
     };
   });
 
