@@ -2,8 +2,8 @@
   # Répertoire contenant l'application Nuxt
   base = "apps/election-mvp"
 
-  # Commande de build pour Nuxt avec pnpm
-  command = "cd ../../ && pnpm install && pnpm build --filter=@ns2po/election-mvp"
+  # Commande de build pour Nuxt avec pnpm + optional deps pour oxc-parser
+  command = "cd ../../ && pnpm install --include=optional && pnpm build --filter=@ns2po/election-mvp"
 
   # Répertoire de sortie après build
   publish = "apps/election-mvp/.output/public"
@@ -14,8 +14,8 @@
   # Utiliser pnpm comme gestionnaire de packages
   NPM_FLAGS = "--version"
   PNPM_VERSION = "8"
-  # Flag obligatoire pour pnpm workspaces sur Netlify
-  PNPM_FLAGS = "--shamefully-hoist"
+  # Flag obligatoire pour pnpm workspaces sur Netlify + oxc-parser native bindings
+  PNPM_FLAGS = "--shamefully-hoist --include=optional"
 
 # Configuration des fonctions serverless pour les API routes Nuxt
 [functions]
