@@ -1,5 +1,5 @@
 {
-  "installCommand": "pnpm install",
+  "installCommand": "pnpm install --no-frozen-lockfile",
   "buildCommand": "cd apps/election-mvp && pnpm build",
   "outputDirectory": "apps/election-mvp/.vercel/output"
 }
