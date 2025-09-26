@@ -1,1 +1,5 @@
-{}
+{
+  "installCommand": "pnpm install",
+  "buildCommand": "cd apps/election-mvp && pnpm build",
+  "outputDirectory": "apps/election-mvp/.vercel/output"
+}
