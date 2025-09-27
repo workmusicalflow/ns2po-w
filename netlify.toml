@@ -2,8 +2,8 @@
   # Build depuis la racine du monorepo pour pnpm workspaces
   base = "."
 
-  # Commande de build avec ignore complet des optional dependencies + scripts
-  command = "pnpm install --no-optional --ignore-scripts --frozen-lockfile && pnpm --filter @ns2po/election-mvp build"
+  # Commande de build avec patch WASM et ignore des optional dependencies
+  command = "pnpm install --no-optional --ignore-scripts --frozen-lockfile && node scripts/force-oxc-wasm.js && pnpm --filter @ns2po/election-mvp build"
 
   # Répertoire de sortie après build
   publish = "apps/election-mvp/.output/public"
@@ -19,6 +19,12 @@
   NPM_CONFIG_IGNORE_SCRIPTS = "true"
   PNPM_IGNORE_SCRIPTS = "true"
   SKIP_INSTALL_OPTIONAL = "true"
+  # Variables pour forcer l'utilisation de WASM au lieu des bindings natifs
+  FORCE_WASM = "true"
+  USE_WASM = "1"
+  OXC_USE_WASM = "true"
+  DISABLE_NATIVE_BINDINGS = "true"
+  NETLIFY_BUILD = "true"
   # Pas de PNPM_FLAGS pour éviter les conflits avec workspaces
 
 # Configuration des fonctions serverless pour les API routes Nuxt

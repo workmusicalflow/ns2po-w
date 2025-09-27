@@ -25,12 +25,6 @@
     "assets:stats": "node scripts/asset-manager.mjs stats",
     "assets:invalidate": "node scripts/asset-manager.mjs invalidate"
   },
-  "dependencies": {
-    "@libsql/client": "^0.15.12",
-    "airtable": "^0.12.2",
-    "cloudinary": "^2.7.0",
-    "dotenv": "^17.2.1"
-  },
   "devDependencies": {
     "@turbo/gen": "^1.10.12",
     "prettier": "^3.0.0",
@@ -38,5 +32,19 @@
   },
   "engines": {
     "node": ">=20.x"
+  },
+  "dependencies": {
+    "@libsql/client": "^0.15.12",
+    "airtable": "^0.12.2",
+    "cloudinary": "^2.7.0",
+    "dotenv": "^17.2.1",
+    "@oxc-parser/binding-wasm32-wasi": "^0.87.0"
+  },
+  "pnpm": {
+    "overrides": {
+      "@oxc-parser/binding-linux-x64-gnu": "@oxc-parser/binding-wasm32-wasi",
+      "@oxc-parser/binding-darwin-x64": "@oxc-parser/binding-wasm32-wasi",
+      "@oxc-parser/binding-win32-x64-msvc": "@oxc-parser/binding-wasm32-wasi"
+    }
   }
 }
