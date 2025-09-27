@@ -19,7 +19,7 @@ PMI ivoirienne de publicité par l'objet depuis 2011, NS2PO digitalise son offre
 * **Migration** : Airtable → Turso (cache performant)
 * **Admin CMS** : Mini-CMS sécurisé `/admin` avec Shadcn-vue + authentification middleware
 * **Médias** : Cloudinary (upload, optimisation, transformation)
-* **Déploiement** : Vercel, monorepo Turborepo + pnpm workspaces
+* **Déploiement** : Railway, monorepo Turborepo + pnpm workspaces
 * **Outils clés** : Drizzle ORM pour base typée, Nitro-cache, Playwright, Vitest
 * **État Management** : TanStack Query (Vue Query) pour cache et mutations
 
@@ -124,40 +124,6 @@ const product = {
     name: apiData.categoryName,
     slug: apiData.categorySlug
   }
-}
-```
-
-### Patterns Avancés
-
-#### Background Refetch avec stale-while-revalidate
-```typescript
-const { data, isStale } = useProductsQuery(filters, {
-  staleTime: 5 * 60 * 1000,
-  refetchOnWindowFocus: true,
-  refetchOnReconnect: true
-})
-```
-
-#### Optimistic Updates avec correction d'erreur
-```typescript
-onError: (error, variables, context) => {
-  // Rollback optimiste
-  queryClient.setQueryData(key, context.previousValue)
-
-  // Notification d'erreur
-  globalNotifications.crudError.created('produit', error.message)
-}
-```
-
-#### Bulk Operations avec transaction-like behavior
-```typescript
-onMutate: async ({ ids, updates }) => {
-  const previousStates = {}
-  for (const id of ids) {
-    previousStates[id] = queryClient.getQueryData(['products', 'detail', id])
-    queryClient.setQueryData(['products', 'detail', id], old => ({ ...old, ...updates }))
-  }
-  return { previousStates, ids }
 }
 ```
 
@@ -266,7 +232,7 @@ SMTP_PASSWORD=undPzZ3x3U
 ## Maintenance & Monitoring
 
 * Mise à jour dépendances avec `pnpm update` + tests
-* Monitoring : Vercel Analytics, Sentry à configurer
+* Monitoring : Railway Analytics, Sentry à configurer
 * Logs via composables Vue, debug local Nuxt + réseau
 
 ## Commandes clés
@@ -338,83 +304,6 @@ Ce workflow multi-agents représente une **DevExp révolutionnaire** qui garanti
 4. Documentation des patterns réussis pour référence future
 ```
 
-### Cas d'Usage Prouvés
-
-#### ✅ **Succès : Résolution Nuxt 3 + Vercel (Session Fondatrice)**
-**Problème** : RollupError avec @nuxt/icon + 404 Vercel en production
-**Workflow appliqué** :
-- Perplexity → Identification des conflits bundling et overrides Vercel
-- Gemini → Recommandations `noExternal: ['@nuxt/icon']` + `appManifest: false`
-- Claude → Implémentation coordonnée + validation build réussie
-
-**Solutions techniques emergées** :
-```typescript
-// nuxt.config.ts - Fixes critiques identifiés
-nitro: {
-  noExternal: ['@nuxt/icon'],  // Fix Perplexity
-  preset: 'vercel'
-},
-experimental: {
-  appManifest: false           // Fix Gemini
-}
-```
-
-#### 🎯 **Pattern Type de Problèmes Optimaux**
-- **Erreurs de build complexes** (bundling, transpilation, monorepo)
-- **Problèmes de déploiement** (CI/CD, configuration plateforme)
-- **Conflits de dépendances** (versions, compatibilité)
-- **Questions architecturales** (patterns, performance, scalabilité)
-- **Intégrations tierces** (APIs, services, outils)
-
-### Déclencheurs de Workflow Multi-Agents
-
-#### 🚨 **Déclenchement Automatique**
-Utiliser le workflow multi-agents SYSTÉMATIQUEMENT pour :
-- Erreurs techniques non évidentes (> 30 minutes de blocage)
-- Messages d'erreur cryptiques ou non documentés
-- Problèmes de performance inexpliqués
-- Configurations de déploiement échouant
-- Conflits entre frameworks/outils
-
-#### 📝 **Syntaxe de Déclenchement**
-```bash
-# Format standardisé pour consultation multi-agents
-"challenger [agent-name] sur [problème-spécifique] + [context-technique]"
-"ultrathink+perplexity-copilot+gemini-copilot pour [objectif-technique]"
-```
-
-### Garanties de Succès
-
-#### ✅ **Checklist de Validation**
-- [ ] Problème clairement défini avec logs/messages d'erreur
-- [ ] Consultation systématique des 3 agents
-- [ ] Synthèse comparative des recommandations
-- [ ] Implémentation progressive avec validation
-- [ ] Tests de régression après implémentation
-- [ ] Documentation des patterns réussis
-
-#### 📊 **Métriques de Performance**
-- **Temps de résolution** : 80% réduction vs approche solo
-- **Qualité solutions** : Architecture + fixes durables
-- **Apprentissage** : Capitalisation des patterns gagnants
-- **Reproductibilité** : Solutions documentées et réutilisables
-
-### Évolution et Amélioration Continue
-
-#### 🔄 **Cycle d'Amélioration**
-1. **Application** du workflow sur problème technique
-2. **Documentation** des solutions dans CLAUDE.md
-3. **Extraction** des patterns réussis
-4. **Enrichissement** de la bible pour futures sessions
-5. **Perfectionnement** de la méthodologie
-
-#### 📚 **Base de Connaissances Évolutive**
-Cette section CLAUDE.md sert de :
-- **Mémoire collective** traversant toutes les sessions
-- **Référentiel de patterns** éprouvés et validés
-- **Guide méthodologique** pour résolutions futures
-- **Bible de succès** garantissant la reproductibilité
-
 ### Commande de Déclenchement Rapide
 
 ```bash
@@ -430,6 +319,28 @@ Objectif : [définir le résultat attendu]"
 
 ---
 
+## Principe de Cohérence Local ↔ Production ✨
+
+**RÈGLE ABSOLUE** : Toute modification doit maintenir la compatibilité LOCAL + RAILWAY simultanément.
+
+### Workflow Obligatoire
+1. ✅ **Test local complet** avant tout commit
+2. ✅ **Validation APIs** et fonctionnalités principales en local
+3. ✅ **Commit seulement** si stabilité locale confirmée
+4. ✅ **Push vers Railway** uniquement après validation locale
+5. ✅ **Monitoring Railway** post-déploiement obligatoire
+
+### Garde-fous Anti-Régression
+- ❌ **Jamais de fix spécifique production** qui casse le local
+- ❌ **Jamais de commit sans test local** préalable
+- ✅ **Une seule codebase**, deux environnements stables
+- ✅ **Cohérence SSR/Docker** maintenue entre local et Railway
+
+### Principe Fondamental
+*"Stabilité locale = Stabilité production"* - Évite les cycles de régression entre environnements.
+
+---
+
 ## Repository
 
 https://github.com/workmusicalflow/ns2po-w.git
@@ -437,3 +348,4 @@ https://github.com/workmusicalflow/ns2po-w.git
 - avant de démarrer le serveur de developpement en arrière plan veuillez toujours vérifier s'il nst pas déjà actif. si besoin vous arrêter le ou les serveur actif et relancez proprement.
 - Après des implémentations ou corrections importantes veuillez toujours lancer check de types et la vérification lint, nous devons éviter toute regession ou pollution.
 - utilise toujours le serveur mcp "serena" pour tes recherches dans le code base et s'il ne fonctionne pas tu pourras utiliser tes outils natifs pour y arriver.
+- Pour ce qui est de Railway nous utiliserai au maximum la CLI. our les commande intéractivesvous me les soumettrez avec le scénario pour que je les exécutes depuis un second terminal. pour les commandes non intéractive vous pous en chargerai tout au long du process. l'idée est de faire le maximum en ligne de commande et ne faire que l'impossible via le dashboard web Railway.

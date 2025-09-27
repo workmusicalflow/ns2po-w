@@ -272,6 +272,10 @@ const debouncedSearch = refDebounced(computed(() => filters.search), 300)
 const currentFilters = computed((): ProductFilters => {
   const result: ProductFilters = {}
 
+  if (filters.search) {
+    result.search = filters.search
+  }
+
   if (filters.category) {
     result.category = filters.category
   }

@@ -1,4 +1,4 @@
-import { VueQueryPlugin, QueryClient, dehydrate, hydrate } from '@tanstack/vue-query'
+import { VueQueryPlugin, QueryClient, dehydrate, hydrate, VUE_QUERY_CLIENT } from '@tanstack/vue-query'
 
 export default defineNuxtPlugin({
   name: 'vue-query',
@@ -29,6 +29,9 @@ export default defineNuxtPlugin({
     }
 
     nuxtApp.vueApp.use(VueQueryPlugin, vueQueryOptions)
+
+    // Injection explicite du QueryClient pour éviter les erreurs d'injection
+    nuxtApp.vueApp.provide(VUE_QUERY_CLIENT, queryClient)
 
     // Hydratation pour SSR
     if (import.meta.server) {
