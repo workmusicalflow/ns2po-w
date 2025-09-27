@@ -39,7 +39,9 @@ COPY --from=dependencies /app/packages ./packages/
 # Copy all source code
 COPY . .
 
-# Build the election-mvp application
+# Build the election-mvp application avec preset Railway forcé
+ENV NITRO_PRESET=node-server
+ENV NODE_ENV=production
 RUN pnpm --filter @ns2po/election-mvp build
 
 # Stage 3: Runner - Production runtime sécurisé
@@ -56,7 +58,7 @@ RUN adduser --system --uid 1001 nuxtjs
 WORKDIR /app
 
 # Copy built application and dependencies
-COPY --from=builder --chown=nuxtjs:nuxtjs /app/apps/election-mvp/.output ./apps/election-mvp/.output
+COPY --from=builder --chown=nuxtjs:nuxtjs /app/apps/election-mvp/.output ./.output
 COPY --from=builder --chown=nuxtjs:nuxtjs /app/package.json /app/pnpm-lock.yaml /app/pnpm-workspace.yaml /app/.npmrc ./
 COPY --from=builder --chown=nuxtjs:nuxtjs /app/apps/election-mvp/package.json ./apps/election-mvp/
 # Copier les packages pour les dépendances workspace
@@ -79,7 +81,7 @@ ENV PORT=3000
 
 # Health check for Railway monitoring
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD node apps/election-mvp/.output/server/index.mjs --health-check || exit 1
+  CMD node .output/server/index.mjs --health-check || exit 1
 
 # Start the application with Railway-optimized command
-CMD ["node", "apps/election-mvp/.output/server/index.mjs"]
+CMD ["node", ".output/server/index.mjs"]
