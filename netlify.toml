@@ -2,18 +2,18 @@
   # Build depuis la racine du monorepo pour pnpm workspaces
   base = "."
 
-  # Commande de build correcte pour monorepo pnpm avec --filter
-  command = "pnpm install --frozen-lockfile && pnpm --filter @ns2po/election-mvp build"
+  # Commande de build avec gestion oxc-parser native bindings
+  command = "pnpm install --frozen-lockfile --include-optional=false && pnpm --filter @ns2po/election-mvp build"
 
   # Répertoire de sortie après build
   publish = "apps/election-mvp/.output/public"
 
 [build.environment]
-  # Version Node.js (utilise .nvmrc = 20.19.0)
-  NODE_VERSION = "20.19.0"
+  # Version Node.js stable LTS (compatible avec oxc-parser)
+  NODE_VERSION = "20.18.0"
   # Utiliser pnpm comme gestionnaire de packages
   NPM_FLAGS = ""
-  PNPM_VERSION = "8.15.6"
+  PNPM_VERSION = "9.1.0"
   # Pas de PNPM_FLAGS pour éviter les conflits avec workspaces
 
 # Configuration des fonctions serverless pour les API routes Nuxt
