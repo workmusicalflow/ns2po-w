@@ -23,6 +23,8 @@
   FORCE_WASM = "true"
   USE_WASM = "1"
   OXC_USE_WASM = "true"
+  OXC_FORCE_WASM = "true"
+  OXLINT_FORCE_WASM = "1"
   DISABLE_NATIVE_BINDINGS = "true"
   NETLIFY_BUILD = "true"
   # Pas de PNPM_FLAGS pour éviter les conflits avec workspaces

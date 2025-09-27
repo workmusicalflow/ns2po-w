@@ -8,6 +8,9 @@ overrides:
   '@oxc-parser/binding-linux-x64-gnu': '@oxc-parser/binding-wasm32-wasi'
   '@oxc-parser/binding-darwin-x64': '@oxc-parser/binding-wasm32-wasi'
   '@oxc-parser/binding-win32-x64-msvc': '@oxc-parser/binding-wasm32-wasi'
+  '@oxc-transform/binding-linux-x64-gnu': '@oxc-transform/binding-wasm32-wasi'
+  '@oxc-transform/binding-darwin-x64': '@oxc-transform/binding-wasm32-wasi'
+  '@oxc-transform/binding-win32-x64-msvc': '@oxc-transform/binding-wasm32-wasi'
 
 importers:
 
@@ -17,6 +20,9 @@ importers:
         specifier: ^0.15.12
         version: 0.15.15
       '@oxc-parser/binding-wasm32-wasi':
+        specifier: ^0.87.0
+        version: 0.87.0
+      '@oxc-transform/binding-wasm32-wasi':
         specifier: ^0.87.0
         version: 0.87.0
       airtable:
@@ -2906,15 +2912,6 @@ packages:
     dev: false
     optional: true
 
-  /@oxc-transform/binding-darwin-x64@0.87.0:
-    resolution: {integrity: sha512-MDbgugi6mvuPTfS78E2jyozm7493Kuqmpc5r406CsUdEsXlnsF+xvmKlrW9ZIkisO74dD+HWouSiDtNyPQHjlw==}
-    engines: {node: '>=14.0.0'}
-    cpu: [x64]
-    os: [darwin]
-    requiresBuild: true
-    dev: false
-    optional: true
-
   /@oxc-transform/binding-freebsd-x64@0.87.0:
     resolution: {integrity: sha512-N0M5D/4haJw7BMn2WZ3CWz0WkdLyoK1+3KxOyCv2CPedMCxx6eQay2AtJxSzj9tjVU1+ukbSb2fDO24JIJGsVA==}
     engines: {node: '>=14.0.0'}
@@ -2978,15 +2975,6 @@ packages:
     dev: false
     optional: true
 
-  /@oxc-transform/binding-linux-x64-gnu@0.87.0:
-    resolution: {integrity: sha512-ZOKW3wx0bW2O7jGdOzr8DyLZqX2C36sXvJdsHj3IueZZ//d/NjLZqEiUKz+q0JlERHtCVKShQ5PLaCx7NpuqNg==}
-    engines: {node: '>=14.0.0'}
-    cpu: [x64]
-    os: [linux]
-    requiresBuild: true
-    dev: false
-    optional: true
-
   /@oxc-transform/binding-linux-x64-musl@0.87.0:
     resolution: {integrity: sha512-eIspx/JqkVMPK1CAYEOo2J8o49s4ZTf+32MSMUknIN2ZS1fvRmWS0D/xFFaLP/9UGhdrXRIPbn/iSYEA8JnV/g==}
     engines: {node: '>=14.0.0'}
@@ -3004,21 +2992,11 @@ packages:
     dependencies:
       '@napi-rs/wasm-runtime': 1.0.5
     dev: false
-    optional: true
 
   /@oxc-transform/binding-win32-arm64-msvc@0.87.0:
     resolution: {integrity: sha512-l/qSi4/N5W1yXKU9+1gWGo0tBoRpp4zvHYrpsbq3zbefPL4VYdA0gKF7O10/ZQVkYylzxiVh2zpYO34/FbZdIg==}
     engines: {node: '>=14.0.0'}
     cpu: [arm64]
-    os: [win32]
-    requiresBuild: true
-    dev: false
-    optional: true
-
-  /@oxc-transform/binding-win32-x64-msvc@0.87.0:
-    resolution: {integrity: sha512-jG/MhMjfSdyj5KyhnwNWr4mnAlAsz+gNUYpjQ+UXWsfsoB3f8HqbsTkG02RBtNa/IuVQYvYYVf1eIimNN3gBEQ==}
-    engines: {node: '>=14.0.0'}
-    cpu: [x64]
     os: [win32]
     requiresBuild: true
     dev: false
@@ -9147,7 +9125,7 @@ packages:
     optionalDependencies:
       '@oxc-transform/binding-android-arm64': 0.87.0
       '@oxc-transform/binding-darwin-arm64': 0.87.0
-      '@oxc-transform/binding-darwin-x64': 0.87.0
+      '@oxc-transform/binding-darwin-x64': link:@oxc-transform/binding-wasm32-wasi
       '@oxc-transform/binding-freebsd-x64': 0.87.0
       '@oxc-transform/binding-linux-arm-gnueabihf': 0.87.0
       '@oxc-transform/binding-linux-arm-musleabihf': 0.87.0
@@ -9155,11 +9133,11 @@ packages:
       '@oxc-transform/binding-linux-arm64-musl': 0.87.0
       '@oxc-transform/binding-linux-riscv64-gnu': 0.87.0
       '@oxc-transform/binding-linux-s390x-gnu': 0.87.0
-      '@oxc-transform/binding-linux-x64-gnu': 0.87.0
+      '@oxc-transform/binding-linux-x64-gnu': link:@oxc-transform/binding-wasm32-wasi
       '@oxc-transform/binding-linux-x64-musl': 0.87.0
       '@oxc-transform/binding-wasm32-wasi': 0.87.0
       '@oxc-transform/binding-win32-arm64-msvc': 0.87.0
-      '@oxc-transform/binding-win32-x64-msvc': 0.87.0
+      '@oxc-transform/binding-win32-x64-msvc': link:@oxc-transform/binding-wasm32-wasi
     dev: false
 
   /oxc-walker@0.5.2(oxc-parser@0.87.0):
