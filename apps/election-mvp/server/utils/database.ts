@@ -14,28 +14,39 @@ let dbClient: ReturnType<typeof createClient> | null = null
 export function getDatabase() {
   if (!dbClient) {
     const config = useRuntimeConfig()
-    
+
     // Access the turso config properly
     const tursoConfig = (config as any).turso
-    
-    if (!tursoConfig?.databaseUrl || !tursoConfig?.authToken) {
+
+    // Fallback direct sur process.env si runtimeConfig échoue (fix Railway)
+    const databaseUrl = tursoConfig?.databaseUrl || process.env.TURSO_DATABASE_URL
+    const authToken = tursoConfig?.authToken || process.env.TURSO_AUTH_TOKEN
+
+    if (!databaseUrl || !authToken) {
       console.warn('⚠️ Turso database not configured - using in-memory fallback')
+      console.warn('  Debug info:', {
+        runtimeConfig: !!tursoConfig,
+        databaseUrl: !!databaseUrl,
+        authToken: !!authToken,
+        env_TURSO_DATABASE_URL: !!process.env.TURSO_DATABASE_URL,
+        env_TURSO_AUTH_TOKEN: !!process.env.TURSO_AUTH_TOKEN
+      })
       // Return null to indicate database is not available
       return null
     }
 
     try {
       dbClient = createClient({
-        url: tursoConfig.databaseUrl as string,
-        authToken: tursoConfig.authToken as string,
+        url: databaseUrl as string,
+        authToken: authToken as string,
       })
-      console.log('✅ Connected to Turso database')
+      console.log('✅ Connected to Turso database via', tursoConfig?.databaseUrl ? 'runtimeConfig' : 'process.env fallback')
     } catch (error) {
       console.error('❌ Failed to connect to Turso database:', error)
       return null
     }
   }
-  
+
   return dbClient
 }
 
