@@ -52,6 +52,7 @@
     "pinia": "^3.0.3",
     "shadcn-vue": "^2.2.0",
     "tailwind-merge": "^3.3.1",
+    "uqr": "0.1.2",
     "vee-validate": "^4.15.1",
     "vue": "^3.4.0",
     "zod": "^3.24.0"
