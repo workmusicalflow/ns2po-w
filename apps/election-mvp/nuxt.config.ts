@@ -79,10 +79,10 @@ export default defineNuxtConfig({
     // Fix pour erreur client.manifest.mjs avec @nuxt/icon - SUPPRIMÉ selon recommandations multi-agents
     // noExternal: ['@nuxt/icon'],
 
-    // Preset Netlify pour déploiement avec génération statique
-    preset: 'netlify',
+    // Preset Railway pour déploiement avec serveur Node.js
+    preset: 'node-server',
 
-    // Désactive les features problématiques sur Netlify
+    // Configuration pour Railway - WASM non requis avec Docker
     experimental: {
       wasm: false
     },
