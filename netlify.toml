@@ -2,8 +2,8 @@
   # Build depuis la racine du monorepo pour pnpm workspaces
   base = "."
 
-  # Commande de build avec gestion oxc-parser native bindings
-  command = "pnpm install --frozen-lockfile --include-optional=false && pnpm --filter @ns2po/election-mvp build"
+  # Commande de build avec ignore complet des optional dependencies
+  command = "pnpm install --no-optional --frozen-lockfile && pnpm --filter @ns2po/election-mvp build"
 
   # Répertoire de sortie après build
   publish = "apps/election-mvp/.output/public"
@@ -14,6 +14,8 @@
   # Utiliser pnpm comme gestionnaire de packages
   NPM_FLAGS = ""
   PNPM_VERSION = "9.1.0"
+  # Force ignore des optional dependencies (native bindings)
+  NPM_CONFIG_OPTIONAL = "false"
   # Pas de PNPM_FLAGS pour éviter les conflits avec workspaces
 
 # Configuration des fonctions serverless pour les API routes Nuxt
