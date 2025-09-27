@@ -1,26 +1,23 @@
 /**
- * API Réalisations Hybride: Turso-first avec fallback Airtable + Auto-discovery Cloudinary
- * Performance: 5-10x amélioration via Turso local vs API Airtable externe
+ * API Réalisations: Turso + Auto-discovery Cloudinary
+ * Performance optimisée après suppression d'Airtable
  */
 
-import type { HybridRealisation, AirtableRealisation } from "@ns2po/types";
+import type { HybridRealisation } from "@ns2po/types";
 import { getDatabase } from "../../utils/database";
 import {
   getCloudinaryCreativeImages,
   cloudinaryImageToHybridRealisation,
 } from "../../utils/cloudinary-discovery";
 
-// Configuration Airtable (fallback seulement)
-const AIRTABLE_BASE_ID = "apprQLdnVwlbfnioT";
-const AIRTABLE_API_KEY = process.env.AIRTABLE_API_KEY;
-
 /**
- * Récupère réalisations depuis Turso (priorité 1)
+ * Récupère réalisations depuis Turso
  */
 async function fetchTursoRealisations(): Promise<HybridRealisation[]> {
   const db = getDatabase();
   if (!db) {
-    throw new Error("Turso database unavailable");
+    console.warn("⚠️ Turso database unavailable - returning empty array");
+    return [];
   }
 
   console.log("🎯 Récupération Turso réalisations...");
@@ -51,107 +48,14 @@ async function fetchTursoRealisations(): Promise<HybridRealisation[]> {
     customizationOptionIds: JSON.parse(row.customization_option_ids || '[]'),
     tags: JSON.parse(row.tags || '[]'),
     isFeatured: Boolean(row.is_featured),
-    order: Number(row.order_position) || undefined,
+    orderPosition: row.order_position,
     isActive: Boolean(row.is_active),
-    source: row.source as "turso" | "airtable",
-    // Générer URLs Cloudinary optimisées
-    cloudinaryUrls: JSON.parse(row.cloudinary_public_ids || '[]').map((publicId: string) => {
-      const fullPath = publicId.includes("/") && !publicId.includes(".")
-        ? `${publicId}.jpg`
-        : publicId;
-      return `https://res.cloudinary.com/dsrvzogof/image/upload/w_800,h_600,c_fit,f_auto,q_auto/${fullPath}`;
-    })
-  })) as HybridRealisation[];
+    source: row.source as 'turso' | 'cloudinary',
+    createdAt: row.created_at,
+    updatedAt: row.updated_at
+  }));
 
   console.log(`✅ Turso: ${realisations.length} réalisations récupérées`);
-  return realisations;
-}
-
-/**
- * Récupère réalisations depuis Airtable (fallback)
- */
-async function fetchAirtableData<T>(tableName: string, view?: string): Promise<T[]> {
-  if (!AIRTABLE_API_KEY) {
-    throw new Error("AIRTABLE_API_KEY manquante");
-  }
-
-  const url = new URL(`https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${tableName}`);
-  if (view) url.searchParams.set("view", view);
-
-  const response = await fetch(url.toString(), {
-    headers: {
-      Authorization: `Bearer ${AIRTABLE_API_KEY}`,
-      "Content-Type": "application/json",
-    },
-  });
-
-  if (!response.ok) {
-    throw createError({
-      statusCode: response.status,
-      statusMessage: `Erreur Airtable ${tableName}: ${response.statusText}`,
-    });
-  }
-
-  const data = await response.json();
-  return data.records || [];
-}
-
-/**
- * Transforme réalisation Airtable en HybridRealisation
- */
-function transformAirtableToHybrid(airtableRealisation: AirtableRealisation): HybridRealisation {
-  const fields = airtableRealisation.fields as any;
-
-  // Parse CloudinaryPublicIds
-  let cloudinaryIds: string[] = [];
-  if (fields.CloudinaryPublicIds) {
-    if (typeof fields.CloudinaryPublicIds === "string") {
-      cloudinaryIds = fields.CloudinaryPublicIds.split(",")
-        .map((id: string) => id.trim())
-        .filter((id: string) => id);
-    } else if (Array.isArray(fields.CloudinaryPublicIds)) {
-      cloudinaryIds = fields.CloudinaryPublicIds;
-    }
-  }
-
-  // Générer URLs optimisées
-  const cloudinaryUrls = cloudinaryIds.map((publicId) => {
-    const fullPath = publicId.includes("/") && !publicId.includes(".")
-      ? `${publicId}.jpg`
-      : publicId;
-    return `https://res.cloudinary.com/dsrvzogof/image/upload/w_800,h_600,c_fit,f_auto,q_auto/${fullPath}`;
-  });
-
-  return {
-    id: airtableRealisation.id,
-    title: fields.Title || "Sans titre",
-    description: fields.Description,
-    cloudinaryPublicIds: cloudinaryIds,
-    productIds: fields.Products || [],
-    categoryIds: fields.Categories || [],
-    customizationOptionIds: fields.CustomizationOptions || [],
-    tags: fields.Tags || [],
-    isFeatured: fields.IsFeatured || false,
-    order: fields.DisplayOrder,
-    isActive: fields.IsActive !== false,
-    source: "airtable" as const,
-    cloudinaryUrls,
-  };
-}
-
-/**
- * Récupère réalisations Airtable (fallback)
- */
-async function fetchAirtableRealisations(): Promise<HybridRealisation[]> {
-  console.log("🔄 Fallback Airtable réalisations...");
-
-  const airtableRealisations = await fetchAirtableData<AirtableRealisation>("Realisations");
-
-  const realisations = airtableRealisations
-    .map(transformAirtableToHybrid)
-    .filter((r: HybridRealisation) => r.isActive);
-
-  console.log(`✅ Airtable: ${realisations.length} réalisations actives`);
   return realisations;
 }
 
@@ -168,7 +72,7 @@ async function generateAutoDiscoveryRealisations(existingPublicIds: Set<string>)
     const db = getDatabase();
     if (!db) {
       console.warn("⚠️ Database non disponible pour auto-discovery blacklist");
-      return [];
+      return cloudinaryImages.map((image: any) => cloudinaryImageToHybridRealisation(image));
     }
 
     const blacklistResult = await db.execute('SELECT public_id FROM realisation_blacklist');
@@ -176,7 +80,7 @@ async function generateAutoDiscoveryRealisations(existingPublicIds: Set<string>)
 
     console.log(`🚫 ${blacklistedPublicIds.size} réalisations blacklistées`);
 
-    // CORRECTION : Transformer le public_id original pour comparaison blacklist
+    // Transformer le public_id original pour comparaison blacklist
     const autoDiscoveryImages = cloudinaryImages.filter((image: any) => {
       const transformedId = `cloudinary_${image.public_id.replace(/[^a-zA-Z0-9]/g, "_")}`;
       return !existingPublicIds.has(transformedId) && !blacklistedPublicIds.has(transformedId);
@@ -196,120 +100,68 @@ async function generateAutoDiscoveryRealisations(existingPublicIds: Set<string>)
 }
 
 /**
- * Handler principal API hybride
+ * Handler principal API
  */
 export default defineEventHandler(async (event): Promise<HybridRealisation[]> => {
   const startTime = Date.now();
 
   try {
-    console.log("🚀 API Réalisations TURSO-FIRST hybride");
+    console.log("🚀 API Réalisations Turso + Cloudinary");
     console.log("🔍 Debug env vars:", {
       TURSO_DATABASE_URL: process.env.TURSO_DATABASE_URL ? "✅ Set" : "❌ Missing",
-      AIRTABLE_API_KEY: AIRTABLE_API_KEY ? "✅ Set" : "❌ Missing",
       CLOUDINARY_CLOUD_NAME: process.env.CLOUDINARY_CLOUD_NAME ? "✅ Set" : "❌ Missing",
     });
 
-    let realisations: HybridRealisation[] = [];
-    let source = 'unknown';
+    // 1. Récupérer réalisations Turso
+    const tursoRealisations = await fetchTursoRealisations();
 
-    // 1. PRIORITÉ: Turso Database (performance optimale)
-    try {
-      realisations = await fetchTursoRealisations();
-      source = 'turso';
-      console.log(`⚡ Turso success: ${realisations.length} réalisations`);
-
-    } catch (tursoError) {
-      console.warn("⚠️ Turso failed, trying Airtable fallback...", tursoError);
-
-      // 2. FALLBACK: Airtable (service dégradé)
-      try {
-        realisations = await fetchAirtableRealisations();
-        source = 'airtable';
-        console.log(`🔄 Airtable fallback: ${realisations.length} réalisations`);
-
-      } catch (airtableError) {
-        console.error("❌ Airtable also failed:", airtableError);
-
-        // 3. FALLBACK FINAL: Réalisations vides avec auto-discovery seulement
-        realisations = [];
-        source = 'auto-discovery-only';
-        console.log("🛡️ Service dégradé: auto-discovery seulement");
-      }
-    }
-
-    // 4. Complément: Auto-discovery Cloudinary (toujours exécuté)
+    // 2. Extraire les public_ids existants
     const existingPublicIds = new Set(
-      realisations.flatMap((r: HybridRealisation) => r.cloudinaryPublicIds)
+      tursoRealisations.flatMap(r =>
+        r.cloudinaryPublicIds?.map(publicId =>
+          typeof publicId === 'string' ? publicId : publicId.id
+        ) || []
+      )
     );
 
+    // 3. Générer réalisations auto-discovery
     const autoDiscoveryRealisations = await generateAutoDiscoveryRealisations(existingPublicIds);
 
-    // 5. Fusion et tri final
-    const allRealisations = [...realisations, ...autoDiscoveryRealisations].sort((a, b) => {
-      // Priorité: Turso > Airtable > Auto-discovery
-      const sourceOrder = { 'turso': 0, 'airtable': 1, 'cloudinary-auto-discovery': 2 };
-      const aPriority = sourceOrder[a.source as keyof typeof sourceOrder] ?? 3;
-      const bPriority = sourceOrder[b.source as keyof typeof sourceOrder] ?? 3;
+    // 4. Fusionner toutes les sources
+    const allRealisations = [
+      ...tursoRealisations,
+      ...autoDiscoveryRealisations
+    ];
 
-      if (aPriority !== bPriority) return aPriority - bPriority;
+    // 5. Trier par ordre et titre
+    const sortedRealisations = allRealisations.sort((a, b) => {
+      if (a.source === 'turso' && b.source !== 'turso') return -1;
+      if (a.source !== 'turso' && b.source === 'turso') return 1;
 
-      // Tri secondaire par ordre puis titre
-      if (a.order !== undefined && b.order !== undefined) {
-        return a.order - b.order;
-      }
-      if (a.order !== undefined) return -1;
-      if (b.order !== undefined) return 1;
+      const orderDiff = (a.orderPosition || 999) - (b.orderPosition || 999);
+      if (orderDiff !== 0) return orderDiff;
+
       return a.title.localeCompare(b.title);
     });
 
-    const duration = Date.now() - startTime;
-    console.log(`🎯 API Hybride: ${allRealisations.length} réalisations totales (${realisations.length} ${source} + ${autoDiscoveryRealisations.length} auto-discovery) en ${duration}ms`);
+    const executionTime = Date.now() - startTime;
+    console.log(`🎯 API: ${sortedRealisations.length} réalisations totales`);
+    console.log(`  - ${tursoRealisations.length} Turso`);
+    console.log(`  - ${autoDiscoveryRealisations.length} auto-discovery`);
+    console.log(`⏱️ Temps d'exécution: ${executionTime}ms`);
 
-    // Cache headers optimisés selon la source
-    if (source === 'turso') {
-      setHeader(event, "Cache-Control", "public, max-age=1800"); // 30min pour Turso
-    } else if (source === 'airtable') {
-      setHeader(event, "Cache-Control", "public, max-age=600");  // 10min pour Airtable
-    } else {
-      setHeader(event, "Cache-Control", "public, max-age=300");  // 5min pour service dégradé
-    }
+    // Headers de cache pour optimisation
+    setHeader(event, 'Cache-Control', 'public, max-age=60, s-maxage=120, stale-while-revalidate=86400');
+    setHeader(event, 'X-Source', 'turso-cloudinary');
+    setHeader(event, 'X-Execution-Time', `${executionTime}ms`);
 
-    // Response avec métadonnées performance
-    const response = {
-      success: true,
-      data: allRealisations,
-      count: allRealisations.length,
-      source,
-      duration,
-      performance: {
-        improvement: source === 'turso' ? '5-10x faster' : 'degraded mode',
-        cacheStrategy: source === 'turso' ? '30min' : source === 'airtable' ? '10min' : '5min'
-      }
-    };
+    return sortedRealisations;
 
-    if (source !== 'turso') {
-      response.warning = 'Service dégradé - performance réduite';
-    }
+  } catch (error: any) {
+    console.error("❌ API Réalisations erreur:", error);
 
-    return allRealisations;
-
-  } catch (error) {
-    console.error("❌ Erreur critique API Réalisations:", error);
-
-    // Fallback ultime: Auto-discovery seulement
-    try {
-      const emergencyRealisations = await generateAutoDiscoveryRealisations(new Set());
-      console.log(`🚨 Fallback ultime: ${emergencyRealisations.length} réalisations auto-discovery`);
-
-      setHeader(event, "Cache-Control", "public, max-age=60"); // Cache très court
-      return emergencyRealisations;
-
-    } catch (finalError) {
-      console.error("❌ Fallback ultime échoué:", finalError);
-      throw createError({
-        statusCode: 500,
-        statusMessage: "Service temporairement indisponible",
-      });
-    }
+    // En cas d'erreur, retourner tableau vide plutôt que de crasher
+    setHeader(event, 'X-Source', 'error-fallback');
+    return [];
   }
 });

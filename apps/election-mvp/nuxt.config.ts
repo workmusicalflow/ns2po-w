@@ -39,8 +39,6 @@ export default defineNuxtConfig({
     cloudinaryCloudName: process.env.CLOUDINARY_CLOUD_NAME,
     cloudinaryApiKey: process.env.CLOUDINARY_API_KEY,
     cloudinaryApiSecret: process.env.CLOUDINARY_API_SECRET,
-    airtableApiKey: process.env.AIRTABLE_API_KEY,
-    airtableBaseId: process.env.AIRTABLE_BASE_ID,
 
     // SMTP Configuration
     smtpHost: process.env.SMTP_HOST,
