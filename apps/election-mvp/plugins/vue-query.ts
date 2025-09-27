@@ -1,4 +1,4 @@
-import { VueQueryPlugin, QueryClient, dehydrate, hydrate, VueQueryPluginOptions } from '@tanstack/vue-query'
+import { VueQueryPlugin, QueryClient, dehydrate, hydrate } from '@tanstack/vue-query'
 
 export default defineNuxtPlugin({
   name: 'vue-query',
@@ -24,7 +24,7 @@ export default defineNuxtPlugin({
       }
     })
 
-    const vueQueryOptions: VueQueryPluginOptions = {
+    const vueQueryOptions = {
       queryClient
     }
 
