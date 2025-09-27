@@ -2,8 +2,8 @@
   # Build depuis la racine du monorepo pour pnpm workspaces
   base = "."
 
-  # Commande de build avec ignore complet des optional dependencies
-  command = "pnpm install --no-optional --frozen-lockfile && pnpm --filter @ns2po/election-mvp build"
+  # Commande de build avec ignore complet des optional dependencies + scripts
+  command = "pnpm install --no-optional --ignore-scripts --frozen-lockfile && pnpm --filter @ns2po/election-mvp build"
 
   # Répertoire de sortie après build
   publish = "apps/election-mvp/.output/public"
@@ -16,6 +16,9 @@
   PNPM_VERSION = "9.1.0"
   # Force ignore des optional dependencies (native bindings)
   NPM_CONFIG_OPTIONAL = "false"
+  NPM_CONFIG_IGNORE_SCRIPTS = "true"
+  PNPM_IGNORE_SCRIPTS = "true"
+  SKIP_INSTALL_OPTIONAL = "true"
   # Pas de PNPM_FLAGS pour éviter les conflits avec workspaces
 
 # Configuration des fonctions serverless pour les API routes Nuxt
