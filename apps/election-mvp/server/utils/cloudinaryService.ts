@@ -61,22 +61,37 @@ class CloudinaryService {
   private initializeConfig() {
     if (this.isConfigured) return
 
-    const config = useRuntimeConfig()
+    try {
+      const config = useRuntimeConfig()
+      
+      // Fallback direct sur process.env si useRuntimeConfig() échoue (fix Railway/Docker)
+      const cloudName = config.cloudinaryCloudName || process.env.CLOUDINARY_CLOUD_NAME
+      const apiKey = config.cloudinaryApiKey || process.env.CLOUDINARY_API_KEY
+      const apiSecret = config.cloudinaryApiSecret || process.env.CLOUDINARY_API_SECRET
 
-    if (!config.cloudinaryCloudName || !config.cloudinaryApiKey || !config.cloudinaryApiSecret) {
-      throw createError({
-        statusCode: 500,
-        statusMessage: 'Configuration Cloudinary manquante'
+      if (!cloudName || !apiKey || !apiSecret) {
+        throw createError({
+          statusCode: 500,
+          statusMessage: `Configuration Cloudinary manquante: ${JSON.stringify({
+            cloudName: !!cloudName,
+            apiKey: !!apiKey,
+            apiSecret: !!apiSecret,
+            availableEnv: Object.keys(process.env).filter(k => k.includes('CLOUDINARY'))
+          })}`
+        })
+      }
+
+      cloudinary.config({
+        cloud_name: cloudName,
+        api_key: apiKey,
+        api_secret: apiSecret
       })
+
+      this.isConfigured = true
+    } catch (error) {
+      console.error('Erreur initialisation Cloudinary:', error)
+      throw error
     }
-
-    cloudinary.config({
-      cloud_name: config.cloudinaryCloudName,
-      api_key: config.cloudinaryApiKey,
-      api_secret: config.cloudinaryApiSecret
-    })
-
-    this.isConfigured = true
   }
 
   /**
