@@ -155,10 +155,14 @@ export const useAdminEventBus = () => {
   }
 
   // Nettoyage automatique au démontage
-  onBeforeUnmount(() => {
-    cleanupFunctions.value.forEach(cleanup => cleanup())
-    cleanupFunctions.value = []
-  })
+  if (process.client) {
+    import('vue').then(({ onBeforeUnmount }) => {
+      onBeforeUnmount(() => {
+        cleanupFunctions.value.forEach(cleanup => cleanup())
+        cleanupFunctions.value = []
+      })
+    })
+  }
 
   return {
     on,

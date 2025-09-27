@@ -29,7 +29,6 @@
 
         <!-- Intégration des drapeaux des pays d'opération -->
         <div class="flags-contextual">
-          <span class="flags-contextual-label">Opérant en :</span>
           <FlagsDisplay />
         </div>
 
@@ -112,20 +111,26 @@
       <div class="text-center">
         <Card variant="primary" class="max-w-4xl mx-auto">
           <div class="py-8">
-            <h2 class="text-3xl font-bold text-gray-900 mb-4">
+            <h2 class="text-2xl md:text-3xl font-bold text-gray-900 mb-4 leading-tight">
               Créez votre devis personnalisé
             </h2>
-            <p class="text-lg text-gray-600 mb-8">
+            <p class="text-base md:text-lg text-gray-600 mb-6 md:mb-8 max-w-2xl mx-auto">
               Sélectionnez vos produits, uploadez votre logo et obtenez un devis
               instantané
             </p>
-            <div class="space-x-4">
-              <Button size="large" @click="navigateTo('/devis')">
+            <!-- CTA Buttons Mobile-First: Stack vertical par défaut, horizontal sur tablet+ -->
+            <div class="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4 max-w-md sm:max-w-none mx-auto">
+              <Button
+                size="large"
+                class="w-full sm:w-auto cta-primary min-h-[48px]"
+                @click="navigateTo('/devis')"
+              >
                 Commencer
               </Button>
               <Button
                 variant="outline"
                 size="large"
+                class="w-full sm:w-auto cta-secondary min-h-[48px]"
                 @click="navigateTo('/contacts')"
               >
                 Nous contacter
@@ -265,12 +270,13 @@ useHead({
 </script>
 
 <style scoped>
-/* Hero Video Section */
+/* Hero Video Section - Mobile-First Optimisé */
 .hero-section {
   position: relative;
   width: 100%;
-  height: 0;
-  padding-bottom: calc(100% / 2.85); /* Force le ratio 2.85:1 */
+  /* Mobile-first: min-height au lieu de ratio forcé */
+  min-height: 60vh;
+  max-height: 85vh;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -320,11 +326,13 @@ useHead({
 }
 
 .hero-title {
-  font-size: clamp(2.5rem, 5vw, 4.5rem);
-  font-weight: 700;
+  /* Typography scale optimisée mobile-first avec clamp() */
+  font-size: clamp(1.75rem, 1.5rem + 4vw, 4rem);
+  font-weight: 800;
   color: rgb(var(--color-primary));
-  margin-bottom: 15px;
-  line-height: 1.2;
+  margin-bottom: clamp(0.75rem, 2vw, 1.5rem);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
   overflow: hidden;
 }
 
@@ -334,25 +342,42 @@ useHead({
 }
 
 .hero-subtitle {
-  font-size: clamp(1.2rem, 2.5vw, 1.8rem);
-  font-weight: 300;
-  color: #f0f0f0;
-  margin-bottom: 30px;
+  /* Subtitle optimisée avec clamp() - lisibilité mobile prioritaire */
+  font-size: clamp(1rem, 1rem + 1.5vw, 1.5rem);
+  font-weight: 400;
+  color: rgba(240, 240, 240, 0.95);
+  margin-bottom: clamp(1.5rem, 3vw, 2.5rem);
   line-height: 1.4;
+  max-width: 90%;
+  margin-left: auto;
+  margin-right: auto;
 }
 
-/* Spécificité élevée pour surcharger les styles du composant Button */
+/* CTA Button optimisé mobile-first - Standard 2024 */
 button.btn.hero-cta {
   background-color: rgb(var(--color-accent)) !important;
   color: #f0f0f0 !important;
   border: none !important;
-  margin-top: 10px;
-  transition: all 0.3s ease;
+  /* Standard accessibilité mobile : 48px min-height */
+  min-height: 48px;
+  padding: clamp(0.75rem, 2vw, 1rem) clamp(1.5rem, 4vw, 2.5rem);
+  font-size: clamp(0.95rem, 1.5vw, 1.1rem);
+  font-weight: 600;
+  border-radius: 8px;
+  margin-top: clamp(0.5rem, 2vw, 1rem);
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
-button.btn.hero-cta:hover {
+button.btn.hero-cta:hover,
+button.btn.hero-cta:focus {
   background-color: rgb(var(--color-primary)) !important;
-  transform: translateY(-2px) scale(1.02);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+}
+
+button.btn.hero-cta:active {
+  transform: translateY(0);
 }
 
 /* Drapeaux contextuels - Intégration selon plan Gemini */
@@ -387,109 +412,79 @@ button.btn.hero-cta:hover {
   }
 }
 
-/* Tablettes - garde le ratio original */
-@media (max-width: 768px) and (min-width: 501px) {
+/* Tablettes - Approche simplifiée mobile-first */
+@media (min-width: 768px) {
   .hero-section {
-    padding-bottom: calc(100% / 2.85); /* Ratio original conservé */
-    max-height: 60vh; /* Limite pour voir le contenu suivant */
+    min-height: 70vh;
+    max-height: 90vh;
   }
 
   .hero-content {
-    padding: 0 20px;
+    padding: 0 2rem;
+    max-width: 1000px;
   }
 
   /* Drapeaux sur tablettes */
   .flags-contextual {
-    flex-direction: column;
-    gap: 0.75rem;
-    margin: 1rem 0;
+    flex-direction: row;
+    gap: 1rem;
+    margin: 2rem 0;
   }
 
   .flags-contextual-label {
-    font-size: 1rem;
+    font-size: 1.1rem;
   }
 }
 
-/* Vrais mobiles - ratio optimisé */
-@media (max-width: 500px) {
+/* Desktop - Optimisation finale */
+@media (min-width: 1024px) {
   .hero-section {
-    /* Hauteur optimisée pour vrais mobiles uniquement */
-    padding-bottom: 0;
-    height: calc(
-      100vh - 64px
-    ); /* Hauteur viewport moins navigation fixe (64px) */
-    min-height: 400px; /* Hauteur minimum pour lisibilité */
-    max-height: 460px; /* Encore plus compact */
+    min-height: 80vh;
   }
 
   .hero-content {
-    padding: 0 15px;
-    /* Position ajustée pour éviter les barres système */
-    top: calc(50% - 20px); /* Légèrement plus haut pour compenser */
-    padding-bottom: clamp(20px, 5vh, 40px);
+    padding: 0 3rem;
+    max-width: 1200px;
   }
 
-  .hero-title {
-    font-size: clamp(1.75rem, 8vw, 2.2rem);
-    margin-bottom: 8px;
-    line-height: 1.1; /* Plus serré sur mobile */
-  }
-
-  .hero-subtitle {
-    font-size: clamp(0.95rem, 4vw, 1.2rem);
-    margin-bottom: 15px;
-    line-height: 1.3;
-  }
-
-  button.btn.hero-cta {
-    margin-top: 5px;
-    font-size: clamp(0.9rem, 3vw, 1.05rem);
-    padding: 0.5rem 1.5rem;
-  }
-
-  /* Drapeaux sur mobile */
   .flags-contextual {
-    flex-direction: column;
-    gap: 0.5rem;
-    margin: 0.75rem 0;
-  }
-
-  .flags-contextual-label {
-    font-size: 0.9rem;
+    margin: 2.5rem 0;
   }
 }
 
-/* Pour les très petits écrans (iPhone SE, etc.) */
-@media (max-width: 375px) {
-  .hero-section {
-    /* Hauteur encore plus optimisée pour petits écrans */
-    height: calc(
-      100vh - 64px
-    ); /* Hauteur viewport moins navigation fixe (64px) */
-    min-height: 350px;
-    max-height: 500px;
+/* CTA Section Buttons - Mobile-First Optimisés */
+.cta-primary {
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  transition: all 0.2s ease;
+}
+
+.cta-primary:hover,
+.cta-primary:focus {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}
+
+.cta-secondary {
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.cta-secondary:hover,
+.cta-secondary:focus {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Amélioration tactile mobile */
+@media (hover: none) {
+  .cta-primary:active {
+    transform: scale(0.98);
   }
 
-  .hero-content {
-    top: calc(50% - 15px); /* Position encore plus ajustée */
-    padding-bottom: clamp(15px, 4vh, 30px);
-  }
-
-  .hero-title {
-    font-size: 1.5rem;
-    margin-bottom: 6px;
-    line-height: 1.05;
-  }
-
-  .hero-subtitle {
-    font-size: 0.9rem;
-    margin-bottom: 12px;
-    line-height: 1.25;
-  }
-
-  button.btn.hero-cta {
-    font-size: 0.85rem;
-    padding: 0.4rem 1.2rem;
+  .cta-secondary:active {
+    transform: scale(0.98);
   }
 }
+
 </style>

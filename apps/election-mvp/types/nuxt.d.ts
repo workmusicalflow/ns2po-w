@@ -1,6 +1,7 @@
 /**
  * Nuxt 3 Global Types Extension
  */
+import type { Ref, WatchSource } from 'vue'
 
 declare global {
   interface NuxtFetchOptions<T = any> {
