@@ -151,9 +151,9 @@ const showSuccessModal = ref(false)
 
 // WhatsApp Configuration
 const whatsappConfig = {
-  phoneNumber: '2250707123456', // Numéro NS2PO (à configurer)
-  fallbackEmail: 'devis@ns2po.com',
-  fallbackPhone: '22 07 07 12 34 56'
+  phoneNumber: '2250777104936', // Numéro NS2PO réel utilisé dans les tests
+  fallbackEmail: 'info@ns2po.com',
+  fallbackPhone: '07 77 10 49 36'
 }
 
 // WhatsApp Quote Integration
@@ -324,13 +324,33 @@ const handleNext = () => {
 const handleSubmit = async (formData: any) => {
   console.log('🚀 Démarrage soumission devis WhatsApp:', formData)
 
+  // Construire le nom de contact de manière sécurisée
+  const getContactName = () => {
+    if (formData.contactName && formData.contactName.trim()) {
+      return formData.contactName.trim()
+    }
+
+    const firstName = formData.firstName?.trim() || ''
+    const lastName = formData.lastName?.trim() || ''
+
+    if (firstName && lastName) {
+      return `${firstName} ${lastName}`
+    } else if (firstName) {
+      return firstName
+    } else if (lastName) {
+      return lastName
+    }
+
+    return 'Contact non précisé'
+  }
+
   // Transformer les données pour le format WhatsApp
   const whatsappData = {
-    organization: formData.organization || 'Organisation non précisée',
-    projectType: formData.projectType || 'Projet électoral',
-    contactName: formData.contactName || formData.firstName + ' ' + formData.lastName || 'Contact non précisé',
-    contactPhone: formData.contactPhone || formData.phone || 'Non précisé',
-    contactEmail: formData.contactEmail || formData.email || 'Non précisé',
+    organization: formData.organization?.trim() || formData.companyName?.trim() || 'Organisation à préciser',
+    projectType: formData.projectType?.trim() || formData.eventType?.trim() || 'Projet électoral',
+    contactName: getContactName(),
+    contactPhone: formData.contactPhone?.trim() || formData.phone?.trim() || 'Téléphone à préciser',
+    contactEmail: formData.contactEmail?.trim() || formData.email?.trim() || 'Email à préciser',
     cart: cartItems.value.map(item => ({
       id: item.id,
       name: item.name,
@@ -338,7 +358,7 @@ const handleSubmit = async (formData: any) => {
       unitPrice: item.unitPrice || (item.total / item.quantity),
       total: item.total
     })),
-    notes: formData.notes || formData.message || ''
+    notes: formData.notes?.trim() || formData.message?.trim() || ''
   }
 
   console.log('📋 Données transformées pour WhatsApp:', whatsappData)

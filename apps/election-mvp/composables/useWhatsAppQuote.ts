@@ -32,39 +32,40 @@ export function useWhatsAppQuote(config: WhatsAppConfig) {
   const error = ref<string | null>(null);
 
   const formatCurrency = (amount: number): string => {
-    return new Intl.NumberFormat('fr-CI', {
-      style: 'currency',
-      currency: 'XOF',
+    // Format simplifié pour WhatsApp (évite les problèmes d'encodage)
+    const formatted = new Intl.NumberFormat('fr-FR', {
       minimumFractionDigits: 0,
       maximumFractionDigits: 0
     }).format(amount);
+    return `${formatted} FCFA`;
   };
 
   const generateWhatsAppMessage = (formData: QuoteFormData): string => {
     const totalAmount = formData.cart.reduce((sum, item) => sum + item.total, 0);
 
-    let message = `🚀 *Demande de Devis Électoral NS2PO* 🚀\n\n`;
-    message += `👤 *Client :* ${formData.organization}\n`;
-    message += `🗳️ *Type de Projet :* ${formData.projectType}\n`;
-    message += `📞 *Contact :* ${formData.contactName} (${formData.contactPhone})\n`;
-    message += `📧 *Email :* ${formData.contactEmail}\n\n`;
+    let message = `*DEMANDE DE DEVIS ELECTORAL NS2PO*\n\n`;
+    message += `*Client:* ${formData.organization}\n`;
+    message += `*Type de Projet:* ${formData.projectType}\n`;
+    message += `*Contact:* ${formData.contactName}\n`;
+    message += `*Telephone:* ${formData.contactPhone}\n`;
+    message += `*Email:* ${formData.contactEmail}\n\n`;
 
-    message += `--- *Détails du Panier* ---\n`;
+    message += `--- DETAILS DU PANIER ---\n`;
     formData.cart.forEach((item, index) => {
-      message += `*${index + 1}.* ${item.name}\n`;
-      message += `   Quantité: ${item.quantity.toLocaleString('fr-FR')}\n`;
-      message += `   Prix Unitaire: ${formatCurrency(item.unitPrice)}\n`;
+      message += `${index + 1}. *${item.name}*\n`;
+      message += `   Quantite: ${item.quantity.toLocaleString('fr-FR')}\n`;
+      message += `   Prix unitaire: ${formatCurrency(item.unitPrice)}\n`;
       message += `   Sous-total: ${formatCurrency(item.total)}\n\n`;
     });
     message += `------------------------\n`;
-    message += `💰 *Montant Total Estimé :* ${formatCurrency(totalAmount)}\n\n`;
+    message += `*MONTANT TOTAL ESTIME: ${formatCurrency(totalAmount)}*\n\n`;
 
     if (formData.notes && formData.notes.trim()) {
-      message += `📝 *Notes Additionnelles :*\n${formData.notes.trim()}\n\n`;
+      message += `*Notes additionnelles:*\n${formData.notes.trim()}\n\n`;
     }
 
-    message += `🔥 *Action Requise :* Merci de nous recontacter rapidement pour finaliser votre devis personnalisé.\n\n`;
-    message += `⚡ *NS2PO - Votre partenaire publicité par l'objet depuis 2011*`;
+    message += `*ACTION REQUISE:* Merci de nous recontacter rapidement pour finaliser votre devis personnalise.\n\n`;
+    message += `NS2PO - Votre partenaire publicite par l'objet depuis 2011`;
 
     return message;
   };
