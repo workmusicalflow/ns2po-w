@@ -182,9 +182,10 @@ Configuration Tailwind avec tokens CSS variables pour couleurs et polices.
 **APIs intégrées** : `/api/products`, `/api/campaign-bundles`, `/api/categories`, `/api/health`
 
 ### Sécurité
-* Middleware d'authentification sur toutes les routes `/admin/*`
+* ⚠️ **Middleware d'authentification TEMPORAIREMENT DÉSACTIVÉ** sur toutes les routes `/admin/*`
 * Mode développement : accès direct sans auth
-* Production : localStorage token validation (à migrer vers JWT)
+* **Production actuelle** : accès libre pour tests admin (bypass temporaire)
+* **TODO** : Réactiver localStorage token validation avant production finale
 
 ## Intégrations Externes
 
@@ -317,6 +318,35 @@ Contexte : [décrire le problème technique]
 Objectif : [définir le résultat attendu]"
 ```
 
+## 🎯 Railway + Turso - Configuration Critique (Victoire Session)
+
+### Problème Runtime V1 → Solution V2 ✅
+**Issue identifiée :** Railway Runtime V1 ne charge pas les variables d'environnement pour Nuxt 3 au moment de l'initialisation, causant fallback in-memory Turso.
+
+**Solution confirmée par workflow multi-agents :**
+```bash
+railway variables --set "RAILWAY_BETA_ENABLE_BUILD_V2=1"
+railway up --detach
+```
+
+### Diagnostic Variables Invisibles
+Si variables Turso configurées mais non détectées sur Railway :
+```bash
+curl https://app.railway.app/api/diagnostic-turso
+```
+
+**Pattern de résolution validé :**
+1. Variables visibles CLI mais invisibles runtime → Runtime V2
+2. Fallback `process.env` dans `server/utils/database.ts` comme sécurité
+3. Endpoint diagnostic pour investigation future
+
+### Performance Post-Fix Confirmée
+- **Avant** : 0.61 req/s, 8.2s latence, `"turso": "down"`
+- **Après** : 1.95+ req/s, 2.56s latence, `"turso": "up"`
+- **Amélioration** : **3.2x** sur toutes les métriques critiques
+
+**Apprentissage clé :** Toujours activer Runtime V2 pour projets Nuxt 3 + Database sur Railway.
+
 ---
 
 ## Principe de Cohérence Local ↔ Production ✨
@@ -349,3 +379,32 @@ https://github.com/workmusicalflow/ns2po-w.git
 - Après des implémentations ou corrections importantes veuillez toujours lancer check de types et la vérification lint, nous devons éviter toute regession ou pollution.
 - utilise toujours le serveur mcp "serena" pour tes recherches dans le code base et s'il ne fonctionne pas tu pourras utiliser tes outils natifs pour y arriver.
 - Pour ce qui est de Railway nous utiliserai au maximum la CLI. our les commande intéractivesvous me les soumettrez avec le scénario pour que je les exécutes depuis un second terminal. pour les commandes non intéractive vous pous en chargerai tout au long du process. l'idée est de faire le maximum en ligne de commande et ne faire que l'impossible via le dashboard web Railway.
+
+## Commandes Railway CLI Essentielles
+
+```bash
+# Connexion et gestion projet
+railway login                    # Authentification (interactif)
+railway status                   # État projet actuel
+railway whoami                   # Utilisateur connecté
+
+# Déploiement
+railway up --detach             # Déploiement manuel (recommandé)
+railway logs --follow           # Suivre logs en temps réel
+railway logs --deployment ID    # Logs déploiement spécifique
+
+# Variables d'environnement
+railway variables               # Lister variables actuelles
+railway variables --set "KEY=VALUE" # Définir variable (syntaxe correcte)
+railway run "command"           # Exécuter avec variables Railway
+
+# Monitoring et debugging
+railway domain                  # Gérer domaines
+railway open                    # Ouvrir dashboard web
+railway shell                   # Shell avec variables Railway
+railway redeploy                # Redéployer dernière version
+
+# Gestion services
+railway service                 # Lier service au répertoire
+railway add                     # Ajouter nouveau service
+```

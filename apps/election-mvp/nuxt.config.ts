@@ -94,6 +94,13 @@ export default defineNuxtConfig({
             "public, max-age=3600, s-maxage=7200, stale-while-revalidate=86400",
         },
       },
+
+      // Page devis - prerender avec cache SWR pour performance mobile critique
+      "/devis": {
+        prerender: true,
+        swr: 3600
+      },
+
       "/demo/**": {
         headers: {
           "Cache-Control":
@@ -101,12 +108,22 @@ export default defineNuxtConfig({
         },
       },
 
-      // API routes caching
+      // API routes caching - cache étendu pour catalogue
       "/api/products/**": {
         cors: true,
+        swr: 86400,
         headers: {
           "Cache-Control":
             "public, max-age=300, s-maxage=600, stale-while-revalidate=86400",
+          Vary: "Accept-Encoding",
+        },
+      },
+      "/api/campaign-bundles/**": {
+        cors: true,
+        swr: 3600,
+        headers: {
+          "Cache-Control":
+            "public, max-age=600, s-maxage=1200, stale-while-revalidate=86400",
           Vary: "Accept-Encoding",
         },
       },
@@ -214,6 +231,16 @@ export default defineNuxtConfig({
           width: 150,
           height: 150,
           fit: "cover",
+        },
+      },
+      // Preset mobile-first pour performance optimale
+      mobile: {
+        modifiers: {
+          format: "auto",
+          quality: "auto:eco",
+          dpr: "auto",
+          sizes: "sm:100vw md:50vw lg:33vw",
+          responsive: true
         },
       },
     },
