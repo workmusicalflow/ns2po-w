@@ -324,33 +324,20 @@ const handleNext = () => {
 const handleSubmit = async (formData: any) => {
   console.log('🚀 Démarrage soumission devis WhatsApp:', formData)
 
-  // Construire le nom de contact de manière sécurisée
-  const getContactName = () => {
-    if (formData.contactName && formData.contactName.trim()) {
-      return formData.contactName.trim()
-    }
+  // Analyser les données reçues du formulaire StepValidation
+  console.log('🔍 Structure formData reçue:', Object.keys(formData))
+  console.log('📋 Contenu formData:', formData)
 
-    const firstName = formData.firstName?.trim() || ''
-    const lastName = formData.lastName?.trim() || ''
-
-    if (firstName && lastName) {
-      return `${firstName} ${lastName}`
-    } else if (firstName) {
-      return firstName
-    } else if (lastName) {
-      return lastName
-    }
-
-    return 'Contact non précisé'
-  }
-
+  // StepValidation envoie: { organization, name, phone, email, channel, items, total, timestamp }
   // Transformer les données pour le format WhatsApp
   const whatsappData = {
-    organization: formData.organization?.trim() || formData.companyName?.trim() || 'Organisation à préciser',
-    projectType: formData.projectType?.trim() || formData.eventType?.trim() || 'Projet électoral',
-    contactName: getContactName(),
-    contactPhone: formData.contactPhone?.trim() || formData.phone?.trim() || 'Téléphone à préciser',
-    contactEmail: formData.contactEmail?.trim() || formData.email?.trim() || 'Email à préciser',
+    organization: formData.organization?.trim() || 'Organisation à préciser',
+    projectType: selectedMode.value === 'bundle'
+      ? 'Campagne Électorale (Pack NS2PO)'
+      : 'Campagne Électorale (Sélection Personnalisée)',
+    contactName: formData.name?.trim() || 'Contact à préciser',
+    contactPhone: formData.phone?.trim() || 'Téléphone à préciser',
+    contactEmail: formData.email?.trim() || (formData.channel === 'email' ? 'Email requis' : 'Contact via WhatsApp'),
     cart: cartItems.value.map(item => ({
       id: item.id,
       name: item.name,
@@ -358,7 +345,9 @@ const handleSubmit = async (formData: any) => {
       unitPrice: item.unitPrice || (item.total / item.quantity),
       total: item.total
     })),
-    notes: formData.notes?.trim() || formData.message?.trim() || ''
+    notes: formData.channel === 'whatsapp'
+      ? 'Demande envoyée via le générateur de devis NS2PO - Canal préféré: WhatsApp'
+      : 'Demande envoyée via le générateur de devis NS2PO - Canal préféré: Email'
   }
 
   console.log('📋 Données transformées pour WhatsApp:', whatsappData)

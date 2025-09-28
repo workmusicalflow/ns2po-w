@@ -7,6 +7,21 @@
       </h3>
 
       <form class="space-y-4" @submit.prevent="handleSubmit">
+        <!-- Organisation -->
+        <div>
+          <label for="organization" class="block text-sm font-medium text-gray-700 mb-1">
+            Organisation / Parti Politique *
+          </label>
+          <input
+            id="organization"
+            v-model="form.organization"
+            type="text"
+            required
+            placeholder="Ex: Parti Démocratique de Côte d'Ivoire"
+            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"
+          >
+        </div>
+
         <!-- Nom -->
         <div>
           <label for="name" class="block text-sm font-medium text-gray-700 mb-1">
@@ -186,6 +201,7 @@ const emit = defineEmits<{
 
 // State
 const form = ref({
+  organization: '',
   name: '',
   phone: '',
   email: '',
@@ -196,11 +212,12 @@ const showSummary = ref(false)
 
 // Computed
 const isValid = computed(() => {
+  const hasOrganization = form.value.organization.trim().length > 0
   const hasName = form.value.name.trim().length > 0
   const hasPhone = form.value.phone.length >= 10
   const hasEmail = form.value.channel === 'email' ? form.value.email.includes('@') : true
 
-  return hasName && hasPhone && hasEmail
+  return hasOrganization && hasName && hasPhone && hasEmail
 })
 
 // Methods
