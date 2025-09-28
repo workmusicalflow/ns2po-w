@@ -9,7 +9,7 @@ import {
   useQueryClient,
   type UseQueryOptions
 } from '@tanstack/vue-query'
-import { isRef } from 'vue'
+import { isRef, ref, computed } from 'vue'
 import type { Ref } from 'vue'
 import type {
   Product,

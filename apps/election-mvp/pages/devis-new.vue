@@ -128,7 +128,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 
 // Components
 import StepChoixMode from '~/components/devis/StepChoixMode.vue'
@@ -166,11 +166,21 @@ const {
   error: bundlesError
 } = useCampaignBundles()
 
+// Temporary: Use useFetch directly for debugging
 const {
-  data: products,
-  isLoading: productsLoading,
+  data: productsResponse,
+  pending: productsLoading,
   error: productsError
-} = useProductsQuery()
+} = await useFetch('/api/products')
+
+// Extract products from response
+const products = computed(() => {
+  console.log('🔍 Products Response:', productsResponse.value)
+  if (productsResponse.value && productsResponse.value.success) {
+    return productsResponse.value.data || []
+  }
+  return []
+})
 
 // Loading et Error States
 const isDataLoading = computed(() => bundlesLoading.value || productsLoading.value)
@@ -191,12 +201,22 @@ const transformedBundles = computed(() => {
 
 // Transform products to match expected format
 const transformedProducts = computed(() => {
+  console.log('📦 Products from API:', products.value)
   return (products.value || []).map(product => ({
     ...product,
     basePrice: product.price || 0, // Map price to basePrice
-    image: product.images?.[0]?.url || null // Get first image URL if available
+    image_url: product.image || product.image_url || null // Unify image field mapping
   }))
 })
+
+// Logs pour debug
+watch([bundles, products], ([newBundles, newProducts]) => {
+  console.log('🔍 devis-new Data Updated:', {
+    bundlesCount: newBundles?.length || 0,
+    productsCount: newProducts?.length || 0,
+    currentStep: currentStep.value
+  })
+}, { immediate: true })
 
 // Computed
 const cartTotal = computed(() => {

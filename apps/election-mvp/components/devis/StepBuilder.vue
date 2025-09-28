@@ -80,7 +80,25 @@
     <div class="tab-content">
       <!-- Tab Bundles -->
       <div v-if="activeTab === 'bundles' && mode === 'bundle'" class="bundles-grid">
-        <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <!-- Message si pas de bundles -->
+        <div v-if="!bundles || bundles.length === 0" class="text-center py-8">
+          <div class="mb-4">
+            <svg class="w-16 h-16 mx-auto text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+            </svg>
+          </div>
+          <h3 class="text-lg font-semibold text-gray-700 mb-2">Aucun pack disponible</h3>
+          <p class="text-gray-600">Les packs de campagne sont en cours de chargement...</p>
+          <button
+            @click="activeTab = 'products'"
+            class="mt-4 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark"
+          >
+            Voir les produits individuels
+          </button>
+        </div>
+
+        <!-- Grille de bundles -->
+        <div v-else class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           <div
             v-for="bundle in bundles"
             :key="bundle.id"
@@ -177,12 +195,61 @@
 
         <!-- Barre de recherche et filtres -->
         <div class="mb-4 space-y-3">
-          <!-- Compteur de produits complémentaires -->
-          <div class="flex items-center justify-between text-sm text-gray-600">
-            <span>{{ filteredProducts.length }} compléments disponibles</span>
-            <span v-if="cartItems.length > 0" class="text-green-600">
-              {{ cartItems.length }} dans le pack
-            </span>
+          <!-- Header contextuel de recherche -->
+          <div class="search-feedback mb-3">
+            <!-- État de recherche active -->
+            <div v-if="searchState.isSearching" class="search-active-header bg-blue-50 border border-blue-200 rounded-lg p-3 mb-3">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                  <span class="text-sm font-medium text-blue-800">
+                    Recherche : "{{ searchState.searchTerm }}"
+                  </span>
+                </div>
+                <button
+                  class="clear-search text-blue-600 hover:text-blue-800 text-sm underline"
+                  @click="searchQuery = ''; debouncedSearchQuery = ''"
+                >
+                  Effacer ✕
+                </button>
+              </div>
+
+              <!-- Résultats trouvés -->
+              <div v-if="searchState.hasResults" class="mt-2 text-sm text-blue-700">
+                ✅ {{ searchState.resultCount }} résultat{{ searchState.resultCount > 1 ? 's' : '' }}
+                trouvé{{ searchState.resultCount > 1 ? 's' : '' }} dans les compléments disponibles
+              </div>
+
+              <!-- Aucun résultat -->
+              <div v-else class="mt-2 text-sm text-orange-700 bg-orange-50 px-2 py-1 rounded">
+                ❌ Aucun résultat pour "{{ searchState.searchTerm }}"
+                <br>
+                <span class="text-xs">Essayez un autre terme ou effacez la recherche</span>
+              </div>
+            </div>
+
+            <!-- État normal sans recherche -->
+            <div v-else class="flex items-center justify-between text-sm text-gray-600">
+              <span>{{ searchResults.length }} complément{{ searchResults.length > 1 ? 's' : '' }} disponible{{ searchResults.length > 1 ? 's' : '' }}</span>
+              <span v-if="cartItems.length > 0" class="text-green-600">
+                {{ cartItems.length }} dans le pack
+              </span>
+            </div>
+
+            <!-- Filtre par catégorie actif -->
+            <div v-if="selectedCategory && !searchState.isSearching" class="mt-2">
+              <span class="inline-flex items-center gap-1 text-xs bg-gray-100 px-2 py-1 rounded">
+                🏷️ Catégorie: {{ selectedCategory }}
+                <button
+                  class="ml-1 text-gray-500 hover:text-gray-700"
+                  @click="selectedCategory = ''"
+                >
+                  ✕
+                </button>
+              </span>
+            </div>
           </div>
 
           <input
@@ -215,15 +282,15 @@
         <!-- Liste virtualisée des produits avec TanStack Virtual -->
         <div ref="scrollElement" class="products-virtual-list h-[400px] overflow-y-auto">
           <div
-            v-if="filteredProducts.length > 0"
+            v-if="searchResults.length > 0"
             :style="{
-              height: `${virtualizer.getTotalSize()}px`,
+              height: `${virtualizer.value.getTotalSize()}px`,
               width: '100%',
               position: 'relative',
             }"
           >
             <div
-              v-for="virtualRow in virtualizer.getVirtualItems()"
+              v-for="virtualRow in virtualizer.value.getVirtualItems()"
               :key="virtualRow.index"
               :style="{
                 position: 'absolute',
@@ -238,47 +305,87 @@
                 <div
                   :class="[
                     'product-card flex items-center gap-4 p-3 bg-white rounded-lg border border-gray-200',
-                    { 'just-added': justAddedProductId === filteredProducts[virtualRow.index]?.id }
+                    { 'just-added': justAddedProductId === searchResults[virtualRow.index]?.product?.id }
                   ]"
                 >
-                  <!-- Image produit -->
-                  <div class="w-16 h-16 bg-gray-100 rounded flex-shrink-0 overflow-hidden">
-                    <NuxtImg
-                      v-if="filteredProducts[virtualRow.index]?.image"
-                      :src="filteredProducts[virtualRow.index].image"
-                      :alt="filteredProducts[virtualRow.index].name"
-                      preset="mobile"
+                  <!-- Image produit optimisée Cloudinary -->
+                  <div class="w-16 h-16 bg-gray-100 rounded-lg flex-shrink-0 overflow-hidden relative">
+                    <img
+                      v-if="getProductImageUrl(searchResults[virtualRow.index]?.product)"
+                      :src="getProductImageUrl(searchResults[virtualRow.index]?.product)"
+                      :alt="searchResults[virtualRow.index].product.name"
+                      loading="lazy"
                       class="w-full h-full object-cover"
+                      @error="handleImageError(virtualRow.index)"
                     />
+                    <!-- Fallback si pas d'image -->
+                    <div v-else class="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200">
+                      <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
+                    </div>
                   </div>
 
-                  <!-- Info produit -->
+                  <!-- Info produit enrichie -->
                   <div class="flex-1 min-w-0">
-                    <h4 class="font-medium truncate">
-                      {{ filteredProducts[virtualRow.index]?.name }}
-                    </h4>
-                    <p class="text-sm text-gray-600">
-                      {{ formatPrice(filteredProducts[virtualRow.index]?.basePrice || 0) }}
-                    </p>
+                    <!-- Nom du produit avec highlight -->
+                    <div class="flex items-center gap-2 mb-1">
+                      <h4
+                        class="font-medium truncate"
+                        v-html="searchState.isSearching ? searchResults[virtualRow.index]?.highlightedName : searchResults[virtualRow.index]?.product?.name"
+                      />
+
+                      <!-- Chip de correspondance -->
+                      <span
+                        v-if="searchState.isSearching && searchResults[virtualRow.index]"
+                        :class="[
+                          'inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium',
+                          {
+                            'bg-green-100 text-green-800': searchResults[virtualRow.index].matchType === 'exact',
+                            'bg-blue-100 text-blue-800': searchResults[virtualRow.index].matchType === 'synonym',
+                            'bg-orange-100 text-orange-800': searchResults[virtualRow.index].matchType === 'fuzzy'
+                          }
+                        ]"
+                      >
+                        {{ searchResults[virtualRow.index].reason }}
+                      </span>
+                    </div>
+
+                    <!-- Prix et score de pertinence -->
+                    <div class="flex items-center gap-2">
+                      <p class="text-sm text-gray-600">
+                        {{ formatPrice(searchResults[virtualRow.index]?.product?.basePrice || 0) }}
+                      </p>
+
+                      <!-- Score de pertinence visuel -->
+                      <div
+                        v-if="searchState.isSearching && searchResults[virtualRow.index]"
+                        class="flex items-center gap-1"
+                        :title="`Score: ${searchResults[virtualRow.index].score}/100`"
+                      >
+                        <span v-for="n in Math.min(3, Math.ceil(searchResults[virtualRow.index].score / 33))" :key="n" class="w-1.5 h-1.5 bg-blue-500 rounded-full"></span>
+                        <span v-for="n in (3 - Math.min(3, Math.ceil(searchResults[virtualRow.index].score / 33)))" :key="`empty-${n}`" class="w-1.5 h-1.5 bg-gray-300 rounded-full"></span>
+                      </div>
+                    </div>
                   </div>
 
                   <!-- Quick add controls -->
                   <div class="flex items-center gap-2 flex-shrink-0">
                     <button
-                      :disabled="!getProductQuantity(filteredProducts[virtualRow.index]?.id)"
+                      :disabled="!getProductQuantity(searchResults[virtualRow.index]?.product?.id)"
                       class="quantity-button w-10 h-10 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-50 disabled:opacity-50 transition-colors"
-                      @click="decrementQuantity(filteredProducts[virtualRow.index])"
+                      @click="decrementQuantity(searchResults[virtualRow.index]?.product)"
                     >
                       -
                     </button>
 
                     <span class="w-12 text-center font-medium">
-                      {{ getProductQuantity(filteredProducts[virtualRow.index]?.id) || 0 }}
+                      {{ getProductQuantity(searchResults[virtualRow.index]?.product?.id) || 0 }}
                     </span>
 
                     <button
                       class="quantity-button w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center hover:bg-primary-dark transition-colors"
-                      @click="incrementQuantity(filteredProducts[virtualRow.index])"
+                      @click="incrementQuantity(searchResults[virtualRow.index]?.product)"
                     >
                       +
                     </button>
@@ -288,32 +395,112 @@
             </div>
           </div>
 
-          <!-- Message si aucun produit -->
-          <div v-else class="text-center py-12 text-gray-500">
-            <svg class="w-16 h-16 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 12h6m-6-4h6m2 5.291A7.962 7.962 0 0118 12a8 8 0 01-8 8 8 8 0 01-8-8 8 8 0 018-8c2.027 0 3.872.76 5.291 2" />
-            </svg>
-            <h3 class="font-medium mb-2">
-              Aucun produit disponible
-            </h3>
-            <p class="text-sm mb-4">
-              Tous les produits correspondants sont déjà dans votre panier
-              ou aucun produit ne correspond à vos critères de recherche.
-            </p>
-            <div class="space-y-2">
-              <button
-                v-if="searchQuery || selectedCategory"
-                class="text-primary hover:underline text-sm"
-                @click="searchQuery = ''; selectedCategory = ''"
-              >
-                Effacer les filtres
-              </button>
-              <button
-                class="block text-primary hover:underline text-sm mx-auto"
-                @click="activeTab = 'cart'"
-              >
-                Voir le panier ({{ cartItems.length }} produits)
-              </button>
+          <!-- États vides intelligents -->
+          <div v-else class="empty-state py-8 px-4 text-center">
+            <!-- État de recherche sans résultats -->
+            <div v-if="searchState.isSearching && !searchState.hasResults" class="search-no-results">
+              <div class="mb-6">
+                <svg class="w-16 h-16 mx-auto mb-4 text-orange-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+                <h3 class="text-lg font-bold text-gray-800 mb-2">
+                  Aucun résultat pour "{{ searchState.searchTerm }}"
+                </h3>
+                <p class="text-sm text-gray-600 mb-4">
+                  Nous n'avons trouvé aucun produit correspondant à votre recherche.
+                </p>
+              </div>
+
+              <!-- Suggestions intelligentes -->
+              <div class="smart-suggestions space-y-4 mb-6">
+                <!-- Suggestions orthographiques -->
+                <div v-if="getSpellingSuggestions().length > 0" class="suggestion-group">
+                  <p class="text-sm font-medium text-gray-700 mb-2">Voulez-vous dire :</p>
+                  <div class="flex flex-wrap justify-center gap-2">
+                    <button
+                      v-for="suggestion in getSpellingSuggestions().slice(0, 3)"
+                      :key="suggestion"
+                      class="suggestion-chip px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm hover:bg-blue-200 transition-colors"
+                      @click="applySuggestion(suggestion)"
+                    >
+                      {{ suggestion }}
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Suggestions de catégories -->
+                <div v-if="availableCategories.length > 0" class="suggestion-group">
+                  <p class="text-sm font-medium text-gray-700 mb-2">Ou explorez par catégorie :</p>
+                  <div class="flex flex-wrap justify-center gap-2">
+                    <button
+                      v-for="category in availableCategories.slice(0, 4)"
+                      :key="category"
+                      class="category-chip px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm hover:bg-gray-200 transition-colors"
+                      @click="selectCategoryAndClearSearch(category)"
+                    >
+                      🏷️ {{ category }}
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Actions rapides -->
+              <div class="quick-actions space-y-2">
+                <button
+                  class="text-primary hover:underline text-sm font-medium"
+                  @click="clearSearchAndFilters"
+                >
+                  ✕ Effacer la recherche
+                </button>
+                <br>
+                <button
+                  v-if="cartItems.length > 0"
+                  class="text-green-600 hover:underline text-sm"
+                  @click="activeTab = 'cart'"
+                >
+                  Voir le panier ({{ cartItems.length }} produit{{ cartItems.length > 1 ? 's' : '' }})
+                </button>
+              </div>
+            </div>
+
+            <!-- État normal : tous produits dans le panier -->
+            <div v-else-if="!searchState.isSearching" class="all-in-cart">
+              <div class="mb-6">
+                <svg class="w-16 h-16 mx-auto mb-4 text-green-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <h3 class="text-lg font-bold text-gray-800 mb-2">
+                  Tous les compléments sont ajoutés !
+                </h3>
+                <p class="text-sm text-gray-600 mb-4">
+                  Parfait ! Vous avez sélectionné tous les produits disponibles pour votre pack.
+                </p>
+              </div>
+
+              <!-- Action principale -->
+              <div class="primary-action">
+                <button
+                  class="inline-flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-lg font-medium hover:bg-primary-dark transition-colors"
+                  @click="activeTab = 'cart'"
+                >
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.5 6M7 13l-1.5-6m0 0h15M17 21a2 2 0 100-4 2 2 0 000 4zM9 21a2 2 0 100-4 2 2 0 000 4z" />
+                  </svg>
+                  Finaliser le panier ({{ cartItems.length }} produits)
+                </button>
+              </div>
+            </div>
+
+            <!-- État: recherche trop courte -->
+            <div v-else-if="searchState.searchTerm.length < 2" class="search-too-short">
+              <div class="mb-4">
+                <svg class="w-12 h-12 mx-auto mb-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                </svg>
+                <p class="text-sm text-gray-600">
+                  ✏️ Tapez au moins 2 caractères pour lancer la recherche
+                </p>
+              </div>
             </div>
           </div>
         </div>
@@ -427,7 +614,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useVirtualizer } from '@tanstack/vue-virtual'
 import type { CampaignBundle, Product } from '~/types/api'
 
@@ -463,9 +650,49 @@ const selectedCategory = ref('')
 const cartItems = ref<CartItem[]>([])
 const scrollElement = ref<HTMLElement>()
 
+// Debug logs pour vérifier l'état initial
+console.log('🔍 StepBuilder initialized:', {
+  mode: props.mode,
+  bundlesCount: props.bundles?.length || 0,
+  productsCount: props.products?.length || 0,
+  activeTab: activeTab.value
+})
+
 // État pour micro-interactions
 const justAddedProductId = ref<string | null>(null)
 const showAddedFeedback = ref(false)
+
+// Debounced search query pour performance (recommandation Gemini)
+const debouncedSearchQuery = ref('')
+let debounceTimer: NodeJS.Timeout | null = null
+
+// Watch pour debounce de la recherche (150ms)
+watch(searchQuery, (newQuery) => {
+  if (debounceTimer) {
+    clearTimeout(debounceTimer)
+  }
+
+  debounceTimer = setTimeout(() => {
+    debouncedSearchQuery.value = newQuery
+  }, 150)
+}, { immediate: true })
+
+// Types pour les résultats de recherche enrichis
+interface SearchResult {
+  product: Product
+  score: number
+  matchType: 'exact' | 'synonym' | 'fuzzy'
+  highlightedName: string
+  reason: string
+}
+
+// État de recherche pour debugging et UX
+const searchState = ref({
+  isSearching: false,
+  hasResults: false,
+  resultCount: 0,
+  searchTerm: ''
+})
 
 // Extraction dynamique des catégories depuis les vraies données
 const availableCategories = computed(() => {
@@ -474,38 +701,247 @@ const availableCategories = computed(() => {
   return uniqueCategories.sort()
 })
 
-// Virtualizer pour la liste des produits
-const virtualizer = useVirtualizer({
-  count: computed(() => filteredProducts.value.length),
-  getScrollElement: () => scrollElement.value,
-  estimateSize: () => 88, // Hauteur estimée par item (p-3 + mb-2 ≈ 88px)
-  overscan: 5, // Nombre d'items à pré-rendre
-})
-
-// Computed
-const filteredProducts = computed(() => {
+// Computed pour résultats de recherche enrichis
+const searchResults = computed<SearchResult[]>(() => {
   let products = props.products || []
 
   // 🚫 Filtrer les produits déjà dans le panier (éviter doublons)
   const cartProductIds = cartItems.value.map(item => item.id)
   products = products.filter(p => !cartProductIds.includes(p.id))
 
-  // 🔍 Recherche textuelle enrichie (nom + description)
-  if (searchQuery.value) {
-    const query = searchQuery.value.toLowerCase()
-    products = products.filter(p => {
-      const name = (p.name || '').toLowerCase()
-      const description = (p.description || '').toLowerCase()
-      return name.includes(query) || description.includes(query)
+  // Mise à jour de l'état de recherche
+  const hasQuery = debouncedSearchQuery.value && debouncedSearchQuery.value.trim()
+  searchState.value.searchTerm = debouncedSearchQuery.value || ''
+  searchState.value.isSearching = hasQuery
+
+  // 🔍 Recherche fuzzy améliorée si requête (avec debounce)
+  if (hasQuery) {
+    const query = debouncedSearchQuery.value.toLowerCase().trim()
+
+    // Préprocess query : suppression accents et normalisation
+    const normalizeText = (text: string) =>
+      text.toLowerCase()
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '') // Remove accents
+          .replace(/[^a-z0-9\s]/g, ' ')
+          .replace(/\s+/g, ' ')
+          .trim()
+
+    const normalizedQuery = normalizeText(query)
+
+    // Synonymes et abréviations locaux (Côte d'Ivoire)
+    const synonyms: Record<string, string[]> = {
+      'flyer': ['tract', 'depliant', 'prospectus'],
+      'tshirt': ['t-shirt', 'tee-shirt', 'maillot'],
+      'casquette': ['cap', 'chapeau'],
+      'bache': ['banderole', 'panneau'],
+      'kakemono': ['kakémono', 'oriflamme', 'voile'],
+      'affiche': ['affiches', 'poster', 'affichage']
+    }
+
+    // Fonction de calcul de distance Levenshtein optimisée
+    const levenshteinDistance = (str1: string, str2: string): number => {
+      if (str1.length === 0) return str2.length
+      if (str2.length === 0) return str1.length
+
+      const matrix = Array(str2.length + 1).fill(null).map(() => Array(str1.length + 1).fill(null))
+
+      for (let i = 0; i <= str1.length; i++) matrix[0][i] = i
+      for (let j = 0; j <= str2.length; j++) matrix[j][0] = j
+
+      for (let j = 1; j <= str2.length; j++) {
+        for (let i = 1; i <= str1.length; i++) {
+          const indicator = str1[i - 1] === str2[j - 1] ? 0 : 1
+          matrix[j][i] = Math.min(
+            matrix[j][i - 1] + 1,     // deletion
+            matrix[j - 1][i] + 1,     // insertion
+            matrix[j - 1][i - 1] + indicator // substitution
+          )
+        }
+      }
+
+      return matrix[str2.length][str1.length]
+    }
+
+    // Calcul du score de pertinence
+    const calculateRelevanceScore = (product: Product): number => {
+      const name = normalizeText(product.name || '')
+      const description = normalizeText(product.description || '')
+      let maxScore = 0
+
+      // 1. Correspondance exacte (score max)
+      if (name.includes(normalizedQuery) || description.includes(normalizedQuery)) {
+        maxScore = Math.max(maxScore, name.includes(normalizedQuery) ? 100 : 70)
+      }
+
+      // 2. Correspondance par mots
+      const queryWords = normalizedQuery.split(' ')
+      const nameWords = name.split(' ')
+      const descWords = description.split(' ')
+
+      for (const queryWord of queryWords) {
+        if (queryWord.length < 2) continue
+
+        // Correspondance exacte de mot
+        for (const nameWord of nameWords) {
+          if (nameWord === queryWord) maxScore = Math.max(maxScore, 90)
+          else if (nameWord.includes(queryWord)) maxScore = Math.max(maxScore, 80)
+        }
+
+        for (const descWord of descWords) {
+          if (descWord === queryWord) maxScore = Math.max(maxScore, 60)
+          else if (descWord.includes(queryWord)) maxScore = Math.max(maxScore, 50)
+        }
+
+        // 3. Correspondance fuzzy (Levenshtein)
+        for (const nameWord of nameWords) {
+          if (nameWord.length >= 3) {
+            const distance = levenshteinDistance(queryWord, nameWord)
+            const tolerance = Math.max(1, Math.floor(queryWord.length / 3))
+            if (distance <= tolerance) {
+              const fuzzyScore = Math.max(0, 75 - (distance * 15))
+              maxScore = Math.max(maxScore, fuzzyScore)
+            }
+          }
+        }
+
+        // 4. Correspondance synonymes
+        for (const [key, values] of Object.entries(synonyms)) {
+          if (key.includes(queryWord) || values.some(v => v.includes(queryWord))) {
+            if (name.includes(key) || values.some(v => name.includes(v))) {
+              maxScore = Math.max(maxScore, 85)
+            }
+          }
+        }
+      }
+
+      return maxScore
+    }
+
+    // Fonction pour surligner les termes trouvés
+    const highlightText = (text: string, query: string): string => {
+      if (!text || !query) return text
+
+      const normalizedText = normalizeText(text)
+      const normalizedQuery = normalizeText(query)
+
+      // Surlignage simple pour les correspondances exactes
+      const regex = new RegExp(`(${normalizedQuery.split(' ').join('|')})`, 'gi')
+      return text.replace(regex, '<mark class="bg-yellow-200 px-1 rounded">$1</mark>')
+    }
+
+    // Fonction pour générer la raison du match
+    const getMatchReason = (product: Product, matchType: string, score: number): string => {
+      const name = normalizeText(product.name || '')
+
+      if (matchType === 'exact' && name.includes(normalizedQuery)) return 'Nom exact'
+      if (matchType === 'exact') return 'Description'
+      if (matchType === 'synonym') return 'Synonyme'
+      if (score > 70) return 'Très proche'
+      if (score > 50) return 'Proche'
+      return 'Similaire'
+    }
+
+    // Filtrage et scoring avec métadonnées enrichies
+    const scoredProducts = products
+      .map(product => {
+        const score = calculateRelevanceScore(product)
+        const name = normalizeText(product.name || '')
+        const description = normalizeText(product.description || '')
+
+        let matchType: 'exact' | 'synonym' | 'fuzzy' = 'fuzzy'
+
+        if (name.includes(normalizedQuery) || description.includes(normalizedQuery)) {
+          matchType = 'exact'
+        } else {
+          const queryWords = normalizedQuery.split(' ')
+          for (const word of queryWords) {
+            for (const [key, values] of Object.entries(synonyms)) {
+              if (key.includes(word) && (name.includes(key) || values.some(v => name.includes(v)))) {
+                matchType = 'synonym'
+                break
+              }
+            }
+            if (matchType === 'synonym') break
+          }
+        }
+
+        return {
+          product,
+          score,
+          matchType,
+          highlightedName: highlightText(product.name || '', query),
+          reason: getMatchReason(product, matchType, score)
+        } as SearchResult
+      })
+      .filter(({ score }) => score > 30) // Seuil minimum de pertinence
+      .sort((a, b) => b.score - a.score) // Tri par pertinence décroissante
+
+    // Mise à jour de l'état de recherche
+    searchState.value.hasResults = scoredProducts.length > 0
+    searchState.value.resultCount = scoredProducts.length
+
+    console.log('🔍 Recherche fuzzy enrichie:', {
+      query: normalizedQuery,
+      resultCount: scoredProducts.length,
+      topResults: scoredProducts.slice(0, 3).map(({ product, score, matchType, reason }) => ({
+        name: product.name,
+        score,
+        matchType,
+        reason
+      }))
     })
+
+    return scoredProducts
   }
+
+  // Mode normal sans recherche - créer des SearchResult basiques
+  const basicResults = products.map(product => ({
+    product,
+    score: 100,
+    matchType: 'exact' as const,
+    highlightedName: product.name || '',
+    reason: 'Produit disponible'
+  } as SearchResult))
 
   // 🏷️ Filtrage par catégorie
   if (selectedCategory.value) {
-    products = products.filter(p => p.category === selectedCategory.value)
+    const filteredResults = basicResults.filter(result =>
+      result.product.category === selectedCategory.value
+    )
+
+    searchState.value.hasResults = filteredResults.length > 0
+    searchState.value.resultCount = filteredResults.length
+    return filteredResults
   }
 
-  return products
+  searchState.value.hasResults = basicResults.length > 0
+  searchState.value.resultCount = basicResults.length
+
+  console.log('📦 Produits sans recherche:', {
+    total: basicResults.length,
+    categorie: selectedCategory.value
+  })
+
+  return basicResults
+})
+
+// Clé réactive pour forcer la mise à jour du virtualizer
+const virtualizerKey = computed(() =>
+  `${searchResults.value.length}-${debouncedSearchQuery.value}-${selectedCategory.value}`
+)
+
+// Virtualizer pour la liste des produits
+const virtualizer = computed(() => useVirtualizer({
+  count: searchResults.value.length,
+  getScrollElement: () => scrollElement.value || null,
+  estimateSize: () => 88,
+  overscan: 5
+}))
+
+// Computed pour compatibilité avec le code existant
+const filteredProducts = computed(() => {
+  return searchResults.value.map(result => result.product)
 })
 
 const cartItemsCount = computed(() => cartItems.value.length)
@@ -522,7 +958,7 @@ const selectBundle = (bundle: CampaignBundle) => {
 
   // Ajouter les produits du bundle au panier
   const newCartItems = bundle.products.map((p) => {
-    const unitPrice = p.basePrice || p.unitPrice || 0
+    const unitPrice = p.basePrice || p.price || 0
     const quantity = p.quantity || 1
     const total = quantity * unitPrice
 
@@ -628,6 +1064,128 @@ const cancelModifications = () => {
 
 const getIncludedProductsCount = () => {
   return cartItems.value.length
+}
+
+// Méthodes pour suggestions intelligentes
+const getSpellingSuggestions = (): string[] => {
+  if (!searchState.value.searchTerm || searchState.value.searchTerm.length < 2) return []
+
+  const query = searchState.value.searchTerm.toLowerCase()
+  const suggestions: string[] = []
+
+  // Dictionnaire de termes courants avec leurs corrections
+  const commonTerms = [
+    'drapeau', 'affiche', 'affiches', 'kakémono', 'kakemono', 'oriflamme',
+    'flyer', 'tract', 'depliant', 'prospectus', 'brochure',
+    'tshirt', 't-shirt', 'tee-shirt', 'maillot', 'polo',
+    'casquette', 'cap', 'chapeau', 'bonnet',
+    'bache', 'banderole', 'panneau', 'enseigne',
+    'stylo', 'crayon', 'marqueur', 'surligneur',
+    'badge', 'pin', 'broche', 'autocollant', 'sticker'
+  ]
+
+  // Recherche de termes similaires par distance de Levenshtein
+  for (const term of commonTerms) {
+    const distance = levenshteinSimple(query, term)
+    if (distance <= 2 && distance > 0 && term !== query) {
+      suggestions.push(term)
+    }
+  }
+
+  // Suggestions basées sur les produits existants
+  if (props.products) {
+    for (const product of props.products) {
+      const name = product.name?.toLowerCase() || ''
+      if (name.includes(query) && name !== query) {
+        const words = name.split(' ')
+        for (const word of words) {
+          if (word.length > 2 && !suggestions.includes(word) && word !== query) {
+            const distance = levenshteinSimple(query, word)
+            if (distance <= 2 && distance > 0) {
+              suggestions.push(word)
+            }
+          }
+        }
+      }
+    }
+  }
+
+  return suggestions.slice(0, 3) // Max 3 suggestions
+}
+
+// Fonction helper pour distance Levenshtein simple
+const levenshteinSimple = (str1: string, str2: string): number => {
+  if (str1.length === 0) return str2.length
+  if (str2.length === 0) return str1.length
+
+  const matrix = Array(str2.length + 1).fill(null).map(() => Array(str1.length + 1).fill(null))
+
+  for (let i = 0; i <= str1.length; i++) matrix[0][i] = i
+  for (let j = 0; j <= str2.length; j++) matrix[j][0] = j
+
+  for (let j = 1; j <= str2.length; j++) {
+    for (let i = 1; i <= str1.length; i++) {
+      const indicator = str1[i - 1] === str2[j - 1] ? 0 : 1
+      matrix[j][i] = Math.min(
+        matrix[j][i - 1] + 1,
+        matrix[j - 1][i] + 1,
+        matrix[j - 1][i - 1] + indicator
+      )
+    }
+  }
+
+  return matrix[str2.length][str1.length]
+}
+
+const applySuggestion = (suggestion: string) => {
+  searchQuery.value = suggestion
+  console.log('💡 Suggestion appliquée:', suggestion)
+}
+
+const selectCategoryAndClearSearch = (category: string) => {
+  searchQuery.value = ''
+  debouncedSearchQuery.value = ''
+  selectedCategory.value = category
+  console.log('🏷️ Catégorie sélectionnée:', category)
+}
+
+const clearSearchAndFilters = () => {
+  searchQuery.value = ''
+  debouncedSearchQuery.value = ''
+  selectedCategory.value = ''
+  console.log('🧹 Recherche et filtres effacés')
+}
+
+// Fonction pour obtenir l'URL optimisée Cloudinary (réutilisée depuis admin)
+const getProductImageUrl = (product?: Product): string | null => {
+  if (!product?.image_url) return null
+
+  // Extraire le public_id depuis l'URL complète Cloudinary
+  const match = product.image_url.match(/\/upload\/(?:v\d+\/)?(.+?)(?:\.[^.]+)?$/)
+  if (!match) return product.image_url // Fallback sur l'URL originale
+
+  const publicId = match[1]
+  // Optimisation pour vignettes 64x64 avec fill et qualité 80
+  return `https://res.cloudinary.com/dsrvzogof/image/upload/w_64,h_64,c_fill,q_80,f_auto/${publicId}`
+}
+
+// Fonction pour gérer les erreurs d'image
+const handleImageError = (index: number) => {
+  console.log('❌ Erreur chargement image pour:', searchResults.value[index]?.product?.name)
+  // On pourrait mettre à jour l'état pour afficher le fallback
+}
+
+// Fonction pour obtenir l'icône de catégorie
+const getCategoryIcon = (category: string): string => {
+  const icons: Record<string, string> = {
+    'TEXTILE': '👕',
+    'ACCESSOIRE': '🎯',
+    'IMPRESSION': '🖨️',
+    'SIGNALÉTIQUE': '🪧',
+    'GADGET': '🎁',
+    'COMMUNICATION': '📣'
+  }
+  return icons[category?.toUpperCase()] || '📦'
 }
 
 // Computed pour la barre de comparaison
