@@ -384,10 +384,14 @@
                     </span>
 
                     <button
-                      class="quantity-button w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center hover:bg-primary-dark transition-colors"
-                      @click="incrementQuantity(searchResults[virtualRow.index]?.product)"
+                      class="quantity-button w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center hover:bg-primary-dark transition-colors relative"
+                      @click="openQuantitySheet(searchResults[virtualRow.index]?.product)"
                     >
                       +
+                      <!-- Indicateur d'options avancées -->
+                      <span class="absolute -top-1 -right-1 w-3 h-3 text-[8px] bg-accent text-white rounded-full flex items-center justify-center font-bold">
+                        •••
+                      </span>
                     </button>
                   </div>
                 </div>
@@ -610,6 +614,21 @@
     <div v-if="showAddedFeedback" class="added-feedback">
       ✅ Produit ajouté au pack !
     </div>
+
+    <!-- Quantity Bottom Sheet -->
+    <QuantityBottomSheet
+      :show="showQuantitySheet"
+      :product="selectedProductForQuantity"
+      :initial-quantity="getProductQuantity(selectedProductForQuantity?.id) || 50"
+      :min="50"
+      :max="10000"
+      :step-small="10"
+      :step-large="100"
+      :presets="[50, 100, 500, 1000, 5000]"
+      @confirm="handleQuantityConfirm"
+      @cancel="handleQuantityCancel"
+      @close="handleQuantityCancel"
+    />
   </div>
 </template>
 
@@ -617,6 +636,7 @@
 import { ref, computed, watch } from 'vue'
 import { useVirtualizer } from '@tanstack/vue-virtual'
 import type { CampaignBundle, Product } from '~/types/api'
+import QuantityBottomSheet from './QuantityBottomSheet.vue'
 
 // Types locaux
 interface CartItem {
@@ -661,6 +681,10 @@ console.log('🔍 StepBuilder initialized:', {
 // État pour micro-interactions
 const justAddedProductId = ref<string | null>(null)
 const showAddedFeedback = ref(false)
+
+// État pour QuantityBottomSheet
+const showQuantitySheet = ref(false)
+const selectedProductForQuantity = ref<Product | null>(null)
 
 // Debounced search query pour performance (recommandation Gemini)
 const debouncedSearchQuery = ref('')
@@ -1036,6 +1060,42 @@ const removeFromCart = (productId: string) => {
   emit('cart-updated', cartItems.value)
 }
 
+// Nouvelle fonction pour ouvrir le bottom sheet
+const openQuantitySheet = (product: Product) => {
+  selectedProductForQuantity.value = product
+  showQuantitySheet.value = true
+}
+
+// Gestionnaire de confirmation du bottom sheet
+const handleQuantityConfirm = (data: { product: Product; quantity: number; total: number }) => {
+  const existing = cartItems.value.find(i => i.id === data.product.id)
+
+  if (existing) {
+    existing.quantity = data.quantity
+    existing.total = data.total
+  } else {
+    cartItems.value.push({
+      id: data.product.id,
+      name: data.product.name,
+      quantity: data.quantity,
+      unitPrice: data.product.basePrice || data.product.price || 0,
+      total: data.total
+    })
+  }
+
+  // Micro-interaction : feedback visuel pour l'ajout
+  triggerAddedFeedback(data.product.id)
+
+  emit('cart-updated', cartItems.value)
+  showQuantitySheet.value = false
+}
+
+// Gestionnaire d'annulation du bottom sheet
+const handleQuantityCancel = () => {
+  showQuantitySheet.value = false
+  selectedProductForQuantity.value = null
+}
+
 const formatPrice = (amount: number) => {
   return new Intl.NumberFormat('fr-CI', {
     style: 'currency',
@@ -1286,10 +1346,54 @@ const triggerAddedFeedback = (productId: string) => {
 
 .quantity-button {
   transition: all 0.15s ease;
+  position: relative;
+  overflow: visible;
+}
+
+.quantity-button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(201, 154, 59, 0.3);
 }
 
 .quantity-button:active {
   transform: scale(0.95);
+}
+
+/* Affordance indicator animation */
+.quantity-button .absolute {
+  animation: pulse-dots 2s infinite;
+  font-size: 6px;
+  line-height: 1;
+}
+
+@keyframes pulse-dots {
+  0%, 100% {
+    opacity: 0.7;
+    transform: scale(0.9);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+}
+
+.quantity-button:hover .absolute {
+  animation-duration: 1s;
+  animation-timing-function: ease-in-out;
+}
+
+.quantity-button:focus {
+  outline: 2px solid rgba(201, 154, 59, 0.5);
+  outline-offset: 2px;
+}
+
+/* Haptic feedback simulation for mobile */
+@media (hover: none) and (pointer: coarse) {
+  .quantity-button:active {
+    background-color: rgba(201, 154, 59, 0.9);
+    transform: scale(0.95);
+    transition: all 0.1s ease;
+  }
 }
 
 .sticky-comparison-bar {

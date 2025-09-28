@@ -411,7 +411,7 @@ curl https://app.railway.app/api/diagnostic-turso
 https://github.com/workmusicalflow/ns2po-w.git
 
 - avant de démarrer le serveur de developpement en arrière plan veuillez toujours vérifier s'il nst pas déjà actif. si besoin vous arrêter le ou les serveur actif et relancez proprement.
-- Après des implémentations ou corrections importantes veuillez toujours lancer check de types et la vérification lint, nous devons éviter toute regession ou pollution.
+- Après des implémentations ou corrections veuillez toujours lancer check de types et la vérification lint, nous devons éviter toute regession, pollution et dettes.
 - utilise toujours le serveur mcp "serena" pour tes recherches dans le code base et s'il ne fonctionne pas tu pourras utiliser tes outils natifs pour y arriver.
 - Pour ce qui est de Railway nous utiliserai au maximum la CLI. our les commande intéractivesvous me les soumettrez avec le scénario pour que je les exécutes depuis un second terminal. pour les commandes non intéractive vous pous en chargerai tout au long du process. l'idée est de faire le maximum en ligne de commande et ne faire que l'impossible via le dashboard web Railway.
 
