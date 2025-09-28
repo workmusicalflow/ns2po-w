@@ -99,31 +99,18 @@
       @action="handleNext"
     />
 
-    <!-- Success Modal -->
-    <div v-if="showSuccessModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div class="bg-white rounded-lg p-6 m-4 max-w-md">
-        <div class="text-center">
-          <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-            </svg>
-          </div>
-          <h3 class="text-lg font-bold mb-2">
-            Devis envoyé !
-          </h3>
-          <p class="text-gray-600 mb-4">
-            Votre demande de devis a été transmise avec succès.
-            Notre équipe vous contactera dans les 24h.
-          </p>
-          <button
-            class="w-full py-3 px-6 bg-primary text-white font-bold rounded-lg hover:bg-primary-dark"
-            @click="resetForm"
-          >
-            Nouveau devis
-          </button>
-        </div>
-      </div>
-    </div>
+    <!-- WhatsApp Quote Confirmation Modal -->
+    <QuoteConfirmationModal
+      :show="showSuccessModal"
+      :whatsappOpened="whatsappOpened"
+      :error="whatsappError"
+      :fallbackEmail="whatsappConfig.fallbackEmail"
+      :fallbackPhone="whatsappConfig.fallbackPhone"
+      :whatsappLink="modalWhatsAppLink"
+      :webWhatsappLink="modalWebWhatsAppLink"
+      :rawMessage="modalRawMessage"
+      @close="resetForm"
+    />
   </div>
 </template>
 
@@ -135,10 +122,14 @@ import StepChoixMode from '~/components/devis/StepChoixMode.vue'
 import StepBuilder from '~/components/devis/StepBuilder.vue'
 import StepValidation from '~/components/devis/StepValidation.vue'
 import StickyBottomBar from '~/components/StickyBottomBar.vue'
+import QuoteConfirmationModal from '~/components/devis/QuoteConfirmationModal.vue'
 
 // Composables Turso
 import { useCampaignBundles } from '~/composables/useCampaignBundles'
 import { useProductsQuery } from '~/composables/useProductsQuery'
+
+// WhatsApp Integration
+import { useWhatsAppQuote } from '~/composables/useWhatsAppQuote'
 
 // SEO
 useHead({
@@ -156,8 +147,27 @@ const currentStep = ref(1)
 const totalSteps = 3
 const selectedMode = ref<'bundle' | 'custom'>('bundle')
 const cartItems = ref<any[]>([])
-const isSubmitting = ref(false)
 const showSuccessModal = ref(false)
+
+// WhatsApp Configuration
+const whatsappConfig = {
+  phoneNumber: '2250707123456', // Numéro NS2PO (à configurer)
+  fallbackEmail: 'devis@ns2po.com',
+  fallbackPhone: '22 07 07 12 34 56'
+}
+
+// WhatsApp Quote Integration
+const {
+  isSubmitting,
+  hasSubmitted,
+  whatsappOpened,
+  error: whatsappError,
+  submitQuote,
+  getWhatsAppLink,
+  getWebWhatsAppLink,
+  generateWhatsAppMessage,
+  reset: resetWhatsApp
+} = useWhatsAppQuote(whatsappConfig)
 
 // Turso Data Integration
 const {
@@ -312,19 +322,39 @@ const handleNext = () => {
 }
 
 const handleSubmit = async (formData: any) => {
-  isSubmitting.value = true
+  console.log('🚀 Démarrage soumission devis WhatsApp:', formData)
+
+  // Transformer les données pour le format WhatsApp
+  const whatsappData = {
+    organization: formData.organization || 'Organisation non précisée',
+    projectType: formData.projectType || 'Projet électoral',
+    contactName: formData.contactName || formData.firstName + ' ' + formData.lastName || 'Contact non précisé',
+    contactPhone: formData.contactPhone || formData.phone || 'Non précisé',
+    contactEmail: formData.contactEmail || formData.email || 'Non précisé',
+    cart: cartItems.value.map(item => ({
+      id: item.id,
+      name: item.name,
+      quantity: item.quantity,
+      unitPrice: item.unitPrice || (item.total / item.quantity),
+      total: item.total
+    })),
+    notes: formData.notes || formData.message || ''
+  }
+
+  console.log('📋 Données transformées pour WhatsApp:', whatsappData)
 
   try {
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 2000))
-
-    // Show success modal
+    await submitQuote(whatsappData)
     showSuccessModal.value = true
+
+    console.log('✅ Soumission WhatsApp terminée:', {
+      hasSubmitted: hasSubmitted.value,
+      whatsappOpened: whatsappOpened.value,
+      error: whatsappError.value
+    })
   } catch (error) {
-    console.error('Erreur envoi devis:', error)
-    // Handle error (show toast, etc.)
-  } finally {
-    isSubmitting.value = false
+    console.error('❌ Erreur soumission WhatsApp:', error)
+    showSuccessModal.value = true // Montrer la modal même en cas d'erreur pour les fallbacks
   }
 }
 
@@ -333,7 +363,75 @@ const resetForm = () => {
   selectedMode.value = 'bundle'
   cartItems.value = []
   showSuccessModal.value = false
+  resetWhatsApp()
 }
+
+// Computed pour les données de la modal
+const modalWhatsAppLink = computed(() => {
+  if (!hasSubmitted.value || cartItems.value.length === 0) return '#'
+
+  const mockData = {
+    organization: 'Votre Organisation',
+    projectType: 'Projet Électoral',
+    contactName: 'Votre Nom',
+    contactPhone: 'Votre Téléphone',
+    contactEmail: 'votre@email.com',
+    cart: cartItems.value.map(item => ({
+      id: item.id,
+      name: item.name,
+      quantity: item.quantity,
+      unitPrice: item.unitPrice || (item.total / item.quantity),
+      total: item.total
+    })),
+    notes: ''
+  }
+
+  return getWhatsAppLink(mockData)
+})
+
+const modalWebWhatsAppLink = computed(() => {
+  if (!hasSubmitted.value || cartItems.value.length === 0) return '#'
+
+  const mockData = {
+    organization: 'Votre Organisation',
+    projectType: 'Projet Électoral',
+    contactName: 'Votre Nom',
+    contactPhone: 'Votre Téléphone',
+    contactEmail: 'votre@email.com',
+    cart: cartItems.value.map(item => ({
+      id: item.id,
+      name: item.name,
+      quantity: item.quantity,
+      unitPrice: item.unitPrice || (item.total / item.quantity),
+      total: item.total
+    })),
+    notes: ''
+  }
+
+  return getWebWhatsAppLink(mockData)
+})
+
+const modalRawMessage = computed(() => {
+  if (!hasSubmitted.value || cartItems.value.length === 0) return ''
+
+  const mockData = {
+    organization: 'Votre Organisation',
+    projectType: 'Projet Électoral',
+    contactName: 'Votre Nom',
+    contactPhone: 'Votre Téléphone',
+    contactEmail: 'votre@email.com',
+    cart: cartItems.value.map(item => ({
+      id: item.id,
+      name: item.name,
+      quantity: item.quantity,
+      unitPrice: item.unitPrice || (item.total / item.quantity),
+      total: item.total
+    })),
+    notes: ''
+  }
+
+  return generateWhatsAppMessage(mockData)
+})
 </script>
 
 <style scoped>
