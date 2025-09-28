@@ -16,9 +16,9 @@
         <div class="flex items-center space-x-3">
           <!-- Sync Button -->
           <button
-            @click="syncCloudinaryAssets"
             :disabled="isSyncing"
             class="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white px-4 py-2 rounded-md flex items-center space-x-2 transition-colors duration-200"
+            @click="syncCloudinaryAssets"
           >
             <Icon
               :name="isSyncing ? 'heroicons:arrow-path' : 'heroicons:arrow-path'"
@@ -29,8 +29,8 @@
 
           <!-- Upload Button -->
           <button
-            @click="showUploadModal = true"
             class="bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-md flex items-center space-x-2 transition-colors duration-200"
+            @click="showUploadModal = true"
           >
             <Icon name="heroicons:cloud-arrow-up" class="w-4 h-4" />
             <span>Uploader un asset</span>
@@ -67,14 +67,30 @@
             v-model="filters.format"
             class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
           >
-            <option value="">Tous les formats</option>
-            <option value="jpg">JPG</option>
-            <option value="png">PNG</option>
-            <option value="webp">WebP</option>
-            <option value="avif">AVIF</option>
-            <option value="gif">GIF</option>
-            <option value="pdf">PDF</option>
-            <option value="mp4">MP4</option>
+            <option value="">
+              Tous les formats
+            </option>
+            <option value="jpg">
+              JPG
+            </option>
+            <option value="png">
+              PNG
+            </option>
+            <option value="webp">
+              WebP
+            </option>
+            <option value="avif">
+              AVIF
+            </option>
+            <option value="gif">
+              GIF
+            </option>
+            <option value="pdf">
+              PDF
+            </option>
+            <option value="mp4">
+              MP4
+            </option>
           </select>
         </div>
 
@@ -87,11 +103,21 @@
             v-model="filters.folder"
             class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
           >
-            <option value="">Tous les dossiers</option>
-            <option value="ns2po/products">Produits</option>
-            <option value="ns2po/realisations">Réalisations</option>
-            <option value="ns2po/campaigns">Campagnes</option>
-            <option value="ns2po/misc">Divers</option>
+            <option value="">
+              Tous les dossiers
+            </option>
+            <option value="ns2po/products">
+              Produits
+            </option>
+            <option value="ns2po/realisations">
+              Réalisations
+            </option>
+            <option value="ns2po/campaigns">
+              Campagnes
+            </option>
+            <option value="ns2po/misc">
+              Divers
+            </option>
           </select>
         </div>
       </div>
@@ -105,16 +131,26 @@
               v-model="pagination.sortBy"
               class="border border-gray-300 rounded-md px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
             >
-              <option value="created_at">Date de création</option>
-              <option value="updated_at">Dernière modification</option>
-              <option value="bytes">Taille</option>
+              <option value="created_at">
+                Date de création
+              </option>
+              <option value="updated_at">
+                Dernière modification
+              </option>
+              <option value="bytes">
+                Taille
+              </option>
             </select>
             <select
               v-model="pagination.sortOrder"
               class="border border-gray-300 rounded-md px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
             >
-              <option value="desc">Décroissant</option>
-              <option value="asc">Croissant</option>
+              <option value="desc">
+                Décroissant
+              </option>
+              <option value="asc">
+                Croissant
+              </option>
             </select>
           </div>
         </div>
@@ -125,10 +161,18 @@
             v-model="pagination.limit"
             class="border border-gray-300 rounded-md px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
           >
-            <option :value="12">12</option>
-            <option :value="24">24</option>
-            <option :value="48">48</option>
-            <option :value="96">96</option>
+            <option :value="12">
+              12
+            </option>
+            <option :value="24">
+              24
+            </option>
+            <option :value="48">
+              48
+            </option>
+            <option :value="96">
+              96
+            </option>
           </select>
         </div>
       </div>
@@ -136,8 +180,8 @@
       <!-- Clear Filters -->
       <div v-if="hasActiveFilters" class="mt-4 pt-4 border-t border-gray-200">
         <button
-          @click="clearFilters"
           class="text-sm text-amber-600 hover:text-amber-700 font-medium"
+          @click="clearFilters"
         >
           Réinitialiser les filtres
         </button>
@@ -146,16 +190,20 @@
 
     <!-- Sync Message -->
     <div v-if="syncMessage" class="mb-6">
-      <div :class="[
-        'rounded-lg border p-4',
-        syncError ? 'bg-red-50 border-red-200 text-red-700' : 'bg-green-50 border-green-200 text-green-700'
-      ]">
+      <div
+        :class="[
+          'rounded-lg border p-4',
+          syncError ? 'bg-red-50 border-red-200 text-red-700' : 'bg-green-50 border-green-200 text-green-700'
+        ]"
+      >
         <div class="flex items-center space-x-3">
           <Icon
             :name="syncError ? 'heroicons:exclamation-triangle' : 'heroicons:check-circle'"
             class="w-5 h-5"
           />
-          <p class="font-medium">{{ syncMessage }}</p>
+          <p class="font-medium">
+            {{ syncMessage }}
+          </p>
         </div>
       </div>
     </div>
@@ -163,7 +211,7 @@
     <!-- Loading State -->
     <div v-if="assetsQuery.isLoading.value" class="text-center py-12">
       <div class="inline-flex items-center space-x-2">
-        <div class="w-4 h-4 border-2 border-amber-600 border-t-transparent rounded-full animate-spin"></div>
+        <div class="w-4 h-4 border-2 border-amber-600 border-t-transparent rounded-full animate-spin" />
         <span class="text-gray-600">Chargement des assets...</span>
       </div>
     </div>
@@ -182,8 +230,8 @@
         </div>
       </div>
       <button
-        @click="assetsQuery.refetch()"
         class="mt-4 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm transition-colors duration-200"
+        @click="assetsQuery.refetch()"
       >
         Réessayer
       </button>
@@ -224,9 +272,9 @@
       <div v-if="assetsData.totalPages > 1" class="flex items-center justify-between">
         <div class="flex items-center space-x-2">
           <button
-            @click="goToPage(assetsData.page - 1)"
             :disabled="!assetsData.hasPrev"
             class="px-3 py-2 border border-gray-300 rounded-md text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+            @click="goToPage(assetsData.page - 1)"
           >
             <Icon name="heroicons:chevron-left" class="w-4 h-4" />
           </button>
@@ -235,13 +283,13 @@
             <template v-for="pageNum in visiblePages" :key="pageNum">
               <button
                 v-if="pageNum !== '...'"
-                @click="goToPage(pageNum)"
                 :class="[
                   'px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200',
                   pageNum === assetsData.page
                     ? 'bg-amber-600 text-white'
                     : 'border border-gray-300 text-gray-700 hover:bg-gray-50'
                 ]"
+                @click="goToPage(pageNum)"
               >
                 {{ pageNum }}
               </button>
@@ -250,9 +298,9 @@
           </div>
 
           <button
-            @click="goToPage(assetsData.page + 1)"
             :disabled="!assetsData.hasNext"
             class="px-3 py-2 border border-gray-300 rounded-md text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+            @click="goToPage(assetsData.page + 1)"
           >
             <Icon name="heroicons:chevron-right" class="w-4 h-4" />
           </button>
@@ -280,14 +328,14 @@
       </p>
       <button
         v-if="hasActiveFilters"
-        @click="clearFilters"
         class="text-amber-600 hover:text-amber-700 font-medium mr-4"
+        @click="clearFilters"
       >
         Réinitialiser les filtres
       </button>
       <button
-        @click="showUploadModal = true"
         class="bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-md transition-colors duration-200"
+        @click="showUploadModal = true"
       >
         Uploader un asset
       </button>

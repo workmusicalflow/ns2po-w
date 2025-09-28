@@ -11,8 +11,12 @@
         <div class="flex items-center space-x-3">
           <Icon name="heroicons:information-circle" class="w-5 h-5 text-blue-500" />
           <div>
-            <h3 class="text-sm font-medium text-blue-800">Produit à supprimer</h3>
-            <p class="text-sm text-blue-700">{{ productName }}</p>
+            <h3 class="text-sm font-medium text-blue-800">
+              Produit à supprimer
+            </h3>
+            <p class="text-sm text-blue-700">
+              {{ productName }}
+            </p>
           </div>
         </div>
       </div>
@@ -41,7 +45,9 @@
       <!-- Before/After comparison - Quantité uniquement -->
       <div class="grid grid-cols-2 gap-4">
         <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
-          <h4 class="text-sm font-medium text-gray-800 mb-2">Avant suppression</h4>
+          <h4 class="text-sm font-medium text-gray-800 mb-2">
+            Avant suppression
+          </h4>
           <div class="space-y-1 text-xs text-gray-600">
             <div class="flex justify-between">
               <span>Quantité:</span>
@@ -51,7 +57,9 @@
         </div>
 
         <div class="bg-red-50 border border-red-200 rounded-lg p-4">
-          <h4 class="text-sm font-medium text-red-800 mb-2">Après suppression</h4>
+          <h4 class="text-sm font-medium text-red-800 mb-2">
+            Après suppression
+          </h4>
           <div class="space-y-1 text-xs text-red-600">
             <div class="flex justify-between">
               <span>Quantité:</span>
@@ -69,11 +77,17 @@
         <div class="flex items-start space-x-3">
           <Icon name="heroicons:light-bulb" class="w-5 h-5 text-yellow-500 mt-0.5 flex-shrink-0" />
           <div class="text-sm text-yellow-800">
-            <p class="font-medium mb-1">Impact sur le bundle</p>
+            <p class="font-medium mb-1">
+              Impact sur le bundle
+            </p>
             <p>Le bundle ne pourra plus être sauvegardé tant que la quantité minimale ne sera pas atteinte. Vous devrez :</p>
             <ul class="mt-2 space-y-1 ml-4">
-              <li class="list-disc">Ajouter d'autres produits pour atteindre 1000 articles minimum</li>
-              <li class="list-disc">Ou augmenter les quantités des produits existants</li>
+              <li class="list-disc">
+                Ajouter d'autres produits pour atteindre 1000 articles minimum
+              </li>
+              <li class="list-disc">
+                Ou augmenter les quantités des produits existants
+              </li>
             </ul>
           </div>
         </div>

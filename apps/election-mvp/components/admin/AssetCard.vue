@@ -8,7 +8,7 @@
           :alt="asset.alt_text || `Asset ${asset.public_id}`"
           class="w-full h-full object-cover"
           @error="onImageError"
-        />
+        >
       </template>
 
       <!-- Non-image assets -->
@@ -31,36 +31,36 @@
         <div class="opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex space-x-2">
           <!-- View Button -->
           <button
-            @click="$emit('view', asset)"
             class="bg-white bg-opacity-90 hover:bg-opacity-100 rounded-full p-2 transition-all duration-200"
             title="Voir les détails"
+            @click="$emit('view', asset)"
           >
             <Icon name="heroicons:eye" class="w-4 h-4 text-gray-700" />
           </button>
 
           <!-- Edit Button -->
           <button
-            @click="$emit('edit', asset)"
             class="bg-white bg-opacity-90 hover:bg-opacity-100 rounded-full p-2 transition-all duration-200"
             title="Modifier"
+            @click="$emit('edit', asset)"
           >
             <Icon name="heroicons:pencil" class="w-4 h-4 text-gray-700" />
           </button>
 
           <!-- Replace Button -->
           <button
-            @click="$emit('replace', asset)"
             class="bg-amber-500 bg-opacity-90 hover:bg-opacity-100 rounded-full p-2 transition-all duration-200"
             title="Remplacer"
+            @click="$emit('replace', asset)"
           >
             <Icon name="heroicons:arrow-path" class="w-4 h-4 text-white" />
           </button>
 
           <!-- Delete Button -->
           <button
-            @click="$emit('delete', asset)"
             class="bg-red-500 bg-opacity-90 hover:bg-opacity-100 rounded-full p-2 transition-all duration-200"
             title="Supprimer"
+            @click="$emit('delete', asset)"
           >
             <Icon name="heroicons:trash" class="w-4 h-4 text-white" />
           </button>
@@ -78,9 +78,11 @@
       </div>
 
       <!-- Usage badge -->
-      <div v-if="asset.usage_count && asset.usage_count > 0"
-           class="absolute bottom-2 left-2 bg-green-600 text-white text-xs px-2 py-1 rounded flex items-center space-x-1"
-           :title="`Utilisé dans ${asset.usage_count} élément(s)`">
+      <div
+        v-if="asset.usage_count && asset.usage_count > 0"
+        class="absolute bottom-2 left-2 bg-green-600 text-white text-xs px-2 py-1 rounded flex items-center space-x-1"
+        :title="`Utilisé dans ${asset.usage_count} élément(s)`"
+      >
         <Icon name="heroicons:link" class="w-3 h-3" />
         <span>{{ asset.usage_count }}</span>
       </div>

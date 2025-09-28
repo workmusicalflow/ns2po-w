@@ -17,9 +17,9 @@
           <div class="flex items-center space-x-4">
             <!-- Mobile Hamburger Menu -->
             <button
-              @click="toggleMobileMenu"
               class="md:hidden inline-flex items-center justify-center w-12 h-12 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-amber-500 touch-manipulation"
               aria-label="Ouvrir le menu de navigation"
+              @click="toggleMobileMenu"
             >
               <Icon
                 :name="isMobileMenuOpen ? 'heroicons:x-mark' : 'heroicons:bars-3'"
@@ -102,9 +102,9 @@
               </div>
             </div>
             <button
-              @click="closeMobileMenu"
               class="w-12 h-12 flex items-center justify-center rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 touch-manipulation"
               aria-label="Fermer le menu"
+              @click="closeMobileMenu"
             >
               <Icon name="heroicons:x-mark" class="w-6 h-6" />
             </button>

@@ -8,9 +8,9 @@
             Sélectionner des images
           </h3>
           <button
-            @click="$emit('close')"
             class="text-gray-400 hover:text-gray-600 transition-colors"
             :disabled="isUploading"
+            @click="$emit('close')"
           >
             <Icon name="heroicons:x-mark" class="w-5 h-5" />
           </button>
@@ -23,25 +23,25 @@
         <div class="border-b border-gray-200 mb-6">
           <nav class="-mb-px flex space-x-8">
             <button
-              @click="activeTab = 'upload'"
               :class="[
                 'py-2 px-1 border-b-2 font-medium text-sm transition-colors',
                 activeTab === 'upload'
                   ? 'border-amber-500 text-amber-600'
                   : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
               ]"
+              @click="activeTab = 'upload'"
             >
               <Icon name="heroicons:cloud-arrow-up" class="w-4 h-4 inline mr-2" />
               Nouveau fichier
             </button>
             <button
-              @click="activeTab = 'select'"
               :class="[
                 'py-2 px-1 border-b-2 font-medium text-sm transition-colors',
                 activeTab === 'select'
                   ? 'border-amber-500 text-amber-600'
                   : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
               ]"
+              @click="activeTab = 'select'"
             >
               <Icon name="heroicons:photo" class="w-4 h-4 inline mr-2" />
               Assets existants
@@ -56,13 +56,17 @@
             <div class="flex">
               <Icon name="heroicons:exclamation-triangle" class="w-5 h-5 text-red-400 mr-2 flex-shrink-0" />
               <div class="flex-1">
-                <h3 class="text-sm font-medium text-red-800">Erreurs détectées :</h3>
+                <h3 class="text-sm font-medium text-red-800">
+                  Erreurs détectées :
+                </h3>
                 <ul class="mt-2 text-sm text-red-700 list-disc list-inside">
-                  <li v-for="error in errorMessages" :key="error">{{ error }}</li>
+                  <li v-for="error in errorMessages" :key="error">
+                    {{ error }}
+                  </li>
                 </ul>
                 <button
-                  @click="errorMessages = []"
                   class="mt-2 text-xs text-red-600 hover:text-red-800 underline"
+                  @click="errorMessages = []"
                 >
                   Masquer les erreurs
                 </button>
@@ -87,11 +91,11 @@
               id="file-upload-input"
               ref="fileInput"
               type="file"
-              @change="handleFileSelect"
               accept="image/*"
               multiple
               class="hidden"
-            />
+              @change="handleFileSelect"
+            >
 
             <div v-if="uploadedFiles.length === 0">
               <Icon
@@ -128,7 +132,7 @@
                   disabled
                   class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-gray-400 bg-gray-200 cursor-not-allowed"
                 >
-                  <div class="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin mr-2"></div>
+                  <div class="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin mr-2" />
                   Upload...
                 </button>
               </template>
@@ -151,7 +155,7 @@
                       :src="file.preview"
                       :alt="file.name"
                       class="w-full h-full object-cover"
-                    />
+                    >
                     <div v-else class="w-full h-full flex items-center justify-center">
                       <Icon name="heroicons:document" class="w-8 h-8 text-gray-400" />
                     </div>
@@ -163,7 +167,7 @@
                     class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center rounded-lg"
                   >
                     <div class="text-white text-center">
-                      <div class="w-8 h-8 border-2 border-white border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
+                      <div class="w-8 h-8 border-2 border-white border-t-transparent rounded-full animate-spin mx-auto mb-2" />
                       <span class="text-sm">Upload...</span>
                     </div>
                   </div>
@@ -171,8 +175,8 @@
                   <!-- Remove Button -->
                   <button
                     v-if="!file.uploading"
-                    @click="removeUploadedFile(index)"
                     class="absolute top-2 right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                    @click="removeUploadedFile(index)"
                   >
                     <Icon name="heroicons:x-mark" class="w-4 h-4" />
                   </button>
@@ -196,8 +200,12 @@
 
                   <!-- File Name -->
                   <div class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-75 text-white p-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <p class="text-xs truncate">{{ file.name }}</p>
-                    <p v-if="file.error" class="text-xs text-red-300 truncate">{{ file.error }}</p>
+                    <p class="text-xs truncate">
+                      {{ file.name }}
+                    </p>
+                    <p v-if="file.error" class="text-xs text-red-300 truncate">
+                      {{ file.error }}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -230,7 +238,7 @@
                   type="text"
                   placeholder="Rechercher des assets..."
                   class="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-                />
+                >
                 <Icon name="heroicons:magnifying-glass" class="absolute left-3 top-2.5 w-4 h-4 text-gray-400" />
               </div>
             </div>
@@ -241,11 +249,21 @@
                 v-model="formatFilter"
                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
               >
-                <option value="">Tous les formats</option>
-                <option value="jpg">JPG</option>
-                <option value="png">PNG</option>
-                <option value="webp">WebP</option>
-                <option value="gif">GIF</option>
+                <option value="">
+                  Tous les formats
+                </option>
+                <option value="jpg">
+                  JPG
+                </option>
+                <option value="png">
+                  PNG
+                </option>
+                <option value="webp">
+                  WebP
+                </option>
+                <option value="gif">
+                  GIF
+                </option>
               </select>
             </div>
           </div>
@@ -253,19 +271,23 @@
           <!-- Assets Grid -->
           <div v-if="assetsQuery.isLoading.value" class="text-center py-12">
             <div class="inline-flex items-center space-x-2">
-              <div class="w-5 h-5 border-2 border-amber-600 border-t-transparent rounded-full animate-spin"></div>
+              <div class="w-5 h-5 border-2 border-amber-600 border-t-transparent rounded-full animate-spin" />
               <span class="text-gray-600">Chargement des assets...</span>
             </div>
           </div>
 
           <div v-else-if="assetsQuery.isError.value" class="text-center py-12">
             <Icon name="heroicons:exclamation-triangle" class="w-8 h-8 text-red-500 mx-auto mb-2" />
-            <p class="text-red-600">Erreur lors du chargement des assets</p>
+            <p class="text-red-600">
+              Erreur lors du chargement des assets
+            </p>
           </div>
 
           <div v-else-if="filteredAssets.length === 0" class="text-center py-12">
             <Icon name="heroicons:photo" class="w-12 h-12 text-gray-400 mx-auto mb-4" />
-            <p class="text-gray-600">Aucun asset trouvé</p>
+            <p class="text-gray-600">
+              Aucun asset trouvé
+            </p>
             <p class="text-sm text-gray-500 mt-1">
               {{ searchQuery ? 'Essayez d\'ajuster votre recherche' : 'Commencez par uploader des images' }}
             </p>
@@ -275,13 +297,13 @@
             <div
               v-for="asset in filteredAssets"
               :key="asset.id"
-              @click="toggleAssetSelection(asset)"
               :class="[
                 'relative group cursor-pointer rounded-lg overflow-hidden border-2 transition-all',
                 selectedAssets.find(a => a.id === asset.id)
                   ? 'border-amber-500 shadow-lg transform scale-105'
                   : 'border-gray-200 hover:border-gray-300 hover:shadow-md'
               ]"
+              @click="toggleAssetSelection(asset)"
             >
               <div class="aspect-square bg-gray-100">
                 <img
@@ -289,7 +311,7 @@
                   :src="getAssetThumbnail(asset)"
                   :alt="asset.alt_text || asset.public_id"
                   class="w-full h-full object-cover"
-                />
+                >
                 <div v-else class="w-full h-full flex items-center justify-center">
                   <Icon :name="getAssetTypeIcon(asset.format, asset.resource_type)" :class="['w-8 h-8', getAssetTypeColor(asset.format, asset.resource_type)]" />
                 </div>
@@ -305,8 +327,12 @@
 
               <!-- Asset Info -->
               <div class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-75 text-white p-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                <p class="text-xs truncate">{{ asset.public_id }}</p>
-                <p class="text-xs text-gray-300">{{ asset.format.toUpperCase() }}</p>
+                <p class="text-xs truncate">
+                  {{ asset.public_id }}
+                </p>
+                <p class="text-xs text-gray-300">
+                  {{ asset.format.toUpperCase() }}
+                </p>
               </div>
             </div>
           </div>
@@ -314,9 +340,9 @@
           <!-- Pagination -->
           <div v-if="assetsQuery.data.value && assetsQuery.data.value.totalPages > 1" class="flex justify-center space-x-2">
             <button
-              @click="goToPage(pagination.page - 1)"
               :disabled="!assetsQuery.data.value.hasPrev"
               class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              @click="goToPage(pagination.page - 1)"
             >
               Précédent
             </button>
@@ -324,9 +350,9 @@
               Page {{ pagination.page }} sur {{ assetsQuery.data.value.totalPages }}
             </span>
             <button
-              @click="goToPage(pagination.page + 1)"
               :disabled="!assetsQuery.data.value.hasNext"
               class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              @click="goToPage(pagination.page + 1)"
             >
               Suivant
             </button>
@@ -349,15 +375,14 @@
         <!-- Actions -->
         <div class="flex space-x-3">
           <button
-            @click="$emit('close')"
             class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-amber-500 transition-colors"
             :disabled="isUploading"
+            @click="$emit('close')"
           >
             Annuler
           </button>
 
           <button
-            @click="confirmSelection"
             :disabled="!hasSelection || isUploading"
             :class="[
               'px-4 py-2 text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500 transition-colors',
@@ -365,10 +390,11 @@
                 ? 'text-white bg-amber-600 hover:bg-amber-700'
                 : 'text-gray-400 bg-gray-200 cursor-not-allowed'
             ]"
+            @click="confirmSelection"
           >
             <template v-if="isUploading">
               <div class="flex items-center space-x-2">
-                <div class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                <div class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                 <span>Upload...</span>
               </div>
             </template>

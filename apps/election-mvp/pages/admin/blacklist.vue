@@ -3,15 +3,17 @@
     <!-- Header -->
     <div class="flex justify-between items-center">
       <div>
-        <h1 class="text-2xl font-semibold text-gray-900">Blacklist Auto-Discovery</h1>
+        <h1 class="text-2xl font-semibold text-gray-900">
+          Blacklist Auto-Discovery
+        </h1>
         <p class="mt-1 text-sm text-gray-600">
           Gestion des réalisations blacklistées pour éviter leur re-découverte automatique
         </p>
       </div>
       <button
-        @click="refreshData"
         class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
         :disabled="isLoading"
+        @click="refreshData"
       >
         <Icon name="heroicons:arrow-path" class="w-4 h-4 mr-2" :class="{ 'animate-spin': isLoading }" />
         Actualiser
@@ -28,8 +30,12 @@
             </div>
             <div class="ml-5 w-0 flex-1">
               <dl>
-                <dt class="text-sm font-medium text-gray-500 truncate">Total Blacklisté</dt>
-                <dd class="text-lg font-medium text-gray-900">{{ blacklistItems.length }}</dd>
+                <dt class="text-sm font-medium text-gray-500 truncate">
+                  Total Blacklisté
+                </dt>
+                <dd class="text-lg font-medium text-gray-900">
+                  {{ blacklistItems.length }}
+                </dd>
               </dl>
             </div>
           </div>
@@ -44,8 +50,12 @@
             </div>
             <div class="ml-5 w-0 flex-1">
               <dl>
-                <dt class="text-sm font-medium text-gray-500 truncate">Aujourd'hui</dt>
-                <dd class="text-lg font-medium text-gray-900">{{ todayCount }}</dd>
+                <dt class="text-sm font-medium text-gray-500 truncate">
+                  Aujourd'hui
+                </dt>
+                <dd class="text-lg font-medium text-gray-900">
+                  {{ todayCount }}
+                </dd>
               </dl>
             </div>
           </div>
@@ -60,8 +70,12 @@
             </div>
             <div class="ml-5 w-0 flex-1">
               <dl>
-                <dt class="text-sm font-medium text-gray-500 truncate">Par Admin</dt>
-                <dd class="text-lg font-medium text-gray-900">{{ adminCount }}</dd>
+                <dt class="text-sm font-medium text-gray-500 truncate">
+                  Par Admin
+                </dt>
+                <dd class="text-lg font-medium text-gray-900">
+                  {{ adminCount }}
+                </dd>
               </dl>
             </div>
           </div>
@@ -82,13 +96,17 @@
 
       <div v-if="isLoading" class="p-8 text-center">
         <Icon name="heroicons:arrow-path" class="w-8 h-8 animate-spin mx-auto text-gray-400" />
-        <p class="mt-2 text-gray-500">Chargement...</p>
+        <p class="mt-2 text-gray-500">
+          Chargement...
+        </p>
       </div>
 
       <div v-else-if="error" class="p-8 text-center">
         <Icon name="heroicons:exclamation-triangle" class="w-8 h-8 mx-auto text-red-400" />
-        <p class="mt-2 text-red-600">{{ error }}</p>
-        <button @click="refreshData" class="mt-2 text-sm text-primary-600 hover:text-primary-500">
+        <p class="mt-2 text-red-600">
+          {{ error }}
+        </p>
+        <button class="mt-2 text-sm text-primary-600 hover:text-primary-500" @click="refreshData">
           Réessayer
         </button>
       </div>
@@ -119,9 +137,9 @@
 
             <div class="flex items-center space-x-2">
               <button
-                @click="removeFromBlacklist(item)"
                 class="inline-flex items-center px-3 py-1 border border-transparent text-xs font-medium rounded-md text-green-700 bg-green-100 hover:bg-green-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
                 :disabled="isRemoving === item.public_id"
+                @click="removeFromBlacklist(item)"
               >
                 <Icon
                   name="heroicons:check-circle"
@@ -137,7 +155,9 @@
 
       <div v-else class="p-8 text-center">
         <Icon name="heroicons:inbox" class="w-12 h-12 mx-auto text-gray-300" />
-        <h3 class="mt-2 text-sm font-medium text-gray-900">Aucun élément blacklisté</h3>
+        <h3 class="mt-2 text-sm font-medium text-gray-900">
+          Aucun élément blacklisté
+        </h3>
         <p class="mt-1 text-sm text-gray-500">
           Toutes les réalisations auto-discovery sont actuellement disponibles
         </p>

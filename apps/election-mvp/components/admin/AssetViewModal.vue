@@ -8,8 +8,8 @@
             Détails de l'asset
           </h3>
           <button
-            @click="$emit('close')"
             class="text-gray-400 hover:text-gray-600 transition-colors"
+            @click="$emit('close')"
           >
             <Icon name="heroicons:x-mark" class="w-5 h-5" />
           </button>
@@ -28,7 +28,7 @@
                   :alt="asset.alt_text || `Asset ${asset.public_id}`"
                   class="max-w-full max-h-full object-contain"
                   @error="onImageError"
-                />
+                >
               </template>
 
               <!-- Non-image assets -->
@@ -69,33 +69,57 @@
 
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <dt class="text-sm font-medium text-gray-500">Public ID</dt>
-                  <dd class="mt-1 text-sm text-gray-900 break-all">{{ asset.public_id }}</dd>
+                  <dt class="text-sm font-medium text-gray-500">
+                    Public ID
+                  </dt>
+                  <dd class="mt-1 text-sm text-gray-900 break-all">
+                    {{ asset.public_id }}
+                  </dd>
                 </div>
 
                 <div>
-                  <dt class="text-sm font-medium text-gray-500">Format</dt>
-                  <dd class="mt-1 text-sm text-gray-900 uppercase">{{ asset.format }}</dd>
+                  <dt class="text-sm font-medium text-gray-500">
+                    Format
+                  </dt>
+                  <dd class="mt-1 text-sm text-gray-900 uppercase">
+                    {{ asset.format }}
+                  </dd>
                 </div>
 
                 <div>
-                  <dt class="text-sm font-medium text-gray-500">Type de ressource</dt>
-                  <dd class="mt-1 text-sm text-gray-900 capitalize">{{ asset.resource_type }}</dd>
+                  <dt class="text-sm font-medium text-gray-500">
+                    Type de ressource
+                  </dt>
+                  <dd class="mt-1 text-sm text-gray-900 capitalize">
+                    {{ asset.resource_type }}
+                  </dd>
                 </div>
 
                 <div>
-                  <dt class="text-sm font-medium text-gray-500">Taille</dt>
-                  <dd class="mt-1 text-sm text-gray-900">{{ formattedSize }}</dd>
+                  <dt class="text-sm font-medium text-gray-500">
+                    Taille
+                  </dt>
+                  <dd class="mt-1 text-sm text-gray-900">
+                    {{ formattedSize }}
+                  </dd>
                 </div>
 
                 <div v-if="asset.width && asset.height">
-                  <dt class="text-sm font-medium text-gray-500">Dimensions</dt>
-                  <dd class="mt-1 text-sm text-gray-900">{{ asset.width }} × {{ asset.height }}px</dd>
+                  <dt class="text-sm font-medium text-gray-500">
+                    Dimensions
+                  </dt>
+                  <dd class="mt-1 text-sm text-gray-900">
+                    {{ asset.width }} × {{ asset.height }}px
+                  </dd>
                 </div>
 
                 <div>
-                  <dt class="text-sm font-medium text-gray-500">Dossier</dt>
-                  <dd class="mt-1 text-sm text-gray-900">{{ asset.folder }}</dd>
+                  <dt class="text-sm font-medium text-gray-500">
+                    Dossier
+                  </dt>
+                  <dd class="mt-1 text-sm text-gray-900">
+                    {{ asset.folder }}
+                  </dd>
                 </div>
               </div>
             </div>
@@ -108,17 +132,27 @@
 
               <div class="space-y-3">
                 <div v-if="asset.alt_text">
-                  <dt class="text-sm font-medium text-gray-500">Texte alternatif</dt>
-                  <dd class="mt-1 text-sm text-gray-900">{{ asset.alt_text }}</dd>
+                  <dt class="text-sm font-medium text-gray-500">
+                    Texte alternatif
+                  </dt>
+                  <dd class="mt-1 text-sm text-gray-900">
+                    {{ asset.alt_text }}
+                  </dd>
                 </div>
 
                 <div v-if="asset.caption">
-                  <dt class="text-sm font-medium text-gray-500">Légende</dt>
-                  <dd class="mt-1 text-sm text-gray-900">{{ asset.caption }}</dd>
+                  <dt class="text-sm font-medium text-gray-500">
+                    Légende
+                  </dt>
+                  <dd class="mt-1 text-sm text-gray-900">
+                    {{ asset.caption }}
+                  </dd>
                 </div>
 
                 <div v-if="asset.tags && asset.tags.length > 0">
-                  <dt class="text-sm font-medium text-gray-500">Tags</dt>
+                  <dt class="text-sm font-medium text-gray-500">
+                    Tags
+                  </dt>
                   <dd class="mt-1">
                     <div class="flex flex-wrap gap-2">
                       <span
@@ -165,13 +199,21 @@
 
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <dt class="text-sm font-medium text-gray-500">Créé le</dt>
-                  <dd class="mt-1 text-sm text-gray-900">{{ formattedCreatedDate }}</dd>
+                  <dt class="text-sm font-medium text-gray-500">
+                    Créé le
+                  </dt>
+                  <dd class="mt-1 text-sm text-gray-900">
+                    {{ formattedCreatedDate }}
+                  </dd>
                 </div>
 
                 <div>
-                  <dt class="text-sm font-medium text-gray-500">Modifié le</dt>
-                  <dd class="mt-1 text-sm text-gray-900">{{ formattedUpdatedDate }}</dd>
+                  <dt class="text-sm font-medium text-gray-500">
+                    Modifié le
+                  </dt>
+                  <dd class="mt-1 text-sm text-gray-900">
+                    {{ formattedUpdatedDate }}
+                  </dd>
                 </div>
               </div>
             </div>
@@ -184,18 +226,20 @@
 
               <div class="space-y-3">
                 <div>
-                  <dt class="text-sm font-medium text-gray-500">URL sécurisée</dt>
+                  <dt class="text-sm font-medium text-gray-500">
+                    URL sécurisée
+                  </dt>
                   <dd class="mt-1">
                     <div class="flex items-center space-x-2">
                       <input
                         :value="asset.secure_url"
                         readonly
                         class="flex-1 text-xs bg-gray-50 border border-gray-300 rounded px-2 py-1 text-gray-700 select-all"
-                      />
+                      >
                       <button
-                        @click="copyToClipboard(asset.secure_url)"
                         class="p-1 text-gray-400 hover:text-gray-600 transition-colors"
                         title="Copier l'URL"
+                        @click="copyToClipboard(asset.secure_url)"
                       >
                         <Icon name="heroicons:clipboard" class="w-4 h-4" />
                       </button>
@@ -204,18 +248,20 @@
                 </div>
 
                 <div v-if="asset.url">
-                  <dt class="text-sm font-medium text-gray-500">URL publique</dt>
+                  <dt class="text-sm font-medium text-gray-500">
+                    URL publique
+                  </dt>
                   <dd class="mt-1">
                     <div class="flex items-center space-x-2">
                       <input
                         :value="asset.url"
                         readonly
                         class="flex-1 text-xs bg-gray-50 border border-gray-300 rounded px-2 py-1 text-gray-700 select-all"
-                      />
+                      >
                       <button
-                        @click="copyToClipboard(asset.url!)"
                         class="p-1 text-gray-400 hover:text-gray-600 transition-colors"
                         title="Copier l'URL"
+                        @click="copyToClipboard(asset.url!)"
                       >
                         <Icon name="heroicons:clipboard" class="w-4 h-4" />
                       </button>
@@ -231,8 +277,8 @@
       <!-- Footer -->
       <div class="px-6 py-4 border-t border-gray-200 flex justify-end">
         <button
-          @click="$emit('close')"
           class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-amber-500 transition-colors"
+          @click="$emit('close')"
         >
           Fermer
         </button>

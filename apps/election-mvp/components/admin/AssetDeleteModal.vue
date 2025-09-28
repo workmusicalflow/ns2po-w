@@ -8,9 +8,9 @@
             Confirmer la suppression
           </h3>
           <button
-            @click="$emit('close')"
             class="text-gray-400 hover:text-gray-600 transition-colors"
             :disabled="isDeleting"
+            @click="$emit('close')"
           >
             <Icon name="heroicons:x-mark" class="w-5 h-5" />
           </button>
@@ -28,7 +28,7 @@
                 :src="thumbnailUrl"
                 :alt="asset.alt_text || `Asset ${asset.public_id}`"
                 class="w-16 h-16 object-cover rounded border"
-              />
+              >
               <div
                 v-else
                 class="w-16 h-16 bg-gray-100 rounded border flex items-center justify-center"
@@ -53,7 +53,7 @@
         <!-- Loading Usage Info -->
         <div v-if="isLoadingUsage" class="mb-4 p-4 bg-gray-50 rounded border text-center">
           <div class="inline-flex items-center space-x-2">
-            <div class="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+            <div class="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
             <span class="text-sm text-gray-600">Vérification des usages...</span>
           </div>
         </div>
@@ -94,22 +94,30 @@
 
                 <!-- Usage Details -->
                 <div class="space-y-2">
-                  <div v-for="warning in usageDetails.deleteWarnings" :key="warning"
-                       class="text-xs text-red-600">
+                  <div
+                    v-for="warning in usageDetails.deleteWarnings" :key="warning"
+                    class="text-xs text-red-600"
+                  >
                     • {{ warning }}
                   </div>
                 </div>
 
                 <!-- Detailed Usage List -->
                 <div v-if="usageDetails.usages.length > 0" class="mt-3">
-                  <p class="text-xs text-red-600 font-medium mb-1">Utilisé dans :</p>
+                  <p class="text-xs text-red-600 font-medium mb-1">
+                    Utilisé dans :
+                  </p>
                   <div class="space-y-1">
-                    <div v-for="usage in usageDetails.usages.slice(0, 3)" :key="usage.id"
-                         class="text-xs text-red-600 pl-2">
+                    <div
+                      v-for="usage in usageDetails.usages.slice(0, 3)" :key="usage.id"
+                      class="text-xs text-red-600 pl-2"
+                    >
                       → {{ usage.entity_name }} ({{ usage.field_name }})
                     </div>
-                    <div v-if="usageDetails.usages.length > 3"
-                         class="text-xs text-red-500 pl-2">
+                    <div
+                      v-if="usageDetails.usages.length > 3"
+                      class="text-xs text-red-500 pl-2"
+                    >
                       ... et {{ usageDetails.usages.length - 3 }} autre(s)
                     </div>
                   </div>
@@ -123,7 +131,7 @@
                       type="checkbox"
                       class="mt-0.5 rounded border-red-300 text-red-600 focus:ring-red-500"
                       :disabled="isDeleting"
-                    />
+                    >
                     <span class="text-xs text-red-700">
                       Je comprends les risques et souhaite supprimer cet asset de toute façon.
                       <strong>Cette action supprimera également toutes les références</strong> et peut
@@ -158,15 +166,14 @@
       <!-- Footer -->
       <div class="px-6 py-4 border-t border-gray-200 flex justify-end space-x-3">
         <button
-          @click="$emit('close')"
           class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-amber-500 transition-colors"
           :disabled="isDeleting"
+          @click="$emit('close')"
         >
           Annuler
         </button>
 
         <button
-          @click="confirmDelete"
           :disabled="isDeleting || isLoadingUsage || (!usageDetails?.canDelete && !forceDelete)"
           :class="[
             'px-4 py-2 text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 transition-colors',
@@ -174,9 +181,10 @@
               ? 'text-white bg-red-600 hover:bg-red-700'
               : 'text-gray-400 bg-gray-200 cursor-not-allowed'
           ]"
+          @click="confirmDelete"
         >
           <div v-if="isDeleting" class="flex items-center space-x-2">
-            <div class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+            <div class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
             <span>Suppression...</span>
           </div>
           <span v-else-if="forceDelete">Supprimer quand même</span>

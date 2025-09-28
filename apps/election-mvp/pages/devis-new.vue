@@ -25,8 +25,41 @@
         </div>
       </div>
 
-      <!-- Stepper Content -->
-      <div class="stepper-content">
+      <!-- Loading State -->
+      <div v-if="isDataLoading" class="stepper-content">
+        <div class="flex flex-col items-center justify-center py-12">
+          <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mb-4" />
+          <p class="text-gray-600">
+            Chargement des données Turso...
+          </p>
+        </div>
+      </div>
+
+      <!-- Error State -->
+      <div v-else-if="hasDataError" class="stepper-content">
+        <div class="flex flex-col items-center justify-center py-12">
+          <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-4">
+            <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <h3 class="text-lg font-bold mb-2 text-red-800">
+            Erreur de connexion
+          </h3>
+          <p class="text-gray-600 text-center mb-4">
+            Impossible de charger les données depuis Turso.
+          </p>
+          <button
+            class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark"
+            @click="$router.go(0)"
+          >
+            Réessayer
+          </button>
+        </div>
+      </div>
+
+      <!-- Normal Stepper Content -->
+      <div v-else class="stepper-content">
         <!-- Étape 1: Choix du mode -->
         <StepChoixMode
           v-if="currentStep === 1"
@@ -37,8 +70,8 @@
         <StepBuilder
           v-else-if="currentStep === 2"
           :mode="selectedMode"
-          :bundles="bundles"
-          :products="products"
+          :bundles="transformedBundles"
+          :products="transformedProducts"
           @bundle-selected="handleBundleSelected"
           @cart-updated="handleCartUpdated"
         />
@@ -75,14 +108,16 @@
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
             </svg>
           </div>
-          <h3 class="text-lg font-bold mb-2">Devis envoyé !</h3>
+          <h3 class="text-lg font-bold mb-2">
+            Devis envoyé !
+          </h3>
           <p class="text-gray-600 mb-4">
             Votre demande de devis a été transmise avec succès.
             Notre équipe vous contactera dans les 24h.
           </p>
           <button
-            @click="resetForm"
             class="w-full py-3 px-6 bg-primary text-white font-bold rounded-lg hover:bg-primary-dark"
+            @click="resetForm"
           >
             Nouveau devis
           </button>
@@ -100,6 +135,10 @@ import StepChoixMode from '~/components/devis/StepChoixMode.vue'
 import StepBuilder from '~/components/devis/StepBuilder.vue'
 import StepValidation from '~/components/devis/StepValidation.vue'
 import StickyBottomBar from '~/components/StickyBottomBar.vue'
+
+// Composables Turso
+import { useCampaignBundles } from '~/composables/useCampaignBundles'
+import { useProductsQuery } from '~/composables/useProductsQuery'
 
 // SEO
 useHead({
@@ -120,61 +159,53 @@ const cartItems = ref<any[]>([])
 const isSubmitting = ref(false)
 const showSuccessModal = ref(false)
 
-// Mock data - à remplacer par des composables réels
-const bundles = ref([
-  {
-    id: 'municipal',
-    name: 'Pack Municipal',
-    description: 'Idéal pour les élections municipales',
-    estimatedTotal: 500000,
-    isPopular: false,
-    products: [
-      { id: '1', name: 'Affiches A2', quantity: 500, basePrice: 200 },
-      { id: '2', name: 'T-shirts', quantity: 100, basePrice: 2500 },
-      { id: '3', name: 'Casquettes', quantity: 50, basePrice: 3000 }
-    ]
-  },
-  {
-    id: 'regional',
-    name: 'Pack Régional',
-    description: 'Solution complète pour campagne régionale',
-    estimatedTotal: 1500000,
-    isPopular: true,
-    products: [
-      { id: '1', name: 'Affiches A2', quantity: 2000, basePrice: 200 },
-      { id: '2', name: 'T-shirts', quantity: 500, basePrice: 2500 },
-      { id: '3', name: 'Casquettes', quantity: 200, basePrice: 3000 },
-      { id: '4', name: 'Banderoles', quantity: 20, basePrice: 15000 }
-    ]
-  },
-  {
-    id: 'national',
-    name: 'Pack National',
-    description: 'Pour les grandes campagnes nationales',
-    estimatedTotal: 5000000,
-    isPopular: false,
-    products: [
-      { id: '1', name: 'Affiches A2', quantity: 10000, basePrice: 200 },
-      { id: '2', name: 'T-shirts', quantity: 2000, basePrice: 2500 },
-      { id: '3', name: 'Casquettes', quantity: 1000, basePrice: 3000 },
-      { id: '4', name: 'Banderoles', quantity: 100, basePrice: 15000 }
-    ]
-  }
-])
+// Turso Data Integration
+const {
+  bundles,
+  loading: bundlesLoading,
+  error: bundlesError
+} = useCampaignBundles()
 
-const products = ref([
-  { id: '1', name: 'Affiches A2', category: 'Affiches', basePrice: 200, image: null },
-  { id: '2', name: 'Affiches A3', category: 'Affiches', basePrice: 150, image: null },
-  { id: '3', name: 'T-shirts', category: 'Textile', basePrice: 2500, image: null },
-  { id: '4', name: 'Polo', category: 'Textile', basePrice: 3500, image: null },
-  { id: '5', name: 'Casquettes', category: 'Accessoires', basePrice: 3000, image: null },
-  { id: '6', name: 'Banderoles', category: 'Signalétique', basePrice: 15000, image: null },
-  { id: '7', name: 'Flyers A5', category: 'Affiches', basePrice: 50, image: null }
-])
+const {
+  data: products,
+  isLoading: productsLoading,
+  error: productsError
+} = useProductsQuery()
+
+// Loading et Error States
+const isDataLoading = computed(() => bundlesLoading.value || productsLoading.value)
+const hasDataError = computed(() => bundlesError.value || productsError.value)
+
+// Transform bundles to handle isPopular vs popularity difference
+const transformedBundles = computed(() => {
+  return (bundles.value || []).map(bundle => ({
+    ...bundle,
+    isPopular: bundle.popularity > 7, // Transform popularity number to boolean
+    products: bundle.products?.map(p => ({
+      ...p,
+      // Preserve basePrice if it exists, otherwise map from other fields
+      basePrice: p.basePrice || p.unitPrice || p.price || 0
+    })) || []
+  }))
+})
+
+// Transform products to match expected format
+const transformedProducts = computed(() => {
+  return (products.value || []).map(product => ({
+    ...product,
+    basePrice: product.price || 0, // Map price to basePrice
+    image: product.images?.[0]?.url || null // Get first image URL if available
+  }))
+})
 
 // Computed
 const cartTotal = computed(() => {
-  return cartItems.value.reduce((sum, item) => sum + item.total, 0)
+  const total = cartItems.value.reduce((sum, item) => sum + item.total, 0)
+  console.log('💰 Calcul total panier:', {
+    items: cartItems.value,
+    total
+  })
+  return total
 })
 
 const canProceed = computed(() => {
@@ -214,14 +245,31 @@ const handleModeSelection = (mode: 'bundle' | 'custom') => {
 }
 
 const handleBundleSelected = (bundle: any) => {
+  console.log('🛒 Bundle sélectionné:', bundle)
   // Auto-populate cart with bundle products
-  cartItems.value = bundle.products.map((p: any) => ({
-    id: p.id,
-    name: p.name,
-    quantity: p.quantity,
-    unitPrice: p.basePrice,
-    total: p.quantity * p.basePrice
-  }))
+  cartItems.value = bundle.products.map((p: any) => {
+    const unitPrice = p.basePrice || p.unitPrice || 0
+    const quantity = p.quantity || 1
+    const total = quantity * unitPrice
+
+    console.log('📦 Produit ajouté:', {
+      name: p.name,
+      unitPrice,
+      quantity,
+      total
+    })
+
+    return {
+      id: p.id,
+      name: p.name,
+      quantity,
+      unitPrice,
+      total
+    }
+  })
+
+  console.log('🛒 Panier final:', cartItems.value)
+  console.log('💰 Total calculé:', cartTotal.value)
 }
 
 const handleCartUpdated = (items: any[]) => {
@@ -230,6 +278,13 @@ const handleCartUpdated = (items: any[]) => {
 
 const handleNext = () => {
   if (!canProceed.value) return
+
+  console.log('🚀 Passage à l\'étape suivante:', {
+    etapeActuelle: currentStep.value,
+    prochainEtape: currentStep.value + 1,
+    panierActuel: cartItems.value,
+    totalActuel: cartTotal.value
+  })
 
   if (currentStep.value < totalSteps) {
     currentStep.value++

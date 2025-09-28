@@ -209,8 +209,8 @@
               <button
                 type="button"
                 class="text-red-600 hover:text-red-700"
-                @click="removeProduct(index)"
                 title="Supprimer ce produit du bundle"
+                @click="removeProduct(index)"
               >
                 <Icon name="heroicons:trash" class="w-4 h-4" />
               </button>
@@ -248,7 +248,6 @@
             </div>
           </div>
         </div>
-
       </div>
 
       <!-- Form Actions -->
@@ -345,15 +344,15 @@
                 >
                   <div class="text-xs space-y-1">
                     <p v-if="productSelectorValidation.validationStats.value.alreadySelected > 0" class="flex items-center gap-2">
-                      <span class="w-2 h-2 bg-blue-500 rounded-full"></span>
+                      <span class="w-2 h-2 bg-blue-500 rounded-full" />
                       {{ productSelectorValidation.validationStats.value.alreadySelected }} déjà dans le bundle
                     </p>
                     <p v-if="productSelectorValidation.validationStats.value.inactive > 0" class="flex items-center gap-2">
-                      <span class="w-2 h-2 bg-gray-500 rounded-full"></span>
+                      <span class="w-2 h-2 bg-gray-500 rounded-full" />
                       {{ productSelectorValidation.validationStats.value.inactive }} produits inactifs
                     </p>
                     <p v-if="productSelectorValidation.validationStats.value.invalidPrice > 0" class="flex items-center gap-2">
-                      <span class="w-2 h-2 bg-red-500 rounded-full"></span>
+                      <span class="w-2 h-2 bg-red-500 rounded-full" />
                       {{ productSelectorValidation.validationStats.value.invalidPrice }} sans prix valide
                     </p>
                   </div>
@@ -365,9 +364,9 @@
           <!-- Toggle to show/hide excluded products -->
           <div class="flex items-center gap-2">
             <input
-              type="checkbox"
-              v-model="showExcludedProducts"
               id="show-excluded"
+              v-model="showExcludedProducts"
+              type="checkbox"
               class="rounded border-gray-300 text-amber-600 focus:ring-amber-500"
             >
             <label for="show-excluded" class="text-sm text-gray-700 cursor-pointer">
@@ -471,8 +470,8 @@
                     getProductStatus(product).reason === 'Déjà dans le bundle'
                       ? 'bg-blue-100 text-blue-800'
                       : getProductStatus(product).reason === 'Produit inactif'
-                      ? 'bg-gray-100 text-gray-800'
-                      : 'bg-red-100 text-red-800'
+                        ? 'bg-gray-100 text-gray-800'
+                        : 'bg-red-100 text-red-800'
                   ]"
                 >
                   {{ getProductStatus(product).reason }}

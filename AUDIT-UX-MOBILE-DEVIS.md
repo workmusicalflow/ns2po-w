@@ -310,4 +310,95 @@ L'audit multi-agents révèle un **potentiel d'amélioration de +150% du taux de
 
 ---
 
-*Document généré par analyse comparative IA - NS2PO Election MVP 2025*
+Notre MVP ne vise pas la perfection, mais la **viabilité commerciale et fonctionnelle** sur le marché cible : des utilisateurs mobiles ivoiriens avec une connectivité potentiellement limitée.
+
+---
+
+### **Organisation d'un Sprint "Anti-Friction" (Pareto Planner MVP)**
+
+L'analyse est sans appel : le produit actuel est inutilisable pour une large part des utilisateurs à cause de la friction (parcours trop long) et de la performance (temps de chargement). Notre premier sprint ne doit avoir qu'un seul but : **rendre la génération de devis possible et rapide pour la majorité.**
+
+Nous allons nommer ce premier sprint de 2 semaines : **Sprint 0 - Le Sprint de Survie.**
+
+#### **Objectif Principal du Sprint 0**
+
+> Réduire le taux d'abandon de 50% et diviser le temps de chargement initial par deux en refondant le parcours utilisateur autour de trois actions critiques et interdépendantes.
+
+Ces trois actions constituent notre "20%" d'effort pour 80% de résultat. Elles doivent être réalisées **ensemble**, car elles sont synergiques. L'une sans les autres n'aura qu'un impact limité.
+
+---
+
+### **Décomposition du Sprint 0 (Semaines 1-2)**
+
+#### **User Story 1 : Le Parcours Express**
+*   **En tant que** responsable de campagne politique,
+*   **Je veux** pouvoir configurer et obtenir mon devis en 3 étapes claires et rapides,
+*   **Afin de** ne pas abandonner le processus par frustration ou manque de temps.
+
+**Tâches Techniques Associées :**
+1.  **Refonte Architecturale du Flux :** Mettre en place la structure `<div class="stepper-minimal">` proposée.
+2.  **Création du composant `<Step1_ChoixMode />` :** Interface simple avec deux choix clairs ("Bundles" / "Custom").
+3.  **Création du composant `<Step2_Builder />` :** C'est le cœur du réacteur.
+    *   Intégrer une navigation par onglets (`Tabs`) pour séparer "Produits" et "Configuration".
+    *   **[PERFORMANCE]** Implémenter une liste virtualisée (avec `vue-virtual-scroller` ou une solution similaire) pour l'affichage des produits. C'est non négociable pour la fluidité.
+    *   Intégrer la logique de "Quick add" pour modifier les quantités directement depuis la liste.
+4.  **Création du composant `<Step3_Validation />` :**
+    *   Formulaire minimaliste : Nom + Téléphone (type `tel` avec pattern pour les numéros ivoiriens; une numérotation à 10 chiffres).
+    *   Choix de canal de réception (WhatsApp par défaut).
+    *   Intégrer un récapitulatif simple et pliable (`collapsible`).
+
+---
+
+#### **User Story 2 : Le Cockpit de Contrôle**
+*   **En tant qu'** utilisateur mobile,
+*   **Je veux** voir le total de mon devis et l'action principale en permanence en bas de mon écran,
+*   **Afin de** savoir où j'en suis financièrement et comment avancer sans avoir à chercher.
+
+**Tâches Techniques Associées :**
+1.  **Création du Composant `StickyBottomBar.vue` :**
+    *   Implémenter le balisage et le style Tailwind CSS proposés, en s'assurant qu'il est bien `fixed` en bas de la page.
+    *   **[ERGONOMIE]** Gérer les `safe areas` pour iOS avec `env(safe-area-inset-bottom)`. C'est un détail critique pour une expérience "native".
+    *   Lier l'affichage du total à la source de vérité de l'état du devis (Pinia, TanStack Query, etc.).
+    *   Rendre le label du bouton d'action dynamique en fonction de l'étape active (`currentStep.ctaLabel`).
+    *   Garantir une hauteur minimale de `48px` pour le bouton principal pour respecter les normes d'accessibilité tactile.
+
+---
+
+#### **User Story 3 : Le Chargement Instantané**
+*   **En tant qu'** utilisateur avec une connexion 3G,
+*   **Je veux** que la page de devis s'affiche en moins de 4 secondes,
+*   **Afin de** pouvoir commencer ma sélection sans attendre et sans consommer trop de données.
+
+**Tâches Techniques Associées :**
+1.  **Configuration `nuxt.config.ts` pour la Performance :**
+    *   **[PERFORMANCE CRITIQUE]** Mettre en place le **code splitting par route**. Le devis étant une section lourde, elle doit être chargée uniquement quand l'utilisateur y accède.
+    *   Appliquer les `routeRules` suggérées pour pré-rendre la page de devis (`prerender: true`) et mettre en cache les API.
+2.  **Intégration de Nuxt Image avec Cloudinary :**
+    *   Configurer le module `@nuxt/image` avec les modificateurs globaux `quality: 'auto:eco'`, `format: 'auto'`.
+    *   Remplacer toutes les balises `<img>` du catalogue par le composant `<NuxtImg />`. Cette tâche, bien que répétitive, a un impact colossal sur le TTI.
+    *   **Priorité :** Appliquer cette optimisation en premier sur les images de la liste produits dans le `Builder`.
+
+---
+
+### **Justification de la Priorisation (Le "Pourquoi" du Pareto)**
+
+*   **Pourquoi ces 3 User Stories ?**
+    *   **Le Parcours Express** s'attaque à la cause N°1 d'abandon identifiée : la complexité et la longueur du tunnel.
+    *   **Le Cockpit de Contrôle** résout le second problème majeur d'ergonomie : la perte de contexte et la difficulté d'action.
+    *   **Le Chargement Instantané** est la porte d'entrée. Si elle est fermée (TTI > 6s), les deux autres améliorations n'ont même pas la chance d'être vues par 60% des utilisateurs.
+
+*   **Pourquoi différer les autres points CRITIQUES ?**
+    *   **Offline-First (TanStack Query) :** C'est une assurance contre les coupures réseau. C'est crucial, mais l'utilisateur doit d'abord *pouvoir compléter le devis dans des conditions idéales*. On colmate la fuite principale avant de construire un système de backup. Il sera la priorité du **Sprint 1**.
+    *   **Bottom Sheets :** C'est une optimisation UX fantastique pour la configuration. Cependant, elle améliore une *micro-interaction*. Le Sprint 0 se concentre sur la *macro-interaction* (le parcours global).
+
+### **Plan Post-MVP (Après le Sprint 0)**
+
+*   **Sprint 1 (Semaines 3-4) - "Consolidation & Fiabilité" :**
+    *   **Objectif :** Rendre le nouveau parcours robuste et encore plus fluide.
+    *   **Tâches Clés :** Implémentation de TanStack Query pour l'état offline, intégration des Bottom Sheets pour la configuration, et amélioration de l'accessibilité (contrastes, focus).
+
+*   **Sprint 2 (Semaines 5-6) - "Innovation & Différenciation" :**
+    *   **Objectif :** Créer un avantage concurrentiel unique.
+    *   **Tâches Clés :** Mode entrée par budget, Preview visuelle Server-Side, et intégration du partage WhatsApp One-Tap.
+
+En adoptant ce plan, nous ne nous contentons pas de suivre une liste de tâches. Nous séquençons l'effort pour débloquer de la valeur business à chaque étape, en commençant par la plus critique : **arrêter l'hémorragie d'utilisateurs et rendre le produit fonctionnel pour son marché principal.**

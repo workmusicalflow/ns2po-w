@@ -122,128 +122,128 @@
         <!-- Desktop Table View -->
         <div class="hidden md:block overflow-x-auto">
           <table class="min-w-full divide-y divide-gray-200">
-          <thead class="bg-gray-50">
-            <tr>
-              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Catégorie
-              </th>
-              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Parent
-              </th>
-              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Statut
-              </th>
-              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Sous-catégories
-              </th>
-              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Ordre
-              </th>
-              <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Actions
-              </th>
-            </tr>
-          </thead>
-          <tbody class="bg-white divide-y divide-gray-200">
-            <tr v-for="category in filteredCategories" :key="category.id" class="hover:bg-gray-50">
-              <!-- Category Info -->
-              <td class="px-6 py-4 whitespace-nowrap">
-                <div class="flex items-center">
-                  <div class="flex-shrink-0 h-8 w-8">
-                    <div
-                      class="h-8 w-8 rounded-lg flex items-center justify-center text-white text-sm font-medium"
-                      :style="{ backgroundColor: category.color || '#6B7280' }"
-                    >
-                      <Icon v-if="category.icon" :name="category.icon" class="w-4 h-4" />
-                      <span v-else>{{ category.name.charAt(0) }}</span>
+            <thead class="bg-gray-50">
+              <tr>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Catégorie
+                </th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Parent
+                </th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Statut
+                </th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Sous-catégories
+                </th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Ordre
+                </th>
+                <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+              <tr v-for="category in filteredCategories" :key="category.id" class="hover:bg-gray-50">
+                <!-- Category Info -->
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="flex items-center">
+                    <div class="flex-shrink-0 h-8 w-8">
+                      <div
+                        class="h-8 w-8 rounded-lg flex items-center justify-center text-white text-sm font-medium"
+                        :style="{ backgroundColor: category.color || '#6B7280' }"
+                      >
+                        <Icon v-if="category.icon" :name="category.icon" class="w-4 h-4" />
+                        <span v-else>{{ category.name.charAt(0) }}</span>
+                      </div>
+                    </div>
+                    <div class="ml-4">
+                      <div class="text-sm font-medium text-gray-900">
+                        {{ category.name }}
+                      </div>
+                      <div class="text-sm text-gray-500">
+                        {{ category.slug }}
+                      </div>
+                      <div v-if="category.description" class="text-xs text-gray-400 mt-1">
+                        {{ category.description }}
+                      </div>
                     </div>
                   </div>
-                  <div class="ml-4">
-                    <div class="text-sm font-medium text-gray-900">
-                      {{ category.name }}
-                    </div>
-                    <div class="text-sm text-gray-500">
-                      {{ category.slug }}
-                    </div>
-                    <div v-if="category.description" class="text-xs text-gray-400 mt-1">
-                      {{ category.description }}
-                    </div>
-                  </div>
-                </div>
-              </td>
+                </td>
 
-              <!-- Parent Category -->
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                <span v-if="category.parentName" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                  {{ category.parentName }}
-                </span>
-                <span v-else class="text-gray-400 italic">Catégorie principale</span>
-              </td>
+                <!-- Parent Category -->
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  <span v-if="category.parentName" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                    {{ category.parentName }}
+                  </span>
+                  <span v-else class="text-gray-400 italic">Catégorie principale</span>
+                </td>
 
-              <!-- Status -->
-              <td class="px-6 py-4 whitespace-nowrap">
-                <span
-                  :class="[
-                    'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium',
-                    category.isActive
-                      ? 'bg-green-100 text-green-800'
-                      : 'bg-red-100 text-red-800'
-                  ]"
-                >
+                <!-- Status -->
+                <td class="px-6 py-4 whitespace-nowrap">
                   <span
                     :class="[
-                      'w-1.5 h-1.5 mr-1.5 rounded-full',
-                      category.isActive ? 'bg-green-400' : 'bg-red-400'
+                      'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium',
+                      category.isActive
+                        ? 'bg-green-100 text-green-800'
+                        : 'bg-red-100 text-red-800'
                     ]"
-                  />
-                  {{ category.isActive ? 'Active' : 'Inactive' }}
-                </span>
-              </td>
-
-              <!-- Subcategories Count -->
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                <span v-if="category.subcategories && category.subcategories.length > 0" class="inline-flex items-center">
-                  <Icon name="heroicons:folder" class="w-4 h-4 mr-1" />
-                  {{ category.subcategories.length }}
-                </span>
-                <span v-else class="text-gray-400">-</span>
-              </td>
-
-              <!-- Sort Order -->
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                {{ category.sortOrder }}
-              </td>
-
-              <!-- Actions -->
-              <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                <div class="flex items-center justify-end space-x-2">
-                  <button
-                    class="text-amber-600 hover:text-amber-900 p-1 rounded hover:bg-amber-50"
-                    title="Modifier"
-                    @click="openEditModal(category)"
                   >
-                    <Icon name="heroicons:pencil" class="w-4 h-4" />
-                  </button>
-                  <button
-                    class="text-blue-600 hover:text-blue-900 p-1 rounded hover:bg-blue-50"
-                    title="Dupliquer"
-                    @click="duplicateCategory(category)"
-                  >
-                    <Icon name="heroicons:document-duplicate" class="w-4 h-4" />
-                  </button>
-                  <button
-                    :disabled="(category.subcategories && category.subcategories.length > 0)"
-                    class="text-red-600 hover:text-red-900 p-1 rounded hover:bg-red-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                    title="Supprimer"
-                    @click="deleteCategory(category)"
-                  >
-                    <Icon name="heroicons:trash" class="w-4 h-4" />
-                  </button>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+                    <span
+                      :class="[
+                        'w-1.5 h-1.5 mr-1.5 rounded-full',
+                        category.isActive ? 'bg-green-400' : 'bg-red-400'
+                      ]"
+                    />
+                    {{ category.isActive ? 'Active' : 'Inactive' }}
+                  </span>
+                </td>
+
+                <!-- Subcategories Count -->
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  <span v-if="category.subcategories && category.subcategories.length > 0" class="inline-flex items-center">
+                    <Icon name="heroicons:folder" class="w-4 h-4 mr-1" />
+                    {{ category.subcategories.length }}
+                  </span>
+                  <span v-else class="text-gray-400">-</span>
+                </td>
+
+                <!-- Sort Order -->
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  {{ category.sortOrder }}
+                </td>
+
+                <!-- Actions -->
+                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                  <div class="flex items-center justify-end space-x-2">
+                    <button
+                      class="text-amber-600 hover:text-amber-900 p-1 rounded hover:bg-amber-50"
+                      title="Modifier"
+                      @click="openEditModal(category)"
+                    >
+                      <Icon name="heroicons:pencil" class="w-4 h-4" />
+                    </button>
+                    <button
+                      class="text-blue-600 hover:text-blue-900 p-1 rounded hover:bg-blue-50"
+                      title="Dupliquer"
+                      @click="duplicateCategory(category)"
+                    >
+                      <Icon name="heroicons:document-duplicate" class="w-4 h-4" />
+                    </button>
+                    <button
+                      :disabled="(category.subcategories && category.subcategories.length > 0)"
+                      class="text-red-600 hover:text-red-900 p-1 rounded hover:bg-red-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                      title="Supprimer"
+                      @click="deleteCategory(category)"
+                    >
+                      <Icon name="heroicons:trash" class="w-4 h-4" />
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
 
         <!-- Mobile Cards View -->
@@ -264,8 +264,12 @@
                   <span v-else>{{ category.name.charAt(0) }}</span>
                 </div>
                 <div class="min-w-0 flex-1">
-                  <h3 class="text-lg font-medium text-gray-900 truncate">{{ category.name }}</h3>
-                  <p class="text-sm text-gray-500">{{ category.slug }}</p>
+                  <h3 class="text-lg font-medium text-gray-900 truncate">
+                    {{ category.name }}
+                  </h3>
+                  <p class="text-sm text-gray-500">
+                    {{ category.slug }}
+                  </p>
                 </div>
               </div>
               <!-- Statut -->
@@ -289,7 +293,9 @@
 
             <!-- Description -->
             <div v-if="category.description" class="mb-4">
-              <p class="text-sm text-gray-600">{{ category.description }}</p>
+              <p class="text-sm text-gray-600">
+                {{ category.description }}
+              </p>
             </div>
 
             <!-- Informations détaillées -->

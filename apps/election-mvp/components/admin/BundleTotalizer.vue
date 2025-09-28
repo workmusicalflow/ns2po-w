@@ -38,8 +38,12 @@
           class="w-4 h-4 mt-0.5 flex-shrink-0"
         />
         <div class="flex-1">
-          <p class="font-medium">{{ statusTitle }}</p>
-          <p class="mt-1">{{ statusMessage }}</p>
+          <p class="font-medium">
+            {{ statusTitle }}
+          </p>
+          <p class="mt-1">
+            {{ statusMessage }}
+          </p>
 
           <!-- Articles restants à ajouter -->
           <div v-if="articlesRemaining > 0" class="mt-2 text-xs opacity-90">
@@ -72,7 +76,7 @@
           :class="progressBarClasses"
           class="h-2 rounded-full transition-all duration-300 ease-in-out"
           :style="{ width: `${Math.min(100, progressPercentage)}%` }"
-        ></div>
+        />
       </div>
     </div>
   </div>

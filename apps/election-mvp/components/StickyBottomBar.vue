@@ -28,7 +28,6 @@
 
         <!-- Section droite: CTA Principal -->
         <button
-          @click="handleAction"
           :disabled="isDisabled"
           :class="[
             'cta-button flex items-center justify-center gap-2',
@@ -40,6 +39,7 @@
             'disabled:opacity-50 disabled:cursor-not-allowed',
             'min-w-[140px] md:min-w-[180px]'
           ]"
+          @click="handleAction"
         >
           <!-- Loading state -->
           <svg

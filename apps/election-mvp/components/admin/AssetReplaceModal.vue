@@ -8,9 +8,9 @@
             Remplacer un asset
           </h3>
           <button
-            @click="$emit('close')"
             class="text-gray-400 hover:text-gray-600 transition-colors"
             :disabled="isReplacing"
+            @click="$emit('close')"
           >
             <Icon name="heroicons:x-mark" class="w-5 h-5" />
           </button>
@@ -21,7 +21,9 @@
       <div class="px-6 py-4 space-y-6">
         <!-- Current Asset -->
         <div v-if="asset">
-          <h4 class="text-sm font-semibold text-gray-900 mb-3">Asset à remplacer</h4>
+          <h4 class="text-sm font-semibold text-gray-900 mb-3">
+            Asset à remplacer
+          </h4>
           <div class="bg-gray-50 rounded-lg p-4">
             <div class="flex items-center space-x-4">
               <div class="flex-shrink-0">
@@ -30,7 +32,7 @@
                   :src="currentThumbnailUrl"
                   :alt="asset.alt_text || `Asset ${asset.public_id}`"
                   class="w-20 h-20 object-cover rounded border"
-                />
+                >
                 <div
                   v-else
                   class="w-20 h-20 bg-gray-200 rounded border flex items-center justify-center"
@@ -39,7 +41,9 @@
                 </div>
               </div>
               <div class="flex-grow">
-                <h5 class="font-medium text-gray-900">{{ asset.public_id }}</h5>
+                <h5 class="font-medium text-gray-900">
+                  {{ asset.public_id }}
+                </h5>
                 <p class="text-sm text-gray-500">
                   {{ asset.format.toUpperCase() }} • {{ formattedCurrentSize }}
                 </p>
@@ -59,31 +63,33 @@
 
         <!-- Replacement Options -->
         <div>
-          <h4 class="text-sm font-semibold text-gray-900 mb-3">Options de remplacement</h4>
+          <h4 class="text-sm font-semibold text-gray-900 mb-3">
+            Options de remplacement
+          </h4>
 
           <!-- Option Tabs -->
           <div class="border-b border-gray-200 mb-4">
             <nav class="-mb-px flex space-x-8">
               <button
-                @click="replacementType = 'upload'"
                 :class="[
                   'py-2 px-1 border-b-2 font-medium text-sm transition-colors',
                   replacementType === 'upload'
                     ? 'border-amber-500 text-amber-600'
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 ]"
+                @click="replacementType = 'upload'"
               >
                 <Icon name="heroicons:cloud-arrow-up" class="w-4 h-4 inline mr-2" />
                 Nouveau fichier
               </button>
               <button
-                @click="replacementType = 'existing'"
                 :class="[
                   'py-2 px-1 border-b-2 font-medium text-sm transition-colors',
                   replacementType === 'existing'
                     ? 'border-amber-500 text-amber-600'
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 ]"
+                @click="replacementType = 'existing'"
               >
                 <Icon name="heroicons:photo" class="w-4 h-4 inline mr-2" />
                 Asset existant
@@ -97,10 +103,10 @@
               <input
                 ref="fileInput"
                 type="file"
-                @change="handleFileSelect"
                 accept="image/*,video/*,application/pdf"
                 class="hidden"
-              />
+                @change="handleFileSelect"
+              >
 
               <div v-if="!selectedFile">
                 <Icon name="heroicons:cloud-arrow-up" class="w-10 h-10 text-gray-400 mx-auto mb-2" />
@@ -108,8 +114,8 @@
                   Cliquez pour sélectionner un fichier ou glissez-déposez
                 </p>
                 <button
-                  @click="fileInput?.click()"
                   class="text-amber-600 hover:text-amber-700 font-medium text-sm"
+                  @click="fileInput?.click()"
                 >
                   Parcourir les fichiers
                 </button>
@@ -126,7 +132,7 @@
                       :src="filePreview"
                       :alt="selectedFile.name"
                       class="w-16 h-16 object-cover rounded border"
-                    />
+                    >
                     <div
                       v-else
                       class="w-16 h-16 bg-gray-200 rounded border flex items-center justify-center"
@@ -135,13 +141,17 @@
                     </div>
                   </div>
                   <div class="text-left">
-                    <p class="font-medium text-gray-900 text-sm">{{ selectedFile.name }}</p>
-                    <p class="text-xs text-gray-500">{{ formatFileSize(selectedFile.size) }}</p>
+                    <p class="font-medium text-gray-900 text-sm">
+                      {{ selectedFile.name }}
+                    </p>
+                    <p class="text-xs text-gray-500">
+                      {{ formatFileSize(selectedFile.size) }}
+                    </p>
                   </div>
                 </div>
                 <button
-                  @click="clearFileSelection"
                   class="text-red-600 hover:text-red-700 text-sm font-medium"
+                  @click="clearFileSelection"
                 >
                   <Icon name="heroicons:trash" class="w-4 h-4 inline mr-1" />
                   Supprimer
@@ -164,7 +174,7 @@
                   type="text"
                   placeholder="ID de l'asset de remplacement"
                   class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-                />
+                >
                 <p class="text-xs text-gray-500">
                   Pour l'instant, entrez l'ID d'un asset existant.
                   Un sélecteur visuel sera ajouté dans une prochaine version.
@@ -176,14 +186,16 @@
 
         <!-- Replacement Options -->
         <div>
-          <h4 class="text-sm font-semibold text-gray-900 mb-3">Options avancées</h4>
+          <h4 class="text-sm font-semibold text-gray-900 mb-3">
+            Options avancées
+          </h4>
           <div class="space-y-3">
             <label class="flex items-start space-x-3">
               <input
                 v-model="deleteOldAsset"
                 type="checkbox"
                 class="mt-1 rounded border-gray-300 text-amber-600 focus:ring-amber-500"
-              />
+              >
               <div>
                 <span class="text-sm font-medium text-gray-900">
                   Supprimer l'ancien asset après remplacement
@@ -198,12 +210,16 @@
         </div>
 
         <!-- Impact Preview -->
-        <div v-if="asset && asset.usage_count && asset.usage_count > 0"
-             class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+        <div
+          v-if="asset && asset.usage_count && asset.usage_count > 0"
+          class="bg-blue-50 border border-blue-200 rounded-lg p-4"
+        >
           <div class="flex items-start space-x-3">
             <Icon name="heroicons:information-circle" class="w-5 h-5 text-blue-600 mt-0.5" />
             <div>
-              <h4 class="text-sm font-medium text-blue-900">Impact du remplacement</h4>
+              <h4 class="text-sm font-medium text-blue-900">
+                Impact du remplacement
+              </h4>
               <p class="text-sm text-blue-700 mt-1">
                 Ce remplacement mettra à jour <strong>{{ asset.usage_count }} référence(s)</strong> dans le système.
                 Tous les endroits où cet asset est utilisé afficheront automatiquement le nouvel asset.
@@ -218,7 +234,7 @@
         <div class="text-sm text-gray-500">
           <template v-if="isReplacing">
             <div class="flex items-center space-x-2">
-              <div class="w-4 h-4 border-2 border-amber-600 border-t-transparent rounded-full animate-spin"></div>
+              <div class="w-4 h-4 border-2 border-amber-600 border-t-transparent rounded-full animate-spin" />
               <span>Remplacement en cours...</span>
             </div>
           </template>
@@ -229,15 +245,14 @@
 
         <div class="flex space-x-3">
           <button
-            @click="$emit('close')"
             class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-amber-500 transition-colors"
             :disabled="isReplacing"
+            @click="$emit('close')"
           >
             Annuler
           </button>
 
           <button
-            @click="confirmReplace"
             :disabled="!canReplace || isReplacing"
             :class="[
               'px-4 py-2 text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500 transition-colors',
@@ -245,10 +260,11 @@
                 ? 'text-white bg-amber-600 hover:bg-amber-700'
                 : 'text-gray-400 bg-gray-200 cursor-not-allowed'
             ]"
+            @click="confirmReplace"
           >
             <template v-if="isReplacing">
               <div class="flex items-center space-x-2">
-                <div class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                <div class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                 <span>Remplacement...</span>
               </div>
             </template>

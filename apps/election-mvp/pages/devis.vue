@@ -7,29 +7,28 @@
         <div class="step-content">
           <!-- Étape 1: Sélection Bundle/Packs de campagne -->
           <div v-if="currentStep === 1" class="step-panel">
-
             <!-- Toggle Bundle/Personnalisé (UX Perplexity) -->
             <div class="flex justify-center mb-8">
               <div class="bg-gray-100 rounded-lg p-1 inline-flex">
                 <button
-                  @click="selectionMode = 'bundle'"
                   :class="[
                     'px-6 py-3 rounded-md text-sm font-medium transition-all duration-200',
                     selectionMode === 'bundle'
                       ? 'bg-white text-accent shadow-sm'
                       : 'text-gray-600 hover:text-gray-800'
                   ]"
+                  @click="selectionMode = 'bundle'"
                 >
                   📦 Packs Prêts-à-Campagne
                 </button>
                 <button
-                  @click="selectionMode = 'custom'"
                   :class="[
                     'px-6 py-3 rounded-md text-sm font-medium transition-all duration-200',
                     selectionMode === 'custom'
                       ? 'bg-white text-accent shadow-sm'
                       : 'text-gray-600 hover:text-gray-800'
                   ]"
+                  @click="selectionMode = 'custom'"
                 >
                   ⚙️ Sélection Personnalisée
                 </button>
@@ -38,7 +37,6 @@
 
             <!-- Interface Bundle Selector (Mode Bundle) -->
             <div v-if="selectionMode === 'bundle'" class="bundle-mode">
-
               <!-- Message d'accroche (UX Perplexity) -->
               <div class="text-center mb-6 md:mb-8 px-4 md:px-0">
                 <h2 class="text-xl md:text-2xl font-bold text-accent mb-2 md:mb-3 leading-tight">
@@ -51,13 +49,19 @@
 
               <!-- Grille 3 colonnes avec Pack Pro au centre (UX Perplexity) -->
               <div v-if="bundlesLoading" class="text-center py-12">
-                <div class="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full mx-auto mb-4"></div>
-                <p class="text-gray-600">Chargement de vos packs optimisés...</p>
+                <div class="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full mx-auto mb-4" />
+                <p class="text-gray-600">
+                  Chargement de vos packs optimisés...
+                </p>
               </div>
 
               <div v-else-if="bundlesError" class="text-center py-12">
-                <p class="text-red-600 mb-4">❌ Erreur de chargement des packs</p>
-                <p class="text-sm text-gray-500">{{ bundlesError }}</p>
+                <p class="text-red-600 mb-4">
+                  ❌ Erreur de chargement des packs
+                </p>
+                <p class="text-sm text-gray-500">
+                  {{ bundlesError }}
+                </p>
               </div>
 
               <div v-else-if="orderedBundles.length" class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-8">
@@ -81,7 +85,9 @@
 
                   <!-- Header du bundle -->
                   <div class="text-center mb-4">
-                    <h3 class="text-lg md:text-xl font-bold text-accent mb-2">{{ bundle.name }}</h3>
+                    <h3 class="text-lg md:text-xl font-bold text-accent mb-2">
+                      {{ bundle.name }}
+                    </h3>
                     <div class="text-2xl md:text-3xl font-bold text-primary mb-1">
                       {{ formatPrice(bundle.estimatedTotal) }}
                     </div>
@@ -91,7 +97,9 @@
                   </div>
 
                   <!-- Description -->
-                  <p class="text-gray-600 text-center mb-4">{{ bundle.description }}</p>
+                  <p class="text-gray-600 text-center mb-4">
+                    {{ bundle.description }}
+                  </p>
 
                   <!-- Produits avec Progressive Disclosure (UX Perplexity) -->
                   <div class="mb-6">
@@ -103,9 +111,11 @@
                         <span>{{ product.name }}</span>
                         <span class="font-medium">{{ product.quantity }}x</span>
                       </li>
-                      <li v-if="bundle.products.length > 3"
-                          class="text-primary font-medium cursor-pointer hover:underline"
-                          @click.stop="toggleProductsExpansion(bundle.id)">
+                      <li
+                        v-if="bundle.products.length > 3"
+                        class="text-primary font-medium cursor-pointer hover:underline"
+                        @click.stop="toggleProductsExpansion(bundle.id)"
+                      >
                         {{ expandedBundle === bundle.id ? 'Voir moins' : `+ ${bundle.products.length - 3} autres produits` }}
                       </li>
                     </ul>
@@ -122,8 +132,10 @@
                   <!-- Tags/Features -->
                   <div class="mb-6">
                     <div class="flex flex-wrap gap-2">
-                      <span v-for="tag in (bundle.tags || []).slice(0, 2)" :key="tag"
-                            class="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded-full">
+                      <span
+                        v-for="tag in (bundle.tags || []).slice(0, 2)" :key="tag"
+                        class="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded-full"
+                      >
                         {{ tag }}
                       </span>
                     </div>
@@ -145,9 +157,13 @@
               </div>
 
               <div v-else class="text-center py-12">
-                <p class="text-gray-500 mb-4">Aucun pack disponible pour le moment</p>
-                <button @click="selectionMode = 'custom'"
-                        class="text-primary hover:text-primary-dark font-medium">
+                <p class="text-gray-500 mb-4">
+                  Aucun pack disponible pour le moment
+                </p>
+                <button
+                  class="text-primary hover:text-primary-dark font-medium"
+                  @click="selectionMode = 'custom'"
+                >
                   → Créer un devis personnalisé
                 </button>
               </div>
