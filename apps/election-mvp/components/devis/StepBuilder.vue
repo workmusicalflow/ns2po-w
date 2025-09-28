@@ -369,23 +369,22 @@
                     </div>
                   </div>
 
-                  <!-- Quick add controls -->
-                  <div class="flex items-center gap-2 flex-shrink-0">
+                  <!-- Simplified quantity controls -->
+                  <div class="flex items-center gap-3 flex-shrink-0">
+                    <!-- Quantité cliquable pour ouvrir le bottom sheet -->
                     <button
-                      :disabled="!getProductQuantity(searchResults[virtualRow.index]?.product?.id)"
-                      class="quantity-button w-10 h-10 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-50 disabled:opacity-50 transition-colors"
-                      @click="decrementQuantity(searchResults[virtualRow.index]?.product)"
+                      class="quantity-display px-3 py-1 text-sm font-medium bg-gray-50 border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors min-w-[3rem] text-center"
+                      @click="openQuantitySheet(searchResults[virtualRow.index]?.product)"
+                      :title="getProductQuantity(searchResults[virtualRow.index]?.product?.id) ? 'Modifier la quantité' : 'Ajouter une quantité'"
                     >
-                      -
+                      {{ getProductQuantity(searchResults[virtualRow.index]?.product?.id) || 0 }}
                     </button>
 
-                    <span class="w-12 text-center font-medium">
-                      {{ getProductQuantity(searchResults[virtualRow.index]?.product?.id) || 0 }}
-                    </span>
-
+                    <!-- Bouton principal pour ouvrir le bottom sheet -->
                     <button
                       class="quantity-button w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center hover:bg-primary-dark transition-colors relative"
                       @click="openQuantitySheet(searchResults[virtualRow.index]?.product)"
+                      :title="getProductQuantity(searchResults[virtualRow.index]?.product?.id) ? 'Modifier la quantité' : 'Choisir une quantité'"
                     >
                       +
                       <!-- Indicateur d'options avancées -->
@@ -1040,20 +1039,6 @@ const incrementQuantity = (product: Product) => {
   emit('cart-updated', cartItems.value)
 }
 
-const decrementQuantity = (product: Product) => {
-  const existing = cartItems.value.find(i => i.id === product.id)
-
-  if (existing) {
-    if (existing.quantity > 1) {
-      existing.quantity--
-      existing.total = existing.quantity * existing.unitPrice
-    } else {
-      removeFromCart(product.id)
-    }
-  }
-
-  emit('cart-updated', cartItems.value)
-}
 
 const removeFromCart = (productId: string) => {
   cartItems.value = cartItems.value.filter(i => i.id !== productId)
@@ -1396,6 +1381,27 @@ const triggerAddedFeedback = (productId: string) => {
   }
 }
 
+/* Styles pour la quantité cliquable */
+.quantity-display {
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.quantity-display:hover {
+  background-color: rgba(201, 154, 59, 0.1);
+  border-color: rgba(201, 154, 59, 0.3);
+  transform: translateY(-1px);
+}
+
+.quantity-display:active {
+  transform: scale(0.95);
+}
+
+.quantity-display:focus {
+  outline: 2px solid rgba(201, 154, 59, 0.5);
+  outline-offset: 2px;
+}
+
 .sticky-comparison-bar {
   animation: slideUp 0.3s ease-out;
 }
@@ -1409,6 +1415,26 @@ const triggerAddedFeedback = (productId: string) => {
     transform: translateY(0);
     opacity: 1;
   }
+}
+
+/* Styles pour quantity-display cliquable */
+.quantity-display {
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.2s ease;
+}
+
+.quantity-display:hover {
+  background-color: #f3f4f6 !important;
+  border-color: #C99A3B !important;
+  color: #C99A3B !important;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(201, 154, 59, 0.1);
+}
+
+.quantity-display:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 2px rgba(201, 154, 59, 0.1);
 }
 
 /* Feedback pour toast léger */
