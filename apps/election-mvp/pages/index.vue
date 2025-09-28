@@ -168,9 +168,9 @@ const handleInspiration = (realisation: Realisation) => {
   // Redirection vers devis avec contexte d'inspiration (catalogue sera disponible en Mars 2025)
   const productId = realisation.productIds[0];
   if (productId) {
-    navigateTo(`/devis?inspiredBy=${realisation.id}&product=${productId}`);
+    navigateTo(`/devis-new?inspiredBy=${realisation.id}&product=${productId}`);
   } else {
-    navigateTo(`/devis?inspiredBy=${realisation.id}`);
+    navigateTo(`/devis-new?inspiredBy=${realisation.id}`);
   }
 };
 

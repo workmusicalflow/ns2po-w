@@ -111,6 +111,15 @@
       :rawMessage="modalRawMessage"
       @close="resetForm"
     />
+
+    <!-- Email Confirmation Modal -->
+    <EmailConfirmationModal
+      :show="showEmailModal"
+      :reference="emailQuoteReference"
+      :trackingUrl="emailTrackingUrl"
+      @close="showEmailModal = false"
+      @new-quote="resetForm"
+    />
   </div>
 </template>
 
@@ -123,6 +132,7 @@ import StepBuilder from '~/components/devis/StepBuilder.vue'
 import StepValidation from '~/components/devis/StepValidation.vue'
 import StickyBottomBar from '~/components/StickyBottomBar.vue'
 import QuoteConfirmationModal from '~/components/devis/QuoteConfirmationModal.vue'
+import EmailConfirmationModal from '~/components/devis/EmailConfirmationModal.vue'
 
 // Composables Turso
 import { useCampaignBundles } from '~/composables/useCampaignBundles'
@@ -130,6 +140,9 @@ import { useProductsQuery } from '~/composables/useProductsQuery'
 
 // WhatsApp Integration
 import { useWhatsAppQuote } from '~/composables/useWhatsAppQuote'
+
+// Email Integration
+import { useEmailQuote } from '~/composables/useEmailQuote'
 
 // SEO
 useHead({
@@ -148,6 +161,7 @@ const totalSteps = 3
 const selectedMode = ref<'bundle' | 'custom'>('bundle')
 const cartItems = ref<any[]>([])
 const showSuccessModal = ref(false)
+const showEmailModal = ref(false)
 
 // WhatsApp Configuration
 const whatsappConfig = {
@@ -168,6 +182,18 @@ const {
   generateWhatsAppMessage,
   reset: resetWhatsApp
 } = useWhatsAppQuote(whatsappConfig)
+
+// Email Quote Integration
+const {
+  isSubmitting: isEmailSubmitting,
+  hasSubmitted: hasEmailSubmitted,
+  submitSuccess: emailSubmitSuccess,
+  error: emailError,
+  quoteReference: emailQuoteReference,
+  trackingUrl: emailTrackingUrl,
+  submitEmailQuote,
+  reset: resetEmail
+} = useEmailQuote()
 
 // Turso Data Integration
 const {
@@ -322,11 +348,23 @@ const handleNext = () => {
 }
 
 const handleSubmit = async (formData: any) => {
-  console.log('🚀 Démarrage soumission devis WhatsApp:', formData)
+  console.log('🚀 Démarrage soumission devis:', formData)
+  console.log('📋 Canal sélectionné:', formData.channel)
 
   // Analyser les données reçues du formulaire StepValidation
   console.log('🔍 Structure formData reçue:', Object.keys(formData))
   console.log('📋 Contenu formData:', formData)
+
+  // Router selon le canal choisi par l'utilisateur
+  if (formData.channel === 'email') {
+    await handleEmailSubmission(formData)
+  } else {
+    await handleWhatsAppSubmission(formData)
+  }
+}
+
+const handleWhatsAppSubmission = async (formData: any) => {
+  console.log('📱 Traitement soumission WhatsApp')
 
   // StepValidation envoie: { organization, name, phone, email, channel, items, total, timestamp }
   // Transformer les données pour le format WhatsApp
@@ -337,7 +375,7 @@ const handleSubmit = async (formData: any) => {
       : 'Campagne Électorale (Sélection Personnalisée)',
     contactName: formData.name?.trim() || 'Contact à préciser',
     contactPhone: formData.phone?.trim() || 'Téléphone à préciser',
-    contactEmail: formData.email?.trim() || (formData.channel === 'email' ? 'Email requis' : 'Contact via WhatsApp'),
+    contactEmail: formData.email?.trim() || 'Contact via WhatsApp',
     cart: cartItems.value.map(item => ({
       id: item.id,
       name: item.name,
@@ -345,9 +383,7 @@ const handleSubmit = async (formData: any) => {
       unitPrice: item.unitPrice || (item.total / item.quantity),
       total: item.total
     })),
-    notes: formData.channel === 'whatsapp'
-      ? 'Demande envoyée via le générateur de devis NS2PO - Canal préféré: WhatsApp'
-      : 'Demande envoyée via le générateur de devis NS2PO - Canal préféré: Email'
+    notes: 'Demande envoyée via le générateur de devis NS2PO - Canal préféré: WhatsApp'
   }
 
   console.log('📋 Données transformées pour WhatsApp:', whatsappData)
@@ -367,12 +403,36 @@ const handleSubmit = async (formData: any) => {
   }
 }
 
+const handleEmailSubmission = async (formData: any) => {
+  console.log('📧 Traitement soumission Email')
+
+  try {
+    const result = await submitEmailQuote(formData, selectedMode.value, cartItems.value)
+
+    if (result.success) {
+      console.log('✅ Soumission Email réussie:', result)
+      // Afficher la modal de confirmation email
+      showEmailModal.value = true
+    } else {
+      console.error('❌ Échec soumission Email:', result.message)
+      // En cas d'erreur, on peut fallback vers la modal WhatsApp ou afficher une erreur
+      showSuccessModal.value = true
+    }
+  } catch (error) {
+    console.error('❌ Erreur soumission Email:', error)
+    // En cas d'erreur technique, fallback vers WhatsApp
+    showSuccessModal.value = true
+  }
+}
+
 const resetForm = () => {
   currentStep.value = 1
   selectedMode.value = 'bundle'
   cartItems.value = []
   showSuccessModal.value = false
+  showEmailModal.value = false
   resetWhatsApp()
+  resetEmail()
 }
 
 // Computed pour les données de la modal

@@ -19,7 +19,7 @@
           </button>
 
           <NuxtLink
-            to="/devis"
+            to="/devis-new"
             class="bg-gray-100 text-text-main px-6 py-2 rounded-lg hover:bg-gray-200"
           >
             Retour aux packs

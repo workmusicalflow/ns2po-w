@@ -231,7 +231,7 @@
               </Button>
 
               <div class="grid grid-cols-2 gap-3">
-                <Button variant="outline" @click="navigateTo('/devis')">
+                <Button variant="outline" @click="navigateTo('/devis-new')">
                   Faire un devis
                 </Button>
                 <Button variant="outline" @click="navigateTo('/contacts')">
@@ -437,9 +437,9 @@ const handleInspiration = (targetRealisation?: Realisation) => {
   });
 
   if (productId) {
-    navigateTo(`/devis?inspiredBy=${realisationToUse.id}&product=${productId}`);
+    navigateTo(`/devis-new?inspiredBy=${realisationToUse.id}&product=${productId}`);
   } else {
-    navigateTo(`/devis?inspiredBy=${realisationToUse.id}`);
+    navigateTo(`/devis-new?inspiredBy=${realisationToUse.id}`);
   }
 };
 

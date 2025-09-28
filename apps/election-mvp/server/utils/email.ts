@@ -152,7 +152,9 @@ export async function sendOrderNotification(data: ContactNotificationData): Prom
         
         <!-- Header -->
         <header style="background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); color: white; padding: 30px 20px; text-align: center;">
-          <h1 style="margin: 0; font-size: 24px; font-weight: 700;">NS2PO</h1>
+          <img src="https://res.cloudinary.com/dsrvzogof/image/upload/w_200,c_fit,q_auto,f_auto/v1759082596/logo-ns2po-mailing_vzelsq.png"
+               alt="NS2PO Logo"
+               style="max-width: 200px; height: auto; margin-bottom: 16px;">
           <p style="margin: 8px 0 0 0; opacity: 0.9; font-size: 16px;">Nouvelle demande reçue</p>
         </header>
         
@@ -306,7 +308,9 @@ export async function sendCustomerConfirmation(data: ContactNotificationData): P
         
         <!-- Header -->
         <header style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; padding: 30px 20px; text-align: center;">
-          <h1 style="margin: 0; font-size: 28px; font-weight: 700;">NS2PO</h1>
+          <img src="https://res.cloudinary.com/dsrvzogof/image/upload/w_200,c_fit,q_auto,f_auto/v1759082596/logo-ns2po-mailing_vzelsq.png"
+               alt="NS2PO Logo"
+               style="max-width: 200px; height: auto; margin-bottom: 16px;">
           <p style="margin: 8px 0 0 0; opacity: 0.95; font-size: 16px;">Confirmation de votre demande</p>
         </header>
         

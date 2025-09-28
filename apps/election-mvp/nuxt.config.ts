@@ -96,7 +96,7 @@ export default defineNuxtConfig({
       },
 
       // Page devis - prerender avec cache SWR pour performance mobile critique
-      "/devis": {
+      "/devis-new": {
         prerender: true,
         swr: 3600
       },

@@ -47,9 +47,9 @@
               Réalisations
             </NuxtLink>
             <NuxtLink
-              to="/devis"
+              to="/devis-new"
               class="text-gray-600 hover:text-primary transition-colors"
-              :class="{ 'text-primary font-medium': $route.path === '/devis' }"
+              :class="{ 'text-primary font-medium': $route.path === '/devis-new' }"
             >
               Devis
             </NuxtLink>
@@ -66,7 +66,7 @@
 
           <!-- CTA Button -->
           <div class="hidden md:block">
-            <Button @click="navigateTo('/devis')">
+            <Button @click="navigateTo('/devis-new')">
               Créer un devis
             </Button>
           </div>
@@ -138,9 +138,9 @@
               Réalisations
             </NuxtLink>
             <NuxtLink
-              to="/devis"
+              to="/devis-new"
               class="block text-gray-600 hover:text-primary transition-colors"
-              :class="{ 'text-primary font-medium': $route.path === '/devis' }"
+              :class="{ 'text-primary font-medium': $route.path === '/devis-new' }"
               @click="mobileMenuOpen = false"
             >
               Devis
@@ -159,7 +159,7 @@
               <Button
                 class="w-full"
                 @click="
-                  navigateTo('/devis');
+                  navigateTo('/devis-new');
                   mobileMenuOpen = false;
                 "
               >
@@ -247,7 +247,7 @@
               </li>
               <li>
                 <NuxtLink
-                  to="/devis"
+                  to="/devis-new"
                   class="text-gray-300 hover:text-white transition-colors"
                 >
                   Devis en ligne

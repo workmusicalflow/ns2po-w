@@ -62,7 +62,8 @@ export default defineEventHandler(async (event) => {
       customerEmail: body.customer.email,
       type: body.type as 'quote' | 'preorder' | 'custom' | 'support' | 'meeting',
       subject: body.subject,
-      message: body.message
+      message: body.message,
+      orderDetails: body.orderDetails // Ajouter les détails de commande pour les devis
     }
     
     try {
@@ -74,20 +75,38 @@ export default defineEventHandler(async (event) => {
       // Ne pas faire échouer la requête si l'email échoue
     }
 
+    // Générer l'URL de tracking
+    const config = useRuntimeConfig()
+    const baseUrl = config.public.siteUrl || 'https://election.ns2po.ci'
+    const trackingUrl = `${baseUrl}/suivi/${contactId}`
+
     const response: ContactSubmissionResponse = {
       success: true,
       contactId,
-      message: 'Votre message a été envoyé avec succès!',
-      nextSteps: [
-        'Nous traiterons votre demande dans les plus brefs délais',
-        'Vous recevrez une confirmation par email',
-        'Un membre de notre équipe vous contactera sous 24h'
-      ],
-      estimatedResponseTime: '24 heures'
+      reference: contactId, // Ajouter reference pour compatibilité useEmailQuote
+      trackingUrl, // Ajouter trackingUrl pour le composable
+      message: body.type === 'quote'
+        ? 'Votre demande de devis a été envoyée avec succès!'
+        : 'Votre message a été envoyé avec succès!',
+      nextSteps: body.type === 'quote'
+        ? [
+          'Nous étudierons votre demande de devis dans les plus brefs délais',
+          'Vous recevrez une confirmation par email avec votre référence',
+          'Notre équipe commerciale vous contactera sous 24h pour finaliser votre devis'
+        ]
+        : [
+          'Nous traiterons votre demande dans les plus brefs délais',
+          'Vous recevrez une confirmation par email',
+          'Un membre de notre équipe vous contactera sous 24h'
+        ],
+      estimatedResponseTime: body.type === 'quote' ? '24 heures' : '24 heures'
     }
 
     return {
       success: true,
+      reference: contactId,
+      trackingUrl,
+      message: response.message,
       data: response
     }
 
