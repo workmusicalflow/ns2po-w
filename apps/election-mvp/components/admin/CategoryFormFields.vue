@@ -6,7 +6,7 @@
     </label>
     <input
       id="name"
-      v-model="form.name"
+      v-model="formName"
       type="text"
       required
       :disabled="isLoading"
@@ -29,7 +29,7 @@
     </label>
     <input
       id="slug"
-      v-model="form.slug"
+      v-model="formSlug"
       type="text"
       required
       :disabled="isLoading"
@@ -55,7 +55,7 @@
     </label>
     <textarea
       id="description"
-      v-model="form.description"
+      v-model="formDescription"
       rows="3"
       :disabled="isLoading"
       class="block w-full px-3 py-3 sm:py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-base sm:text-sm touch-manipulation transition-colors duration-200 placeholder:text-gray-400 resize-none"
@@ -83,7 +83,7 @@
     <div class="relative">
       <input
         id="isActive"
-        v-model="form.isActive"
+        v-model="formIsActive"
         type="checkbox"
         :disabled="isLoading"
         class="sr-only"
@@ -93,15 +93,15 @@
         :disabled="isLoading"
         :class="[
           'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 touch-manipulation',
-          form.isActive ? 'bg-amber-600' : 'bg-gray-200',
+          formIsActive ? 'bg-amber-600' : 'bg-gray-200',
           isLoading ? 'opacity-50 cursor-not-allowed' : ''
         ]"
-        @click="form.isActive = !form.isActive"
+        @click="formIsActive = !formIsActive"
       >
         <span
           :class="[
             'pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out',
-            form.isActive ? 'translate-x-5' : 'translate-x-0'
+            formIsActive ? 'translate-x-5' : 'translate-x-0'
           ]"
         />
       </button>
@@ -122,10 +122,31 @@ interface Props {
   isLoading: boolean
 }
 
-defineProps<Props>()
+const props = defineProps<Props>()
 
-defineEmits<{
+const emit = defineEmits<{
   'update:form': [form: Props['form']]
   'update:errors': [errors: Props['errors']]
 }>()
+
+// Computed properties to handle form updates via emits
+const formName = computed({
+  get: () => props.form.name,
+  set: (value: string) => emit('update:form', { ...props.form, name: value })
+})
+
+const formSlug = computed({
+  get: () => props.form.slug,
+  set: (value: string) => emit('update:form', { ...props.form, slug: value })
+})
+
+const formDescription = computed({
+  get: () => props.form.description,
+  set: (value: string) => emit('update:form', { ...props.form, description: value })
+})
+
+const formIsActive = computed({
+  get: () => props.form.isActive,
+  set: (value: boolean) => emit('update:form', { ...props.form, isActive: value })
+})
 </script>

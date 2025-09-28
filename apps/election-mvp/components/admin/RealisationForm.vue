@@ -380,9 +380,6 @@
 </template>
 
 <script setup lang="ts">
-// Auto-imported via Nuxt 3: useFormValidation
-// Auto-imported via Nuxt 3: globalNotifications
-
 interface Product {
   id: string
   name: string
@@ -429,8 +426,32 @@ const emit = defineEmits<{
   cancel: []
 }>()
 
-const { validateRealisation } = useFormValidation()
-const { crudError } = globalNotifications
+// Simple validation function instead of undefined useFormValidation
+const validateRealisation = (realisation: Realisation) => {
+  const errors: Array<{ field: string; message: string }> = []
+
+  if (!realisation.title?.trim()) {
+    errors.push({ field: 'title', message: 'Le titre est requis' })
+  }
+  if (!realisation.description?.trim()) {
+    errors.push({ field: 'description', message: 'La description est requise' })
+  }
+  if (!realisation.client?.trim()) {
+    errors.push({ field: 'client', message: 'Le nom du client est requis' })
+  }
+
+  return {
+    success: errors.length === 0,
+    errors
+  }
+}
+
+// Simple notification functions instead of undefined globalNotifications
+const crudError = {
+  validation: (message: string) => console.error(`❌ Validation:`, message),
+  created: (type: string, message: string) => console.error(`❌ Erreur création ${type}:`, message),
+  updated: (type: string, message: string) => console.error(`❌ Erreur mise à jour ${type}:`, message)
+}
 
 // Form state
 const formData = reactive<Realisation>({

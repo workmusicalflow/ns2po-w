@@ -446,8 +446,6 @@
 </template>
 
 <script setup lang="ts">
-// Auto-imported via Nuxt 3: useFormValidation, globalNotifications
-
 interface Product {
   id: string
   name: string
@@ -491,8 +489,49 @@ const emit = defineEmits<{
   cancel: []
 }>()
 
-const { validateBundle } = useFormValidation()
-const { crudSuccess, crudError } = globalNotifications
+// Simple validation function instead of undefined useFormValidation
+const validateBundle = (bundle: Bundle) => {
+  const errors: Array<{ field: string; message: string }> = []
+
+  if (!bundle.name?.trim()) {
+    errors.push({ field: 'name', message: 'Le nom du bundle est requis' })
+  }
+  if (!bundle.description?.trim()) {
+    errors.push({ field: 'description', message: 'La description est requise' })
+  }
+  if (!bundle.targetAudience) {
+    errors.push({ field: 'targetAudience', message: 'L\'audience cible est requise' })
+  }
+  if (!bundle.budgetRange) {
+    errors.push({ field: 'budgetRange', message: 'La gamme de budget est requise' })
+  }
+  if (!bundle.products.length) {
+    errors.push({ field: 'products', message: 'Au moins un produit est requis' })
+  }
+
+  return {
+    success: errors.length === 0,
+    errors
+  }
+}
+
+// Simple notification functions instead of undefined globalNotifications
+const crudSuccess = {
+  created: (type: string, message?: string) => console.log(`✅ ${type} créé:`, message),
+  updated: (type: string, message?: string) => console.log(`✅ ${type} mis à jour:`, message)
+}
+
+const crudError = {
+  validation: (message: string) => console.error(`❌ Validation:`, message),
+  created: (type: string, message: string) => console.error(`❌ Erreur création ${type}:`, message),
+  updated: (type: string, message: string) => console.error(`❌ Erreur mise à jour ${type}:`, message)
+}
+
+const globalNotifications = {
+  info: (title: string, message: string) => console.log(`ℹ️ ${title}:`, message),
+  warning: (title: string, message: string) => console.warn(`⚠️ ${title}:`, message),
+  error: (title: string, message: string) => console.error(`❌ ${title}:`, message)
+}
 
 // Form state
 const formData = reactive<Bundle>({

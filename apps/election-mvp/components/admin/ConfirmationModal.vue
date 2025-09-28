@@ -219,7 +219,7 @@ const handleConfirm = () => {
   props.onConfirm(deleteFromCloudinary.value)
 }
 
-const onConfirm = () => {
+const confirmAction = () => {
   handleConfirm()
 }
 

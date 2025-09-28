@@ -125,9 +125,10 @@ export function useWhatsAppQuote(config: WhatsAppConfig) {
         });
       }
 
-    } catch (e: any) {
+    } catch (e: unknown) {
       console.error('Erreur lors de la soumission WhatsApp:', e);
-      error.value = e.message || 'Une erreur est survenue lors de la préparation du devis';
+      const errorMessage = e instanceof Error ? e.message : 'Une erreur est survenue lors de la préparation du devis'
+      error.value = errorMessage;
       whatsappOpened.value = false;
     } finally {
       isSubmitting.value = false;

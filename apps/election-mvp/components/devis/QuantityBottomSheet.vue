@@ -369,7 +369,7 @@ const close = () => {
 }
 
 // Animation d'ouverture/fermeture
-const show = async () => {
+const showBottomSheet = async () => {
   isVisible.value = true
   await nextTick()
   // Trigger reflow pour l'animation
@@ -383,7 +383,7 @@ const hide = () => {
 // Watchers
 watch(() => props.show, async (newShow) => {
   if (newShow) {
-    await show()
+    await showBottomSheet()
   } else {
     hide()
   }
@@ -403,7 +403,7 @@ watch(selectedQuantity, () => {
 // Au montage
 if (props.show) {
   nextTick(() => {
-    show()
+    showBottomSheet()
   })
 }
 
@@ -412,7 +412,7 @@ validate()
 
 // Exposition des méthodes pour contrôle externe
 defineExpose({
-  show,
+  show: showBottomSheet,
   hide
 })
 </script>

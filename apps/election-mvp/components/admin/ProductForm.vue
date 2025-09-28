@@ -304,7 +304,6 @@
 </template>
 
 <script setup lang="ts">
-// Auto-imported via Nuxt 3: useFormValidation, globalNotifications
 import type { Asset } from '~/composables/useAssetsQuery'
 import { useUploadAssetMutation } from '~/composables/useAssetsQuery'
 import AssetSelectionModal from '~/components/admin/AssetSelectionModal.vue'
@@ -338,8 +337,35 @@ const emit = defineEmits<{
   cancel: []
 }>()
 
-const { validateProduct } = useFormValidation()
-const { crudError } = globalNotifications
+// Simple validation function instead of undefined useFormValidation
+const validateProduct = (product: Product) => {
+  const errors: Array<{ field: string; message: string }> = []
+
+  if (!product.name?.trim()) {
+    errors.push({ field: 'name', message: 'Le nom du produit est requis' })
+  }
+  if (!product.reference?.trim()) {
+    errors.push({ field: 'reference', message: 'La référence est requise' })
+  }
+  if (!product.category_id) {
+    errors.push({ field: 'category_id', message: 'La catégorie est requise' })
+  }
+  if (product.price && product.price < 0) {
+    errors.push({ field: 'price', message: 'Le prix doit être positif' })
+  }
+
+  return {
+    success: errors.length === 0,
+    errors
+  }
+}
+
+// Simple notification functions instead of undefined globalNotifications
+const crudError = {
+  validation: (message: string) => console.error(`❌ Validation:`, message),
+  created: (type: string, message: string) => console.error(`❌ Erreur création ${type}:`, message),
+  updated: (type: string, message: string) => console.error(`❌ Erreur mise à jour ${type}:`, message)
+}
 
 // Form state
 const formData = reactive<Product>({

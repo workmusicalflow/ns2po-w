@@ -459,11 +459,11 @@
 <script setup lang="ts">
 import { globalNotifications } from '../../composables/useNotifications'
 
-interface Column {
+interface Column<T = Record<string, unknown>> {
   key: string
   label: string
   sortable?: boolean
-  formatter?: (value: any, item: any) => string
+  formatter?: (value: unknown, item: T) => string
   class?: string
 }
 
@@ -479,9 +479,9 @@ interface DeleteModal {
   cancelText?: string
 }
 
-interface Props {
-  data: any[]
-  columns: Column[]
+interface Props<T = Record<string, unknown>> {
+  data: T[]
+  columns: Column<T>[]
   title?: string
   description?: string
   isLoading?: boolean
@@ -492,7 +492,7 @@ interface Props {
   searchValue?: string
   emptyTitle?: string
   emptyDescription?: string
-  getRowKey?: (item: any) => string | number
+  getRowKey?: (item: T) => string | number
   // New standardized CRUD props
   createButton?: CreateButton | boolean
   showStandardActions?: boolean
@@ -500,7 +500,7 @@ interface Props {
   allowDelete?: boolean
   itemLabelKey?: string
   deleteModal?: DeleteModal
-  onDelete?: (item: any) => Promise<void>
+  onDelete?: (item: T) => Promise<void>
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -519,10 +519,10 @@ const props = withDefaults(defineProps<Props>(), {
 // Emits
 const emit = defineEmits<{
   create: []
-  edit: [item: any]
-  delete: [item: any]
-  'delete-success': [item: any]
-  'delete-error': [error: any, item: any]
+  edit: [item: Record<string, unknown>]
+  delete: [item: Record<string, unknown>]
+  'delete-success': [item: Record<string, unknown>]
+  'delete-error': [error: Error, item: Record<string, unknown>]
 }>()
 
 // Reactive state
@@ -590,17 +590,18 @@ function toggleSort(key: string) {
   currentPage.value = 1 // Reset to first page when sorting
 }
 
-function getNestedValue(obj: any, path: string): any {
+function getNestedValue(obj: Record<string, unknown>, path: string): unknown {
   return path.split('.').reduce((current, key) => current?.[key], obj)
 }
 
 // New CRUD methods
-function getItemLabel(item: any): string {
+function getItemLabel(item: Record<string, unknown>): string {
   if (!item) return ''
-  return getNestedValue(item, props.itemLabelKey) || item.id || item.name || 'Élément'
+  const labelValue = getNestedValue(item, props.itemLabelKey)
+  return String(labelValue || item.id || item.name || 'Élément')
 }
 
-function confirmDelete(item: any) {
+function confirmDelete(item: Record<string, unknown>) {
   itemToDelete.value = item
   showDeleteModal.value = true
 }
@@ -627,9 +628,10 @@ async function executeDelete() {
     crudSuccess.deleted(getItemLabel(itemToDelete.value))
     emit('delete-success', itemToDelete.value)
     cancelDelete()
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Erreur lors de la suppression:', error)
-    crudError.deleted('élément', error.message || 'Une erreur est survenue lors de la suppression.')
+    const errorMessage = error instanceof Error ? error.message : 'Une erreur est survenue lors de la suppression.'
+    crudError.deleted('élément', errorMessage)
     emit('delete-error', error, itemToDelete.value)
     isDeleting.value = false
   }
