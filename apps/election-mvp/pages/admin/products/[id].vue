@@ -792,6 +792,10 @@ async function handleSubmit() {
       // Mise à jour d'un produit existant via le composable
       const updatedProduct = await updateProductAction(productId.value, productData)
       crudSuccess.updated(`Produit "${updatedProduct.name}" mis à jour`)
+
+      // ✅ FIX: Rafraîchir les données depuis l'API pour éviter le cache Pinia
+      mapProductToForm(updatedProduct)
+
       // Rester sur la page de modification pour continuer l'édition
       // Le store et Event Bus gèrent automatiquement la synchronisation avec la liste
     }
