@@ -1,14 +1,27 @@
 /**
  * API Route: GET /api/products/search
- * Recherche de produits par terme avec stratégie Turso-first → Fallback statique
+ * Recherche de produits avec FTS5 + filtres avancés (schéma normalisé)
+ *
+ * MIGRATION POST-002:
+ * - FTS5 (Full-Text Search) pour recherche textuelle ultra-rapide
+ * - Filtres par matériaux/couleurs depuis tables normalisées
+ * - Support multi-critères: ?q=shirt&material=coton&color=blanc
  */
 
 import { getDatabase } from '../../utils/database'
+import {
+  searchProductsFTS,
+  searchProductsByMaterial,
+  searchProductsByColor,
+  getProductWithRelations
+} from '../../utils/db-queries'
 
 export default defineEventHandler(async (event) => {
   const startTime = Date.now()
   const query = getQuery(event)
   const searchTerm = query.q as string
+  const materialFilter = query.material as string | undefined
+  const colorFilter = query.color as string | undefined
 
   if (!searchTerm || searchTerm.trim().length < 2) {
     throw createError({
@@ -20,123 +33,93 @@ export default defineEventHandler(async (event) => {
   const cleanTerm = searchTerm.trim()
 
   try {
-    // 1. Priorité : Turso Database
     const tursoClient = getDatabase()
-    if (tursoClient) {
-      try {
-        console.log(`🎯 Recherche Turso pour "${cleanTerm}"...`)
-        const result = await tursoClient.execute({
-          sql: `
-            SELECT
-              id, name, description, category, subcategory,
-              base_price as basePrice, min_quantity as minQuantity,
-              max_quantity as maxQuantity, unit, production_time_days,
-              customizable, materials, colors, sizes,
-              image_url as image, gallery_urls, specifications,
-              is_active as isActive, created_at as createdAt, updated_at as updatedAt
-            FROM products
-            WHERE is_active = true
-              AND (
-                name LIKE ? OR
-                description LIKE ? OR
-                category LIKE ? OR
-                subcategory LIKE ? OR
-                materials LIKE ?
-              )
-            ORDER BY
-              CASE
-                WHEN name LIKE ? THEN 1
-                WHEN category LIKE ? THEN 2
-                WHEN description LIKE ? THEN 3
-                ELSE 4
-              END,
-              name
-          `,
-          args: [
-            `%${cleanTerm}%`, `%${cleanTerm}%`, `%${cleanTerm}%`, `%${cleanTerm}%`, `%${cleanTerm}%`,
-            `%${cleanTerm}%`, `%${cleanTerm}%`, `%${cleanTerm}%`
-          ]
-        })
-
-        const products = result.rows.map((row: any) => ({
-          id: String(row.id),
-          name: row.name,
-          description: row.description || '',
-          category: row.category,
-          subcategory: row.subcategory,
-          basePrice: Number(row.basePrice) || 0,
-          minQuantity: Number(row.minQuantity) || 1,
-          maxQuantity: Number(row.maxQuantity) || 1000,
-          unit: row.unit || 'pièce',
-          productionTimeDays: Number(row.production_time_days) || 7,
-          customizable: Boolean(row.customizable),
-          materials: row.materials,
-          colors: row.colors ? JSON.parse(row.colors) : [],
-          sizes: row.sizes ? JSON.parse(row.sizes) : [],
-          image: row.image,
-          galleryUrls: row.gallery_urls ? JSON.parse(row.gallery_urls) : [],
-          specifications: row.specifications,
-          tags: [row.category?.toLowerCase(), row.subcategory?.toLowerCase()].filter(Boolean),
-          isActive: Boolean(row.isActive),
-          createdAt: row.createdAt,
-          updatedAt: row.updatedAt
-        }))
-
-        const duration = Date.now() - startTime
-        console.log(`✅ Turso recherche OK: ${products.length} produits pour "${cleanTerm}" en ${duration}ms`)
-
-        return {
-          success: true,
-          data: products,
-          count: products.length,
-          query: cleanTerm,
-          source: 'turso',
-          duration
-        }
-      } catch (tursoError) {
-        console.warn(`⚠️ Turso recherche failed pour "${cleanTerm}", using static fallback...`, tursoError)
-      }
+    if (!tursoClient) {
+      throw createError({
+        statusCode: 503,
+        statusMessage: 'Base de données indisponible'
+      })
     }
 
-    // 2. Fallback final : Recherche dans données statiques
-      const staticFallback = [
-        {
-          id: 'static-1',
-          name: 'T-Shirt Personnalisé',
-          category: 'Textile',
-          basePrice: 5000,
-          description: 'T-shirt coton personnalisable',
-          tags: ['textile', 'personnalisable']
-        }
-      ].filter(product =>
-        product.name.toLowerCase().includes(cleanTerm.toLowerCase()) ||
-        product.category.toLowerCase().includes(cleanTerm.toLowerCase()) ||
-        product.description.toLowerCase().includes(cleanTerm.toLowerCase())
-      )
+    console.log(`🔍 Recherche FTS5 pour "${cleanTerm}" (material: ${materialFilter || 'none'}, color: ${colorFilter || 'none'})...`)
 
-      const duration = Date.now() - startTime
-      console.log(`🛡️ Fallback recherche statique: ${staticFallback.length} produits pour "${cleanTerm}" en ${duration}ms`)
+    // 1. Recherche Full-Text Search (FTS5) - Ultra rapide
+    let productIds = await searchProductsFTS(tursoClient, cleanTerm)
+    let searchMethod = 'fts5'
 
-      return {
-        success: true,
-        data: staticFallback,
-        count: staticFallback.length,
-        query: cleanTerm,
-        source: 'static',
-        duration,
-        warning: 'Service dégradé - recherche limitée'
-      }
+    // 2. Filtres additionnels (intersection des résultats)
+    if (materialFilter) {
+      const materialIds = await searchProductsByMaterial(tursoClient, materialFilter)
+      productIds = productIds.filter(id => materialIds.includes(id))
+      searchMethod += '+material'
+    }
+
+    if (colorFilter) {
+      const colorIds = await searchProductsByColor(tursoClient, colorFilter)
+      productIds = productIds.filter(id => colorIds.includes(id))
+      searchMethod += '+color'
+    }
+
+    // 3. Récupérer produits complets avec relations
+    const products = await Promise.all(
+      productIds.map(id => getProductWithRelations(tursoClient, id))
+    )
+
+    // Filtrer les nulls (produits supprimés entre-temps)
+    const validProducts = products.filter(p => p !== null)
+
+    const duration = Date.now() - startTime
+    console.log(`✅ Recherche ${searchMethod} OK: ${validProducts.length} produits pour "${cleanTerm}" en ${duration}ms`)
+
+    return {
+      success: true,
+      data: validProducts,
+      count: validProducts.length,
+      query: cleanTerm,
+      filters: {
+        material: materialFilter || null,
+        color: colorFilter || null
+      },
+      source: 'turso-normalized-fts5',
+      searchMethod,
+      duration
+    }
 
   } catch (error) {
     console.error(`❌ Erreur critique recherche "${cleanTerm}":`, error)
 
-    throw createError({
-      statusCode: 500,
-      statusMessage: 'Erreur lors de la recherche de produits',
-      data: {
-        error: error instanceof Error ? error.message : 'Erreur inconnue',
-        duration: Date.now() - startTime
+    // Fallback: Recherche dans données statiques en cas d'erreur
+    const staticFallback = [
+      {
+        id: 'static-1',
+        name: 'T-Shirt Personnalisé',
+        category: 'Textile',
+        basePrice: 5000,
+        price: 5000,
+        description: 'T-shirt coton personnalisable',
+        tags: ['textile', 'personnalisable'],
+        materials: ['Coton'],
+        colors: ['Blanc', 'Noir'],
+        sizes: ['S', 'M', 'L'],
+        isActive: true
       }
-    })
+    ].filter(product =>
+      product.name.toLowerCase().includes(cleanTerm.toLowerCase()) ||
+      product.category.toLowerCase().includes(cleanTerm.toLowerCase()) ||
+      product.description.toLowerCase().includes(cleanTerm.toLowerCase())
+    )
+
+    const fallbackDuration = Date.now() - startTime
+    console.log(`🛡️ Fallback recherche statique: ${staticFallback.length} produits pour "${cleanTerm}" en ${fallbackDuration}ms`)
+
+    return {
+      success: true,
+      data: staticFallback,
+      count: staticFallback.length,
+      query: cleanTerm,
+      source: 'static-fallback',
+      duration: fallbackDuration,
+      warning: 'Service en mode dégradé suite à erreur'
+    }
   }
 })

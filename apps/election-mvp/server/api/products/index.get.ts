@@ -1,9 +1,14 @@
 /**
  * API Route: GET /api/products
- * Récupère tous les produits avec stratégie Turso-first → Fallback statique
+ * Récupère tous les produits avec schéma normalisé
+ *
+ * MIGRATION POST-002: Utilise getProductsListOptimized() avec GROUP_CONCAT
+ * - 1 seule requête optimisée vs N+1 queries
+ * - Relations depuis tables normalisées (materials, colors, sizes, gallery)
  */
 
 import { getDatabase } from '../../utils/database'
+import { getProductsListOptimized } from '../../utils/db-queries'
 
 // Fallback statique minimal pour résilience
 const STATIC_FALLBACK = [
@@ -12,7 +17,7 @@ const STATIC_FALLBACK = [
     name: 'T-Shirt Personnalisé',
     category: 'Textile',
     basePrice: 5000,
-    price: 5000, // 🔧 FIX: Ajout du champ price pour cohérence
+    price: 5000,
     minQuantity: 50,
     maxQuantity: 1000,
     description: 'T-shirt coton personnalisable avec logo',
@@ -25,7 +30,7 @@ const STATIC_FALLBACK = [
     name: 'Casquette Brodée',
     category: 'Textile',
     basePrice: 3500,
-    price: 3500, // 🔧 FIX: Ajout du champ price pour cohérence
+    price: 3500,
     minQuantity: 25,
     maxQuantity: 500,
     description: 'Casquette avec broderie personnalisée',
@@ -38,7 +43,7 @@ const STATIC_FALLBACK = [
     name: 'Stylo Publicitaire',
     category: 'Bureau',
     basePrice: 500,
-    price: 500, // 🔧 FIX: Ajout du champ price pour cohérence
+    price: 500,
     minQuantity: 100,
     maxQuantity: 5000,
     description: 'Stylo personnalisé avec logo',
@@ -52,67 +57,23 @@ export default defineEventHandler(async (event) => {
   const startTime = Date.now()
 
   try {
-    // 1. Priorité : Turso Database (performance optimale)
     const tursoClient = getDatabase()
     if (tursoClient) {
       try {
-        console.log('🎯 Tentative Turso...')
-        const result = await tursoClient.execute(`
-          SELECT
-            p.id, p.name, p.description, p.category, p.subcategory,
-            p.base_price as basePrice, p.min_quantity as minQuantity,
-            p.max_quantity as maxQuantity, p.unit, p.production_time_days,
-            p.customizable, p.materials, p.colors, p.sizes,
-            p.image_url as image, p.gallery_urls, p.specifications,
-            p.is_active as isActive, p.created_at as createdAt, p.updated_at as updatedAt,
-            c.id as categoryId, c.name as categoryName, c.slug as categorySlug,
-            c.description as categoryDescription, c.icon as categoryIcon, c.color as categoryColor
-          FROM products p
-          LEFT JOIN categories c ON p.category = c.id
-          WHERE p.is_active = true
-          ORDER BY c.name, p.name
-        `)
+        console.log('🎯 Chargement produits (schéma normalisé, GROUP_CONCAT)...')
 
-        const products = result.rows.map((row: any) => ({
-          id: String(row.id),
-          name: row.name,
-          description: row.description || '',
-          category: row.category,
-          subcategory: row.subcategory,
-          categoryDetails: row.categoryId ? {
-            id: row.categoryId,
-            name: row.categoryName,
-            slug: row.categorySlug,
-            description: row.categoryDescription,
-            icon: row.categoryIcon,
-            color: row.categoryColor
-          } : null,
-          basePrice: Number(row.basePrice) || 0,
-          price: Number(row.basePrice) || 0, // 🔧 FIX: Ajout du champ price requis par la validation
-          minQuantity: Number(row.minQuantity) || 1,
-          maxQuantity: Number(row.maxQuantity) || 1000,
-          unit: row.unit || 'pièce',
-          productionTimeDays: Number(row.production_time_days) || 7,
-          customizable: Boolean(row.customizable),
-          materials: row.materials,
-          colors: row.colors ? JSON.parse(row.colors) : [],
-          sizes: row.sizes ? JSON.parse(row.sizes) : [],
-          image: row.image,
-          galleryUrls: row.gallery_urls ? JSON.parse(row.gallery_urls) : [],
-          specifications: row.specifications,
-          tags: [row.category?.toLowerCase(), row.subcategory?.toLowerCase()].filter(Boolean),
-          isActive: Boolean(row.isActive),
-          createdAt: row.createdAt,
-          updatedAt: row.updatedAt
-        }))
+        // Récupération optimisée avec relations (1 seule requête)
+        const products = await getProductsListOptimized(tursoClient, {
+          isActive: true
+        })
 
         const duration = Date.now() - startTime
-        console.log(`✅ Turso OK: ${products.length} produits en ${duration}ms`)
+        console.log(`✅ ${products.length} produits récupérés en ${duration}ms (schéma normalisé)`)
 
         return {
           success: true,
           data: products,
-          source: 'turso',
+          source: 'turso-normalized',
           count: products.length,
           duration,
           cached: false
