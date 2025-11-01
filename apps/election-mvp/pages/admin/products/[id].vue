@@ -631,11 +631,11 @@ async function fetchProduct() {
   if (!id || id === 'new') return
 
   try {
-    // ✅ FIX CACHE PINIA: Toujours fetcher depuis l'API pour garantir données fraîches
-    // Le cache Pinia peut être stale après un reload de page
-    console.log(`🔄 Fetching product ${id} from API (bypass Pinia cache)`)
+    // ✅ FIX CRITIQUE: Utiliser l'endpoint ADMIN au lieu de l'endpoint public
+    // L'endpoint public /api/products peut avoir des données cached/stale
+    console.log(`🔄 Fetching product ${id} from ADMIN API`)
 
-    const response = await $fetch(`/api/products/${id}`)
+    const response = await $fetch(`/api/admin/products/${id}`)
     const data = response.data
     mapProductToForm(data)
 
