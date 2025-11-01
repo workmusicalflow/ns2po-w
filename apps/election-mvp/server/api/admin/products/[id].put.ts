@@ -80,10 +80,7 @@ export default defineEventHandler(async (event) => {
       })
     }
 
-    // 3. Préparer les statements SQL pour mise à jour
-    const updateStatements: Array<{ sql: string; args: any[] }> = []
-
-    // Mise à jour champs principaux (si fournis)
+    // 3. Mise à jour champs principaux (EXÉCUTION IMMÉDIATE)
     const mainFields = []
     const mainValues = []
 
@@ -106,6 +103,7 @@ export default defineEventHandler(async (event) => {
     if (validatedData.basePrice !== undefined) {
       mainFields.push('base_price = ?')
       mainValues.push(validatedData.basePrice)
+      console.log(`🔧 [DEBUG] Updating basePrice to:`, validatedData.basePrice)
     }
     if (validatedData.minQuantity !== undefined) {
       mainFields.push('min_quantity = ?')
@@ -128,15 +126,29 @@ export default defineEventHandler(async (event) => {
     mainFields.push('updated_at = ?')
     mainValues.push(new Date().toISOString())
 
-    // Exécuter update champs principaux si présents
+    // 4. EXÉCUTER UPDATE CHAMPS PRINCIPAUX EN PREMIER (FIX CRITIQUE)
+    let rowsAffected = 0
     if (mainFields.length > 1) { // > 1 car updated_at est toujours présent
-      updateStatements.push({
+      console.log(`📝 [DEBUG] Executing UPDATE with fields:`, mainFields.join(', '))
+
+      const updateResult = await tursoClient.execute({
         sql: `UPDATE products SET ${mainFields.join(', ')} WHERE id = ?`,
         args: [...mainValues, productId]
       })
+
+      rowsAffected = updateResult.rowsAffected || 0
+      console.log(`✅ [DEBUG] UPDATE executed - rowsAffected:`, rowsAffected)
+
+      // Vérification critique recommandée par Perplexity
+      if (rowsAffected === 0) {
+        throw createError({
+          statusCode: 404,
+          statusMessage: 'Produit non trouvé ou aucune modification détectée'
+        })
+      }
     }
 
-    // 4. Mise à jour relations normalisées (si fournies)
+    // 5. Mise à jour relations normalisées (APRÈS l'UPDATE principal)
     if (validatedData.materials || validatedData.colors || validatedData.sizes) {
       await updateProductWithRelations(tursoClient, productId, {
         materials: validatedData.materials,
@@ -145,23 +157,18 @@ export default defineEventHandler(async (event) => {
       })
     }
 
-    // 5. Mise à jour FTS si champs textuels modifiés
+    // 6. Récupérer produit mis à jour (APRÈS toutes les écritures)
+    const updatedProduct = await getProductWithRelations(tursoClient, productId)
+
+    // 7. Mise à jour FTS (APRÈS lecture du produit complet)
     if (validatedData.name || validatedData.description || validatedData.category || validatedData.subcategory) {
       await updateProductFTS(tursoClient, productId, {
-        name: validatedData.name || existingProduct.name,
-        description: validatedData.description || existingProduct.description || '',
-        category: validatedData.category || existingProduct.category,
-        subcategory: validatedData.subcategory || existingProduct.subcategory || ''
+        name: updatedProduct.name,
+        description: updatedProduct.description || '',
+        category: updatedProduct.category,
+        subcategory: updatedProduct.subcategory || ''
       })
     }
-
-    // 6. Exécuter mise à jour champs principaux
-    if (updateStatements.length > 0) {
-      await tursoClient.batch(updateStatements, 'write')
-    }
-
-    // 7. Récupérer produit mis à jour
-    const updatedProduct = await getProductWithRelations(tursoClient, productId)
 
     const duration = Date.now() - startTime
     console.log(`✅ Produit ${productId} mis à jour en ${duration}ms`)
