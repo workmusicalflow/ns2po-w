@@ -48,7 +48,7 @@ export const useProducts = () => {
   // Actions CRUD avec synchronisation automatique
   const updateProduct = async (id: string, data: any) => {
     try {
-      const response = await $fetch<{ success: boolean; data: any }>(`/api/products/${id}`, {
+      const response = await $fetch<{ success: boolean; data: any }>(`/api/admin/products/${id}`, {
         method: 'PUT',
         body: data
       })
@@ -73,7 +73,7 @@ export const useProducts = () => {
 
   const createProduct = async (data: any) => {
     try {
-      const response = await $fetch<{ success: boolean; data: any }>('/api/products', {
+      const response = await $fetch<{ success: boolean; data: any }>('/api/admin/products', {
         method: 'POST',
         body: data
       })
