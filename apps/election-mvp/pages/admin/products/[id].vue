@@ -1,11 +1,12 @@
 <template>
-  <div class="relative">
-    <!-- Loading Overlay -->
+  <div>
+    <!-- Loading Overlay Full Screen -->
     <NSLoadingSpinner
       :show="isLoading"
       message="Chargement des données produit..."
-      size="md"
+      size="lg"
       variant="primary"
+      full-screen
     />
 
     <!-- Page Header -->
