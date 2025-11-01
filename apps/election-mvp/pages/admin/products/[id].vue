@@ -631,16 +631,10 @@ async function fetchProduct() {
   if (!id || id === 'new') return
 
   try {
-    // Essayer de récupérer depuis le store Pinia d'abord
-    const cachedProduct = findProductById(id)
+    // ✅ FIX CACHE PINIA: Toujours fetcher depuis l'API pour garantir données fraîches
+    // Le cache Pinia peut être stale après un reload de page
+    console.log(`🔄 Fetching product ${id} from API (bypass Pinia cache)`)
 
-    if (cachedProduct) {
-      // Utiliser les données en cache
-      mapProductToForm(cachedProduct)
-      return
-    }
-
-    // Sinon, faire un appel direct à l'API
     const response = await $fetch(`/api/products/${id}`)
     const data = response.data
     mapProductToForm(data)
