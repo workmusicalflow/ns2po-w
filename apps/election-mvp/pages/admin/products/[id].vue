@@ -650,6 +650,14 @@ function mapProductToForm(data: any) {
   // Map response to form - corriger le mapping des champs API vers form
   const mappedPrice = data.basePrice || data.base_price || data.price || 0
 
+  // 🔍 DEBUG: Logger les valeurs de prix reçues
+  console.log('🔍 [mapProductToForm] Prix reçu depuis API:', {
+    basePrice: data.basePrice,
+    base_price: data.base_price,
+    price: data.price,
+    mappedPrice
+  })
+
   Object.assign(form, {
     name: data.name,
     description: data.description || '',
@@ -669,6 +677,8 @@ function mapProductToForm(data: any) {
     specifications: data.specifications || '',
     is_active: data.isActive ?? data.is_active ?? true // API: isActive → form: is_active
   })
+
+  console.log('✅ [mapProductToForm] Formulaire après mapping - base_price:', form.base_price)
 }
 
 async function fetchCategories() {
