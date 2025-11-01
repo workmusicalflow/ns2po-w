@@ -22,11 +22,11 @@ const UpdateProductSchema = z.object({
   description: z.string().max(2000).optional(),
   category: z.string().max(100).optional(),
   subcategory: z.string().max(100).optional(),
-  basePrice: z.number().int().positive().optional(),
-  minQuantity: z.number().int().positive().optional(),
-  maxQuantity: z.number().int().positive().optional(),
+  base_price: z.number().int().positive().optional(), // ✅ snake_case pour cohérence frontend
+  min_quantity: z.number().int().positive().optional(), // ✅ snake_case
+  max_quantity: z.number().int().positive().optional(), // ✅ snake_case
   image: z.string().url().optional(),
-  isActive: z.boolean().optional(),
+  is_active: z.boolean().optional(), // ✅ snake_case
 
   // Relations normalisées
   materials: z.array(z.string()).optional(),
@@ -100,26 +100,26 @@ export default defineEventHandler(async (event) => {
       mainFields.push('subcategory = ?')
       mainValues.push(validatedData.subcategory)
     }
-    if (validatedData.basePrice !== undefined) {
+    if (validatedData.base_price !== undefined) {
       mainFields.push('base_price = ?')
-      mainValues.push(validatedData.basePrice)
-      console.log(`🔧 [DEBUG] Updating basePrice to:`, validatedData.basePrice)
+      mainValues.push(validatedData.base_price)
+      console.log(`🔧 [DEBUG] Updating base_price to:`, validatedData.base_price)
     }
-    if (validatedData.minQuantity !== undefined) {
+    if (validatedData.min_quantity !== undefined) {
       mainFields.push('min_quantity = ?')
-      mainValues.push(validatedData.minQuantity)
+      mainValues.push(validatedData.min_quantity)
     }
-    if (validatedData.maxQuantity !== undefined) {
+    if (validatedData.max_quantity !== undefined) {
       mainFields.push('max_quantity = ?')
-      mainValues.push(validatedData.maxQuantity)
+      mainValues.push(validatedData.max_quantity)
     }
     if (validatedData.image !== undefined) {
       mainFields.push('image = ?')
       mainValues.push(validatedData.image)
     }
-    if (validatedData.isActive !== undefined) {
+    if (validatedData.is_active !== undefined) {
       mainFields.push('is_active = ?')
-      mainValues.push(validatedData.isActive ? 1 : 0)
+      mainValues.push(validatedData.is_active ? 1 : 0)
     }
 
     // Ajouter updated_at
