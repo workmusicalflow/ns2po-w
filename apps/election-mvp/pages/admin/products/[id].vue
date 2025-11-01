@@ -1,5 +1,13 @@
 <template>
-  <div>
+  <div class="relative">
+    <!-- Loading Overlay -->
+    <NSLoadingSpinner
+      :show="isLoading"
+      message="Chargement des données produit..."
+      size="md"
+      variant="primary"
+    />
+
     <!-- Page Header -->
     <div class="mb-8">
       <div class="flex items-center justify-between">
@@ -545,6 +553,9 @@ definePageMeta({
   middleware: 'admin'
 })
 
+// Loading state pour UX améliorée
+const { isLoading, withLoading } = useLoadingState()
+
 // Route params
 const route = useRoute()
 const router = useRouter()
@@ -630,20 +641,22 @@ async function fetchProduct() {
   const id = productId.value
   if (!id || id === 'new') return
 
-  try {
-    // ✅ FIX CRITIQUE: Utiliser l'endpoint ADMIN au lieu de l'endpoint public
-    // L'endpoint public /api/products peut avoir des données cached/stale
-    console.log(`🔄 Fetching product ${id} from ADMIN API`)
+  await withLoading(async () => {
+    try {
+      // ✅ FIX CRITIQUE: Utiliser l'endpoint ADMIN au lieu de l'endpoint public
+      // L'endpoint public /api/products peut avoir des données cached/stale
+      console.log(`🔄 Fetching product ${id} from ADMIN API`)
 
-    const response = await $fetch(`/api/admin/products/${id}`)
-    const data = response.data
-    mapProductToForm(data)
+      const response = await $fetch(`/api/admin/products/${id}`)
+      const data = response.data
+      mapProductToForm(data)
 
-  } catch (error) {
-    console.error('Error fetching product:', error)
-    crudError.read('product', `Erreur lors du chargement du produit "${id}"`)
-    await router.push('/admin/products')
-  }
+    } catch (error) {
+      console.error('Error fetching product:', error)
+      crudError.read('product', `Erreur lors du chargement du produit "${id}"`)
+      await router.push('/admin/products')
+    }
+  })
 }
 
 function mapProductToForm(data: any) {
