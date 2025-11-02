@@ -1,0 +1,12 @@
+{
+  "id": "proj-1759088227426-bacb1533",
+  "name": "NS2PO Email System Optimization",
+  "description": "Audit et optimisation complète du système de notifications email NS2PO suite à l'identification de problèmes de délivrabilité clients externes. Implémentation d'une architecture résiliente avec ESP professionnels, queue asynchrone et monitoring avancé pour garantir 100% de réception des emails de confirmation clients.",
+  "created": "2025-09-28T19:37:07.434Z",
+  "sprints": [
+    "sprint-1759088235435-f75dcbb7",
+    "sprint-1761951789807-555cce96"
+  ],
+  "activeSprint": "sprint-1761951789807-555cce96",
+  "updated": "2025-10-31T23:03:09.807Z"
+}

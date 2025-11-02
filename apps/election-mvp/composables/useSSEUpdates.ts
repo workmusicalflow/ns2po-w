@@ -1,4 +1,6 @@
-import { useProductsStore } from '../stores/products'
+// 🚨 MIGRATION TANSTACK QUERY PURE - Phase 1.3
+// useProductsStore supprimé, remplacé par useQueryClient
+import { useQueryClient } from '@tanstack/vue-query'
 import { useBundleStore } from '../stores/useBundleStore'
 // Auto-imported via Nuxt 3: globalNotifications
 
@@ -75,7 +77,9 @@ export const useSSEUpdates = () => {
   }
 
   const handleSSEMessage = (message: SSEMessage) => {
-    const store = useProductsStore()
+    // 🚨 MIGRATION TANSTACK QUERY PURE - Phase 1.3
+    // Pinia store supprimé, utilisation TanStack Query uniquement
+    const queryClient = useQueryClient()
     const bundleStore = useBundleStore()
 
     switch (message.type) {
@@ -90,7 +94,9 @@ export const useSSEUpdates = () => {
       case 'product:updated':
         console.log('📝 Mise à jour produit reçue via SSE:', message.data?.name)
         if (message.data) {
-          store.updateProductInStore(message.data)
+          // ✅ TanStack Query: Update cache optimiste + invalidation
+          queryClient.setQueryData(['products', 'detail', message.data.id], message.data)
+          queryClient.invalidateQueries({ queryKey: ['products', 'list'] })
 
           // Notification visuelle
           const { crudSuccess } = globalNotifications
@@ -101,7 +107,8 @@ export const useSSEUpdates = () => {
       case 'product:created':
         console.log('➕ Nouveau produit reçu via SSE:', message.data?.name)
         if (message.data) {
-          store.addProductToStore(message.data)
+          // ✅ TanStack Query: Invalidation liste pour re-fetch
+          queryClient.invalidateQueries({ queryKey: ['products', 'list'] })
 
           // Notification visuelle
           const { crudSuccess } = globalNotifications
@@ -112,7 +119,9 @@ export const useSSEUpdates = () => {
       case 'product:deleted':
         console.log('🗑️ Suppression produit reçue via SSE:', message.data?.id)
         if (message.data?.id) {
-          store.removeProductFromStore(message.data.id)
+          // ✅ TanStack Query: Suppression cache + invalidation liste
+          queryClient.removeQueries({ queryKey: ['products', 'detail', message.data.id] })
+          queryClient.invalidateQueries({ queryKey: ['products', 'list'] })
 
           // Notification visuelle
           const { crudSuccess } = globalNotifications

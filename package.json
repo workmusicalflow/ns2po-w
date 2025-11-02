@@ -27,6 +27,8 @@
   },
   "devDependencies": {
     "@turbo/gen": "^1.10.12",
+    "@types/better-sqlite3": "^7.6.13",
+    "better-sqlite3": "^12.4.1",
     "prettier": "^3.0.0",
     "turbo": "^1.10.12"
   },
@@ -35,11 +37,11 @@
   },
   "dependencies": {
     "@libsql/client": "^0.15.12",
+    "@oxc-parser/binding-wasm32-wasi": "^0.87.0",
+    "@oxc-transform/binding-wasm32-wasi": "^0.87.0",
     "airtable": "^0.12.2",
     "cloudinary": "^2.7.0",
-    "dotenv": "^17.2.1",
-    "@oxc-parser/binding-wasm32-wasi": "^0.87.0",
-    "@oxc-transform/binding-wasm32-wasi": "^0.87.0"
+    "dotenv": "^17.2.1"
   },
   "pnpm": {
     "overrides": {

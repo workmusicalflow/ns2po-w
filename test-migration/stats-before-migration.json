@@ -1,0 +1,23 @@
+{
+  "products": {
+    "count": 6
+  },
+  "customers": {
+    "count": 0
+  },
+  "orders": {
+    "count": 0
+  },
+  "quotes": {
+    "count": 0
+  },
+  "productsWithMaterials": {
+    "count": 3
+  },
+  "productsWithColors": {
+    "count": 6
+  },
+  "productsWithSizes": {
+    "count": 6
+  }
+}

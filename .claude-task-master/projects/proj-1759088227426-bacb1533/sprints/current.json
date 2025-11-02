@@ -1,0 +1,162 @@
+{
+  "id": "sprint-1761951789807-555cce96",
+  "name": "Sprint 1 - Migration API Post-Optimisation DB",
+  "startDate": "2025-10-31",
+  "endDate": "2025-11-07",
+  "goals": "Migrer progressivement les endpoints API pour utiliser le nouveau schéma DB normalisé. Valider performance et intégrité. Créer backup et monitoring post-migration.",
+  "status": "active",
+  "created": "2025-10-31T23:03:09.807Z",
+  "tasks": [
+    {
+      "id": 1,
+      "title": "Créer backup Turso post-migration",
+      "description": "Créer un snapshot SQL de la base Turso après migration pour sécurité. Commande: turso db shell ns2po-election-mvp \".dump\" > backup-post-migration-$(date +%Y%m%d).sql",
+      "status": "completed",
+      "priority": 5,
+      "dependencies": [],
+      "created": "2025-10-31T23:03:16.127Z",
+      "updated": "2025-10-31T23:05:19.940Z",
+      "isPareto80": false
+    },
+    {
+      "id": 2,
+      "title": "Vérifier fonctionnement application actuelle",
+      "description": "Tester que l'app fonctionne normalement avec les colonnes JSON existantes. Vérifier: catalogue produits, détail produit, recherche. Les colonnes JSON sont conservées pour backward compatibility.",
+      "status": "completed",
+      "priority": 5,
+      "dependencies": [
+        1
+      ],
+      "created": "2025-10-31T23:03:23.008Z",
+      "updated": "2025-10-31T23:11:11.474Z",
+      "isPareto80": false
+    },
+    {
+      "id": 3,
+      "title": "Créer helper utils/db-queries.ts pour requêtes optimisées",
+      "description": "Créer fichier utils partagé avec fonctions réutilisables pour requêtes normalisées: getProductWithRelations(), searchProductsByMaterial(), searchProductsByColor(), etc. Utilise GROUP_CONCAT pour agréger données.",
+      "status": "pending",
+      "priority": 5,
+      "dependencies": [
+        2
+      ],
+      "created": "2025-10-31T23:03:28.627Z",
+      "updated": "2025-10-31T23:03:28.627Z",
+      "isPareto80": false
+    },
+    {
+      "id": 4,
+      "title": "Migrer endpoint /api/products/[id].get.ts vers schéma normalisé",
+      "description": "Remplacer JSON.parse() par JOIN sur product_materials, product_colors, product_sizes, product_gallery. Utiliser helper getProductWithRelations(). Tester endpoint avec plusieurs IDs produits.",
+      "status": "pending",
+      "priority": 5,
+      "dependencies": [
+        3
+      ],
+      "created": "2025-10-31T23:03:34.729Z",
+      "updated": "2025-10-31T23:03:34.729Z",
+      "isPareto80": false
+    },
+    {
+      "id": 5,
+      "title": "Migrer endpoint /api/products/index.get.ts liste produits",
+      "description": "Optimiser chargement liste produits avec LEFT JOIN pour materials/colors preview. Utiliser pagination si > 20 produits. Comparer performance avant/après.",
+      "status": "pending",
+      "priority": 4,
+      "dependencies": [
+        4
+      ],
+      "created": "2025-10-31T23:03:39.966Z",
+      "updated": "2025-10-31T23:03:39.966Z",
+      "isPareto80": false
+    },
+    {
+      "id": 6,
+      "title": "Migrer endpoint /api/products/search.get.ts recherche produits",
+      "description": "Implémenter recherche FTS5 avec products_search_fts MATCH. Ajouter filtres par material_name, color_name via JOIN. Tester recherche \"shirt\", \"coton\", \"rouge\".",
+      "status": "pending",
+      "priority": 4,
+      "dependencies": [
+        4
+      ],
+      "created": "2025-10-31T23:03:45.445Z",
+      "updated": "2025-10-31T23:03:45.445Z",
+      "isPareto80": false
+    },
+    {
+      "id": 7,
+      "title": "Migrer endpoint /api/admin/products/[id].put.ts mise à jour produit",
+      "description": "Lors update produit, mettre à jour tables normalisées: DELETE + INSERT pour materials/colors/sizes. Gérer transactions pour intégrité. Mettre à jour products_search_fts.",
+      "status": "pending",
+      "priority": 4,
+      "dependencies": [
+        4
+      ],
+      "created": "2025-10-31T23:03:50.655Z",
+      "updated": "2025-10-31T23:03:50.655Z",
+      "isPareto80": false
+    },
+    {
+      "id": 8,
+      "title": "Migrer endpoint /api/admin/products/index.post.ts création produit",
+      "description": "Lors création produit, insérer dans tables normalisées: product_materials, product_colors, product_sizes, product_gallery. Utiliser transactions. Ajouter à products_search_fts.",
+      "status": "pending",
+      "priority": 4,
+      "dependencies": [
+        4
+      ],
+      "created": "2025-10-31T23:03:55.734Z",
+      "updated": "2025-10-31T23:03:55.734Z",
+      "isPareto80": false
+    },
+    {
+      "id": 9,
+      "title": "Créer tests E2E pour endpoints migrés",
+      "description": "Tests Playwright/Vitest: 1) GET produit avec relations, 2) Liste produits, 3) Recherche FTS, 4) Création produit admin, 5) Modification produit admin. Valider structure réponse et intégrité données.",
+      "status": "pending",
+      "priority": 3,
+      "dependencies": [
+        5,
+        6,
+        7,
+        8
+      ],
+      "created": "2025-10-31T23:04:01.873Z",
+      "updated": "2025-10-31T23:04:01.873Z",
+      "isPareto80": false
+    },
+    {
+      "id": 10,
+      "title": "Monitoring Railway post-déploiement (7 jours)",
+      "description": "Surveiller métriques Railway: latence P95 < 500ms, taux erreur = 0%, logs SQL. Check quotidien intégrité Turso (0 orphelins). Dashboard Analytics pour comparer avant/après.",
+      "status": "pending",
+      "priority": 3,
+      "dependencies": [
+        9
+      ],
+      "created": "2025-10-31T23:04:08.124Z",
+      "updated": "2025-10-31T23:04:08.124Z",
+      "isPareto80": false
+    },
+    {
+      "id": 11,
+      "title": "Documentation API migration et bonnes pratiques",
+      "description": "Créer docs/API_MIGRATION_NORMALIZED_SCHEMA.md avec patterns migration, exemples requêtes optimisées, gestion transactions, synchronisation FTS. Guide pour futures migrations endpoints.",
+      "status": "pending",
+      "priority": 2,
+      "dependencies": [
+        9
+      ],
+      "created": "2025-10-31T23:04:15.127Z",
+      "updated": "2025-10-31T23:04:15.127Z",
+      "isPareto80": false
+    }
+  ],
+  "paretoDecisions": [],
+  "metrics": {
+    "tasksCompleted": 2,
+    "tasksMovedToVault": 0,
+    "velocityPoints": 0
+  },
+  "updated": "2025-10-31T23:11:11.476Z"
+}

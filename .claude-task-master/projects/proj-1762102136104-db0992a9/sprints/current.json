@@ -1,0 +1,62 @@
+{
+  "id": "sprint-1762102879435-9e67f5de",
+  "name": "Sprint 0 - Préparation & Sécurisation (Recommandation Gemini)",
+  "startDate": "2025-11-02",
+  "endDate": "2025-11-02",
+  "goals": "AVANT Sprint 1: Renforcer tests E2E, préparer rollback strategy, auditer dépendances cachées. Minimiser risque régression CRUD admin. Recommandation critique Gemini: \"Risque ÉLEVÉ Sprint 1\"",
+  "status": "active",
+  "created": "2025-11-02T17:01:19.435Z",
+  "tasks": [
+    {
+      "id": 1,
+      "title": "Renforcer massivement tests E2E CRUD products (Recommandation Gemini CRITIQUE)",
+      "description": "Gemini: \"Renforcer MASSIVEMENT tests E2E avant Sprint 1\". Couvrir TOUS scénarios: création, lecture, modification, suppression, recherche, pagination, filtres products. Utiliser Playwright. Baseline pour détecter régressions. Fichier: tests/e2e/admin-products-crud-complete.spec.ts",
+      "status": "completed",
+      "priority": 5,
+      "dependencies": [],
+      "created": "2025-11-02T17:01:29.576Z",
+      "updated": "2025-11-02T17:42:08.798Z",
+      "isPareto80": false
+    },
+    {
+      "id": 2,
+      "title": "Audit dépendances cachées useProducts/stores Pinia (Recommandation Gemini)",
+      "description": "Gemini: \"Dépendances cachées non détectées par grep\". Audit manuel approfondi: injections dépendances, appels indirects, composants imbriqués. Vérifier provide/inject, dynamic imports. Documenter TOUTES dépendances dans MIGRATION_DEPENDENCIES_AUDIT.md. Identifier risques avant suppression stores.",
+      "status": "completed",
+      "priority": 5,
+      "dependencies": [],
+      "created": "2025-11-02T17:01:39.487Z",
+      "updated": "2025-11-02T17:48:00.129Z",
+      "isPareto80": false
+    },
+    {
+      "id": 3,
+      "title": "Préparer rollback strategy + branche Git dédiée (Recommandation Gemini)",
+      "description": "Gemini: \"Rollback strategy CRITIQUE pour Sprint 1\". Créer branche feat/migration-tanstack-query-sprint-1. Documenter procédure rollback: git revert, Railway redeploy version stable. Sauvegarder DB Turso avant migration. Environnement staging obligatoire. Doc: ROLLBACK_STRATEGY.md",
+      "status": "pending",
+      "priority": 5,
+      "dependencies": [],
+      "created": "2025-11-02T17:01:49.360Z",
+      "updated": "2025-11-02T17:01:49.360Z",
+      "isPareto80": false
+    },
+    {
+      "id": 4,
+      "title": "Setup métriques performance baseline (Recommandation Gemini)",
+      "description": "Gemini: \"Métriques performance INDISPENSABLE\". Exécuter Lighthouse mobile 3G sur pages admin products (index + [id]). Mesurer Core Web Vitals baseline: LCP, FID/INP, CLS, TTFB, TBT. Bundle analyzer avant migration. Documenter dans PERFORMANCE_BASELINE.md. Target: >90 Lighthouse, <500ms API.",
+      "status": "pending",
+      "priority": 4,
+      "dependencies": [],
+      "created": "2025-11-02T17:01:59.621Z",
+      "updated": "2025-11-02T17:01:59.621Z",
+      "isPareto80": false
+    }
+  ],
+  "paretoDecisions": [],
+  "metrics": {
+    "tasksCompleted": 2,
+    "tasksMovedToVault": 0,
+    "velocityPoints": 0
+  },
+  "updated": "2025-11-02T17:48:00.130Z"
+}

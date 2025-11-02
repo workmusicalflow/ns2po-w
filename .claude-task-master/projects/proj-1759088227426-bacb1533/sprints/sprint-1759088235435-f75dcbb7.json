@@ -1,0 +1,19 @@
+{
+  "id": "sprint-1759088235435-f75dcbb7",
+  "name": "Sprint 0 - Email Delivery Critical Fix",
+  "startDate": "2025-09-28",
+  "endDate": "2025-10-05",
+  "goals": "OBJECTIF CRITIQUE : Résoudre immédiatement le problème de non-réception des emails clients externes identifié lors de l'audit technique multi-agents (Perplexity + Gemini + Serena). Cause racine : réputation SMTP mail.topdigitalevel.site défaillante. Solution : Migration ESP professionnel + architecture résiliente.",
+  "status": "closed",
+  "created": "2025-09-28T19:37:15.435Z",
+  "tasks": [],
+  "paretoDecisions": [],
+  "metrics": {
+    "tasksCompleted": 0,
+    "tasksMovedToVault": 9,
+    "velocityPoints": 0
+  },
+  "updated": "2025-10-31T23:03:04.553Z",
+  "closedAt": "2025-10-31T23:03:04.531Z",
+  "summary": "Sprint interrompu pour prioriser migration API post-optimisation DB. Tâches email non critiques déplacées vers Pareto Vault."
+}

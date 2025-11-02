@@ -1,0 +1,136 @@
+{
+  "id": "sprint-1762102149062-8c6906c9",
+  "name": "Sprint 1 - Migration Products (Core 20%)",
+  "startDate": "2025-11-02",
+  "endDate": "2025-11-05",
+  "goals": "Migrer complètement la gestion Products de Pinia vers TanStack Query pure. Supprimer duplication cache. Stabiliser CRUD admin products. Valider architecture cible avec tests E2E.",
+  "status": "closed",
+  "created": "2025-11-02T16:49:09.063Z",
+  "tasks": [
+    {
+      "id": 1,
+      "title": "Migrer pages/admin/products/[id].vue vers useProductQuery",
+      "description": "Remplacer $fetch direct par useProductQuery pour lecture produit. Utiliser useUpdateProductMutation pour update. Retirer Event Bus. Pattern: const { data: product } = useProductQuery(productId). Tests: modification produit + validation cache sync.",
+      "status": "pending",
+      "priority": 5,
+      "dependencies": [],
+      "created": "2025-11-02T16:49:19.150Z",
+      "updated": "2025-11-02T16:49:19.150Z",
+      "isPareto80": false
+    },
+    {
+      "id": 2,
+      "title": "Auditer tous les usages de useProducts() dans le codebase",
+      "description": "Grep exhaustif pour identifier tous les fichiers utilisant useProducts(). Créer liste complète des pages/composants à migrer. Pattern: grep -r \"useProducts()\" apps/election-mvp/. Documentation: fichier MIGRATION_AUDIT.md avec liste complète.",
+      "status": "pending",
+      "priority": 5,
+      "dependencies": [
+        1
+      ],
+      "created": "2025-11-02T16:49:32.097Z",
+      "updated": "2025-11-02T16:49:32.097Z",
+      "isPareto80": false
+    },
+    {
+      "id": 3,
+      "title": "Remplacer tous usages useProducts() par TanStack Query direct",
+      "description": "Migrer tous les fichiers identifiés dans l'audit (tâche #2). Remplacer useProducts() par imports directs: useProductsQuery, useProductQuery, useUpdateProductMutation, etc. Retirer Event Bus. Tests unitaires après chaque migration.",
+      "status": "pending",
+      "priority": 5,
+      "dependencies": [
+        2
+      ],
+      "created": "2025-11-02T16:49:44.752Z",
+      "updated": "2025-11-02T16:49:44.752Z",
+      "isPareto80": false
+    },
+    {
+      "id": 4,
+      "title": "Supprimer composables/useProducts.ts",
+      "description": "Supprimer fichier useProducts.ts (161 lignes). Vérifier aucun import restant: grep -r \"from.*useProducts\" apps/election-mvp/. Update imports vers useProductsQuery/useProductMutations direct.",
+      "status": "pending",
+      "priority": 5,
+      "dependencies": [
+        3
+      ],
+      "created": "2025-11-02T16:49:56.939Z",
+      "updated": "2025-11-02T16:49:56.939Z",
+      "isPareto80": false
+    },
+    {
+      "id": 5,
+      "title": "Supprimer stores/products.ts",
+      "description": "Supprimer stores/products.ts (117 lignes). Vérifier aucun import: grep -r \"useProductsStore\" apps/election-mvp/. Toute logique cache maintenant gérée par TanStack Query.",
+      "status": "pending",
+      "priority": 5,
+      "dependencies": [
+        4
+      ],
+      "created": "2025-11-02T16:50:08.088Z",
+      "updated": "2025-11-02T16:50:08.088Z",
+      "isPareto80": false
+    },
+    {
+      "id": 6,
+      "title": "Supprimer stores/useProductStore.ts",
+      "description": "Supprimer stores/useProductStore.ts (566 lignes). Logique cache complexe (searchCache, aggregateCache) remplacée par TanStack Query staleTime/gcTime. Vérifier aucun import restant.",
+      "status": "pending",
+      "priority": 5,
+      "dependencies": [
+        4
+      ],
+      "created": "2025-11-02T16:50:20.318Z",
+      "updated": "2025-11-02T16:50:20.318Z",
+      "isPareto80": false
+    },
+    {
+      "id": 7,
+      "title": "Retirer synchronisation Pinia dans useProductMutations.ts",
+      "description": "Éditer useProductMutations.ts pour retirer appels Pinia store (updateProductInStore, addProductToStore, removeProductFromStore). Retirer Event Bus adminEventBus.emit. Garder uniquement invalidation TanStack Query. Réduire ~30 lignes.",
+      "status": "pending",
+      "priority": 4,
+      "dependencies": [
+        5,
+        6
+      ],
+      "created": "2025-11-02T16:50:29.933Z",
+      "updated": "2025-11-02T16:50:29.933Z",
+      "isPareto80": false
+    },
+    {
+      "id": 8,
+      "title": "Tests E2E admin products CRUD complet",
+      "description": "Créer/mettre à jour tests E2E pour admin products. Scénarios: 1) Liste produits affichée 2) Création produit + vérif cache sync 3) Modification produit + vérif cache sync 4) Suppression produit + vérif cache sync. Utiliser Playwright. Fichier: tests/e2e/admin-products-crud.spec.ts",
+      "status": "pending",
+      "priority": 5,
+      "dependencies": [
+        1,
+        3,
+        7
+      ],
+      "created": "2025-11-02T16:50:39.351Z",
+      "updated": "2025-11-02T16:50:39.351Z",
+      "isPareto80": false
+    },
+    {
+      "id": 9,
+      "title": "Validation finale Sprint 1 - Déploiement Railway",
+      "description": "Build + lint + type-check local. Tests E2E passent. Déploiement Railway. Validation production: CRUD products fonctionne, cache sync TanStack Query OK, zéro erreur console. Métriques: bundle size, Lighthouse performance.",
+      "status": "pending",
+      "priority": 5,
+      "dependencies": [
+        8
+      ],
+      "created": "2025-11-02T16:50:53.549Z",
+      "updated": "2025-11-02T16:50:53.549Z",
+      "isPareto80": false
+    }
+  ],
+  "paretoDecisions": [],
+  "metrics": {
+    "tasksCompleted": 0,
+    "tasksMovedToVault": 0,
+    "velocityPoints": 0
+  },
+  "updated": "2025-11-02T16:51:05.497Z"
+}

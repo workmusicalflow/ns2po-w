@@ -1,0 +1,14 @@
+{
+  "id": "proj-1762102136104-db0992a9",
+  "name": "Migration TanStack Query Pure",
+  "description": "Migration complète architecture Pinia+TanStack hybride vers TanStack Query pure. Objectifs: éliminer duplication cache (-955 lignes), stabiliser CRUD admin, améliorer performance 3G. Scope: Products (P1), Bundles (P2), Categories (P2), Cleanup (P3).",
+  "created": "2025-11-02T16:48:56.109Z",
+  "sprints": [
+    "sprint-1762102149062-8c6906c9",
+    "sprint-1762102265497-805464b2",
+    "sprint-1762102339464-e238a3d0",
+    "sprint-1762102879435-9e67f5de"
+  ],
+  "activeSprint": "sprint-1762102879435-9e67f5de",
+  "updated": "2025-11-02T17:01:19.436Z"
+}

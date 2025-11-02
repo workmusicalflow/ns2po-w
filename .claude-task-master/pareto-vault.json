@@ -567,7 +567,223 @@
       "estimatedValue": "low",
       "revisitSuggestion": "Future - Si équipe grandit et debug devient complexe",
       "archivedAt": "2025-09-23T03:58:25.855Z"
+    },
+    {
+      "id": "pv-1761951784548-aeb0cc6f",
+      "originalProject": "proj-1759088227426-bacb1533",
+      "originalSprint": "sprint-1759088235435-f75dcbb7",
+      "task": {
+        "id": 1,
+        "title": "🚨 CRITICAL - Migration ESP SendGrid pour délivrabilité clients",
+        "description": "CORE 20% - ACTION CRITIQUE IMMÉDIATE\nContext: Audit multi-agents révèle que mail.topdigitalevel.site cause filtrage anti-spam → clients ne reçoivent pas emails confirmation\nImpact: Perte de confiance clients + parcours devis cassé\nSolution: Migration vers ESP professionnel (SendGrid) avec réputation IP garantie\n\nACTIONS TECHNIQUES:\n1. Inscription SendGrid (plan gratuit 100 emails/jour)\n2. Génération clé API + configuration variables Railway\n3. Configuration SPF/DKIM via interface SendGrid\n4. Modification server/utils/email.ts → API SendGrid REST\n5. Test validation email client externe → confirmation réception ✅\n\nVALIDATION: Test email vers gmail.com/outlook.com → inbox (pas spam)\nDEADLINE: 24H MAXIMUM",
+        "status": "pending",
+        "priority": 5,
+        "dependencies": [],
+        "created": "2025-09-28T19:37:27.721Z",
+        "updated": "2025-09-28T19:37:27.721Z",
+        "isPareto80": false
+      },
+      "reason": "Sprint terminé - tâche non complétée",
+      "tags": [
+        "incomplete",
+        "deferred"
+      ],
+      "estimatedValue": "medium",
+      "revisitSuggestion": "Prochain sprint",
+      "archivedAt": "2025-10-31T23:03:04.550Z"
+    },
+    {
+      "id": "pv-1761951784550-49712d36",
+      "originalProject": "proj-1759088227426-bacb1533",
+      "originalSprint": "sprint-1759088235435-f75dcbb7",
+      "task": {
+        "id": 2,
+        "title": "🔧 CORE - Implémentation logging détaillé SMTP pour debugging",
+        "description": "CORE 20% - DIAGNOSTIC TECHNIQUE ESSENTIEL\nContext: Audit Perplexity révèle logs insuffisants → pas de visibilité sur codes retour SMTP réels\nImpact: Debugging impossible + pas de monitoring délivrabilité\nSolution: Logging structuré avec correlation IDs\n\nACTIONS TECHNIQUES:\n1. Modification sendEmail() → capture codes retour SMTP complets\n2. Ajout correlation ID par notification (UUID)\n3. Logs structurés format JSON (timestamp, correlationId, status, details)\n4. Endpoint /api/test-email-delivery pour validation ESP\n5. Monitoring Railway logs → filtrage par correlation ID\n\nCONTEXT TECHNIQUE:\n- server/utils/email.ts:91-112 → améliorer try/catch\n- Capturer response.messageId + détails SMTP\n- Console.log enrichi → JSON.stringify(logData)\n\nVALIDATION: Logs détaillés visibles Railway → tracking end-to-end",
+        "status": "pending",
+        "priority": 5,
+        "dependencies": [],
+        "created": "2025-09-28T19:37:39.043Z",
+        "updated": "2025-09-28T19:37:39.044Z",
+        "isPareto80": false
+      },
+      "reason": "Sprint terminé - tâche non complétée",
+      "tags": [
+        "incomplete",
+        "deferred"
+      ],
+      "estimatedValue": "medium",
+      "revisitSuggestion": "Prochain sprint",
+      "archivedAt": "2025-10-31T23:03:04.550Z"
+    },
+    {
+      "id": "pv-1761951784550-dd6c8f94",
+      "originalProject": "proj-1759088227426-bacb1533",
+      "originalSprint": "sprint-1759088235435-f75dcbb7",
+      "task": {
+        "id": 3,
+        "title": "⚡ CORE - Tests validation immédiate délivrabilité post-migration",
+        "description": "CORE 20% - VALIDATION CRITIQUE SUCCESS\nContext: Après migration ESP, validation absolue que emails clients externes arrivent en inbox\nImpact: Confirmation résolution problème audit → parcours devis fonctionnel\nSolution: Batterie tests exhaustifs multi-domaines\n\nACTIONS VALIDATION:\n1. Tests emails vers Gmail (@gmail.com) → vérification inbox/spam\n2. Tests emails vers Outlook (@outlook.com/@hotmail.com) → inbox check\n3. Tests emails vers Yahoo (@yahoo.fr) → délivrabilité validation\n4. Tests emails domaines corporatifs (@orange.ci @mtn.ci) → B2B check\n5. Monitoring template HTML → responsive + logo Cloudinary\n\nCONTEXT TECHNIQUE:\n- Utiliser endpoint /api/test-email-delivery\n- Tester sendCustomerConfirmation() complète avec data réelles\n- Vérifier trackingUrl génération + liens fonctionnels\n- Templates HTML validation multi-clients email\n\nVALIDATION SUCCESS: 100% emails test reçus en inbox (pas spam)\nDEADLINE: Immédiatement après tâche #1",
+        "status": "pending",
+        "priority": 5,
+        "dependencies": [],
+        "created": "2025-09-28T19:37:50.780Z",
+        "updated": "2025-09-28T19:37:50.780Z",
+        "isPareto80": false
+      },
+      "reason": "Sprint terminé - tâche non complétée",
+      "tags": [
+        "incomplete",
+        "deferred"
+      ],
+      "estimatedValue": "medium",
+      "revisitSuggestion": "Prochain sprint",
+      "archivedAt": "2025-10-31T23:03:04.550Z"
+    },
+    {
+      "id": "pv-1761951784550-da13e354",
+      "originalProject": "proj-1759088227426-bacb1533",
+      "originalSprint": "sprint-1759088235435-f75dcbb7",
+      "task": {
+        "id": 4,
+        "title": "🏗️ Architecture Queue Redis + BullMQ pour résilience async",
+        "description": "EVOLUTION ARCHITECTURE - Post-fix critique\nContext: Architecture Gemini recommande découplage notifications pour éviter timeouts API\nImpact: Résilience + performance + retry intelligent\nSolution: Queue asynchrone avec worker dédié\n\nACTIONS TECHNIQUES:\n1. Ajout service Redis sur Railway (service managé)\n2. Installation BullMQ dans package.json projet Nuxt\n3. Création worker notifications (service Railway séparé)\n4. Modification /api/contacts/submit → enqueue job au lieu envoi direct\n5. Worker consomme jobs → appelle sendEmail() avec retry logic\n\nCONTEXT ARCHITECTURE:\n- useEmailQuote.ts reste inchangé (backward compatibility)\n- API répond immédiatement → meilleure UX\n- Jobs background → pas de timeout utilisateur\n- Retry exponential backoff → résistance pannes temporaires\n\nVALIDATION: API rapide + emails envoyés asynchrone + retry auto",
+        "status": "pending",
+        "priority": 4,
+        "dependencies": [],
+        "created": "2025-09-28T19:38:03.150Z",
+        "updated": "2025-09-28T19:38:03.150Z",
+        "isPareto80": true
+      },
+      "reason": "Sprint terminé - tâche non complétée",
+      "tags": [
+        "incomplete",
+        "deferred"
+      ],
+      "estimatedValue": "medium",
+      "revisitSuggestion": "Prochain sprint",
+      "archivedAt": "2025-10-31T23:03:04.550Z"
+    },
+    {
+      "id": "pv-1761951784550-e0d3f65c",
+      "originalProject": "proj-1759088227426-bacb1533",
+      "originalSprint": "sprint-1759088235435-f75dcbb7",
+      "task": {
+        "id": 5,
+        "title": "📊 Multi-Provider Fallback ESP (SendGrid + Postmark)",
+        "description": "ROBUSTESSE PRODUCTION - Enhancement 80%\nContext: Architecture Gemini recommande fallback automatique pour éliminer single point failure\nImpact: Garantie délivrabilité même si ESP primaire down\nSolution: Abstraction NotificationService avec basculement intelligent\n\nACTIONS TECHNIQUES:\n1. Création NotificationService abstraction layer\n2. Configuration Postmark comme ESP fallback (clé API séparée)\n3. Logique basculement → try SendGrid, if fail → try Postmark\n4. Retry logic intelligent → distinguer erreurs temporaires/permanentes\n5. Configuration variables environment → PRIMARY_ESP, FALLBACK_ESP\n\nCONTEXT ARCHITECTURE:\n- Pattern Strategy pour ESP selection\n- Exponential backoff entre tentatives\n- Logging détaillé par provider\n- Métriques success rate par ESP\n\nVALIDATION: Simulation panne SendGrid → Postmark prend le relais auto",
+        "status": "pending",
+        "priority": 3,
+        "dependencies": [],
+        "created": "2025-09-28T19:38:13.829Z",
+        "updated": "2025-09-28T19:38:13.829Z",
+        "isPareto80": true
+      },
+      "reason": "Sprint terminé - tâche non complétée",
+      "tags": [
+        "incomplete",
+        "deferred"
+      ],
+      "estimatedValue": "medium",
+      "revisitSuggestion": "Prochain sprint",
+      "archivedAt": "2025-10-31T23:03:04.550Z"
+    },
+    {
+      "id": "pv-1761951784550-c9540897",
+      "originalProject": "proj-1759088227426-bacb1533",
+      "originalSprint": "sprint-1759088235435-f75dcbb7",
+      "task": {
+        "id": 6,
+        "title": "🔍 Webhook tracking délivrabilité ESP + observabilité avancée",
+        "description": "MONITORING PRODUCTION - Enhancement 80%\nContext: Perplexity recommande webhooks ESP pour tracking réel delivered/bounced/opened\nImpact: Visibilité complète cycle vie email + métriques business\nSolution: Endpoints webhooks + dashboard monitoring\n\nACTIONS TECHNIQUES:\n1. Création /api/webhooks/email-status.post.ts pour événements ESP\n2. Configuration webhooks SendGrid → delivered, bounced, opened, clicked\n3. Mise à jour Turso DB → status notifications (pending→delivered→opened)\n4. Dashboard simple admin monitoring délivrabilité\n5. Alertes automatiques sur taux bounced élevé\n\nCONTEXT TECHNIQUE:\n- Webhook signature validation (sécurité)\n- Mapping événements ESP → status DB\n- Métriques aggregées par période\n- Integration Railway monitoring\n\nVALIDATION: Dashboard temps réel + alertes fonctionnelles",
+        "status": "pending",
+        "priority": 2,
+        "dependencies": [],
+        "created": "2025-09-28T19:38:24.900Z",
+        "updated": "2025-09-28T19:38:24.900Z",
+        "isPareto80": true
+      },
+      "reason": "Sprint terminé - tâche non complétée",
+      "tags": [
+        "incomplete",
+        "deferred"
+      ],
+      "estimatedValue": "medium",
+      "revisitSuggestion": "Prochain sprint",
+      "archivedAt": "2025-10-31T23:03:04.550Z"
+    },
+    {
+      "id": "pv-1761951784550-13a32062",
+      "originalProject": "proj-1759088227426-bacb1533",
+      "originalSprint": "sprint-1759088235435-f75dcbb7",
+      "task": {
+        "id": 7,
+        "title": "🔄 Système retry intelligent avec Dead Letter Queue",
+        "description": "RESILIENCE AVANCÉE - Enhancement 80%\nContext: Gemini recommande retry logic sophistiquée pour éviter pertes notifications\nImpact: Zéro perte email même avec pannes temporaires ESP\nSolution: BullMQ retry + DLQ pour échecs persistants\n\nACTIONS TECHNIQUES:\n1. Configuration BullMQ retry exponential backoff (1s, 5s, 25s, 125s)\n2. Dead Letter Queue pour échecs après 5 tentatives\n3. Classification erreurs → temporaires (retry) vs permanentes (DLQ)\n4. Interface admin pour retraitement DLQ manuel\n5. Alertes automatiques sur accumulation DLQ\n\nCONTEXT TECHNIQUE:\n- BullMQ job options → delay, attempts, backoff\n- Error classification → 4xx (permanent) vs 5xx (temporaire)\n- DLQ dashboard → retry sélectif\n- Monitoring queue health\n\nVALIDATION: Simulation pannes → recovery automatique + DLQ fonctionnelle",
+        "status": "pending",
+        "priority": 3,
+        "dependencies": [],
+        "created": "2025-09-28T19:38:35.702Z",
+        "updated": "2025-09-28T19:38:35.702Z",
+        "isPareto80": true
+      },
+      "reason": "Sprint terminé - tâche non complétée",
+      "tags": [
+        "incomplete",
+        "deferred"
+      ],
+      "estimatedValue": "medium",
+      "revisitSuggestion": "Prochain sprint",
+      "archivedAt": "2025-10-31T23:03:04.550Z"
+    },
+    {
+      "id": "pv-1761951784550-5c16bdba",
+      "originalProject": "proj-1759088227426-bacb1533",
+      "originalSprint": "sprint-1759088235435-f75dcbb7",
+      "task": {
+        "id": 8,
+        "title": "📱 Optimisation système WhatsApp + unification architecture notifications",
+        "description": "UNIFICATION CANAUX - Enhancement 80%\nContext: Audit révèle système WhatsApp déjà fonctionnel mais architecture séparée\nImpact: Cohérence architecture + maintenance simplifiée\nSolution: Intégration WhatsApp dans queue unifié + amélioration UX\n\nACTIONS TECHNIQUES:\n1. Migration useWhatsAppQuote.ts vers queue Redis (même pattern que email)\n2. Worker unifié → traitement jobs email ET WhatsApp\n3. API Twilio/MessageBird pour WhatsApp Business programmatique\n4. Templates WhatsApp enrichis + tracking liens\n5. Dashboard monitoring unifié email + WhatsApp\n\nCONTEXT ARCHITECTURAL:\n- Composable useWhatsAppQuote.ts:28-157 déjà fonctionnel\n- Queue jobs type: 'email' | 'whatsapp' | 'sms'\n- Worker polymorphe selon job.type\n- Correlation ID cross-canal\n\nVALIDATION: Notifications email + WhatsApp via même queue + monitoring unifié",
+        "status": "pending",
+        "priority": 2,
+        "dependencies": [],
+        "created": "2025-09-28T19:38:46.957Z",
+        "updated": "2025-09-28T19:38:46.957Z",
+        "isPareto80": true
+      },
+      "reason": "Sprint terminé - tâche non complétée",
+      "tags": [
+        "incomplete",
+        "deferred"
+      ],
+      "estimatedValue": "medium",
+      "revisitSuggestion": "Prochain sprint",
+      "archivedAt": "2025-10-31T23:03:04.550Z"
+    },
+    {
+      "id": "pv-1761951784550-11062470",
+      "originalProject": "proj-1759088227426-bacb1533",
+      "originalSprint": "sprint-1759088235435-f75dcbb7",
+      "task": {
+        "id": 9,
+        "title": "📈 Dashboard admin monitoring délivrabilité + métriques business",
+        "description": "BUSINESS INTELLIGENCE - Enhancement 80%\nContext: NS2PO a besoin visibilité performance système notifications pour optimisation business\nImpact: Décisions data-driven + détection proactive problèmes\nSolution: Dashboard temps réel + KPIs email/WhatsApp\n\nACTIONS TECHNIQUES:\n1. Page /admin/notifications-dashboard avec métriques temps réel\n2. KPIs: taux délivrabilité, temps traitement, volumes par canal\n3. Graphiques tendances + alertes visuelles\n4. Export rapports CSV pour analyse business\n5. Integration Railway monitoring + alertes Slack\n\nCONTEXT BUSINESS:\n- Shadcn-vue dashboard déjà en place admin\n- Métriques utiles: conversion email→action, pics horaires\n- Alertes business: baisse délivrabilité, queue saturée\n- ROI visibility pour investissement ESP\n\nVALIDATION: Dashboard fonctionnel + alertes business actives",
+        "status": "pending",
+        "priority": 2,
+        "dependencies": [],
+        "created": "2025-09-28T19:38:58.128Z",
+        "updated": "2025-09-28T19:38:58.128Z",
+        "isPareto80": true
+      },
+      "reason": "Sprint terminé - tâche non complétée",
+      "tags": [
+        "incomplete",
+        "deferred"
+      ],
+      "estimatedValue": "medium",
+      "revisitSuggestion": "Prochain sprint",
+      "archivedAt": "2025-10-31T23:03:04.550Z"
     }
   ],
-  "updated": "2025-09-23T03:58:25.855Z"
+  "updated": "2025-10-31T23:03:04.550Z"
 }

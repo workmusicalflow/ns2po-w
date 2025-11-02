@@ -1,7 +1,7 @@
 {
   "version": "3.0",
   "created": "2025-09-20T18:38:27.616Z",
-  "activeProject": "proj-1758599576196-9c4e56d4",
+  "activeProject": "proj-1762102136104-db0992a9",
   "projects": [
     {
       "id": "bundles-crud-enhancement",
@@ -46,7 +46,17 @@
       "id": "proj-1758599576196-9c4e56d4",
       "name": "Bundle Validation Architecture Fix",
       "path": "/Users/logansery/Documents/ns2po-w/.claude-task-master/projects/proj-1758599576196-9c4e56d4"
+    },
+    {
+      "id": "proj-1759088227426-bacb1533",
+      "name": "NS2PO Email System Optimization",
+      "path": "/Users/logansery/Documents/ns2po-w/.claude-task-master/projects/proj-1759088227426-bacb1533"
+    },
+    {
+      "id": "proj-1762102136104-db0992a9",
+      "name": "Migration TanStack Query Pure",
+      "path": "/Users/logansery/Documents/ns2po-w/.claude-task-master/projects/proj-1762102136104-db0992a9"
     }
   ],
-  "updated": "2025-09-23T03:52:56.200Z"
+  "updated": "2025-11-02T16:48:56.114Z"
 }

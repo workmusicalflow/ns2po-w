@@ -1,0 +1,80 @@
+{
+  "id": "sprint-1762102339464-e238a3d0",
+  "name": "Sprint 3 - Categories + Cleanup (Enhancement 80%)",
+  "startDate": "2025-11-09",
+  "endDate": "2025-11-11",
+  "goals": "Créer mutations categories. Simplifier Event Bus (retirer events products/bundles). Migrer pages publiques. Audit final zéro Pinia server state. Documentation architecture finale.",
+  "status": "closed",
+  "created": "2025-11-02T16:52:19.464Z",
+  "tasks": [
+    {
+      "id": 1,
+      "title": "Créer composables/useCategoryMutations.ts",
+      "description": "Créer mutations CRUD categories: useCreateCategoryMutation, useUpdateCategoryMutation, useDeleteCategoryMutation. Pattern identique à useProductMutations. Optimistic updates. ~150 lignes. Fichier: composables/useCategoryMutations.ts",
+      "status": "pending",
+      "priority": 3,
+      "dependencies": [],
+      "created": "2025-11-02T16:52:34.859Z",
+      "updated": "2025-11-02T16:52:34.859Z",
+      "isPareto80": true
+    },
+    {
+      "id": 2,
+      "title": "Simplifier stores/useGlobalEventBus.ts",
+      "description": "Retirer events products/bundles (products:updated, products:created, products:deleted, bundles:*). TanStack Query gère invalidation automatiquement. Garder seulement events UI si nécessaires. Réduire ~200 lignes. Potentiellement supprimer entièrement si inutile.",
+      "status": "pending",
+      "priority": 2,
+      "dependencies": [],
+      "created": "2025-11-02T16:52:47.465Z",
+      "updated": "2025-11-02T16:52:47.465Z",
+      "isPareto80": true
+    },
+    {
+      "id": 3,
+      "title": "Audit final zéro Pinia server state dans codebase",
+      "description": "Grep exhaustif pour vérifier ZÉRO usage Pinia server state restant: grep -r \"useProductsStore|useProductStore|useBundleStore\" apps/election-mvp/. Vérifier imports Pinia uniquement pour UI state. Documenter résultats dans MIGRATION_FINAL_AUDIT.md",
+      "status": "pending",
+      "priority": 3,
+      "dependencies": [
+        1,
+        2
+      ],
+      "created": "2025-11-02T16:53:02.199Z",
+      "updated": "2025-11-02T16:53:02.199Z",
+      "isPareto80": true
+    },
+    {
+      "id": 4,
+      "title": "Documentation architecture TanStack Query pure finale",
+      "description": "Créer docs/ARCHITECTURE_TANSTACK_QUERY.md: 1) Principes (server state = TanStack, UI state = composables) 2) Patterns queries/mutations 3) Query keys hiérarchiques 4) Optimistic updates 5) Invalidation sélective 6) Migration guide pour futures features. ~200 lignes.",
+      "status": "pending",
+      "priority": 2,
+      "dependencies": [
+        3
+      ],
+      "created": "2025-11-02T16:53:13.989Z",
+      "updated": "2025-11-02T16:53:13.989Z",
+      "isPareto80": true
+    },
+    {
+      "id": 5,
+      "title": "Validation finale Sprint 3 - Architecture TanStack Query pure",
+      "description": "Tests E2E complets (products + bundles + categories). Audit zéro Pinia server state validé. Métriques performance: bundle size réduit de ~100KB, Lighthouse >90. Déploiement Railway production. Documentation complète.",
+      "status": "pending",
+      "priority": 3,
+      "dependencies": [
+        4
+      ],
+      "created": "2025-11-02T16:53:26.572Z",
+      "updated": "2025-11-02T16:53:26.572Z",
+      "isPareto80": true
+    }
+  ],
+  "paretoDecisions": [],
+  "metrics": {
+    "tasksCompleted": 0,
+    "tasksMovedToVault": 0,
+    "velocityPoints": 0
+  },
+  "updated": "2025-11-02T17:01:19.435Z"
+}

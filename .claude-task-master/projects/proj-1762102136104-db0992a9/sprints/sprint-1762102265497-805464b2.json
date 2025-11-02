@@ -1,0 +1,82 @@
+{
+  "id": "sprint-1762102265497-805464b2",
+  "name": "Sprint 2 - Migration Bundles (Core 20%)",
+  "startDate": "2025-11-06",
+  "endDate": "2025-11-08",
+  "goals": "Migrer gestion Bundles de Pinia vers TanStack Query. Extraire UI state pur (selectedBundle) dans composable dédié. Supprimer server state de useBundleStore. Tests E2E admin bundles.",
+  "status": "closed",
+  "created": "2025-11-02T16:51:05.497Z",
+  "tasks": [
+    {
+      "id": 1,
+      "title": "Créer composable/useBundleUIState.ts pour UI state pur",
+      "description": "Extraire selectedBundle + selectedBundleProducts de useBundleStore vers nouveau composable useBundleUIState.ts. Pattern: const selectedBundle = ref(), const selectBundle = (bundle) => {}, const clearSelection = (). ~50 lignes. Ceci est UI state (sélection utilisateur), pas server state.",
+      "status": "pending",
+      "priority": 5,
+      "dependencies": [],
+      "created": "2025-11-02T16:51:17.227Z",
+      "updated": "2025-11-02T16:51:17.227Z",
+      "isPareto80": false
+    },
+    {
+      "id": 2,
+      "title": "Migrer pages/admin/bundles/[id].vue vers useBundlesQuery",
+      "description": "Remplacer useBundleStore par useBundlesQuery (déjà implémenté). Utiliser useBundleQuery + useUpdateBundleMutation + useAddProductToBundleMutation. Utiliser useBundleUIState pour selectedBundle. Pattern TanStack Query pur. Tests: modification bundle + sync cache.",
+      "status": "pending",
+      "priority": 5,
+      "dependencies": [
+        1
+      ],
+      "created": "2025-11-02T16:51:28.081Z",
+      "updated": "2025-11-02T16:51:28.081Z",
+      "isPareto80": false
+    },
+    {
+      "id": 3,
+      "title": "Supprimer server state de stores/useBundleStore.ts",
+      "description": "Supprimer toute logique server state: bundles list, searchCache, aggregateCache, calculationCache, fetchBundles, etc. Garder SEULEMENT si nécessaire pour compatibilité temporaire. Idéalement supprimer entièrement et utiliser useBundleUIState. ~260 lignes supprimées.",
+      "status": "pending",
+      "priority": 4,
+      "dependencies": [
+        2
+      ],
+      "created": "2025-11-02T16:51:38.805Z",
+      "updated": "2025-11-02T16:51:38.805Z",
+      "isPareto80": false
+    },
+    {
+      "id": 4,
+      "title": "Tests E2E admin bundles CRUD complet",
+      "description": "Tests E2E bundles similaires à products. Scénarios: 1) Liste bundles 2) Création bundle 3) Modification bundle 4) Ajout/retrait produits bundle 5) Suppression bundle. Vérifier cache sync TanStack Query. Fichier: tests/e2e/admin-bundles-crud.spec.ts",
+      "status": "pending",
+      "priority": 5,
+      "dependencies": [
+        2,
+        3
+      ],
+      "created": "2025-11-02T16:51:53.521Z",
+      "updated": "2025-11-02T16:51:53.521Z",
+      "isPareto80": false
+    },
+    {
+      "id": 5,
+      "title": "Validation finale Sprint 2 - Déploiement Railway",
+      "description": "Build + lint + type-check local. Tests E2E bundles passent. Déploiement Railway. Validation production: CRUD bundles OK, UI state selectedBundle fonctionne, cache sync TanStack Query, zéro erreur console.",
+      "status": "pending",
+      "priority": 5,
+      "dependencies": [
+        4
+      ],
+      "created": "2025-11-02T16:52:07.193Z",
+      "updated": "2025-11-02T16:52:07.193Z",
+      "isPareto80": false
+    }
+  ],
+  "paretoDecisions": [],
+  "metrics": {
+    "tasksCompleted": 0,
+    "tasksMovedToVault": 0,
+    "velocityPoints": 0
+  },
+  "updated": "2025-11-02T16:52:19.465Z"
+}
