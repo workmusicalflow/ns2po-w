@@ -547,7 +547,6 @@ import { useProductsQuery } from '../../../composables/useProductsQuery'
 import { useBundleCalculations } from '../../../composables/useBundleCalculations'
 import { useProductReferenceValidation, useBundleProductsValidation, useProductSelectorValidation } from '../../../composables/useProductReferenceValidation'
 import { globalNotifications } from '../../../composables/useNotifications'
-import { useBundleStore } from '../../../stores/useBundleStore'
 import { initializeGlobalEventBus, useGlobalEventBus } from '../../../stores/useGlobalEventBus'
 import { refDebounced } from '@vueuse/core'
 import type { Bundle, BundleProduct, BundleAggregate, BundleTargetAudience } from '../../../types/domain/Bundle'
@@ -714,9 +713,6 @@ const deleteBundleMutation = useDeleteBundleMutation({
     crudError?.deleted('bundle', error.message)
   }
 })
-
-// ===== PINIA STORE INTEGRATION =====
-const bundleStore = useBundleStore()
 
 // ===== COMPUTED PROPERTIES =====
 // Use centralized calculations from composable
@@ -1312,13 +1308,6 @@ watchEffect(() => {
 watch(() => bundleCalculations.estimatedTotal.value, (newTotal) => {
   // Always update form total, including when it's 0 (no products)
   form.estimatedTotal = newTotal
-})
-
-// Sync with Pinia stores for cross-component state sharing
-watchEffect(() => {
-  if (bundleData.value) {
-    bundleStore.setSelectedBundle(bundleData.value)
-  }
 })
 
 // Handle real-time updates from other interfaces

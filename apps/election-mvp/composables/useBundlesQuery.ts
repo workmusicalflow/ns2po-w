@@ -22,7 +22,7 @@ import type {
   PaginatedBundles
 } from '../types/domain/Bundle'
 import { bundleService } from '../services/BundleService'
-import { useBundleStore } from '../stores/useBundleStore'
+import { useBundleUIState } from './useBundleUIState'
 import { useEventEmitter } from '../stores/useGlobalEventBus'
 
 // Mutation Context Types
@@ -228,7 +228,7 @@ export function useCreateBundleMutation(
   options?: UseMutationOptions<Bundle, Error, Omit<Bundle, 'id' | 'createdAt' | 'updatedAt'>, CreateBundleMutationContext>
 ) {
   const queryClient = useQueryClient()
-  const bundleStore = useBundleStore()
+  const bundleUIState = useBundleUIState()
   const eventEmitter = useEventEmitter()
 
   return useMutation({
@@ -267,8 +267,8 @@ export function useCreateBundleMutation(
       // Update all relevant queries
       queryClient.invalidateQueries({ queryKey: bundleQueryKeys.all })
 
-      // Update Pinia store
-      bundleStore.setSelectedBundle(data)
+      // Update UI state
+      bundleUIState.selectBundle(data)
 
       // Emit global event
       eventEmitter.bundle.created(data)
@@ -291,7 +291,7 @@ export function useUpdateBundleMutation(
   options?: UseMutationOptions<Bundle, Error, { id: string; updates: Partial<Bundle> }, UpdateBundleMutationContext>
 ) {
   const queryClient = useQueryClient()
-  const bundleStore = useBundleStore()
+  const bundleUIState = useBundleUIState()
   const eventEmitter = useEventEmitter()
 
   return useMutation({
@@ -344,9 +344,9 @@ export function useUpdateBundleMutation(
       queryClient.invalidateQueries({ queryKey: bundleQueryKeys.lists() })
       queryClient.invalidateQueries({ queryKey: bundleQueryKeys.aggregate(data.id) })
 
-      // Update Pinia store
-      if (bundleStore.selectedBundle?.id === data.id) {
-        bundleStore.setSelectedBundle(data)
+      // Update UI state
+      if (bundleUIState.selectedBundle.value?.id === data.id) {
+        bundleUIState.selectBundle(data)
       }
 
       // Emit global event
@@ -361,7 +361,7 @@ export function useDeleteBundleMutation(
   options?: UseMutationOptions<boolean, Error, string, DeleteBundleMutationContext>
 ) {
   const queryClient = useQueryClient()
-  const bundleStore = useBundleStore()
+  const bundleUIState = useBundleUIState()
   const eventEmitter = useEventEmitter()
 
   return useMutation({
@@ -397,9 +397,9 @@ export function useDeleteBundleMutation(
         queryClient.removeQueries({ queryKey: bundleQueryKeys.products(id) })
         queryClient.invalidateQueries({ queryKey: bundleQueryKeys.lists() })
 
-        // Update Pinia store
-        if (bundleStore.selectedBundle?.id === id) {
-          bundleStore.setSelectedBundle(null)
+        // Update UI state
+        if (bundleUIState.selectedBundle.value?.id === id) {
+          bundleUIState.clearSelection()
         }
 
         // Emit global event
@@ -415,7 +415,6 @@ export function useAddProductToBundleMutation(
   options?: UseMutationOptions<BundleProduct, Error, { bundleId: string; productId: string; quantity: number }, AddProductMutationContext>
 ) {
   const queryClient = useQueryClient()
-  const bundleStore = useBundleStore()
   const eventEmitter = useEventEmitter()
 
   return useMutation({
@@ -458,7 +457,6 @@ export function useRemoveProductFromBundleMutation(
   options?: UseMutationOptions<boolean, Error, { bundleId: string; productId: string }>
 ) {
   const queryClient = useQueryClient()
-  const bundleStore = useBundleStore()
   const eventEmitter = useEventEmitter()
 
   return useMutation({
