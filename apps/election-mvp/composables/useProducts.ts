@@ -1,7 +1,9 @@
 import { useProductsStore } from '../stores/products'
+import { useQueryClient } from '@tanstack/vue-query'
 
 export const useProducts = () => {
   const store = useProductsStore()
+  const queryClient = useQueryClient()
 
   // Utilisation de storeToRefs pour la réactivité correcte
   const { products, loading, error, productsCount, hasProducts, isCacheValid, isInitialized } = storeToRefs(store)
@@ -58,6 +60,9 @@ export const useProducts = () => {
         const productsStore = useProductsStore()
         productsStore.updateProductInStore(response.data)
 
+        // FIX CACHE: Invalider Vue Query pour synchroniser liste
+        await queryClient.invalidateQueries({ queryKey: ['products'] })
+
         // Émettre l'événement pour synchronisation inter-pages
         const { adminEventBus } = await import('../utils/adminEventBus')
         adminEventBus.emit('products:updated', response.data)
@@ -84,6 +89,9 @@ export const useProducts = () => {
         const productsStore = useProductsStore()
         productsStore.addProductToStore(response.data)
 
+        // FIX CACHE: Invalider Vue Query pour synchroniser liste
+        await queryClient.invalidateQueries({ queryKey: ['products'] })
+
         // Émettre l'événement
         const { adminEventBus } = await import('../utils/adminEventBus')
         adminEventBus.emit('products:created', response.data)
@@ -108,6 +116,9 @@ export const useProducts = () => {
         // FIX: Utiliser directement store (pas storeToRefs)
         const productsStore = useProductsStore()
         productsStore.removeProductFromStore(id)
+
+        // FIX CACHE: Invalider Vue Query pour synchroniser liste
+        await queryClient.invalidateQueries({ queryKey: ['products'] })
 
         // Émettre l'événement
         const { adminEventBus } = await import('../utils/adminEventBus')
