@@ -99,7 +99,7 @@
     <AdminDataTable
       :data="filteredProducts"
       :columns="columns"
-      :loading="isLoading"
+      :loading="false"
       :error="error"
     >
       <!-- Custom slot for image -->
