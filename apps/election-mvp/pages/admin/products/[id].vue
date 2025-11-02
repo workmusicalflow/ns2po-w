@@ -554,8 +554,10 @@ definePageMeta({
   middleware: 'admin'
 })
 
-// Loading state pour UX améliorée
-const { isLoading, withLoading } = useLoadingState()
+// Loading state pour UX améliorée - garantir 3s minimum pour illusion parfaite
+const { isLoading, withLoading } = useLoadingState({
+  minDuration: 3000 // 3 secondes minimum d'affichage même si API répond en 200ms
+})
 
 // Route params
 const route = useRoute()
