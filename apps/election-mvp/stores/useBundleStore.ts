@@ -12,7 +12,9 @@ import type {
   BundleFilters,
   BundleSortOptions,
   PaginatedBundles,
-  BundleCalculation
+  BundleCalculation,
+  BundleTargetAudience,
+  BundleBudgetRange
 } from '../types/domain/Bundle'
 // Note: bundleService removed - Vue Query handles API calls
 // import { useProductStore } from './useProductStore' // Not used currently
@@ -106,11 +108,11 @@ export const useBundleStore = defineStore('bundles', {
       return state.bundles.filter(bundle => bundle.isFeatured && bundle.isActive)
     },
 
-    getBundlesByTargetAudience: (state) => (audience: string): Bundle[] => {
+    getBundlesByTargetAudience: (state) => (audience: BundleTargetAudience): Bundle[] => {
       return state.bundles.filter(bundle => bundle.targetAudience === audience)
     },
 
-    getBundlesByBudgetRange: (state) => (range: string): Bundle[] => {
+    getBundlesByBudgetRange: (state) => (range: BundleBudgetRange): Bundle[] => {
       return state.bundles.filter(bundle => bundle.budgetRange === range)
     },
 
@@ -272,13 +274,18 @@ export const useBundleStore = defineStore('bundles', {
 
     // Synchronization with Product Store
     handleProductUpdate(productId: string, updatedProduct: any): void {
-      // Update bundle products that reference this product
-      this.selectedBundleProducts.forEach(bundleProduct => {
+      // Update bundle products that reference this product (immutable update)
+      this.selectedBundleProducts = this.selectedBundleProducts.map(bundleProduct => {
         if (bundleProduct.productId === productId) {
-          bundleProduct.name = updatedProduct.name
-          bundleProduct.basePrice = updatedProduct.basePrice || updatedProduct.price
-          bundleProduct.subtotal = bundleProduct.quantity * bundleProduct.basePrice
+          const newBasePrice = updatedProduct.basePrice || updatedProduct.price
+          return {
+            ...bundleProduct,
+            name: updatedProduct.name,
+            basePrice: newBasePrice,
+            subtotal: bundleProduct.quantity * newBasePrice
+          }
         }
+        return bundleProduct
       })
 
       // Recalculate bundle totals for selected bundle
@@ -306,6 +313,30 @@ export const useBundleStore = defineStore('bundles', {
       // Clear caches
       this.calculationCache.clear()
       this.aggregateCache.clear()
+    },
+
+    // Recalculate bundle total from selectedBundleProducts
+    recalculateBundleTotal(bundleId: string): void {
+      if (!this.selectedBundle || this.selectedBundle.id !== bundleId) {
+        return
+      }
+
+      // Calculate new total from selected bundle products
+      const newTotal = this.selectedBundleProducts.reduce(
+        (sum, product) => sum + product.subtotal,
+        0
+      )
+
+      // Update selected bundle with new total (immutable)
+      this.selectedBundle = {
+        ...this.selectedBundle,
+        estimatedTotal: newTotal,
+        updatedAt: new Date().toISOString()
+      }
+
+      // Clear calculation cache for this bundle
+      this.calculationCache.delete(bundleId)
+      this.aggregateCache.delete(bundleId)
     }
   }
 })
