@@ -1,0 +1,23 @@
+# Railway ignore - Éviter snapshot trop gros
+# Recommandation GPT-5 pour monorepo Nuxt 3
+
+.git
+node_modules
+.nuxt
+.output
+.dist
+.cache
+.turbo
+coverage
+.pnpm-store
+.pnpm
+.npm
+.DS_Store
+.idea
+.vscode
+.env.local
+.env.*.local
+*.log
+.playwright-mcp
+test-migration
+backup-*.sql
