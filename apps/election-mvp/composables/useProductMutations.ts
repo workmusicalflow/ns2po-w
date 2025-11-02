@@ -65,8 +65,21 @@ export function useCreateProductMutation(
       }
     },
     onSuccess: (data, _variables, context) => {
-      // Update all relevant queries
-      queryClient.invalidateQueries({ queryKey: productQueryKeys.all })
+      // ⚡ Invalidation ciblée (évite sur-invalidation)
+      queryClient.invalidateQueries({
+        queryKey: productQueryKeys.lists(),
+        exact: false // Invalide toutes les listes (avec filtres)
+      })
+
+      // Invalidation recherche/catégories (si pertinent)
+      queryClient.invalidateQueries({
+        queryKey: productQueryKeys.all,
+        predicate: (query) =>
+          query.queryKey.includes('search') ||
+          query.queryKey.includes('category') ||
+          query.queryKey.includes('popular') ||
+          query.queryKey.includes('recent')
+      })
 
       // Pre-populate the detail cache for immediate access
       queryClient.setQueryData(productQueryKeys.detail(data.id), data)
@@ -145,10 +158,20 @@ export function useUpdateProductMutation(
       }
     },
     onSuccess: (data, _variables, context) => {
-      // Update all relevant queries
+      // Update detail cache directly
       queryClient.setQueryData(productQueryKeys.detail(data.id), data)
-      queryClient.invalidateQueries({ queryKey: productQueryKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: productQueryKeys.bundles(data.id) })
+
+      // ⚡ Invalidation ciblée listes seulement
+      queryClient.invalidateQueries({
+        queryKey: productQueryKeys.lists(),
+        exact: false // Invalide toutes variantes de listes
+      })
+
+      // Invalidation bundles du produit
+      queryClient.invalidateQueries({
+        queryKey: productQueryKeys.bundles(data.id),
+        exact: true // Exact match seulement
+      })
 
       // Update Pinia store
       productStore.replaceProduct(data.id, data)
@@ -203,10 +226,15 @@ export function useDeleteProductMutation(
     },
     onSuccess: (success, id, context) => {
       if (success) {
-        // Remove from all queries
-        queryClient.removeQueries({ queryKey: productQueryKeys.detail(id) })
-        queryClient.removeQueries({ queryKey: productQueryKeys.bundles(id) })
-        queryClient.invalidateQueries({ queryKey: productQueryKeys.lists() })
+        // Remove detail et bundles cache (exact match)
+        queryClient.removeQueries({ queryKey: productQueryKeys.detail(id), exact: true })
+        queryClient.removeQueries({ queryKey: productQueryKeys.bundles(id), exact: true })
+
+        // ⚡ Invalidation ciblée listes uniquement
+        queryClient.invalidateQueries({
+          queryKey: productQueryKeys.lists(),
+          exact: false
+        })
 
         // Update Pinia store
         productStore.removeProduct(id)
@@ -263,19 +291,26 @@ export function useBulkUpdateProductsMutation(
       }
     },
     onSuccess: (data, { ids }) => {
-      // Update all relevant queries
-      queryClient.invalidateQueries({ queryKey: productQueryKeys.lists() })
+      // ⚡ Invalidation ciblée listes
+      queryClient.invalidateQueries({
+        queryKey: productQueryKeys.lists(),
+        exact: false
+      })
+
+      // Invalidation details individuels (exact match)
       ids.forEach(id => {
-        queryClient.invalidateQueries({ queryKey: productQueryKeys.detail(id) })
+        queryClient.invalidateQueries({
+          queryKey: productQueryKeys.detail(id),
+          exact: true
+        })
       })
 
       // Update Pinia store
       data.forEach(product => {
         productStore.replaceProduct(product.id, product)
+        // Emit individual update events (no bulkUpdated event exists)
+        eventEmitter.product?.updated?.(product.id, product, {})
       })
-
-      // Emit global event for bulk update
-      eventEmitter.product.bulkUpdated(data)
     },
     ...options
   })

@@ -88,7 +88,10 @@ export function useProductQuery(
       return response.data
     },
     enabled: computed(() => !!idRef.value),
-    staleTime: 5 * 60 * 1000,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 10 * 60 * 1000, // 10 minutes (garde en cache même si non utilisé)
+    refetchOnWindowFocus: false, // Pas de refetch automatique au focus (SSE gère temps réel)
+    retry: 2, // Limite retries (performance réseau 3G)
     ...options
   })
 }
@@ -123,7 +126,10 @@ export function useProductSearchQuery(
       return response.data || []
     },
     enabled: computed(() => queryRef.value.trim().length >= 2),
-    staleTime: 2 * 60 * 1000, // 2 minutes for search results
+    staleTime: 2 * 60 * 1000, // 2 minutes (résultats recherche éphémères)
+    gcTime: 5 * 60 * 1000, // 5 minutes (nettoyage rapide recherches anciennes)
+    refetchOnWindowFocus: false, // Pas de refetch recherche au focus
+    retry: 1, // 1 seul retry pour recherche (performance 3G)
     ...options
   })
 }
@@ -153,7 +159,10 @@ export function useProductsByCategoryQuery(
       return response.data || []
     },
     enabled: computed(() => !!categoryIdRef.value),
-    staleTime: 5 * 60 * 1000,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 10 * 60 * 1000, // 10 minutes
+    refetchOnWindowFocus: false, // SSE gère synchronisation
+    retry: 2,
     ...options
   })
 }
@@ -181,7 +190,11 @@ export function usePopularProductsQuery(
 
       return response.data || []
     },
-    staleTime: 10 * 60 * 1000, // 10 minutes for popular products
+    staleTime: 10 * 60 * 1000, // 10 minutes (données stables)
+    gcTime: 30 * 60 * 1000, // 30 minutes (garde longtemps en cache)
+    refetchOnMount: false, // Pas de refetch au mount (données stables)
+    refetchOnWindowFocus: false, // Pas de refetch au focus
+    retry: 2,
     ...options
   })
 }
@@ -209,7 +222,10 @@ export function useRecentProductsQuery(
 
       return response.data || []
     },
-    staleTime: 5 * 60 * 1000,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 15 * 60 * 1000, // 15 minutes
+    refetchOnWindowFocus: false, // SSE gère nouveaux produits
+    retry: 2,
     ...options
   })
 }
@@ -229,6 +245,9 @@ export function useProductBundlesQuery(
     },
     enabled: computed(() => !!id.value),
     staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 10 * 60 * 1000, // 10 minutes
+    refetchOnWindowFocus: false, // Pas de refetch bundles au focus
+    retry: 2,
     ...options
   })
 }
