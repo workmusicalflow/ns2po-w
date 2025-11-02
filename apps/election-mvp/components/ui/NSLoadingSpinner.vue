@@ -71,7 +71,7 @@ const containerClasses = computed(() => [
 ])
 
 const overlayClasses = computed(() => [
-  props.overlay ? 'bg-white/80 backdrop-blur-sm' : '',
+  props.overlay ? 'bg-black/60 backdrop-blur-md' : '',
   'rounded-lg p-8',
   'flex items-center justify-center'
 ])
@@ -84,9 +84,9 @@ const spinnerClasses = computed(() => {
   }
 
   const variantClasses = {
-    primary: 'text-[#C99A3B]', // Ocre NS2PO
-    accent: 'text-[#6A2B3A]',  // Bourgogne NS2PO
-    neutral: 'text-gray-600'
+    primary: 'text-white', // BLANC pour visibilité maximale sur fond noir
+    accent: 'text-white',
+    neutral: 'text-white'
   }
 
   return [
@@ -104,7 +104,7 @@ const messageClasses = computed(() => {
 
   return [
     sizeClasses[props.size],
-    'text-gray-700 font-medium text-center'
+    'text-white font-medium text-center'
   ]
 })
 </script>
