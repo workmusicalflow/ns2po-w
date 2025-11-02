@@ -1,9 +1,9 @@
 <template>
   <div>
-    <!-- Global Loading Spinner - Niveau RACINE pour visibilité garantie pendant navigation -->
+    <!-- Global Loading Spinner - SANS readonly() pour réactivité -->
     <NSLoadingSpinner
-      :show="globalLoading.isLoading.value"
-      :message="globalLoading.loadingMessage.value || 'Chargement des données...'"
+      :show="isLoading"
+      :message="loadingMessage"
       full-screen
       size="lg"
       variant="primary"
@@ -19,11 +19,17 @@
 </template>
 
 <script setup lang="ts">
-// Import explicite du composable useGlobalLoading
 import { useGlobalLoading } from '~/composables/useGlobalLoading'
 
-// État global du spinner (SSR-safe avec useState)
+// 🎯 TEST: Accès DIRECT aux refs sans readonly()
 const globalLoading = useGlobalLoading()
+const isLoading = globalLoading.isLoading
+const loadingMessage = globalLoading.loadingMessage
+
+console.log('[APP.VUE] globalLoading initialisé:', {
+  isLoading: isLoading.value,
+  loadingMessage: loadingMessage.value
+})
 
 // Global app configuration
 useHead({
