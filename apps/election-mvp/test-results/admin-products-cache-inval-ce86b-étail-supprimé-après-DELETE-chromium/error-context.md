@@ -1,0 +1,132 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e1]:
+  - generic [ref=e4]:
+    - banner [ref=e5]:
+      - generic [ref=e7]:
+        - link "NS NS2PO Admin CMS d'administration" [ref=e9] [cursor=pointer]:
+          - /url: /admin
+          - generic [ref=e11]: NS
+          - generic [ref=e12]:
+            - heading "NS2PO Admin" [level=1] [ref=e13]
+            - paragraph [ref=e14]: CMS d'administration
+        - generic [ref=e15]:
+          - generic [ref=e18]: Sync actif
+          - button "A Admin" [ref=e20] [cursor=pointer]:
+            - generic [ref=e22]: A
+            - generic [ref=e23]: Admin
+    - generic [ref=e24]:
+      - navigation [ref=e25]:
+        - generic [ref=e27]:
+          - link "Dashboard" [ref=e28] [cursor=pointer]:
+            - /url: /admin
+            - generic [ref=e30]: Dashboard
+          - link "Produits" [ref=e31] [cursor=pointer]:
+            - /url: /admin/products
+            - generic [ref=e33]: Produits
+          - link "Packs Campagne" [ref=e34] [cursor=pointer]:
+            - /url: /admin/bundles
+            - generic [ref=e36]: Packs Campagne
+          - link "Catégories" [ref=e37] [cursor=pointer]:
+            - /url: /admin/categories
+            - generic [ref=e39]: Catégories
+          - link "Réalisations" [ref=e40] [cursor=pointer]:
+            - /url: /admin/realisations
+            - generic [ref=e42]: Réalisations
+          - link "Assets Cloudinary" [ref=e43] [cursor=pointer]:
+            - /url: /admin/assets
+            - generic [ref=e45]: Assets Cloudinary
+          - link "Synchronisation" [ref=e46] [cursor=pointer]:
+            - /url: /admin/sync
+            - generic [ref=e48]: Synchronisation
+          - link "Blacklist" [ref=e49] [cursor=pointer]:
+            - /url: /admin/blacklist
+            - generic [ref=e51]: Blacklist
+          - separator [ref=e52]
+          - link "Paramètres" [ref=e53] [cursor=pointer]:
+            - /url: /admin/settings
+            - generic [ref=e55]: Paramètres
+          - link "Retour au site" [ref=e56] [cursor=pointer]:
+            - /url: /
+            - generic [ref=e58]: Retour au site
+      - main [ref=e59]:
+        - generic [ref=e62]:
+          - generic [ref=e64]:
+            - generic [ref=e65]:
+              - heading "Nouveau Produit" [level=1] [ref=e66]
+              - paragraph [ref=e67]: Ajouter un nouveau produit au catalogue
+            - link "Retour" [ref=e69] [cursor=pointer]:
+              - /url: /admin/products
+              - text: Retour
+          - generic [ref=e71]:
+            - generic [ref=e72]:
+              - heading "Informations de base" [level=3] [ref=e73]
+              - generic [ref=e74]:
+                - generic [ref=e75]:
+                  - generic [ref=e76]: Nom du produit *
+                  - textbox "Nom du produit *" [ref=e77]:
+                    - /placeholder: "Ex: T-shirt personnalisé"
+                - generic [ref=e78]:
+                  - generic [ref=e79]: Référence *
+                  - textbox "Référence *" [ref=e80]:
+                    - /placeholder: "Ex: TSHIRT-001"
+                  - paragraph [ref=e81]: Lettres majuscules, chiffres, tirets et underscores uniquement
+              - generic [ref=e82]:
+                - generic [ref=e83]: Description
+                - textbox "Description" [ref=e84]:
+                  - /placeholder: Description détaillée du produit...
+            - generic [ref=e85]:
+              - heading "Catégorie et statut" [level=3] [ref=e86]
+              - generic [ref=e87]:
+                - generic [ref=e88]:
+                  - generic [ref=e89]: Catégorie *
+                  - combobox "Catégorie *" [ref=e90]:
+                    - option "Sélectionner une catégorie" [selected]
+                    - option "TEXTILE"
+                    - option "ACCESSOIRE"
+                    - option "BUREAU"
+                    - option "ÉVÉNEMENTIEL"
+                - generic [ref=e91]:
+                  - generic [ref=e92]: Statut *
+                  - combobox "Statut *" [ref=e93]:
+                    - option "Actif" [selected]
+                    - option "Inactif"
+                    - option "Brouillon"
+            - generic [ref=e94]:
+              - heading "Tarification et quantités" [level=3] [ref=e95]
+              - generic [ref=e96]:
+                - generic [ref=e97]:
+                  - generic [ref=e98]: Prix (XOF) *
+                  - spinbutton "Prix (XOF) *" [ref=e99]: "0"
+                - generic [ref=e100]:
+                  - generic [ref=e101]: Quantité minimum *
+                  - spinbutton "Quantité minimum *" [active] [ref=e102]: "1"
+                - generic [ref=e103]:
+                  - generic [ref=e104]: Quantité maximum
+                  - spinbutton "Quantité maximum" [ref=e105]
+            - generic [ref=e106]:
+              - heading "Images du produit" [level=3] [ref=e107]
+              - generic [ref=e109]:
+                - button "Ajouter des images" [ref=e112] [cursor=pointer]: Ajouter des images
+                - paragraph [ref=e114]: Uploadez de nouvelles images ou sélectionnez depuis les assets existants
+            - generic [ref=e115]:
+              - button "Annuler" [ref=e116] [cursor=pointer]
+              - button "Créer" [disabled] [ref=e117]
+  - generic:
+    - img
+  - generic:
+    - generic:
+      - generic:
+        - button "Go to parent" [disabled]
+        - button "Open in editor"
+        - button "Close"
+  - generic [ref=e118]:
+    - button "Toggle Nuxt DevTools" [ref=e119] [cursor=pointer]:
+      - img [ref=e120]
+    - generic "Page load time" [ref=e123]:
+      - generic [ref=e124]: "871"
+      - generic [ref=e125]: ms
+    - button "Toggle Component Inspector" [ref=e127] [cursor=pointer]:
+      - img [ref=e128]
+```

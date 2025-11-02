@@ -783,7 +783,55 @@
       "estimatedValue": "medium",
       "revisitSuggestion": "Prochain sprint",
       "archivedAt": "2025-10-31T23:03:04.550Z"
+    },
+    {
+      "id": "pv-1762114590973-57956794",
+      "originalProject": "proj-1762102136104-db0992a9",
+      "originalSprint": "sprint-1762102879435-9e67f5de",
+      "task": {
+        "id": 3,
+        "title": "Préparer rollback strategy + branche Git dédiée (Recommandation Gemini)",
+        "description": "Gemini: \"Rollback strategy CRITIQUE pour Sprint 1\". Créer branche feat/migration-tanstack-query-sprint-1. Documenter procédure rollback: git revert, Railway redeploy version stable. Sauvegarder DB Turso avant migration. Environnement staging obligatoire. Doc: ROLLBACK_STRATEGY.md",
+        "status": "pending",
+        "priority": 5,
+        "dependencies": [],
+        "created": "2025-11-02T17:01:49.360Z",
+        "updated": "2025-11-02T17:01:49.360Z",
+        "isPareto80": false
+      },
+      "reason": "Sprint terminé - tâche non complétée",
+      "tags": [
+        "incomplete",
+        "deferred"
+      ],
+      "estimatedValue": "medium",
+      "revisitSuggestion": "Prochain sprint",
+      "archivedAt": "2025-11-02T20:16:30.981Z"
+    },
+    {
+      "id": "pv-1762114590981-35d2aace",
+      "originalProject": "proj-1762102136104-db0992a9",
+      "originalSprint": "sprint-1762102879435-9e67f5de",
+      "task": {
+        "id": 4,
+        "title": "Setup métriques performance baseline (Recommandation Gemini)",
+        "description": "Gemini: \"Métriques performance INDISPENSABLE\". Exécuter Lighthouse mobile 3G sur pages admin products (index + [id]). Mesurer Core Web Vitals baseline: LCP, FID/INP, CLS, TTFB, TBT. Bundle analyzer avant migration. Documenter dans PERFORMANCE_BASELINE.md. Target: >90 Lighthouse, <500ms API.",
+        "status": "pending",
+        "priority": 4,
+        "dependencies": [],
+        "created": "2025-11-02T17:01:59.621Z",
+        "updated": "2025-11-02T17:01:59.621Z",
+        "isPareto80": false
+      },
+      "reason": "Sprint terminé - tâche non complétée",
+      "tags": [
+        "incomplete",
+        "deferred"
+      ],
+      "estimatedValue": "medium",
+      "revisitSuggestion": "Prochain sprint",
+      "archivedAt": "2025-11-02T20:16:30.981Z"
     }
   ],
-  "updated": "2025-10-31T23:03:04.550Z"
+  "updated": "2025-11-02T20:16:30.981Z"
 }
