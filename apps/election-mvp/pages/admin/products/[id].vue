@@ -1,16 +1,5 @@
 <template>
   <div>
-    <!-- Loading Overlay Full Screen - ClientOnly pour éviter mismatch SSR -->
-    <ClientOnly>
-      <NSLoadingSpinner
-        :show="isLoading"
-        message="Chargement des données produit..."
-        size="lg"
-        variant="primary"
-        full-screen
-      />
-    </ClientOnly>
-
     <!-- Page Header -->
     <div class="mb-8">
       <div class="flex items-center justify-between">
@@ -556,12 +545,10 @@ definePageMeta({
   middleware: 'admin'
 })
 
-// Loading state pour UX améliorée - Solution SSR-safe recommandée par Perplexity
-// initial: true garantit affichage au montage client malgré hydratation SSR
-const { isLoading, withLoading } = useLoadingState({
-  minDuration: 3000, // 3 secondes minimum d'affichage même si API répond en 200ms
-  initial: true       // État initial à true pour contourner limitation SSR
-})
+// Loading state GLOBAL - Solution ROOT CAUSE identifiée par Perplexity
+// Utilise l'état global + plugin navigation pour éviter race condition SSR
+// Plus de ClientOnly, plus de problème d'hydratation
+const { withMinDuration } = useGlobalLoading()
 
 // Route params
 const route = useRoute()
@@ -648,7 +635,8 @@ async function fetchProduct() {
   const id = productId.value
   if (!id || id === 'new') return
 
-  await withLoading(async () => {
+  // Utilise withMinDuration() global pour garantir 3s de visibilité spinner
+  await withMinDuration(async () => {
     try {
       // ✅ FIX CRITIQUE: Utiliser l'endpoint ADMIN au lieu de l'endpoint public
       // L'endpoint public /api/products peut avoir des données cached/stale
@@ -663,7 +651,7 @@ async function fetchProduct() {
       crudError.read('product', `Erreur lors du chargement du produit "${id}"`)
       await router.push('/admin/products')
     }
-  })
+  }, 3000) // 3 secondes minimum de visibilité (solution Perplexity)
 }
 
 function mapProductToForm(data: any) {
