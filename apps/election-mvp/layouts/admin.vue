@@ -1,14 +1,5 @@
 <template>
   <div class="min-h-screen bg-gray-50">
-    <!-- Global Loading Spinner (SANS ClientOnly pour éviter race condition SSR) -->
-    <NSLoadingSpinner
-      :show="globalLoading.isLoading.value"
-      :message="globalLoading.loadingMessage.value || 'Chargement des données...'"
-      full-screen
-      size="lg"
-      variant="primary"
-    />
-
     <!-- Mobile Navigation Overlay -->
     <div
       v-if="isMobileMenuOpen"
@@ -147,9 +138,6 @@ import { ref, watch, onUnmounted } from 'vue'
 
 // Import du composant NSNotificationContainer
 import NSNotificationContainer from '../components/ui/NSNotificationContainer.vue'
-
-// Global Loading State (Solution Perplexity - évite race condition SSR)
-const globalLoading = useGlobalLoading()
 
 // État réactif pour la navigation mobile
 const isMobileMenuOpen = ref(false)
