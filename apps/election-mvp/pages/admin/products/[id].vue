@@ -545,12 +545,7 @@ definePageMeta({
   middleware: 'admin'
 })
 
-// Loading state GLOBAL - Solution ROOT CAUSE identifiée par Perplexity
-// Utilise l'état global + plugin navigation pour éviter race condition SSR
-// Plus de ClientOnly, plus de problème d'hydratation
-const { withMinDuration } = useGlobalLoading()
-
-// Route params
+// Route params - DOIT être défini AVANT useAsyncData
 const route = useRoute()
 const router = useRouter()
 const productId = computed(() => (route.params.id as string) || 'new')
@@ -559,10 +554,78 @@ const isNew = computed(() => {
   return !id || id === 'new'
 })
 
+// Loading state GLOBAL - Solution ROOT CAUSE FINALE identifiée par Gemini
+// useAsyncData bloque le rendu AVANT que la page ne s'affiche avec données vides
+// Résout le problème : onMounted() permet rendu PUIS fetch → spinner invisible
+const { startLoading, stopLoading } = useGlobalLoading()
+
 // Head
 useHead({
   title: computed(() => isNew.value ? 'Nouveau Produit | Admin' : 'Modifier Produit | Admin')
 })
+
+// ========================================================================
+// SOLUTION GEMINI ROOT CAUSE: useAsyncData au lieu de onMounted()
+// ========================================================================
+// useAsyncData s'exécute AVANT le rendu de la page (bloque le rendu)
+// Résout le problème: onMounted s'exécute APRÈS le rendu avec données vides
+// Spinner est visible car la page attend les données avant de s'afficher
+// ========================================================================
+
+const { data: productData, pending, error: fetchError } = await useAsyncData(
+  `product-${productId.value}`,
+  async () => {
+    // Ne charger que si ce n'est pas un nouveau produit
+    if (isNew.value) return null
+
+    const startTime = Date.now()
+    console.log(`🔄 [useAsyncData] Fetching product ${productId.value} from ADMIN API`)
+
+    try {
+      const response = await $fetch(`/api/admin/products/${productId.value}`)
+
+      // Garantir 3 secondes minimum de spinner (même si Railway cache < 100ms)
+      const elapsed = Date.now() - startTime
+      const remaining = 3000 - elapsed
+
+      if (remaining > 0) {
+        console.log(`⏱️ [useAsyncData] Délai artificiel: ${remaining}ms pour atteindre 3s minimum`)
+        await new Promise(resolve => setTimeout(resolve, remaining))
+      }
+
+      console.log(`✅ [useAsyncData] Produit chargé en ${Date.now() - startTime}ms`)
+      return response.data
+    } catch (e) {
+      console.error('❌ [useAsyncData] Error fetching product:', e)
+      throw e // Propage l'erreur pour que error.value soit défini
+    }
+  },
+  {
+    // Options useAsyncData
+    server: true, // SSR enabled (défaut)
+    lazy: false,  // Bloque le rendu jusqu'à ce que les données arrivent
+    immediate: true // Exécute immédiatement
+  }
+)
+
+// Gérer le spinner global basé sur l'état `pending` de useAsyncData
+watch(pending, (isPending) => {
+  if (isPending) {
+    console.log('🔄 [watch(pending)] Spinner activé - Chargement en cours...')
+    startLoading(`Chargement du produit ${productId.value}...`)
+  } else {
+    console.log('✅ [watch(pending)] Spinner désactivé - Chargement terminé')
+    // Petit délai pour fluidité visuelle (comme dans plugin navigation)
+    setTimeout(() => stopLoading(), 300)
+  }
+}, { immediate: true })
+
+// Gérer les erreurs de chargement
+if (fetchError.value) {
+  console.error('❌ [useAsyncData] Failed to load product:', fetchError.value)
+  crudError.read('product', `Erreur lors du chargement du produit "${productId.value}"`)
+  await router.push('/admin/products')
+}
 
 // Nouvelle solution Pinia + Event Bus
 const {
@@ -606,6 +669,14 @@ const form = reactive({
   is_active: true
 })
 
+// Mapper les données productData vers le formulaire quand elles changent
+watch(productData, (newData) => {
+  if (newData) {
+    console.log('📝 [watch(productData)] Mapping données vers formulaire')
+    mapProductToForm(newData)
+  }
+}, { immediate: true }) // immediate pour initialiser dès que les données arrivent
+
 // Form errors
 const errors = reactive({
   name: '',
@@ -631,28 +702,10 @@ const isFormValid = computed(() => {
 })
 
 // Methods
-async function fetchProduct() {
-  const id = productId.value
-  if (!id || id === 'new') return
-
-  // Utilise withMinDuration() global pour garantir 3s de visibilité spinner
-  await withMinDuration(async () => {
-    try {
-      // ✅ FIX CRITIQUE: Utiliser l'endpoint ADMIN au lieu de l'endpoint public
-      // L'endpoint public /api/products peut avoir des données cached/stale
-      console.log(`🔄 Fetching product ${id} from ADMIN API`)
-
-      const response = await $fetch(`/api/admin/products/${id}`)
-      const data = response.data
-      mapProductToForm(data)
-
-    } catch (error) {
-      console.error('Error fetching product:', error)
-      crudError.read('product', `Erreur lors du chargement du produit "${id}"`)
-      await router.push('/admin/products')
-    }
-  }, 3000) // 3 secondes minimum de visibilité (solution Perplexity)
-}
+// ❌ SUPPRIMÉ: fetchProduct() - Remplacé par useAsyncData (Solution Gemini)
+// L'ancienne approche onMounted() + fetchProduct() permettait au rendu de se faire avec données vides
+// AVANT que les données n'arrivent, rendant le spinner invisible
+// useAsyncData bloque le rendu jusqu'à ce que les données soient chargées
 
 function mapProductToForm(data: any) {
   // Map response to form - corriger le mapping des champs API vers form
@@ -867,10 +920,11 @@ function formatPrice(price: number | undefined | null): string {
 }
 
 // Lifecycle
+// ℹ️ onMounted() simplifié: fetchProduct() remplacé par useAsyncData (Solution Gemini)
+// useAsyncData charge les données AVANT le rendu, plus besoin de onMounted()
 onMounted(async () => {
-  await Promise.all([
-    fetchCategories(),
-    fetchProduct()
-  ])
+  // Charge seulement les catégories (non critique pour le spinner)
+  await fetchCategories()
+  console.log('✅ [onMounted] Catégories chargées')
 })
 </script>
