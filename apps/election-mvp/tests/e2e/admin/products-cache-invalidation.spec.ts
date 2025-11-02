@@ -63,12 +63,12 @@ test.describe('Cache Invalidation - CREATE Operations', () => {
     await page.goto(`${ADMIN_URL}/new`)
     const testProductName = `Test Cache CREATE ${Date.now()}`
 
-    await page.fill('input[name="name"]', testProductName)
-    await page.fill('input[name="reference"]', `REF-CACHE-${Date.now()}`)
-    await page.fill('textarea[name="description"]', 'Test invalidation cache CREATE')
-    await page.fill('input[name="price"]', '12000')
-    await page.fill('input[name="minQuantity"]', '50')
-    await page.selectOption('select[name="category"]', 'textiles')
+    await page.fill('#name', testProductName)
+    await page.fill('#reference', `REF-CACHE-${Date.now()}`)
+    await page.fill('#description', 'Test invalidation cache CREATE')
+    await page.fill('#price', '12000')
+    await page.fill('#min_quantity', '50')
+    await page.selectOption('#category_id', 'textiles')
 
     // 3. Soumettre + attendre toast success
     await page.click('button[type="submit"]')
@@ -95,12 +95,12 @@ test.describe('Cache Invalidation - CREATE Operations', () => {
     const testProductName = `Test Cache Prepopulate ${Date.now()}`
     const testReference = `REF-PREPOP-${Date.now()}`
 
-    await page.fill('input[name="name"]', testProductName)
-    await page.fill('input[name="reference"]', testReference)
-    await page.fill('textarea[name="description"]', 'Test pré-population cache')
-    await page.fill('input[name="price"]', '15000')
-    await page.fill('input[name="minQuantity"]', '100')
-    await page.selectOption('select[name="category"]', 'accessoires')
+    await page.fill('#name', testProductName)
+    await page.fill('#reference', testReference)
+    await page.fill('#description', 'Test pré-population cache')
+    await page.fill('#price', '15000')
+    await page.fill('#min_quantity', '100')
+    await page.selectOption('#category_id', 'accessoires')
 
     // Soumettre (redirection auto vers détail)
     await page.click('button[type="submit"]')
@@ -128,12 +128,12 @@ test.describe('Cache Invalidation - UPDATE Operations', () => {
 
     testProductName = `Test Cache UPDATE ${Date.now()}`
 
-    await page.fill('input[name="name"]', testProductName)
-    await page.fill('input[name="reference"]', `REF-UPDATE-${Date.now()}`)
-    await page.fill('textarea[name="description"]', 'Test invalidation cache UPDATE')
-    await page.fill('input[name="price"]', '10000')
-    await page.fill('input[name="minQuantity"]', '50')
-    await page.selectOption('select[name="category"]', 'textiles')
+    await page.fill('#name', testProductName)
+    await page.fill('#reference', `REF-UPDATE-${Date.now()}`)
+    await page.fill('#description', 'Test invalidation cache UPDATE')
+    await page.fill('#price', '10000')
+    await page.fill('#min_quantity', '50')
+    await page.selectOption('#category_id', 'textiles')
 
     await page.click('button[type="submit"]')
     await expect(page.locator('text=/créé avec succès/i')).toBeVisible({ timeout: 5000 })
@@ -151,16 +151,16 @@ test.describe('Cache Invalidation - UPDATE Operations', () => {
     const updatedName = `${testProductName} - UPDATED`
     const updatedPrice = '18000'
 
-    await page.fill('input[name="name"]', updatedName)
-    await page.fill('input[name="price"]', updatedPrice)
+    await page.fill('#name', updatedName)
+    await page.fill('#price', updatedPrice)
 
     // Soumettre update
     await page.click('button[type="submit"]:has-text("Enregistrer")')
     await expect(page.locator('text=/mis à jour avec succès/i')).toBeVisible({ timeout: 5000 })
 
     // 2. ✅ Vérifier cache détail mis à jour (pas de reload)
-    await expect(page.locator(`input[name="name"][value="${updatedName}"]`)).toBeVisible()
-    await expect(page.locator(`input[name="price"][value="${updatedPrice}"]`)).toBeVisible()
+    await expect(page.locator(`#name[value="${updatedName}"]`)).toBeVisible()
+    await expect(page.locator(`#price[value="${updatedPrice}"]`)).toBeVisible()
 
     // 3. ✅ Vérifier cache liste invalidé
     await page.goto(ADMIN_URL)
@@ -176,7 +176,7 @@ test.describe('Cache Invalidation - UPDATE Operations', () => {
     const updatedDescription = `Description optimiste ${Date.now()}`
 
     // Modifier description (optimistic update)
-    await page.fill('textarea[name="description"]', updatedDescription)
+    await page.fill('#description', updatedDescription)
 
     // ✅ Soumettre et vérifier update immédiat (optimistic)
     const submitPromise = page.click('button[type="submit"]:has-text("Enregistrer")')
@@ -185,7 +185,7 @@ test.describe('Cache Invalidation - UPDATE Operations', () => {
     await page.waitForTimeout(100)
 
     // Vérifier que la valeur est toujours présente (optimistic update)
-    await expect(page.locator(`textarea[name="description"]`)).toHaveValue(updatedDescription)
+    await expect(page.locator(`#description`)).toHaveValue(updatedDescription)
 
     await submitPromise
     await expect(page.locator('text=/mis à jour avec succès/i')).toBeVisible({ timeout: 5000 })
@@ -205,12 +205,12 @@ test.describe('Cache Invalidation - DELETE Operations', () => {
 
     testProductName = `Test Cache DELETE ${Date.now()}`
 
-    await page.fill('input[name="name"]', testProductName)
-    await page.fill('input[name="reference"]', `REF-DELETE-${Date.now()}`)
-    await page.fill('textarea[name="description"]', 'Test invalidation cache DELETE')
-    await page.fill('input[name="price"]', '8000')
-    await page.fill('input[name="minQuantity"]', '25')
-    await page.selectOption('select[name="category"]', 'gadgets')
+    await page.fill('#name', testProductName)
+    await page.fill('#reference', `REF-DELETE-${Date.now()}`)
+    await page.fill('#description', 'Test invalidation cache DELETE')
+    await page.fill('#price', '8000')
+    await page.fill('#min_quantity', '25')
+    await page.selectOption('#category_id', 'gadgets')
 
     await page.click('button[type="submit"]')
     await expect(page.locator('text=/créé avec succès/i')).toBeVisible({ timeout: 5000 })
@@ -290,12 +290,12 @@ test.describe('Cache Synchronisation - Multi-Pages', () => {
       await page1.goto(`${ADMIN_URL}/new`)
       const testProductName = `Test Multi-Tab ${Date.now()}`
 
-      await page1.fill('input[name="name"]', testProductName)
-      await page1.fill('input[name="reference"]', `REF-MULTITAB-${Date.now()}`)
-      await page1.fill('textarea[name="description"]', 'Test sync multi-tabs')
-      await page1.fill('input[name="price"]', '20000')
-      await page1.fill('input[name="minQuantity"]', '100')
-      await page1.selectOption('select[name="category"]', 'textiles')
+      await page1.fill('#name', testProductName)
+      await page1.fill('#reference', `REF-MULTITAB-${Date.now()}`)
+      await page1.fill('#description', 'Test sync multi-tabs')
+      await page1.fill('#price', '20000')
+      await page1.fill('#min_quantity', '100')
+      await page1.selectOption('#category_id', 'textiles')
 
       await page1.click('button[type="submit"]')
       await expect(page1.locator('text=/créé avec succès/i')).toBeVisible({ timeout: 5000 })
@@ -314,7 +314,7 @@ test.describe('Cache Synchronisation - Multi-Pages', () => {
 
       // Page 1: Modifier le produit
       const updatedName = `${testProductName} - SYNCED`
-      await page1.fill('input[name="name"]', updatedName)
+      await page1.fill('#name', updatedName)
       await page1.click('button[type="submit"]:has-text("Enregistrer")')
       await expect(page1.locator('text=/mis à jour avec succès/i')).toBeVisible({ timeout: 5000 })
 
@@ -347,12 +347,12 @@ test.describe('Stale Data Detection', () => {
     const testProductName = `Test Stale Data ${Date.now()}`
 
     await page.goto(`${ADMIN_URL}/new`)
-    await page.fill('input[name="name"]', testProductName)
-    await page.fill('input[name="reference"]', `REF-STALE-${Date.now()}`)
-    await page.fill('textarea[name="description"]', 'Test stale data detection')
-    await page.fill('input[name="price"]', '14000')
-    await page.fill('input[name="minQuantity"]', '75')
-    await page.selectOption('select[name="category"]', 'accessoires')
+    await page.fill('#name', testProductName)
+    await page.fill('#reference', `REF-STALE-${Date.now()}`)
+    await page.fill('#description', 'Test stale data detection')
+    await page.fill('#price', '14000')
+    await page.fill('#min_quantity', '75')
+    await page.selectOption('#category_id', 'accessoires')
 
     await page.click('button[type="submit"]')
     await expect(page.locator('text=/créé avec succès/i')).toBeVisible({ timeout: 5000 })

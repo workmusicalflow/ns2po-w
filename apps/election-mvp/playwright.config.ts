@@ -35,13 +35,13 @@ export default defineConfig({
       use: { ...devices['Pixel 5'] },
     },
   ],
-  // webServer désactivé pour tests plus rapides
-  // webServer: {
-  //   command: 'pnpm dev',
-  //   url: 'http://localhost:3003',
-  //   reuseExistingServer: !process.env.CI,
-  //   timeout: 120 * 1000, // 2 minutes
-  // },
+  // webServer activé pour tests E2E cache invalidation
+  webServer: {
+    command: 'pnpm dev',
+    url: 'http://localhost:3003',
+    reuseExistingServer: !process.env.CI,
+    timeout: 120 * 1000, // 2 minutes
+  },
   expect: {
     timeout: 10000, // 10 secondes pour les assertions
   },

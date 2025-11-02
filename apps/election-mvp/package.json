@@ -6,7 +6,7 @@
   "type": "module",
   "packageManager": "pnpm@9.1.0",
   "scripts": {
-    "dev": "nuxt dev",
+    "dev": "PORT=3003 nuxt dev",
     "build": "nuxt build",
     "vercel-build": "nuxt build",
     "preview": "nuxt preview",
