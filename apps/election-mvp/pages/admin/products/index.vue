@@ -242,6 +242,7 @@ import { useCategoriesQuery } from '../../../composables/useCategoriesQuery'
 import { useMultipleProductBundleInfoQuery, useProductBundleUsageBadge, useProductBundleActions } from '../../../composables/useProductBundlesQuery'
 import { useCreateProductMutation, useUpdateProductMutation, useDeleteProductMutation } from '../../../composables/useProductMutations'
 import { globalNotifications } from '../../../composables/useNotifications'
+import { useGlobalLoading } from '../../../composables/useGlobalLoading'
 import { refDebounced } from '@vueuse/core'
 import type { Product, ProductFilters, ProductStatus } from '../../../types/domain/Product'
 
@@ -258,6 +259,9 @@ useHead({
 
 // Global notifications - Pattern Bundles
 const { crudSuccess, crudError } = globalNotifications
+
+// Global loading control - FIX: Spinner reste bloqué
+const { stopLoading } = useGlobalLoading()
 
 // ===== FILTERS - Simple et cohérent avec Bundles =====
 const filters = reactive({
@@ -308,6 +312,12 @@ const {
 
 // Categories query - Vue Query cohérent
 const { data: categories } = useCategoriesQuery()
+
+// FIX: Arrêter spinner global au chargement de la page
+onMounted(() => {
+  console.log('[PRODUCTS/INDEX] onMounted - Force stopLoading()')
+  stopLoading()
+})
 
 // ===== MUTATIONS CRUD - Vue Query intégré =====
 const createProductMutation = useCreateProductMutation()
