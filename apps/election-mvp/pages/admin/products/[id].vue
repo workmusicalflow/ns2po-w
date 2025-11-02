@@ -635,9 +635,6 @@ import { productQueryKeys } from '~/composables/useProductsQuery'
 
 const queryClient = useQueryClient()
 
-// Event Bus pour notifications
-const { emitProductUpdated, emitProductCreated, emitProductDeleted } = useProductsEventBus()
-
 // Notifications
 // Auto-imported via Nuxt 3: globalNotifications
 const { crudSuccess, crudError } = globalNotifications
@@ -859,9 +856,6 @@ async function handleSubmit() {
         // Invalider cache TanStack Query
         await queryClient.invalidateQueries({ queryKey: productQueryKeys.all })
 
-        // Event Bus
-        emitProductCreated(response.data)
-
         crudSuccess.created(`Produit "${response.data.name}" créé avec succès`, 'product')
         await router.push('/admin/products')
       }
@@ -881,9 +875,6 @@ async function handleSubmit() {
 
         // Invalider par sécurité
         await queryClient.invalidateQueries({ queryKey: productQueryKeys.all })
-
-        // Event Bus
-        emitProductUpdated(response.data)
 
         // Rafraîchir form local
         mapProductToForm(response.data)
@@ -930,9 +921,6 @@ async function deleteProduct() {
     if (response.success) {
       // Invalider cache TanStack Query
       await queryClient.invalidateQueries({ queryKey: productQueryKeys.all })
-
-      // Event Bus
-      emitProductDeleted(productId.value)
 
       crudSuccess.deleted(`Produit "${form.name}" supprimé avec succès`, 'product')
       await router.push('/admin/products')
