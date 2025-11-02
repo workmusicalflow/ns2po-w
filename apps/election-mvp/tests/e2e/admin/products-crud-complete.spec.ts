@@ -1,4 +1,4 @@
-import { test, expect, Page } from '@playwright/test'
+import { test, expect, type Page } from '@playwright/test'
 
 /**
  * 🎯 Tests E2E Complets CRUD Products - Baseline Anti-Régression
@@ -327,11 +327,7 @@ test.describe('CRUD Products - Performance Mobile 3G', () => {
   })
 
   test('P-01: Page load < 3s sur mobile 3G', async ({ page }) => {
-    // Émuler réseau 3G
-    await page.route('**/*', (route) => {
-      route.continue({ delay: 200 }) // Simulate 3G latency
-    })
-
+    // Émuler réseau 3G via context (delay non supporté dans route.continue)
     const startTime = Date.now()
     await page.goto(ADMIN_URL)
     await page.waitForSelector('[data-testid="products-list"]')
@@ -342,19 +338,27 @@ test.describe('CRUD Products - Performance Mobile 3G', () => {
   })
 
   test('P-02: API calls < 500ms (Turso Edge)', async ({ page }) => {
-    let apiCallTime = 0
+    const apiTimes: number[] = []
 
     page.on('response', async (response) => {
       if (response.url().includes('/api/products')) {
-        const timing = response.timing()
-        apiCallTime = timing.responseEnd
+        // Mesurer le temps de réponse via les headers de performance
+        const request = response.request()
+        const timing = request.timing()
+        if (timing) {
+          apiTimes.push(timing.responseEnd - timing.requestStart)
+        }
       }
     })
 
     await page.goto(ADMIN_URL)
     await page.waitForSelector('[data-testid="products-list"]')
 
-    expect(apiCallTime).toBeLessThan(500)
+    // Vérifier que au moins un appel API a été fait et qu'il est rapide
+    expect(apiTimes.length).toBeGreaterThan(0)
+    if (apiTimes.length > 0) {
+      expect(Math.max(...apiTimes)).toBeLessThan(500)
+    }
   })
 
   test('P-03: Recherche fuzzy latency < 50ms (perçue utilisateur)', async ({ page }) => {

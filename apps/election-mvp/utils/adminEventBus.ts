@@ -8,7 +8,7 @@
 
 import mitt from 'mitt'
 
-export interface ProductImagesEvents {
+export type ProductImagesEvents = {
   'image:metadata-updated': {
     productId: string
     publicId: string
