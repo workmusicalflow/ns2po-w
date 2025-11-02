@@ -43,13 +43,19 @@ export function useGlobalLoading(): GlobalLoadingState {
   const loadingMessage = useState('global-loading-message', () => '')
 
   function startLoading(message = '') {
+    const caller = new Error().stack?.split('\n')[2]?.trim() || 'Unknown'
+    console.log(`[🔵 GLOBAL_LOADING] START @ ${Date.now()}ms - Message: "${message}" - From: ${caller}`)
     loadingMessage.value = message
     isLoading.value = true
+    console.log(`[🔵 GLOBAL_LOADING] isLoading.value = ${isLoading.value}`)
   }
 
   function stopLoading() {
+    const caller = new Error().stack?.split('\n')[2]?.trim() || 'Unknown'
+    console.log(`[🔴 GLOBAL_LOADING] STOP @ ${Date.now()}ms - From: ${caller}`)
     isLoading.value = false
     loadingMessage.value = ''
+    console.log(`[🔴 GLOBAL_LOADING] isLoading.value = ${isLoading.value}`)
   }
 
   /**

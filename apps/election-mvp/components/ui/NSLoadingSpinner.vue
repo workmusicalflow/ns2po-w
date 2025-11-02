@@ -1,6 +1,6 @@
 <template>
   <div
-    v-if="show"
+    v-show="show"
     :class="containerClasses"
   >
     <div :class="overlayClasses">
