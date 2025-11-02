@@ -1,13 +1,15 @@
 <template>
   <div>
-    <!-- Loading Overlay Full Screen -->
-    <NSLoadingSpinner
-      :show="isLoading"
-      message="Chargement des données produit..."
-      size="lg"
-      variant="primary"
-      full-screen
-    />
+    <!-- Loading Overlay Full Screen - ClientOnly pour éviter mismatch SSR -->
+    <ClientOnly>
+      <NSLoadingSpinner
+        :show="isLoading"
+        message="Chargement des données produit..."
+        size="lg"
+        variant="primary"
+        full-screen
+      />
+    </ClientOnly>
 
     <!-- Page Header -->
     <div class="mb-8">
@@ -554,9 +556,11 @@ definePageMeta({
   middleware: 'admin'
 })
 
-// Loading state pour UX améliorée - garantir 3s minimum pour illusion parfaite
+// Loading state pour UX améliorée - Solution SSR-safe recommandée par Perplexity
+// initial: true garantit affichage au montage client malgré hydratation SSR
 const { isLoading, withLoading } = useLoadingState({
-  minDuration: 3000 // 3 secondes minimum d'affichage même si API répond en 200ms
+  minDuration: 3000, // 3 secondes minimum d'affichage même si API répond en 200ms
+  initial: true       // État initial à true pour contourner limitation SSR
 })
 
 // Route params

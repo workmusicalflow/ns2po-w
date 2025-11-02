@@ -42,12 +42,19 @@ export interface LoadingStateOptions {
    * @default 0
    */
   delay?: number
+
+  /**
+   * État initial du loading
+   * Utile pour SSR : mettre à true pour garantir affichage au montage client
+   * @default false
+   */
+  initial?: boolean
 }
 
 export function useLoadingState(options: LoadingStateOptions = {}) {
-  const { minDuration = 200, delay = 0 } = options
+  const { minDuration = 200, delay = 0, initial = false } = options
 
-  const isLoading = ref(false)
+  const isLoading = ref(initial)
   const loadingStartTime = ref<number | null>(null)
   let delayTimeout: ReturnType<typeof setTimeout> | null = null
 
