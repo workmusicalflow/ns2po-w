@@ -54,8 +54,9 @@ export const useProducts = () => {
       })
 
       if (response.success && response.data) {
-        // Mettre à jour le store local
-        store.updateProductInStore(response.data)
+        // FIX: Utiliser directement store (pas storeToRefs)
+        const productsStore = useProductsStore()
+        productsStore.updateProductInStore(response.data)
 
         // Émettre l'événement pour synchronisation inter-pages
         const { adminEventBus } = await import('../utils/adminEventBus')
@@ -79,8 +80,9 @@ export const useProducts = () => {
       })
 
       if (response.success && response.data) {
-        // Ajouter au store local
-        store.addProductToStore(response.data)
+        // FIX: Utiliser directement store (pas storeToRefs)
+        const productsStore = useProductsStore()
+        productsStore.addProductToStore(response.data)
 
         // Émettre l'événement
         const { adminEventBus } = await import('../utils/adminEventBus')
@@ -98,13 +100,14 @@ export const useProducts = () => {
 
   const deleteProduct = async (id: string) => {
     try {
-      const response = await $fetch<{ success: boolean }>(`/api/products/${id}`, {
+      const response = await $fetch<{ success: boolean }>(`/api/admin/products/${id}`, {
         method: 'DELETE'
       })
 
       if (response.success) {
-        // Supprimer du store local
-        store.removeProductFromStore(id)
+        // FIX: Utiliser directement store (pas storeToRefs)
+        const productsStore = useProductsStore()
+        productsStore.removeProductFromStore(id)
 
         // Émettre l'événement
         const { adminEventBus } = await import('../utils/adminEventBus')
