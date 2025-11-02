@@ -109,6 +109,8 @@
             v-if="item.image"
             :src="item.image"
             :alt="item.name"
+            context="thumbnail"
+            :eager="true"
             class="w-full h-full object-cover"
           />
           <div v-else class="w-full h-full flex items-center justify-center text-gray-400">

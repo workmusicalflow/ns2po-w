@@ -4,9 +4,9 @@
     :class="containerClass"
     :style="containerStyle"
   >
-    <!-- Placeholder pendant le chargement -->
+    <!-- Placeholder pendant le chargement - FIX GPT-5: Seulement si lazy actif -->
     <div
-      v-if="!isLoaded && !isInView"
+      v-if="!isLoaded && shouldLazy && !isInView"
       class="responsive-placeholder"
       :style="placeholderStyle"
     >
@@ -120,6 +120,7 @@ interface Props {
   threshold?: number
   showDebugInfo?: boolean
   customSizes?: string
+  eager?: boolean  // FIX GPT-5: Désactiver lazy loading
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -128,9 +129,10 @@ const props = withDefaults(defineProps<Props>(), {
   containerClass: '',
   imgClass: '',
   placeholderColor: '#f3f4f6',
-  rootMargin: '50px',
-  threshold: 0.1,
-  showDebugInfo: false
+  rootMargin: '200px',  // FIX GPT-5: Plus généreux pour déclencher tôt
+  threshold: 0,         // FIX GPT-5: Déclenche dès le moindre recouvrement
+  showDebugInfo: false,
+  eager: false
 })
 
 // État du composant
@@ -141,6 +143,27 @@ const hasError = ref(false)
 
 // Observer intersection
 let observer: IntersectionObserver | null = null
+
+// FIX GPT-5: Lazy actif seulement si pas eager et pas thumbnail
+const shouldLazy = computed(() => !props.eager && props.context !== 'thumbnail')
+
+// FIX GPT-5: Helper pour parser rootMargin
+function parseRootMarginPx(margin: string): number {
+  const m = String(margin).trim().split(/\s+/)[0]
+  const n = parseInt(m, 10)
+  return Number.isFinite(n) ? n : 0
+}
+
+// FIX GPT-5: Check synchrone du viewport au mount
+function isElementInViewport(el: HTMLElement, rootMargin: string): boolean {
+  const rect = el.getBoundingClientRect()
+  const margin = parseRootMarginPx(rootMargin)
+  const vw = window.innerWidth || document.documentElement.clientWidth
+  const vh = window.innerHeight || document.documentElement.clientHeight
+  const horizontally = rect.right + margin > 0 && rect.left - margin < vw
+  const vertically = rect.bottom + margin > 0 && rect.top - margin < vh
+  return horizontally && vertically
+}
 
 // Configuration responsive complète
 const { getOptimizedUrl } = useCloudinaryImage()
@@ -223,20 +246,42 @@ const handleIntersection = (entries: IntersectionObserverEntry[]) => {
   })
 }
 
-// Lifecycle hooks
+// FIX GPT-5: Lifecycle hooks avec initialisation robuste
 onMounted(() => {
   if (!container.value) return
 
-  // Vérifier le support de IntersectionObserver
+  // Pas de lazy dans ces cas: rendu immédiat
+  if (!shouldLazy.value) {
+    isInView.value = true
+    return
+  }
+
+  // Check synchrone au premier paint - CRITIQUE!
+  isInView.value = isElementInViewport(container.value, props.rootMargin)
+
+  // Si déjà dans le viewport étendu, pas besoin d'observer
+  if (isInView.value) return
+
+  // Sinon, observer pour lazy load
   if ('IntersectionObserver' in window) {
-    observer = new IntersectionObserver(handleIntersection, {
+    observer = new IntersectionObserver((entries) => {
+      for (const entry of entries) {
+        // threshold=0: déclenche dès le moindre recouvrement
+        if (entry.isIntersecting || entry.intersectionRatio > 0) {
+          isInView.value = true
+          if (observer && container.value) observer.unobserve(container.value)
+          observer = null
+          break
+        }
+      }
+    }, {
+      root: null,
       rootMargin: props.rootMargin,
       threshold: props.threshold
     })
-    
     observer.observe(container.value)
   } else {
-    // Fallback pour navigateurs sans support
+    // Fallback sans IO: ne bloque jamais le rendu
     isInView.value = true
   }
 })
