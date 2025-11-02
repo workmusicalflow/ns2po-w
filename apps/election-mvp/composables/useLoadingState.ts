@@ -6,10 +6,12 @@
  * - Timer anti-flash (évite spinner < 200ms)
  * - Compatible TanStack Query isPending
  * - Support async/await
+ * - SSR-safe avec initial: true (pattern Gemini + Perplexity)
+ * - Watch intelligent pour éviter reset timer
  *
  * Usage:
  * ```ts
- * const { isLoading, withLoading } = useLoadingState()
+ * const { isLoading, withLoading } = useLoadingState({ initial: true })
  *
  * // Méthode 1: Wrapper automatique
  * await withLoading(async () => {
@@ -26,7 +28,7 @@
  * ```
  */
 
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 
 export interface LoadingStateOptions {
   /**
@@ -55,20 +57,31 @@ export function useLoadingState(options: LoadingStateOptions = {}) {
   const { minDuration = 200, delay = 0, initial = false } = options
 
   const isLoading = ref(initial)
-  const loadingStartTime = ref<number | null>(null)
+  const loadingStartTime = ref(0) // Initialisé à 0, sera Date.now() quand le chargement démarre
   let delayTimeout: ReturnType<typeof setTimeout> | null = null
 
-  function startLoading() {
-    if (delay > 0) {
-      // Mode delayed: attendre avant d'afficher
-      delayTimeout = setTimeout(() => {
-        isLoading.value = true
-        loadingStartTime.value = Date.now()
-      }, delay)
-    } else {
-      // Mode immédiat
-      isLoading.value = true
+  // Watch intelligent: définit loadingStartTime uniquement lors de la transition false → true
+  // Avec immediate: initial, s'exécute au montage client si initial: true
+  // Évite le reset du timer lors des appels ultérieurs à startLoading()
+  watch(isLoading, (newValue, oldValue) => {
+    if (newValue === true && oldValue === false) {
       loadingStartTime.value = Date.now()
+    }
+  }, { immediate: initial })
+
+  function startLoading() {
+    // Ne déclenche changement que si pas déjà en chargement
+    // Le watch ci-dessus gérera la définition de loadingStartTime
+    if (!isLoading.value) {
+      if (delay > 0) {
+        // Mode delayed: attendre avant d'afficher
+        delayTimeout = setTimeout(() => {
+          isLoading.value = true
+        }, delay)
+      } else {
+        // Mode immédiat
+        isLoading.value = true
+      }
     }
   }
 
@@ -83,18 +96,16 @@ export function useLoadingState(options: LoadingStateOptions = {}) {
       return
     }
 
-    // Garantir durée minimum d'affichage
-    if (loadingStartTime.value && minDuration > 0) {
-      const elapsed = Date.now() - loadingStartTime.value
-      const remaining = minDuration - elapsed
+    // Garantir durée minimum d'affichage depuis loadingStartTime
+    const elapsed = Date.now() - loadingStartTime.value
+    const remaining = minDuration - elapsed
 
-      if (remaining > 0) {
-        await new Promise(resolve => setTimeout(resolve, remaining))
-      }
+    if (remaining > 0) {
+      await new Promise(resolve => setTimeout(resolve, remaining))
     }
 
     isLoading.value = false
-    loadingStartTime.value = null
+    loadingStartTime.value = 0 // Réinitialise pour le prochain cycle
   }
 
   /**
