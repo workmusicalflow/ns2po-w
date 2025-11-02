@@ -76,6 +76,7 @@ export interface BundlePricing {
 export interface BundleFilters {
   readonly search?: string
   readonly targetAudience?: BundleTargetAudience
+  readonly budgetRange?: BundleBudgetRange
   readonly status?: BundleStatus
   readonly featured?: boolean
   readonly tags?: string[]

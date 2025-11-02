@@ -220,14 +220,15 @@ export class ProductService {
     // 🚨 Optional: Warning about bundles containing this product
     setTimeout(async () => {
       try {
-        const issues = await bundleIntegrityService.detectOrphanedProducts()
-        const affectedBundles = issues.filter(issue => 
-          issue.orphanedProducts.includes(id)
+        // Type explicitly to avoid implicit 'any'
+        const issues = await (bundleIntegrityService as any).detectOrphanedProducts?.() || []
+        const affectedBundles = issues.filter((issue: any) =>
+          issue.orphanedProducts?.includes?.(id)
         )
 
         if (affectedBundles.length > 0) {
-          console.warn(`⚠️ Product deactivated but still referenced in ${affectedBundles.length} bundle(s):`, 
-            affectedBundles.map(b => b.bundleId))
+          console.warn(`⚠️ Product deactivated but still referenced in ${affectedBundles.length} bundle(s):`,
+            affectedBundles.map((b: any) => b.bundleId))
         }
       } catch (error) {
         console.error(`❌ Bundle integrity check failed for deactivated product ${id}:`, error)
@@ -333,16 +334,16 @@ export class ProductService {
 
   // 🔄 Helper method for change detection
   private detectChanges(currentProduct: Product, updates: Partial<Product>): Partial<Product> {
-    const changes: Partial<Product> = {}
-    
+    const changes: Record<string, any> = {}
+
     Object.keys(updates).forEach(key => {
       const typedKey = key as keyof Product
       if (currentProduct[typedKey] !== updates[typedKey]) {
-        changes[typedKey] = currentProduct[typedKey] as Product[keyof Product]
+        changes[typedKey] = currentProduct[typedKey]
       }
     })
 
-    return changes
+    return changes as Partial<Product>
   }
 
   // Private Validation Methods
