@@ -627,13 +627,13 @@ if (fetchError.value) {
   await router.push('/admin/products')
 }
 
-// Nouvelle solution Pinia + Event Bus
-const {
-  findById: findProductById,
-  updateProduct: updateProductAction,
-  createProduct: createProductAction,
-  deleteProduct: deleteProductAction
-} = useProducts()
+// 🚨 PATCH URGENCE GPT-5: Contourner useProducts cassé (storeToRefs exclut méthodes)
+// Railway n'a pas rebuild avec commits b2121bd + 5ca5232
+// Solution temporaire: $fetch direct + TanStack Query invalidation
+import { useQueryClient } from '@tanstack/vue-query'
+import { productQueryKeys } from '~/composables/useProductsQuery'
+
+const queryClient = useQueryClient()
 
 // Event Bus pour notifications
 const { emitProductUpdated, emitProductCreated, emitProductDeleted } = useProductsEventBus()
@@ -849,20 +849,47 @@ async function handleSubmit() {
     }
 
     if (isNew.value) {
-      // Création d'un nouveau produit via le composable
-      const newProduct = await createProductAction(productData)
-      crudSuccess.created(`Produit "${newProduct.name}" créé avec succès`, 'product')
-      await router.push('/admin/products')
+      // 🚨 PATCH GPT-5: Création directe via $fetch
+      const response = await $fetch<{ success: boolean; data: any }>('/api/admin/products', {
+        method: 'POST',
+        body: productData
+      })
+
+      if (response.success && response.data) {
+        // Invalider cache TanStack Query
+        await queryClient.invalidateQueries({ queryKey: productQueryKeys.all })
+
+        // Event Bus
+        emitProductCreated(response.data)
+
+        crudSuccess.created(`Produit "${response.data.name}" créé avec succès`, 'product')
+        await router.push('/admin/products')
+      }
     } else {
-      // Mise à jour d'un produit existant via le composable
-      const updatedProduct = await updateProductAction(productId.value, productData)
-      crudSuccess.updated(`Produit "${updatedProduct.name}" mis à jour`)
+      // 🚨 PATCH GPT-5: Update direct via $fetch + invalidation TanStack Query
+      const response = await $fetch<{ success: boolean; data: any }>(`/api/admin/products/${productId.value}`, {
+        method: 'PUT',
+        body: productData
+      })
 
-      // ✅ FIX: Rafraîchir les données depuis l'API pour éviter le cache Pinia
-      mapProductToForm(updatedProduct)
+      if (response.success && response.data) {
+        // Mettre à jour cache TanStack Query directement
+        queryClient.setQueryData(productQueryKeys.lists(), (old?: any[]) =>
+          Array.isArray(old) ? old.map(p => (p.id === response.data.id ? response.data : p)) : old
+        )
+        queryClient.setQueryData(productQueryKeys.detail(response.data.id), response.data)
 
-      // Rester sur la page de modification pour continuer l'édition
-      // Le store et Event Bus gèrent automatiquement la synchronisation avec la liste
+        // Invalider par sécurité
+        await queryClient.invalidateQueries({ queryKey: productQueryKeys.all })
+
+        // Event Bus
+        emitProductUpdated(response.data)
+
+        // Rafraîchir form local
+        mapProductToForm(response.data)
+
+        crudSuccess.updated(`Produit "${response.data.name}" mis à jour`)
+      }
     }
 
   } catch (error) {
@@ -895,11 +922,22 @@ async function deleteProduct() {
   if (!confirm(`Êtes-vous sûr de vouloir supprimer le produit "${form.name}" ?`)) return
 
   try {
-    // Utilise la nouvelle action du composable qui gère Event Bus automatiquement
-    await deleteProductAction(productId.value)
-    crudSuccess.deleted(`Produit "${form.name}" supprimé avec succès`, 'product')
-    await router.push('/admin/products')
-  } catch (error) {
+    // 🚨 PATCH GPT-5: Delete direct via $fetch
+    const response = await $fetch<{ success: boolean }>(`/api/admin/products/${productId.value}`, {
+      method: 'DELETE'
+    })
+
+    if (response.success) {
+      // Invalider cache TanStack Query
+      await queryClient.invalidateQueries({ queryKey: productQueryKeys.all })
+
+      // Event Bus
+      emitProductDeleted(productId.value)
+
+      crudSuccess.deleted(`Produit "${form.name}" supprimé avec succès`, 'product')
+      await router.push('/admin/products')
+    }
+  } catch (error: any) {
     console.error('Error deleting product:', error)
     if (error.statusCode === 409) {
       crudError.deleted('product', 'Impossible de supprimer ce produit car il est utilisé dans des bundles.')
