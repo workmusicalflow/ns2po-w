@@ -111,10 +111,7 @@
 
           <!-- Données avec overlay loading pour rechargements -->
           <template v-else-if="paginatedData.length > 0">
-            <!-- Loading overlay pour actions utilisateur (quand on a déjà des données) -->
-            <div v-if="isLoading && hasInitialData" class="absolute inset-0 bg-white/70 z-10 flex items-center justify-center">
-              <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-600" />
-            </div>
+            <!-- ❌ OVERLAY SUPPRIMÉ - Utiliser spinner global uniquement -->
 
             <tr
               v-for="(item, index) in paginatedData"
@@ -212,12 +209,7 @@
         </div>
       </div>
 
-      <!-- Mobile Loading Overlay -->
-      <div v-else-if="isLoading && hasInitialData" class="relative">
-        <div class="absolute inset-0 bg-white/70 z-10 flex items-center justify-center">
-          <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-600" />
-        </div>
-      </div>
+      <!-- ❌ MOBILE OVERLAY SUPPRIMÉ - Utiliser spinner global uniquement -->
 
       <!-- Mobile Cards Data -->
       <div v-else-if="paginatedData.length > 0" class="space-y-3 p-4">
