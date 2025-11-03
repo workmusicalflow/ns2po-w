@@ -95,8 +95,19 @@
       </div>
     </div>
 
+    <!-- Loading State avec Spinner - Feedback visuel données fraîches -->
+    <div v-if="isLoading || isFetching" class="bg-white p-12 rounded-lg shadow-sm border border-gray-200 mb-6 text-center">
+      <div class="inline-flex items-center space-x-3">
+        <div class="w-6 h-6 border-3 border-amber-600 border-t-transparent rounded-full animate-spin" />
+        <span class="text-gray-600">
+          {{ isLoading ? 'Chargement des produits...' : 'Actualisation des données...' }}
+        </span>
+      </div>
+    </div>
+
     <!-- Products Table -->
     <AdminDataTable
+      v-else
       :data="filteredProducts"
       :columns="columns"
       :loading="false"

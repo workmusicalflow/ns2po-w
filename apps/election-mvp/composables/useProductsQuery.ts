@@ -61,8 +61,10 @@ export function useProductsQuery(
 
       return response.data || []
     },
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: 0, // 🔧 FIX: Toujours considérer stale pour refetch après invalidation
     gcTime: 10 * 60 * 1000, // 10 minutes
+    refetchOnMount: 'always', // 🔧 FIX: Refetch à chaque mount (retour depuis page édition)
+    refetchOnWindowFocus: true, // 🔧 FIX: Refetch au retour focus (données toujours à jour)
     ...options
   })
 }
