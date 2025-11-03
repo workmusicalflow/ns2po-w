@@ -19,7 +19,7 @@ export const useContacts = () => {
       isLoading.value = true;
       error.value = null;
 
-      const data = await $fetch<CommercialContact[]>("/api/contacts");
+      const data = await $fetch("/api/contacts") as CommercialContact[];
       contacts.value = data || [];
     } catch (err) {
       error.value =

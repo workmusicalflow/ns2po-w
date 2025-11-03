@@ -547,7 +547,6 @@ import { useProductsQuery } from '../../../composables/useProductsQuery'
 import { useBundleCalculations } from '../../../composables/useBundleCalculations'
 import { useProductReferenceValidation, useBundleProductsValidation, useProductSelectorValidation } from '../../../composables/useProductReferenceValidation'
 import { globalNotifications } from '../../../composables/useNotifications'
-import { initializeGlobalEventBus, useGlobalEventBus } from '../../../stores/useGlobalEventBus'
 import { refDebounced } from '@vueuse/core'
 import type { Bundle, BundleProduct, BundleAggregate, BundleTargetAudience } from '../../../types/domain/Bundle'
 import type { Product } from '../../../types/domain/Product'
@@ -582,7 +581,6 @@ let warning: typeof globalNotifications.warning | undefined
 
 // Client-only initialization
 if (import.meta.client) {
-  initializeGlobalEventBus()
   const notifications = globalNotifications
   crudSuccess = notifications.crudSuccess
   crudError = notifications.crudError
@@ -1312,7 +1310,6 @@ watch(() => bundleCalculations.estimatedTotal.value, (newTotal) => {
 
 // Handle real-time updates from other interfaces
 onMounted(async () => {
-  const eventBus = useGlobalEventBus()
 
   // 🔄 AUTO-SYNCHRONISATION AU CHARGEMENT - Synchroniser immédiatement les données
   console.log('🚀 Auto-synchronisation du bundle au chargement...')
@@ -1367,124 +1364,6 @@ onMounted(async () => {
     }
   }
 
-  eventBus.on('product.updated', (event: any) => {
-    // Update selected products if they reference the updated product
-    const productId = event.payload?.productId || event.productId
-    const updatedProduct = event.payload?.product || event.updatedProduct
-
-    selectedProducts.value = selectedProducts.value.map(bundleProduct => {
-      if (bundleProduct.id === productId) {
-        return {
-          ...bundleProduct,
-          name: updatedProduct.name,
-          basePrice: updatedProduct.basePrice || updatedProduct.price,
-          subtotal: bundleProduct.quantity * (updatedProduct.basePrice || updatedProduct.price)
-        }
-      }
-      return bundleProduct
-    })
-  })
-
-
-  eventBus.on('product.price_changed', (event: any) => {
-    // Handle specific price changes with detailed logging
-    const productId = event.payload?.productId
-    const oldPrice = event.payload?.oldPrice
-    const newPrice = event.payload?.newPrice
-
-    selectedProducts.value = selectedProducts.value.map(bundleProduct => {
-      if (bundleProduct.id === productId) {
-        const updatedProduct = {
-          ...bundleProduct,
-          basePrice: newPrice,
-          subtotal: bundleProduct.quantity * newPrice
-        }
-
-        // Show notification for price change impact
-        info?.(`Prix mis à jour: ${bundleProduct.name}`, `${formatPrice(oldPrice)} → ${formatPrice(newPrice)}`)
-
-        return updatedProduct
-      }
-      return bundleProduct
-    })
-  })
-
-  // 🖼️ SYNCHRONISATION IMAGES CLOUDINARY - Gestion en temps réel des changements d'images
-  eventBus.on('product.image_added', (event: any) => {
-    const { productId, imagePublicId, imageUrl, metadata } = event
-
-    selectedProducts.value = selectedProducts.value.map(bundleProduct => {
-      if (bundleProduct.id === productId) {
-        const updatedImages = [...(bundleProduct.images || []), imagePublicId]
-        const updatedProduct = {
-          ...bundleProduct,
-          images: updatedImages,
-          // Update main image if it was empty
-          image_url: bundleProduct.image_url || imageUrl
-        }
-
-        // Show notification for image addition
-        info?.(`Image ajoutée: ${bundleProduct.name}`, `Nouvelle image (${metadata?.format?.toUpperCase()}, ${Math.round(metadata?.size / 1024)}KB)`)
-
-        return updatedProduct
-      }
-      return bundleProduct
-    })
-  })
-
-  eventBus.on('product.image_removed', (event: any) => {
-    const { productId, imagePublicId, remainingImages } = event
-
-    selectedProducts.value = selectedProducts.value.map(bundleProduct => {
-      if (bundleProduct.id === productId) {
-        const wasMainImage = bundleProduct.image_url?.includes(imagePublicId)
-        const updatedProduct = {
-          ...bundleProduct,
-          images: remainingImages,
-          // Update main image if the removed image was the main one
-          image_url: wasMainImage && remainingImages.length > 0
-            ? `https://res.cloudinary.com/dsrvzogof/image/upload/w_400,h_300,c_fill/${remainingImages[0]}`
-            : bundleProduct.image_url
-        }
-
-        // Show notification for image removal
-        info?.(`Image supprimée: ${bundleProduct.name}`, `Image retirée du produit`)
-
-        return updatedProduct
-      }
-      return bundleProduct
-    })
-  })
-
-  eventBus.on('product.image_metadata_updated', (event: any) => {
-    const { productId, imagePublicId, metadata } = event
-
-    selectedProducts.value = selectedProducts.value.map(bundleProduct => {
-      if (bundleProduct.id === productId && bundleProduct.image_url?.includes(imagePublicId)) {
-        // If the updated image is the main image, potentially refresh the URL with new transformations
-        const updatedProduct = {
-          ...bundleProduct,
-          // Could add logic here to apply new transformations if needed
-        }
-
-        // Show notification for metadata update
-        info?.(`Métadonnées mises à jour: ${bundleProduct.name}`, `Image "${metadata.alt || 'sans titre'}" mise à jour`)
-
-        return updatedProduct
-      }
-      return bundleProduct
-    })
-  })
-  eventBus.on('product.deleted', (event: any) => {
-    // Remove deleted product from selected products
-    const productId = event.payload?.productId || event.productId
-    selectedProducts.value = selectedProducts.value.filter(p => p.id !== productId)
-  })
-
-  eventBus.on('bundle.updated', () => {
-    if (!isNew.value) {
-      refetchBundle()
-    }
-  })
+  // ✅ Event Bus supprimé - TanStack Query gère l'invalidation cache automatiquement
 })
 </script>

@@ -847,10 +847,10 @@ async function handleSubmit() {
 
     if (isNew.value) {
       // 🚨 PATCH GPT-5: Création directe via $fetch
-      const response = await $fetch<{ success: boolean; data: any }>('/api/admin/products', {
+      const response = await $fetch('/api/admin/products', {
         method: 'POST',
         body: productData
-      })
+      }) as { success: boolean; data: any }
 
       if (response.success && response.data) {
         // Invalider cache TanStack Query
@@ -861,10 +861,10 @@ async function handleSubmit() {
       }
     } else {
       // 🚨 PATCH GPT-5: Update direct via $fetch + invalidation TanStack Query
-      const response = await $fetch<{ success: boolean; data: any }>(`/api/admin/products/${productId.value}`, {
+      const response = await $fetch(`/api/admin/products/${productId.value}`, {
         method: 'PUT',
         body: productData
-      })
+      }) as { success: boolean; data: any }
 
       if (response.success && response.data) {
         // Mettre à jour cache TanStack Query directement
@@ -914,9 +914,9 @@ async function deleteProduct() {
 
   try {
     // 🚨 PATCH GPT-5: Delete direct via $fetch
-    const response = await $fetch<{ success: boolean }>(`/api/admin/products/${productId.value}`, {
+    const response = await $fetch(`/api/admin/products/${productId.value}`, {
       method: 'DELETE'
-    })
+    }) as { success: boolean }
 
     if (response.success) {
       // Invalider cache TanStack Query

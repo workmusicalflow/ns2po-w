@@ -245,13 +245,13 @@ const handleFile = async (file: File) => {
     formData.append('folder', props.folder)
 
     // Upload
-    const response = await $fetch<{
-      success: boolean
-      data: CloudinaryUploadResult
-    }>('/api/cloudinary/upload', {
+    const response = await $fetch('/api/cloudinary/upload', {
       method: 'POST',
       body: formData
-    })
+    }) as {
+      success: boolean
+      data: CloudinaryUploadResult
+    }
 
     clearInterval(progressInterval)
     uploadProgress.value = 100

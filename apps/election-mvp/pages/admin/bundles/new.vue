@@ -90,10 +90,10 @@ const availableProducts = ref<Product[]>([])
 // Methods
 const handleSubmit = async (bundle: Bundle) => {
   try {
-    const response = await $fetch<ApiResponse<{ id: string }>>('/api/bundles', {
+    const response = await $fetch('/api/bundles', {
       method: 'POST',
       body: bundle
-    })
+    }) as ApiResponse<{ id: string }>
 
     if (response.success) {
       crudSuccess.created(bundle.name, 'bundle')
@@ -112,7 +112,7 @@ const handleCancel = () => {
 // Fetch available products on mount
 onMounted(async () => {
   try {
-    const response = await $fetch<ApiResponse<Product[]>>('/api/products')
+    const response = await $fetch('/api/products') as ApiResponse<Product[]>
     if (response.data && response.data.length > 0) {
       availableProducts.value = response.data.map((product: any) => ({
         id: product.id,

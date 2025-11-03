@@ -61,13 +61,13 @@ export const useCloudinaryMetadata = () => {
     try {
       isLoading.value = true
 
-      const response = await $fetch<{
-        success: boolean
-        data: CloudinaryImageInfo
-      }>('/api/cloudinary/metadata', {
+      const response = await $fetch('/api/cloudinary/metadata', {
         method: 'GET',
         query: { public_id: publicId }
-      })
+      }) as {
+        success: boolean
+        data: CloudinaryImageInfo
+      }
 
       if (response.success && response.data) {
         // Mettre à jour le cache local
@@ -98,10 +98,7 @@ export const useCloudinaryMetadata = () => {
       isLoading.value = true
       syncStatus.value = 'syncing'
 
-      const response = await $fetch<{
-        success: boolean
-        data: CloudinaryImageInfo
-      }>('/api/cloudinary/metadata', {
+      const response = await $fetch('/api/cloudinary/metadata', {
         method: 'PUT',
         body: {
           public_id: publicId,
@@ -112,7 +109,10 @@ export const useCloudinaryMetadata = () => {
             updatedBy: 'admin'
           }
         }
-      })
+      }) as {
+        success: boolean
+        data: CloudinaryImageInfo
+      }
 
       if (response.success) {
         // Mettre à jour le cache local
@@ -155,7 +155,7 @@ export const useCloudinaryMetadata = () => {
       if (!imageInfo) return false
 
       // Synchroniser avec la base de données produit
-      const response = await $fetch<{ success: boolean }>(`/api/products/${productId}/images`, {
+      const response = await $fetch(`/api/products/${productId}/images`, {
         method: 'PUT',
         body: {
           publicId: imagePublicId,
@@ -169,7 +169,7 @@ export const useCloudinaryMetadata = () => {
             bytes: imageInfo.bytes
           }
         }
-      })
+      }) as { success: boolean }
 
       return response.success
 

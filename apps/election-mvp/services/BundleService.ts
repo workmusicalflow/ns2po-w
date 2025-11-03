@@ -35,9 +35,9 @@ export class BundleService {
   // Query Operations
   async getBundle(id: string): Promise<Bundle | null> {
     this.validateId(id)
-    
+
     try {
-      const response = await $fetch<SingleBundleApiResponse>(`/api/campaign-bundles/${id}`)
+      const response = await $fetch(`/api/campaign-bundles/${id}`) as SingleBundleApiResponse
       return response.success ? response.data : null
     } catch (error) {
       console.error(`Error fetching bundle ${id}:`, error)
@@ -47,9 +47,9 @@ export class BundleService {
 
   async getBundleAggregate(id: string): Promise<BundleAggregate | null> {
     this.validateId(id)
-    
+
     try {
-      const response = await $fetch<SingleBundleApiResponse>(`/api/campaign-bundles/${id}`)
+      const response = await $fetch(`/api/campaign-bundles/${id}`) as SingleBundleApiResponse
       return response.success ? response.data as BundleAggregate : null
     } catch (error) {
       console.error(`Error fetching bundle aggregate ${id}:`, error)
@@ -74,8 +74,8 @@ export class BundleService {
         if (sort.field) queryParams.set('sortBy', sort.field)
         if (sort.direction) queryParams.set('sortOrder', sort.direction)
       }
-      
-      const response = await $fetch<BundleApiResponse>(`/api/campaign-bundles?${queryParams}`)
+
+      const response = await $fetch(`/api/campaign-bundles?${queryParams}`) as BundleApiResponse
       return response.success ? response.data : []
     } catch (error) {
       console.error('Error fetching bundles:', error)
@@ -212,9 +212,9 @@ export class BundleService {
   // Bundle Products Management
   async getBundleProducts(bundleId: string): Promise<BundleProduct[]> {
     this.validateId(bundleId)
-    
+
     try {
-      const response = await $fetch<SingleBundleApiResponse>(`/api/campaign-bundles/${bundleId}`)
+      const response = await $fetch(`/api/campaign-bundles/${bundleId}`) as SingleBundleApiResponse
       if (response.success && response.data) {
         return response.data.products || []
       }
@@ -372,11 +372,11 @@ export class BundleService {
     this.validateBundleData(bundleData)
 
     try {
-      const response = await $fetch<SingleBundleApiResponse>('/api/campaign-bundles', {
+      const response = await $fetch('/api/campaign-bundles', {
         method: 'POST',
         body: bundleData
-      })
-      
+      }) as SingleBundleApiResponse
+
       if (response.success) {
         return response.data
       }
@@ -396,11 +396,11 @@ export class BundleService {
     this.validateBundleUpdates(updates)
 
     try {
-      const response = await $fetch<SingleBundleApiResponse>(`/api/campaign-bundles/${id}`, {
+      const response = await $fetch(`/api/campaign-bundles/${id}`, {
         method: 'PUT',
         body: updates
-      })
-      
+      }) as SingleBundleApiResponse
+
       if (response.success) {
         return response.data
       }
@@ -422,10 +422,10 @@ export class BundleService {
         throw new Error(`Bundle with id '${id}' not found`)
       }
 
-      const response = await $fetch<SingleBundleApiResponse>(`/api/campaign-bundles/${id}`, {
+      const response = await $fetch(`/api/campaign-bundles/${id}`, {
         method: 'DELETE'
-      })
-      
+      }) as SingleBundleApiResponse
+
       return response.success
     } catch (error) {
       console.error(`Error deleting bundle ${id}:`, error)

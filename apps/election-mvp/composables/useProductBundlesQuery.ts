@@ -59,7 +59,7 @@ export function useProductBundleInfoQuery(
       }
 
       try {
-        const response = await $fetch<{ success: boolean; data: ProductBundleInfo }>(`/api/products/${productIdRef.value}/bundles`)
+        const response = await $fetch(`/api/products/${productIdRef.value}/bundles`) as { success: boolean; data: ProductBundleInfo }
 
         if (!response.success) {
           throw new Error('Failed to fetch product bundle info')
@@ -95,7 +95,7 @@ export function useMultipleProductBundleInfoQuery(
         queryKey: productBundleQueryKeys.productBundles(productId),
         queryFn: async (): Promise<ProductBundleInfo> => {
           try {
-            const response = await $fetch<{ success: boolean; data: ProductBundleInfo }>(`/api/products/${productId}/bundles`)
+            const response = await $fetch(`/api/products/${productId}/bundles`) as { success: boolean; data: ProductBundleInfo }
 
             if (!response.success) {
               throw new Error('Failed to fetch product bundle info')
@@ -166,7 +166,7 @@ export function useProductBundleActions() {
     return queryClient.prefetchQuery({
       queryKey: productBundleQueryKeys.productBundles(productId),
       queryFn: async () => {
-        const response = await $fetch<{ success: boolean; data: ProductBundleInfo }>(`/api/products/${productId}/bundles`)
+        const response = await $fetch(`/api/products/${productId}/bundles`) as { success: boolean; data: ProductBundleInfo }
         return response.data
       }
     })

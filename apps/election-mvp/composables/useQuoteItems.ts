@@ -17,10 +17,10 @@ export const useQuoteItems = () => {
     error.value = null;
 
     try {
-      const response = await $fetch<{
+      const response = await $fetch("/api/quote-items") as {
         success: boolean;
         data: QuoteItemCatalog[];
-      }>("/api/quote-items");
+      };
       quoteItems.value = response.data;
     } catch (err) {
       error.value =

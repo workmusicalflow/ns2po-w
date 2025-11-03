@@ -401,31 +401,31 @@ const confirmReplace = async () => {
       formData.append('file', selectedFile.value)
       formData.append('deleteOldAsset', deleteOldAsset.value.toString())
 
-      response = await $fetch<{
-        success: boolean
-        data: {
-          oldAsset: Asset
-          newAsset: Asset
-        }
-      }>(`/api/assets/${props.asset.id}/replace`, {
+      response = await $fetch(`/api/assets/${props.asset.id}/replace`, {
         method: 'POST',
         body: formData
-      })
-    } else {
-      // Remplacement par asset existant
-      response = await $fetch<{
+      }) as {
         success: boolean
         data: {
           oldAsset: Asset
           newAsset: Asset
         }
-      }>(`/api/assets/${props.asset.id}/replace`, {
+      }
+    } else {
+      // Remplacement par asset existant
+      response = await $fetch(`/api/assets/${props.asset.id}/replace`, {
         method: 'POST',
         body: {
           newAssetId: selectedAssetId.value,
           deleteOldAsset: deleteOldAsset.value
         }
-      })
+      }) as {
+        success: boolean
+        data: {
+          oldAsset: Asset
+          newAsset: Asset
+        }
+      }
     }
 
     if (response.success) {

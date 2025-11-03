@@ -49,10 +49,10 @@ export function useProductReferenceValidation(
         throw new Error('Product ID is required for validation')
       }
 
-      const response = await $fetch<{ success: boolean; data: ProductReferenceValidation }>(
+      const response = await $fetch(
         `/api/admin/product-reference/validate/${productIdRef.value}`,
         { method: 'GET' }
-      )
+      ) as { success: boolean; data: ProductReferenceValidation }
 
       if (!response.success) {
         throw new Error('Failed to validate product reference')
@@ -213,13 +213,13 @@ export function useBundleProductsValidation(
         }
       }
 
-      const response = await $fetch<{ success: boolean; data: BundleReferenceValidation }>(
+      const response = await $fetch(
         `/api/admin/bundle-reference/validate/${bundleIdRef.value}`,
         {
           method: 'POST',
           body: { products: products.value }
         }
-      )
+      ) as { success: boolean; data: BundleReferenceValidation }
 
       if (!response.success) {
         throw new Error('Failed to validate bundle product references')

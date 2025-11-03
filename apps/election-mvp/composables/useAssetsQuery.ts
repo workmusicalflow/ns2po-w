@@ -80,11 +80,11 @@ export function useAssetsQuery(
       if (pagination.value.sortBy) params.set('sortBy', pagination.value.sortBy)
       if (pagination.value.sortOrder) params.set('sortOrder', pagination.value.sortOrder)
 
-      const response = await $fetch<{
+      const response = await $fetch(`/api/assets?${params.toString()}`) as {
         success: boolean
         data: AssetsResponse
         message: string
-      }>(`/api/assets?${params.toString()}`)
+      }
 
       if (!response.success) {
         throw new Error(response.message || 'Erreur lors du chargement des assets')
@@ -108,11 +108,11 @@ export function useAssetQuery(assetId: MaybeRef<string>) {
     queryFn: async (): Promise<Asset> => {
       if (!id.value) throw new Error('Asset ID requis')
 
-      const response = await $fetch<{
+      const response = await $fetch(`/api/assets/${id.value}`) as {
         success: boolean
         data: Asset
         message: string
-      }>(`/api/assets/${id.value}`)
+      }
 
       if (!response.success) {
         throw new Error(response.message || 'Asset non trouvé')
@@ -139,14 +139,14 @@ export function useUpdateAssetMutation() {
       id: string
       updates: UpdateAssetData
     }): Promise<Asset> => {
-      const response = await $fetch<{
+      const response = await $fetch(`/api/assets/${id}`, {
+        method: 'PUT',
+        body: updates
+      }) as {
         success: boolean
         data: Asset
         message: string
-      }>(`/api/assets/${id}`, {
-        method: 'PUT',
-        body: updates
-      })
+      }
 
       if (!response.success) {
         throw new Error(response.message || 'Erreur lors de la mise à jour')
@@ -173,7 +173,9 @@ export function useDeleteAssetMutation() {
       success: boolean
       asset: Asset | null
     }> => {
-      const response = await $fetch<{
+      const response = await $fetch(`/api/assets/${assetId}`, {
+        method: 'DELETE'
+      }) as {
         success: boolean
         data: {
           asset: Asset | null
@@ -181,9 +183,7 @@ export function useDeleteAssetMutation() {
           deleted_from_database: boolean
         }
         message: string
-      }>(`/api/assets/${assetId}`, {
-        method: 'DELETE'
-      })
+      }
 
       if (!response.success) {
         throw new Error(response.message || 'Erreur lors de la suppression')
@@ -228,15 +228,15 @@ export function useUploadAssetMutation() {
       if (metadata?.folder) formData.append('folder', metadata.folder)
       if (metadata?.tags) formData.append('tags', JSON.stringify(metadata.tags))
 
-      const response = await $fetch<{
-        success: boolean
-        data: Asset
-        message?: string
-      }>('/api/assets', {
+      const response = await $fetch('/api/assets', {
         method: 'POST',
         body: formData,
         timeout: 30000 // Timeout de 30 secondes
-      })
+      }) as {
+        success: boolean
+        data: Asset
+        message?: string
+      }
 
       if (!response.success) {
         throw new Error(response.message || 'Erreur lors de l\'upload')

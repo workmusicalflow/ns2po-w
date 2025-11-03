@@ -11,8 +11,6 @@ import {
 } from '@tanstack/vue-query'
 import type { Product } from '../types/domain/Product'
 import { productQueryKeys } from './useProductsQuery'
-import { useProductStore } from '../stores/useProductStore'
-import { useEventEmitter } from '../stores/useGlobalEventBus'
 
 
 // Create Product Mutation
@@ -20,15 +18,13 @@ export function useCreateProductMutation(
   options?: UseMutationOptions<Product, Error, Omit<Product, 'id' | 'createdAt' | 'updatedAt'>>
 ) {
   const queryClient = useQueryClient()
-  const productStore = useProductStore()
-  const eventEmitter = useEventEmitter()
 
   return useMutation({
     mutationFn: async (productData: Omit<Product, 'id' | 'createdAt' | 'updatedAt'>): Promise<Product> => {
-      const response = await $fetch<{ success: boolean; data: Product }>('/api/admin/products', {
+      const response = await $fetch('/api/admin/products', {
         method: 'POST',
         body: productData
-      })
+      }) as { success: boolean; data: Product }
 
       if (!response.success) {
         throw new Error('Failed to create product')
@@ -84,12 +80,6 @@ export function useCreateProductMutation(
       // Pre-populate the detail cache for immediate access
       queryClient.setQueryData(productQueryKeys.detail(data.id), data)
 
-      // Update Pinia store
-      productStore.addProduct(data)
-
-      // Emit global event
-      eventEmitter.product.created(data)
-
       // Replace optimistic update with real data
       if ((context as any)?.optimisticProduct) {
         queryClient.setQueryData(productQueryKeys.list(), (old: Product[] = []) =>
@@ -111,15 +101,13 @@ export function useUpdateProductMutation(
   options?: UseMutationOptions<Product, Error, { id: string; updates: Partial<Product> }>
 ) {
   const queryClient = useQueryClient()
-  const productStore = useProductStore()
-  const eventEmitter = useEventEmitter()
 
   return useMutation({
     mutationFn: async ({ id, updates }: { id: string; updates: Partial<Product> }): Promise<Product> => {
-      const response = await $fetch<{ success: boolean; data: Product }>(`/api/admin/products/${id}`, {
+      const response = await $fetch(`/api/admin/products/${id}`, {
         method: 'PUT',
         body: updates
-      })
+      }) as { success: boolean; data: Product }
 
       if (!response.success) {
         throw new Error('Failed to update product')
@@ -172,12 +160,6 @@ export function useUpdateProductMutation(
         queryKey: productQueryKeys.bundles(data.id),
         exact: true // Exact match seulement
       })
-
-      // Update Pinia store
-      productStore.replaceProduct(data.id, data)
-
-      // Emit global event
-      eventEmitter.product.updated(data.id, data, _variables.updates)
     },
     ...options
   })
@@ -188,14 +170,12 @@ export function useDeleteProductMutation(
   options?: UseMutationOptions<boolean, Error, string>
 ) {
   const queryClient = useQueryClient()
-  const productStore = useProductStore()
-  const eventEmitter = useEventEmitter()
 
   return useMutation({
     mutationFn: async (id: string): Promise<boolean> => {
-      const response = await $fetch<{ success: boolean }>(`/api/admin/products/${id}`, {
+      const response = await $fetch(`/api/admin/products/${id}`, {
         method: 'DELETE'
-      })
+      }) as { success: boolean }
 
       if (!response.success) {
         throw new Error('Failed to delete product')
@@ -235,12 +215,6 @@ export function useDeleteProductMutation(
           queryKey: productQueryKeys.lists(),
           exact: false
         })
-
-        // Update Pinia store
-        productStore.removeProduct(id)
-
-        // Emit global event
-        eventEmitter.product.deleted(id)
       }
     },
     ...options
@@ -252,17 +226,15 @@ export function useBulkUpdateProductsMutation(
   options?: UseMutationOptions<Product[], Error, { ids: string[]; updates: Partial<Product> }>
 ) {
   const queryClient = useQueryClient()
-  const productStore = useProductStore()
-  const eventEmitter = useEventEmitter()
 
   return useMutation({
     mutationFn: async ({ ids, updates }: { ids: string[]; updates: Partial<Product> }): Promise<Product[]> => {
       // TODO: Créer endpoint /api/admin/products/bulk-update.put.ts avec schéma normalisé
       // Pour l'instant, faire des updates individuels
-      const response = await $fetch<{ success: boolean; data: Product[] }>('/api/admin/products/bulk-update', {
+      const response = await $fetch('/api/admin/products/bulk-update', {
         method: 'PUT',
         body: { ids, updates }
-      })
+      }) as { success: boolean; data: Product[] }
 
       if (!response.success) {
         throw new Error('Failed to bulk update products')
@@ -303,13 +275,6 @@ export function useBulkUpdateProductsMutation(
           queryKey: productQueryKeys.detail(id),
           exact: true
         })
-      })
-
-      // Update Pinia store
-      data.forEach(product => {
-        productStore.replaceProduct(product.id, product)
-        // Emit individual update events (no bulkUpdated event exists)
-        eventEmitter.product?.updated?.(product.id, product, {})
       })
     },
     ...options

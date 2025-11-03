@@ -16,16 +16,13 @@ import { productRepository } from '../repositories/ProductRepository'
 import { ProductValidationRules as ValidationRules } from '../types/domain/Product'
 
 // 🔄 Event Bus Integration
-import { useEventEmitter } from '../stores/useGlobalEventBus'
 import { bundleIntegrityService } from './BundleIntegrityService'
 
 export class ProductService {
-  private eventEmitter: ReturnType<typeof useEventEmitter> | null = null
 
   constructor(private repository: IProductRepository = productRepository) {
     // Initialize event emitter only on client side
     if (typeof window !== 'undefined') {
-      this.eventEmitter = useEventEmitter()
     }
   }
 
@@ -118,7 +115,6 @@ export class ProductService {
     const product = await this.repository.create(productData)
 
     // 🔄 Emit product.created event
-    this.eventEmitter?.product.created(product)
 
     console.log(`📦 Product created: ${product.name} (ID: ${product.id})`)
     return product
@@ -149,7 +145,6 @@ export class ProductService {
 
     // 🔄 Emit product.updated event with change detection
     const changes = this.detectChanges(currentProduct, updates)
-    this.eventEmitter?.product.updated(id, updatedProduct, changes)
 
     console.log(`📝 Product updated: ${updatedProduct.name} (ID: ${id})`, changes)
     return updatedProduct
@@ -169,7 +164,6 @@ export class ProductService {
 
       if (success) {
         // 🔄 Emit product.deleted event FIRST
-        this.eventEmitter?.product.deleted(id)
 
         // 🧹 Trigger automatic bundle cleanup (async, non-blocking)
         setTimeout(async () => {
@@ -215,7 +209,6 @@ export class ProductService {
     const product = await this.repository.deactivate(id)
 
     // 🔄 Emit product.deactivated event
-    this.eventEmitter?.product.deleted(id) // Use deleted for consistency with bundle cleanup
 
     // 🚨 Optional: Warning about bundles containing this product
     setTimeout(async () => {
@@ -256,7 +249,6 @@ export class ProductService {
 
     // 🔄 Emit product.updated with price change
     const changes = { price: oldPrice }
-    this.eventEmitter?.product.updated(id, updatedProduct, changes)
 
     console.log(`💰 Product price updated: ${updatedProduct.name} (${oldPrice} → ${newPrice})`)
     return updatedProduct
@@ -286,7 +278,6 @@ export class ProductService {
       const product = results[i]
       const updateData = updates[i]
       
-      this.eventEmitter?.product.updated(product.id, product, updateData.data)
     }
 
     console.log(`📦 Bulk updated ${results.length} products`)

@@ -23,7 +23,6 @@ import type {
 } from '../types/domain/Bundle'
 import { bundleService } from '../services/BundleService'
 import { useBundleUIState } from './useBundleUIState'
-import { useEventEmitter } from '../stores/useGlobalEventBus'
 
 // Mutation Context Types
 interface CreateBundleMutationContext {
@@ -229,7 +228,6 @@ export function useCreateBundleMutation(
 ) {
   const queryClient = useQueryClient()
   const bundleUIState = useBundleUIState()
-  const eventEmitter = useEventEmitter()
 
   return useMutation({
     mutationFn: async (bundleData: Omit<Bundle, 'id' | 'createdAt' | 'updatedAt'>) => {
@@ -270,8 +268,6 @@ export function useCreateBundleMutation(
       // Update UI state
       bundleUIState.selectBundle(data)
 
-      // Emit global event
-      eventEmitter.bundle.created(data)
 
       // Replace optimistic update with real data
       if (context?.optimisticBundle) {
@@ -292,7 +288,6 @@ export function useUpdateBundleMutation(
 ) {
   const queryClient = useQueryClient()
   const bundleUIState = useBundleUIState()
-  const eventEmitter = useEventEmitter()
 
   return useMutation({
     mutationFn: async ({ id, updates }: { id: string; updates: Partial<Bundle> }) => {
@@ -349,8 +344,6 @@ export function useUpdateBundleMutation(
         bundleUIState.selectBundle(data)
       }
 
-      // Emit global event
-      eventEmitter.bundle.updated(data.id, data)
     },
     ...options
   })
@@ -362,7 +355,6 @@ export function useDeleteBundleMutation(
 ) {
   const queryClient = useQueryClient()
   const bundleUIState = useBundleUIState()
-  const eventEmitter = useEventEmitter()
 
   return useMutation({
     mutationFn: async (id: string) => {
@@ -402,8 +394,6 @@ export function useDeleteBundleMutation(
           bundleUIState.clearSelection()
         }
 
-        // Emit global event
-        eventEmitter.bundle.deleted(id)
       }
     },
     ...options
@@ -415,7 +405,6 @@ export function useAddProductToBundleMutation(
   options?: UseMutationOptions<BundleProduct, Error, { bundleId: string; productId: string; quantity: number }, AddProductMutationContext>
 ) {
   const queryClient = useQueryClient()
-  const eventEmitter = useEventEmitter()
 
   return useMutation({
     mutationFn: async ({ bundleId, productId, quantity }) => {
@@ -445,8 +434,6 @@ export function useAddProductToBundleMutation(
       // Update Pinia store - TODO: implement recalculateBundleTotal method
       // bundleStore.recalculateBundleTotal(bundleId)
 
-      // Emit global event
-      eventEmitter.bundle.productAdded(bundleId, productId, quantity)
     },
     ...options
   })
@@ -457,7 +444,6 @@ export function useRemoveProductFromBundleMutation(
   options?: UseMutationOptions<boolean, Error, { bundleId: string; productId: string }>
 ) {
   const queryClient = useQueryClient()
-  const eventEmitter = useEventEmitter()
 
   return useMutation({
     mutationFn: async ({ bundleId, productId }) => {
@@ -473,8 +459,6 @@ export function useRemoveProductFromBundleMutation(
         // Update Pinia store - TODO: implement recalculateBundleTotal method
         // bundleStore.recalculateBundleTotal(bundleId)
 
-        // Emit global event
-        eventEmitter.bundle.productRemoved(bundleId, productId)
       }
     },
     ...options

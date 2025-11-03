@@ -258,10 +258,10 @@ const loadUsageDetails = async () => {
   usageDetails.value = null
 
   try {
-    const response = await $fetch<{
+    const response = await $fetch(`/api/assets/${props.asset.id}/usage`) as {
       success: boolean
       data: any
-    }>(`/api/assets/${props.asset.id}/usage`)
+    }
 
     if (response.success) {
       usageDetails.value = response.data
@@ -287,12 +287,12 @@ const confirmDelete = async () => {
       params.set('force', 'true')
     }
 
-    const response = await $fetch<{
+    const response = await $fetch(`/api/assets/${props.asset.id}?${params.toString()}`, {
+      method: 'DELETE'
+    }) as {
       success: boolean
       data: any
-    }>(`/api/assets/${props.asset.id}?${params.toString()}`, {
-      method: 'DELETE'
-    })
+    }
 
     if (response.success) {
       // Émettre l'événement de suppression réussie

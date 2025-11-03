@@ -27,7 +27,7 @@ export class ProductRepository implements IProductRepository {
   // Query Operations (Read)
   async findById(id: string): Promise<Product | null> {
     try {
-      const response = await $fetch<ApiResponse<Product>>(`${this.baseUrl}/${id}`)
+      const response = await $fetch(`${this.baseUrl}/${id}`) as ApiResponse<Product>
       return response.success ? response.data : null
     } catch (error) {
       if (this.isNotFoundError(error)) {
@@ -40,7 +40,7 @@ export class ProductRepository implements IProductRepository {
   async findAll(filters?: ProductFilters, sort?: ProductSortOptions): Promise<Product[]> {
     try {
       const queryParams = this.buildQueryParams(filters, sort)
-      const response = await $fetch<ApiResponse<Product[]>>(`${this.baseUrl}${queryParams}`)
+      const response = await $fetch(`${this.baseUrl}${queryParams}`) as ApiResponse<Product[]>
 
       if (!response.success || !Array.isArray(response.data)) {
         throw this.createRepositoryError('INVALID_PRODUCT_DATA', 'Invalid response format from API')
@@ -60,7 +60,7 @@ export class ProductRepository implements IProductRepository {
   ): Promise<PaginatedProducts> {
     try {
       const queryParams = this.buildQueryParams(filters, sort, { page, limit })
-      const response = await $fetch<ApiResponse<Product[]> & { pagination: any }>(`${this.baseUrl}${queryParams}`)
+      const response = await $fetch(`${this.baseUrl}${queryParams}`) as ApiResponse<Product[]> & { pagination: any }
 
       if (!response.success) {
         throw this.createRepositoryError('INVALID_PRODUCT_DATA', 'Invalid pagination response')
@@ -88,7 +88,7 @@ export class ProductRepository implements IProductRepository {
       if (ids.length === 0) return []
 
       const queryParams = `?ids=${ids.join(',')}`
-      const response = await $fetch<ApiResponse<Product[]>>(`${this.baseUrl}${queryParams}`)
+      const response = await $fetch(`${this.baseUrl}${queryParams}`) as ApiResponse<Product[]>
 
       return response.success ? response.data : []
     } catch (error) {
@@ -107,7 +107,7 @@ export class ProductRepository implements IProductRepository {
 
   async findByReference(reference: string): Promise<Product | null> {
     try {
-      const response = await $fetch<ApiResponse<Product[]>>(`${this.baseUrl}?reference=${reference}`)
+      const response = await $fetch(`${this.baseUrl}?reference=${reference}`) as ApiResponse<Product[]>
 
       if (response.success && response.data.length > 0) {
         return response.data[0]
@@ -131,7 +131,7 @@ export class ProductRepository implements IProductRepository {
   async count(filters?: ProductFilters): Promise<number> {
     try {
       const queryParams = this.buildQueryParams(filters) + '&count=true'
-      const response = await $fetch<ApiResponse<{ count: number }>>(`${this.baseUrl}${queryParams}`)
+      const response = await $fetch(`${this.baseUrl}${queryParams}`) as ApiResponse<{ count: number }>
 
       return response.success ? response.data.count : 0
     } catch (error) {
@@ -151,7 +151,7 @@ export class ProductRepository implements IProductRepository {
   // Aggregate Queries
   async findAggregateById(id: string): Promise<ProductAggregate | null> {
     try {
-      const response = await $fetch<ApiResponse<ProductAggregate>>(`${this.baseUrl}/${id}?aggregate=true`)
+      const response = await $fetch(`${this.baseUrl}/${id}?aggregate=true`) as ApiResponse<ProductAggregate>
       return response.success ? response.data : null
     } catch (error) {
       if (this.isNotFoundError(error)) {
@@ -195,10 +195,10 @@ export class ProductRepository implements IProductRepository {
   // Command Operations (Write)
   async create(productData: Omit<Product, 'id' | 'createdAt' | 'updatedAt'>): Promise<Product> {
     try {
-      const response = await $fetch<ApiResponse<Product>>(this.baseUrl, {
+      const response = await $fetch(this.baseUrl, {
         method: 'POST',
         body: productData
-      })
+      }) as ApiResponse<Product>
 
       if (!response.success) {
         throw this.createRepositoryError('VALIDATION_ERROR', response.error?.message || 'Product creation failed')
@@ -212,10 +212,10 @@ export class ProductRepository implements IProductRepository {
 
   async update(id: string, data: Partial<Omit<Product, 'id' | 'createdAt' | 'updatedAt'>>): Promise<Product> {
     try {
-      const response = await $fetch<ApiResponse<Product>>(`${this.baseUrl}/${id}`, {
+      const response = await $fetch(`${this.baseUrl}/${id}`, {
         method: 'PUT',
         body: data
-      })
+      }) as ApiResponse<Product>
 
       if (!response.success) {
         throw this.createRepositoryError('VALIDATION_ERROR', response.error?.message || 'Product update failed')
@@ -229,9 +229,9 @@ export class ProductRepository implements IProductRepository {
 
   async delete(id: string): Promise<boolean> {
     try {
-      const response = await $fetch<ApiResponse<{ deleted: boolean }>>(`${this.baseUrl}/${id}`, {
+      const response = await $fetch(`${this.baseUrl}/${id}`, {
         method: 'DELETE'
-      })
+      }) as ApiResponse<{ deleted: boolean }>
 
       return response.success && response.data.deleted
     } catch (error) {
@@ -253,10 +253,10 @@ export class ProductRepository implements IProductRepository {
 
   async bulkUpdate(updates: Array<{ id: string; data: Partial<Product> }>): Promise<Product[]> {
     try {
-      const response = await $fetch<ApiResponse<Product[]>>(`${this.baseUrl}/bulk`, {
+      const response = await $fetch(`${this.baseUrl}/bulk`, {
         method: 'PUT',
         body: { updates }
-      })
+      }) as ApiResponse<Product[]>
 
       if (!response.success) {
         throw this.createRepositoryError('VALIDATION_ERROR', 'Bulk update failed')
@@ -271,7 +271,7 @@ export class ProductRepository implements IProductRepository {
   // Event Sourcing (Optional)
   async getEvents(productId: string): Promise<ProductDomainEvent[]> {
     try {
-      const response = await $fetch<ApiResponse<ProductDomainEvent[]>>(`${this.baseUrl}/${productId}/events`)
+      const response = await $fetch(`${this.baseUrl}/${productId}/events`) as ApiResponse<ProductDomainEvent[]>
       return response.success ? response.data : []
     } catch (error) {
       return []

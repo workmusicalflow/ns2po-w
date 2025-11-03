@@ -48,12 +48,12 @@ export function useProductsQuery(
   return useQuery({
     queryKey: computed(() => productQueryKeys.list(filtersRef.value, sortRef.value)),
     queryFn: async (): Promise<Product[]> => {
-      const response = await $fetch<{ success: boolean; data: Product[] }>('/api/products', {
+      const response = await $fetch('/api/products', {
         query: {
           ...(filtersRef.value || {}),
           ...(sortRef.value || {})
         }
-      })
+      }) as { success: boolean; data: Product[] }
 
       if (!response.success) {
         throw new Error('Failed to fetch products')
@@ -79,7 +79,7 @@ export function useProductQuery(
     queryFn: async (): Promise<Product | null> => {
       if (!idRef.value) return null
 
-      const response = await $fetch<{ success: boolean; data: Product }>(`/api/products/${idRef.value}`)
+      const response = await $fetch(`/api/products/${idRef.value}`) as { success: boolean; data: Product }
 
       if (!response.success) {
         throw new Error('Failed to fetch product')
@@ -112,12 +112,12 @@ export function useProductSearchQuery(
         return []
       }
 
-      const response = await $fetch<{ success: boolean; data: Product[] }>('/api/products/search', {
+      const response = await $fetch('/api/products/search', {
         query: {
           q: queryRef.value,
           ...(filtersRef.value || {})
         }
-      })
+      }) as { success: boolean; data: Product[] }
 
       if (!response.success) {
         throw new Error('Failed to search products')
@@ -146,11 +146,11 @@ export function useProductsByCategoryQuery(
     queryFn: async (): Promise<Product[]> => {
       if (!categoryIdRef.value) return []
 
-      const response = await $fetch<{ success: boolean; data: Product[] }>('/api/products', {
+      const response = await $fetch('/api/products', {
         query: {
           category: categoryIdRef.value
         }
-      })
+      }) as { success: boolean; data: Product[] }
 
       if (!response.success) {
         throw new Error('Failed to fetch products by category')
@@ -177,12 +177,12 @@ export function usePopularProductsQuery(
   return useQuery({
     queryKey: computed(() => productQueryKeys.popular(limitRef.value)),
     queryFn: async (): Promise<Product[]> => {
-      const response = await $fetch<{ success: boolean; data: Product[] }>('/api/products', {
+      const response = await $fetch('/api/products', {
         query: {
           popular: true,
           limit: limitRef.value
         }
-      })
+      }) as { success: boolean; data: Product[] }
 
       if (!response.success) {
         throw new Error('Failed to fetch popular products')
@@ -209,12 +209,12 @@ export function useRecentProductsQuery(
   return useQuery({
     queryKey: computed(() => productQueryKeys.recent(limitRef.value)),
     queryFn: async (): Promise<Product[]> => {
-      const response = await $fetch<{ success: boolean; data: Product[] }>('/api/products', {
+      const response = await $fetch('/api/products', {
         query: {
           recent: true,
           limit: limitRef.value
         }
-      })
+      }) as { success: boolean; data: Product[] }
 
       if (!response.success) {
         throw new Error('Failed to fetch recent products')

@@ -1,7 +1,6 @@
-// 🚨 MIGRATION TANSTACK QUERY PURE - Phase 1.3
-// useProductsStore supprimé, remplacé par useQueryClient
+// ✅ MIGRATION TANSTACK QUERY PURE - COMPLÈTE
+// Pinia stores supprimés, TanStack Query uniquement
 import { useQueryClient } from '@tanstack/vue-query'
-import { useBundleStore } from '../stores/useBundleStore'
 // Auto-imported via Nuxt 3: globalNotifications
 
 interface SSEMessage {
@@ -77,10 +76,9 @@ export const useSSEUpdates = () => {
   }
 
   const handleSSEMessage = (message: SSEMessage) => {
-    // 🚨 MIGRATION TANSTACK QUERY PURE - Phase 1.3
-    // Pinia store supprimé, utilisation TanStack Query uniquement
+    // ✅ MIGRATION TANSTACK QUERY PURE - COMPLÈTE
+    // Utilisation TanStack Query uniquement (zéro Pinia)
     const queryClient = useQueryClient()
-    const bundleStore = useBundleStore()
 
     switch (message.type) {
       case 'connected':
@@ -132,40 +130,19 @@ export const useSSEUpdates = () => {
       case 'bundle:updated':
         console.log('📦 Mise à jour bundle reçue via SSE:', message.data?.name)
         if (message.data) {
-          // Update bundle store with fresh server data
-          const existingBundle = bundleStore.getBundleById(message.data.id)
-          if (existingBundle) {
-            // Update the bundle in the store
-            const index = bundleStore.bundles.findIndex(b => b.id === message.data.id)
-            if (index !== -1) {
-              bundleStore.bundles[index] = message.data
-            }
+          // ✅ TanStack Query: Update cache optimiste + invalidation
+          queryClient.setQueryData(['bundles', 'detail', message.data.id], message.data)
+          queryClient.invalidateQueries({ queryKey: ['bundles', 'list'] })
 
-            // Update selected bundle if it's the same bundle
-            if (bundleStore.selectedBundle?.id === message.data.id) {
-              bundleStore.setSelectedBundle(message.data)
-
-              // Update products if provided
-              if (message.data.products) {
-                bundleStore.selectedBundleProducts = message.data.products
-              }
-            }
-          }
-
-          // Clear relevant caches to ensure fresh data
-          bundleStore.calculationCache.delete(message.data.id)
-          bundleStore.aggregateCache.delete(message.data.id)
-
-          // Show notification using the fresh server data
+          // Notification visuelle
+          const { crudSuccess } = globalNotifications
           if (message.data.products && message.data.products.length > 0) {
-            const { crudSuccess } = globalNotifications
             const totalQuantity = message.data.products.reduce((sum: number, p: any) => sum + (p.quantity || 0), 0)
             crudSuccess.updated(
               `Bundle "${message.data.name}" mis à jour - ${message.data.products.length} produit(s), ${totalQuantity} articles total`,
               'bundle'
             )
           } else {
-            const { crudSuccess } = globalNotifications
             crudSuccess.updated(`Bundle "${message.data.name}" mis à jour en temps réel`, 'bundle')
           }
         }

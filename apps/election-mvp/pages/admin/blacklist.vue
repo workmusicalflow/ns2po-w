@@ -208,7 +208,7 @@ async function refreshData() {
   error.value = null
 
   try {
-    const { data } = await $fetch<{ success: boolean, data: BlacklistItem[] }>('/api/admin/blacklist')
+    const { data } = await $fetch('/api/admin/blacklist') as { success: boolean, data: BlacklistItem[] }
     blacklistItems.value = data
   } catch (err: any) {
     error.value = err.data?.message || err.message || 'Erreur lors du chargement'
