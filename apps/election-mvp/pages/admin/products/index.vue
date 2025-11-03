@@ -250,11 +250,8 @@ import AdminDataTable from '../../../components/admin/AdminDataTable.vue'
 import { StatusBadge } from '@ns2po/ui'
 import AdvancedResponsiveImage from '../../../components/AdvancedResponsiveImage.vue'
 
-// Vue lifecycle imports - PHASE 2: Event Bus
-import { onMounted, onUnmounted } from 'vue'
-
-// SOLID Architecture imports - Hybride useAsyncData + Vue Query
-import { useProductSearchQuery } from '../../../composables/useProductsQuery'
+// SOLID Architecture imports - TanStack Query EXCLUSIF (Phase 3: Cache Unifié)
+import { useProductsQuery, useProductSearchQuery } from '../../../composables/useProductsQuery'
 import { useCategoriesQuery } from '../../../composables/useCategoriesQuery'
 import { useMultipleProductBundleInfoQuery, useProductBundleUsageBadge, useProductBundleActions } from '../../../composables/useProductBundlesQuery'
 import { useCreateProductMutation, useUpdateProductMutation, useDeleteProductMutation } from '../../../composables/useProductMutations'
@@ -308,113 +305,40 @@ const currentFilters = computed((): ProductFilters => {
   return result
 })
 
-// ===== MAIN DATA LOADING - useAsyncData Pattern (identique Page Édition) =====
-// 🎯 FIX AUDIT: Migration useProductsQuery → useAsyncData pour spinner global garanti
+// ===== MAIN DATA LOADING - TanStack Query (Phase 3: Migration Cache Unifié) =====
+// ⭐ PHASE 3: Migration useAsyncData → useProductsQuery pour cache unifié avec Page Édition
 const {
   data: products,
-  pending,
-  error,
-  refresh: refetch
-} = await useAsyncData(
-  'products-list',
-  async (): Promise<Product[]> => {
-    try {
-      const startTime = Date.now() // ⭐ PHASE 1: Timing pour délai artificiel
-      if (process.dev) {
-        console.log('🔄 [useAsyncData] Fetching products list')
-      }
-
-      const response = await $fetch('/api/products', {
-        query: {
-          ...(currentFilters.value || {})
-        }
-      }) as { success: boolean; data: Product[] }
-
-      if (!response.success) {
-        throw new Error('Failed to fetch products')
-      }
-
-      // ⭐ PHASE 1: Délai artificiel 3s minimum (même pattern que Page Édition)
-      // Garantit spinner visible même si Railway cache < 100ms
-      const elapsed = Date.now() - startTime
-      const remaining = 3000 - elapsed
-
-      if (remaining > 0) {
-        if (process.dev) {
-          console.log(`⏱️ [useAsyncData] Délai artificiel: ${remaining}ms pour atteindre 3s minimum`)
-        }
-        await new Promise(resolve => setTimeout(resolve, remaining))
-      }
-
-      if (process.dev) {
-        console.log(`✅ [useAsyncData] Produits chargés en ${Date.now() - startTime}ms (incl. délai)`)
-      }
-      return response.data || []
-    } catch (e) {
-      console.error('❌ [useAsyncData] Failed to load products:', e)
-      throw e
-    }
-  },
-  {
-    server: false, // 🔧 FIX: Client-only pour garantir spinner visible pendant fetch
-    lazy: false,   // 🔧 Bloque le rendu jusqu'aux données
-    immediate: true,
-    watch: [currentFilters] // 🔧 Re-fetch automatique quand filtres changent
-  }
+  isPending, // TanStack Query utilise isPending au lieu de pending
+  error
+} = useProductsQuery(
+  currentFilters, // Filters reactifs
+  undefined       // Sort options (undefined = pas de tri pour l'instant)
+  // Les options (staleTime: 0, refetchOnMount: 'always', etc.) sont déjà dans le composable
 )
 
-// Gérer le spinner global basé sur l'état `pending` de useAsyncData (Pattern Page Édition)
-watch(pending, (isPending) => {
-  if (isPending) {
+// Gérer le spinner global basé sur l'état `isPending` de TanStack Query
+watch(isPending, (loading) => {
+  if (loading) {
     if (process.dev) {
-      console.log('🔄 [watch(pending)] Spinner activé - Chargement en cours...')
+      console.log('🔄 [TanStack Query] Spinner activé - Chargement en cours...')
     }
     startLoading('Chargement des produits...')
   } else {
     if (process.dev) {
-      console.log('✅ [watch(pending)] Spinner désactivé - Chargement terminé')
+      console.log('✅ [TanStack Query] Spinner désactivé - Chargement terminé')
     }
     setTimeout(() => stopLoading(), 300)
   }
 }, { immediate: true })
 
-// ⭐ PHASE 2: Écoute Event Bus pour invalidation cache après mutation Page Édition
-const { $bus } = useNuxtApp()
-onMounted(() => {
-  // Écouter les événements de modification/création de produits
-  $bus.on('product-updated', (productId) => {
-    if (process.dev) {
-      console.log(`📡 [Event Bus] product-updated reçu: ${productId}, rafraîchissement liste...`)
-    }
-    refetch() // Refetch avec délai 3s garanti pour spinner visible
-  })
-
-  $bus.on('product-created', (productId) => {
-    if (process.dev) {
-      console.log(`📡 [Event Bus] product-created reçu: ${productId}, rafraîchissement liste...`)
-    }
-    refetch() // Refetch avec délai 3s garanti pour spinner visible
-  })
-
-  // ⭐ PHASE 2: Écouter aussi product-deleted (recommandation Gemini)
-  $bus.on('product-deleted', (productId) => {
-    if (process.dev) {
-      console.log(`📡 [Event Bus] product-deleted reçu: ${productId}, rafraîchissement liste...`)
-    }
-    refetch() // Refetch avec délai 3s garanti pour spinner visible
-  })
-})
-
-onUnmounted(() => {
-  // Nettoyer les écouteurs pour éviter memory leaks
-  $bus.off('product-updated')
-  $bus.off('product-created')
-  $bus.off('product-deleted')
-})
+// ⭐ PHASE 3: Event Bus SUPPRIMÉ - TanStack Query gère invalidation automatiquement
+// L'invalidation dans [id].vue (queryClient.invalidateQueries) suffit maintenant
+// car index.vue et [id].vue partagent le même cache TanStack Query
 
 // Créer isLoading et isFetching pour compatibilité template
-const isLoading = computed(() => pending.value)
-const isFetching = computed(() => pending.value)
+const isLoading = computed(() => isPending.value)
+const isFetching = computed(() => isPending.value)
 
 // Search query (separate for performance)
 const {

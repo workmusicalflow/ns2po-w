@@ -853,14 +853,8 @@ async function handleSubmit() {
 
       if (response.success && response.data) {
         // Invalider cache TanStack Query
+        // ⭐ PHASE 3: TanStack Query unifié - invalidation suffit (Event Bus supprimé)
         await queryClient.invalidateQueries({ queryKey: productQueryKeys.all })
-
-        // ⭐ PHASE 2: Émettre événement pour invalidation cache Page Liste
-        const { $bus } = useNuxtApp()
-        $bus.emit('product-created', response.data.id)
-        if (process.dev) {
-          console.log(`📡 [Event Bus] product-created émis: ${response.data.id}`)
-        }
 
         crudSuccess.created(`Produit "${response.data.name}" créé avec succès`, 'product')
         await router.push('/admin/products')
@@ -880,17 +874,11 @@ async function handleSubmit() {
         queryClient.setQueryData(productQueryKeys.detail(response.data.id), response.data)
 
         // Invalider par sécurité
+        // ⭐ PHASE 3: TanStack Query unifié - invalidation suffit (Event Bus supprimé)
         await queryClient.invalidateQueries({ queryKey: productQueryKeys.all })
 
         // Rafraîchir form local
         mapProductToForm(response.data)
-
-        // ⭐ PHASE 2: Émettre événement pour invalidation cache Page Liste
-        const { $bus } = useNuxtApp()
-        $bus.emit('product-updated', response.data.id)
-        if (process.dev) {
-          console.log(`📡 [Event Bus] product-updated émis: ${response.data.id}`)
-        }
 
         crudSuccess.updated(`Produit "${response.data.name}" mis à jour`)
       }
@@ -933,14 +921,8 @@ async function deleteProduct() {
 
     if (response.success) {
       // Invalider cache TanStack Query
+      // ⭐ PHASE 3: TanStack Query unifié - invalidation suffit (Event Bus supprimé)
       await queryClient.invalidateQueries({ queryKey: productQueryKeys.all })
-
-      // ⭐ PHASE 2: Émettre événement pour invalidation cache Page Liste
-      const { $bus } = useNuxtApp()
-      $bus.emit('product-deleted', productId.value)
-      if (process.dev) {
-        console.log(`📡 [Event Bus] product-deleted émis: ${productId.value}`)
-      }
 
       crudSuccess.deleted(`Produit "${form.name}" supprimé avec succès`, 'product')
       await router.push('/admin/products')

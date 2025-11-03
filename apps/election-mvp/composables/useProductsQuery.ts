@@ -48,6 +48,14 @@ export function useProductsQuery(
   return useQuery({
     queryKey: computed(() => productQueryKeys.list(filtersRef.value, sortRef.value)),
     queryFn: async (): Promise<Product[]> => {
+      // ⭐ PHASE 3: Délai artificiel 3s minimum pour spinner visible (UX cohérente 3G)
+      const startTime = Date.now()
+      const MIN_LOADING_TIME_MS = 3000
+
+      if (process.dev) {
+        console.log('🔄 [TanStack Query] Fetching products list')
+      }
+
       const response = await $fetch('/api/products', {
         query: {
           ...(filtersRef.value || {}),
@@ -57,6 +65,21 @@ export function useProductsQuery(
 
       if (!response.success) {
         throw new Error('Failed to fetch products')
+      }
+
+      // ⭐ PHASE 3: Garantir délai minimum 3s pour spinner visible
+      const elapsed = Date.now() - startTime
+      const remaining = MIN_LOADING_TIME_MS - elapsed
+
+      if (remaining > 0) {
+        if (process.dev) {
+          console.log(`⏱️ [TanStack Query] Délai artificiel: ${remaining}ms pour atteindre ${MIN_LOADING_TIME_MS}ms minimum`)
+        }
+        await new Promise(resolve => setTimeout(resolve, remaining))
+      }
+
+      if (process.dev) {
+        console.log(`✅ [TanStack Query] Produits chargés en ${Date.now() - startTime}ms (incl. délai)`)
       }
 
       return response.data || []
