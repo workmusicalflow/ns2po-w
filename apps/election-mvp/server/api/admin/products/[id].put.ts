@@ -49,6 +49,8 @@ export default defineEventHandler(async (event) => {
   const startTime = Date.now()
   const productId = getRouterParam(event, 'id')
 
+  console.log(`➡️ [API PUT] Début du handler pour produit ID: ${productId}`)
+
   if (!productId) {
     throw createError({
       statusCode: 400,
@@ -69,7 +71,7 @@ export default defineEventHandler(async (event) => {
     const body = await readBody(event)
     const validatedData = UpdateProductSchema.parse(body)
 
-    console.log(`📝 Mise à jour produit ${productId}...`)
+    console.log(`➡️ [API PUT] Tentative de mise à jour en BDD pour ID: ${productId}`, validatedData)
 
     // 2. Vérifier existence produit
     const existingProduct = await getProductWithRelations(tursoClient, productId)
@@ -171,15 +173,21 @@ export default defineEventHandler(async (event) => {
     }
 
     const duration = Date.now() - startTime
-    console.log(`✅ Produit ${productId} mis à jour en ${duration}ms`)
+    console.log(`✅ [API PUT] Mise à jour BDD réussie. Produit ${productId} mis à jour en ${duration}ms`, {
+      updatedProduct: updatedProduct.id,
+      basePrice: updatedProduct.basePrice
+    })
 
     // ⭐ INVALIDATION CACHE NITRO: Force le refetch de la liste produits
     try {
+      console.log(`➡️ [API PUT] Tentative d'invalidation du cache Nitro...`)
       await useStorage('cache').removeItem('products:list:active')
-      console.log('🗑️ Cache Nitro invalidé après UPDATE produit')
+      console.log('🗑️ [API PUT] Cache Nitro invalidé après UPDATE produit')
     } catch (cacheError) {
-      console.warn('⚠️ Échec invalidation cache (non-bloquant):', cacheError)
+      console.warn('⚠️ [API PUT] Échec invalidation cache (non-bloquant):', cacheError)
     }
+
+    console.log(`✅ [API PUT] Fin du handler, renvoi de la réponse pour produit ${productId}`)
 
     return {
       success: true,
@@ -189,10 +197,11 @@ export default defineEventHandler(async (event) => {
     }
 
   } catch (error) {
-    console.error(`❌ Erreur mise à jour produit ${productId}:`, error)
+    console.error(`❌ [API PUT] Erreur fatale dans le handler PUT pour produit ${productId}:`, error)
 
     // Erreur de validation Zod
     if (error instanceof z.ZodError) {
+      console.error(`❌ [API PUT] Erreur de validation Zod:`, error.errors)
       throw createError({
         statusCode: 400,
         statusMessage: 'Données invalides',

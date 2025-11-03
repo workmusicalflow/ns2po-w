@@ -52,6 +52,8 @@ const CreateProductSchema = z.object({
 export default defineEventHandler(async (event) => {
   const startTime = Date.now()
 
+  console.log(`➡️ [API POST] Début du handler pour créer un nouveau produit`)
+
   try {
     const tursoClient = getDatabase()
     if (!tursoClient) {
@@ -69,7 +71,7 @@ export default defineEventHandler(async (event) => {
     const productId = `prod_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`
     const now = new Date().toISOString()
 
-    console.log(`📝 Création produit ${productId} - ${validatedData.name}...`)
+    console.log(`➡️ [API POST] Tentative de création produit ${productId} - ${validatedData.name}...`)
 
     // 3. Préparer statements pour insertion batch
     const insertStatements: Array<{ sql: string; args: any[] }> = []
@@ -150,15 +152,21 @@ export default defineEventHandler(async (event) => {
     const createdProduct = await getProductWithRelations(tursoClient, productId)
 
     const duration = Date.now() - startTime
-    console.log(`✅ Produit ${productId} créé avec succès en ${duration}ms`)
+    console.log(`✅ [API POST] Création BDD réussie. Produit ${productId} créé en ${duration}ms`, {
+      createdProduct: createdProduct.id,
+      name: createdProduct.name
+    })
 
     // ⭐ INVALIDATION CACHE NITRO: Force le refetch de la liste produits
     try {
+      console.log(`➡️ [API POST] Tentative d'invalidation du cache Nitro...`)
       await useStorage('cache').removeItem('products:list:active')
-      console.log('🗑️ Cache Nitro invalidé après CREATE produit')
+      console.log('🗑️ [API POST] Cache Nitro invalidé après CREATE produit')
     } catch (cacheError) {
-      console.warn('⚠️ Échec invalidation cache (non-bloquant):', cacheError)
+      console.warn('⚠️ [API POST] Échec invalidation cache (non-bloquant):', cacheError)
     }
+
+    console.log(`✅ [API POST] Fin du handler, renvoi de la réponse pour produit ${productId}`)
 
     return {
       success: true,
@@ -168,10 +176,11 @@ export default defineEventHandler(async (event) => {
     }
 
   } catch (error) {
-    console.error('❌ Erreur création produit:', error)
+    console.error('❌ [API POST] Erreur fatale dans le handler POST:', error)
 
     // Erreur de validation Zod
     if (error instanceof z.ZodError) {
+      console.error(`❌ [API POST] Erreur de validation Zod:`, error.errors)
       throw createError({
         statusCode: 400,
         statusMessage: 'Données invalides',

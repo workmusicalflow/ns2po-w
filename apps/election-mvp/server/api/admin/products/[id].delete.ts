@@ -18,7 +18,7 @@ export default defineEventHandler(async (event) => {
     const query = getQuery(event)
     const deleteImages = query.deleteImages === 'true'
 
-    console.log(`📦 DELETE /api/admin/products/${productId} - Suppression produit (schéma normalisé) ${deleteImages ? 'avec images' : 'sans images'}`)
+    console.log(`➡️ [API DELETE] Début du handler pour produit ID: ${productId} (${deleteImages ? 'avec images' : 'sans images'})`)
 
     if (!productId) {
       throw createError({
@@ -154,15 +154,18 @@ export default defineEventHandler(async (event) => {
 
       await db.batch(deleteStatements, 'write')
 
-      console.log(`✅ Produit et relations supprimés avec succès: ${productId} (${productName})`)
+      console.log(`✅ [API DELETE] Suppression BDD réussie. Produit ${productId} (${productName}) supprimé`)
 
       // ⭐ INVALIDATION CACHE NITRO: Force le refetch de la liste produits
       try {
+        console.log(`➡️ [API DELETE] Tentative d'invalidation du cache Nitro...`)
         await useStorage('cache').removeItem('products:list:active')
-        console.log('🗑️ Cache Nitro invalidé après DELETE produit')
+        console.log('🗑️ [API DELETE] Cache Nitro invalidé après DELETE produit')
       } catch (cacheError) {
-        console.warn('⚠️ Échec invalidation cache (non-bloquant):', cacheError)
+        console.warn('⚠️ [API DELETE] Échec invalidation cache (non-bloquant):', cacheError)
       }
+
+      console.log(`✅ [API DELETE] Fin du handler, renvoi de la réponse pour produit ${productId}`)
 
       const response = {
         success: true,
@@ -213,7 +216,8 @@ export default defineEventHandler(async (event) => {
     }
 
   } catch (error: any) {
-    console.error(`❌ Erreur DELETE /api/admin/products/${getRouterParam(event, 'id')}:`, error)
+    const productId = getRouterParam(event, 'id')
+    console.error(`❌ [API DELETE] Erreur fatale dans le handler DELETE pour produit ${productId}:`, error)
 
     if (error.statusCode) {
       throw error
