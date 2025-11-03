@@ -855,6 +855,13 @@ async function handleSubmit() {
         // Invalider cache TanStack Query
         await queryClient.invalidateQueries({ queryKey: productQueryKeys.all })
 
+        // ⭐ PHASE 2: Émettre événement pour invalidation cache Page Liste
+        const { $bus } = useNuxtApp()
+        $bus.emit('product-created', response.data.id)
+        if (process.dev) {
+          console.log(`📡 [Event Bus] product-created émis: ${response.data.id}`)
+        }
+
         crudSuccess.created(`Produit "${response.data.name}" créé avec succès`, 'product')
         await router.push('/admin/products')
       }
@@ -877,6 +884,13 @@ async function handleSubmit() {
 
         // Rafraîchir form local
         mapProductToForm(response.data)
+
+        // ⭐ PHASE 2: Émettre événement pour invalidation cache Page Liste
+        const { $bus } = useNuxtApp()
+        $bus.emit('product-updated', response.data.id)
+        if (process.dev) {
+          console.log(`📡 [Event Bus] product-updated émis: ${response.data.id}`)
+        }
 
         crudSuccess.updated(`Produit "${response.data.name}" mis à jour`)
       }
@@ -920,6 +934,13 @@ async function deleteProduct() {
     if (response.success) {
       // Invalider cache TanStack Query
       await queryClient.invalidateQueries({ queryKey: productQueryKeys.all })
+
+      // ⭐ PHASE 2: Émettre événement pour invalidation cache Page Liste
+      const { $bus } = useNuxtApp()
+      $bus.emit('product-deleted', productId.value)
+      if (process.dev) {
+        console.log(`📡 [Event Bus] product-deleted émis: ${productId.value}`)
+      }
 
       crudSuccess.deleted(`Produit "${form.name}" supprimé avec succès`, 'product')
       await router.push('/admin/products')

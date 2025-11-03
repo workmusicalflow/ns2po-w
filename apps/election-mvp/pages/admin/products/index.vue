@@ -250,6 +250,9 @@ import AdminDataTable from '../../../components/admin/AdminDataTable.vue'
 import { StatusBadge } from '@ns2po/ui'
 import AdvancedResponsiveImage from '../../../components/AdvancedResponsiveImage.vue'
 
+// Vue lifecycle imports - PHASE 2: Event Bus
+import { onMounted, onUnmounted } from 'vue'
+
 // SOLID Architecture imports - Hybride useAsyncData + Vue Query
 import { useProductSearchQuery } from '../../../composables/useProductsQuery'
 import { useCategoriesQuery } from '../../../composables/useCategoriesQuery'
@@ -316,6 +319,11 @@ const {
   'products-list',
   async (): Promise<Product[]> => {
     try {
+      const startTime = Date.now() // ⭐ PHASE 1: Timing pour délai artificiel
+      if (process.dev) {
+        console.log('🔄 [useAsyncData] Fetching products list')
+      }
+
       const response = await $fetch('/api/products', {
         query: {
           ...(currentFilters.value || {})
@@ -326,6 +334,21 @@ const {
         throw new Error('Failed to fetch products')
       }
 
+      // ⭐ PHASE 1: Délai artificiel 3s minimum (même pattern que Page Édition)
+      // Garantit spinner visible même si Railway cache < 100ms
+      const elapsed = Date.now() - startTime
+      const remaining = 3000 - elapsed
+
+      if (remaining > 0) {
+        if (process.dev) {
+          console.log(`⏱️ [useAsyncData] Délai artificiel: ${remaining}ms pour atteindre 3s minimum`)
+        }
+        await new Promise(resolve => setTimeout(resolve, remaining))
+      }
+
+      if (process.dev) {
+        console.log(`✅ [useAsyncData] Produits chargés en ${Date.now() - startTime}ms (incl. délai)`)
+      }
       return response.data || []
     } catch (e) {
       console.error('❌ [useAsyncData] Failed to load products:', e)
@@ -343,13 +366,51 @@ const {
 // Gérer le spinner global basé sur l'état `pending` de useAsyncData (Pattern Page Édition)
 watch(pending, (isPending) => {
   if (isPending) {
-    console.log('🔄 [watch(pending)] Spinner activé - Chargement en cours...')
+    if (process.dev) {
+      console.log('🔄 [watch(pending)] Spinner activé - Chargement en cours...')
+    }
     startLoading('Chargement des produits...')
   } else {
-    console.log('✅ [watch(pending)] Spinner désactivé - Chargement terminé')
+    if (process.dev) {
+      console.log('✅ [watch(pending)] Spinner désactivé - Chargement terminé')
+    }
     setTimeout(() => stopLoading(), 300)
   }
 }, { immediate: true })
+
+// ⭐ PHASE 2: Écoute Event Bus pour invalidation cache après mutation Page Édition
+const { $bus } = useNuxtApp()
+onMounted(() => {
+  // Écouter les événements de modification/création de produits
+  $bus.on('product-updated', (productId) => {
+    if (process.dev) {
+      console.log(`📡 [Event Bus] product-updated reçu: ${productId}, rafraîchissement liste...`)
+    }
+    refetch() // Refetch avec délai 3s garanti pour spinner visible
+  })
+
+  $bus.on('product-created', (productId) => {
+    if (process.dev) {
+      console.log(`📡 [Event Bus] product-created reçu: ${productId}, rafraîchissement liste...`)
+    }
+    refetch() // Refetch avec délai 3s garanti pour spinner visible
+  })
+
+  // ⭐ PHASE 2: Écouter aussi product-deleted (recommandation Gemini)
+  $bus.on('product-deleted', (productId) => {
+    if (process.dev) {
+      console.log(`📡 [Event Bus] product-deleted reçu: ${productId}, rafraîchissement liste...`)
+    }
+    refetch() // Refetch avec délai 3s garanti pour spinner visible
+  })
+})
+
+onUnmounted(() => {
+  // Nettoyer les écouteurs pour éviter memory leaks
+  $bus.off('product-updated')
+  $bus.off('product-created')
+  $bus.off('product-deleted')
+})
 
 // Créer isLoading et isFetching pour compatibilité template
 const isLoading = computed(() => pending.value)
