@@ -152,6 +152,14 @@ export default defineEventHandler(async (event) => {
     const duration = Date.now() - startTime
     console.log(`✅ Produit ${productId} créé avec succès en ${duration}ms`)
 
+    // ⭐ INVALIDATION CACHE NITRO: Force le refetch de la liste produits
+    try {
+      await useStorage('cache').removeItem('products:list:active')
+      console.log('🗑️ Cache Nitro invalidé après CREATE produit')
+    } catch (cacheError) {
+      console.warn('⚠️ Échec invalidation cache (non-bloquant):', cacheError)
+    }
+
     return {
       success: true,
       data: createdProduct,

@@ -57,10 +57,31 @@ export default defineEventHandler(async (event) => {
   const startTime = Date.now()
 
   try {
+    // ⭐ CACHE NITRO: Clé unique pour la liste des produits
+    const cacheKey = 'products:list:active'
+    const cacheStorage = useStorage('cache')
+
+    // 1. Vérifier cache Nitro en premier
+    const cachedData = await cacheStorage.getItem(cacheKey)
+    if (cachedData) {
+      const duration = Date.now() - startTime
+      console.log(`⚡ Cache hit: ${(cachedData as any).length} produits en ${duration}ms`)
+
+      return {
+        success: true,
+        data: cachedData,
+        source: 'nitro-cache',
+        count: (cachedData as any).length,
+        duration,
+        cached: true
+      }
+    }
+
+    // 2. Cache miss → Fetch depuis Turso
     const tursoClient = getDatabase()
     if (tursoClient) {
       try {
-        console.log('🎯 Chargement produits (schéma normalisé, GROUP_CONCAT)...')
+        console.log('🎯 Cache miss - Chargement produits depuis Turso (schéma normalisé)...')
 
         // Récupération optimisée avec relations (1 seule requête)
         const products = await getProductsListOptimized(tursoClient, {
@@ -69,6 +90,12 @@ export default defineEventHandler(async (event) => {
 
         const duration = Date.now() - startTime
         console.log(`✅ ${products.length} produits récupérés en ${duration}ms (schéma normalisé)`)
+
+        // ⭐ Stocker dans cache Nitro (TTL 5 minutes)
+        await cacheStorage.setItem(cacheKey, products, {
+          ttl: 300 // 5 minutes
+        })
+        console.log('💾 Produits mis en cache Nitro (TTL: 5min)')
 
         return {
           success: true,

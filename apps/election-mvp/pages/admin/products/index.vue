@@ -108,7 +108,7 @@
     <!-- Products Table -->
     <AdminDataTable
       v-else
-      :data="filteredProducts"
+      :data="filteredProducts as any"
       :columns="columns"
       :loading="false"
       :error="error"
@@ -117,9 +117,9 @@
       <template #cell-image="{ item }">
         <div class="w-12 h-12 rounded-lg overflow-hidden bg-gray-100">
           <AdvancedResponsiveImage
-            v-if="item.image"
-            :src="item.image"
-            :alt="item.name"
+            v-if="(item as any).image"
+            :src="(item as any).image"
+            :alt="(item as any).name"
             context="thumbnail"
             :eager="true"
             class="w-full h-full object-cover"
@@ -133,14 +133,14 @@
       <!-- Custom slot for price -->
       <template #cell-price="{ item }">
         <span class="font-medium text-gray-900">
-          {{ formatPrice(item.price || item.basePrice) }}
+          {{ formatPrice((item as any).price || (item as any).basePrice) }}
         </span>
       </template>
 
       <!-- Custom slot for category -->
       <template #cell-category="{ item }">
         <span class="text-gray-900">
-          {{ item.categoryDetails?.name || item.category || 'Non catégorisé' }}
+          {{ (item as any).category || 'Non catégorisé' }}
         </span>
       </template>
 
@@ -148,16 +148,16 @@
       <template #cell-bundles="{ item }">
         <span
           class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
-          :class="getBundleUsageBadgeWrapper(item.id).class"
+          :class="getBundleUsageBadgeWrapper((item as any).id).class"
         >
-          {{ getBundleUsageBadgeWrapper(item.id).text }}
+          {{ getBundleUsageBadgeWrapper((item as any).id).text }}
         </span>
       </template>
 
       <!-- Custom slot for status -->
       <template #cell-status="{ item }">
-        <StatusBadge :status="getProductStatus(item)">
-          {{ getProductStatusLabel(item) }}
+        <StatusBadge :status="getProductStatus(item as any)">
+          {{ getProductStatusLabel(item as any) }}
         </StatusBadge>
       </template>
 
@@ -165,7 +165,7 @@
       <template #actions="{ item }">
         <div class="flex items-center space-x-2">
           <NuxtLink
-            :to="`/admin/products/${item.id}`"
+            :to="`/admin/products/${(item as any).id}`"
             class="text-amber-600 hover:text-amber-900 text-sm font-medium"
           >
             Modifier
@@ -173,9 +173,9 @@
 
           <!-- Bouton "Voir bundles" si le produit est utilisé -->
           <button
-            v-if="!getBundleUsageBadgeWrapper(item.id).canDelete"
+            v-if="!getBundleUsageBadgeWrapper((item as any).id).canDelete"
             class="text-blue-600 hover:text-blue-900 text-sm font-medium"
-            @click="viewProductBundles(item)"
+            @click="viewProductBundles(item as any)"
           >
             Voir bundles
           </button>
@@ -184,13 +184,13 @@
           <button
             :class="[
               'text-sm font-medium',
-              getBundleUsageBadgeWrapper(item.id).canDelete
+              getBundleUsageBadgeWrapper((item as any).id).canDelete
                 ? 'text-red-600 hover:text-red-900'
                 : 'text-gray-400 cursor-not-allowed'
             ]"
             disabled
-            :title="!getBundleUsageBadgeWrapper(item.id).canDelete ? 'Produit utilisé dans des bundles' : ''"
-            @click="getBundleUsageBadgeWrapper(item.id).canDelete ? handleDeleteProduct(item) : null"
+            :title="!getBundleUsageBadgeWrapper((item as any).id).canDelete ? 'Produit utilisé dans des bundles' : ''"
+            @click="getBundleUsageBadgeWrapper((item as any).id).canDelete ? handleDeleteProduct(item as any) : null"
           >
             Supprimer (bientôt)
           </button>
@@ -250,8 +250,9 @@ import AdminDataTable from '../../../components/admin/AdminDataTable.vue'
 import { StatusBadge } from '@ns2po/ui'
 import AdvancedResponsiveImage from '../../../components/AdvancedResponsiveImage.vue'
 
-// SOLID Architecture imports - TanStack Query EXCLUSIF (Phase 3: Cache Unifié)
-import { useProductsQuery, useProductSearchQuery } from '../../../composables/useProductsQuery'
+// SOLID Architecture imports - Architecture Hybride (Reversement Phase 3)
+// useAsyncData pour data loading (Nuxt Cache) + TanStack Query pour mutations CRUD
+import { useProductSearchQuery } from '../../../composables/useProductsQuery'
 import { useCategoriesQuery } from '../../../composables/useCategoriesQuery'
 import { useMultipleProductBundleInfoQuery, useProductBundleUsageBadge, useProductBundleActions } from '../../../composables/useProductBundlesQuery'
 import { useCreateProductMutation, useUpdateProductMutation, useDeleteProductMutation } from '../../../composables/useProductMutations'
@@ -278,67 +279,97 @@ const { crudSuccess, crudError } = globalNotifications
 const { startLoading, stopLoading } = useGlobalLoading()
 
 // ===== FILTERS - Simple et cohérent avec Bundles =====
-const filters = reactive({
+const filters = ref({
   search: '',
   category: '',
   status: ''
 })
 
-const debouncedSearch = refDebounced(computed(() => filters.search), 300)
+const debouncedSearch = refDebounced(computed(() => filters.value.search), 300)
 
 // ===== COMPUTED FILTERS - Simplifié =====
-const currentFilters = computed((): ProductFilters => {
-  const result: ProductFilters = {}
+const currentFilters = computed((): Partial<ProductFilters> => {
+  const result: Record<string, any> = {} // Utiliser Record pour éviter readonly errors
 
-  if (filters.search) {
-    result.search = filters.search
+  if (filters.value.search) {
+    result.search = filters.value.search
   }
 
-  if (filters.category) {
-    result.category = filters.category
+  if (filters.value.category) {
+    result.category = filters.value.category
   }
 
-  if (filters.status) {
-    result.status = filters.status as ProductStatus
+  if (filters.value.status) {
+    result.status = filters.value.status as ProductStatus
   }
 
-  return result
+  return result as Partial<ProductFilters>
 })
 
-// ===== MAIN DATA LOADING - TanStack Query (Phase 3: Migration Cache Unifié) =====
-// ⭐ PHASE 3: Migration useAsyncData → useProductsQuery pour cache unifié avec Page Édition
-const {
-  data: products,
-  isPending, // TanStack Query utilise isPending au lieu de pending
-  error
-} = useProductsQuery(
-  currentFilters, // Filters reactifs
-  undefined       // Sort options (undefined = pas de tri pour l'instant)
-  // Les options (staleTime: 0, refetchOnMount: 'always', etc.) sont déjà dans le composable
+// ===== MAIN DATA LOADING - useAsyncData (Reversement Phase 3) =====
+// ⭐ REVERSEMENT PHASE 3: Migration TanStack Query → useAsyncData pour copier le pattern réussi de [id].vue
+// Pattern identique à [Page Édition [id].vue] → useAsyncData → Nuxt Cache
+// Utilise /api/products car /api/admin/products GET liste n'existe pas (seulement POST/PUT/DELETE)
+const { data: productsData, pending, error, refresh } = await useAsyncData(
+  'admin-products-list', // Key unique pour le cache Nuxt
+  async () => {
+    const startTime = Date.now()
+    console.log('🔄 [useAsyncData] Fetching products list from API')
+
+    try {
+      // Appel API avec filtres (cache Nitro actif avec invalidation auto)
+      const response = await $fetch('/api/products', {
+        query: currentFilters.value
+      }) as { success: boolean; data: Product[] }
+
+      // Garantir 3 secondes minimum de spinner (UX cohérente 3G comme [id].vue)
+      const elapsed = Date.now() - startTime
+      const remaining = 3000 - elapsed
+
+      if (remaining > 0) {
+        console.log(`⏱️ [useAsyncData] Délai artificiel: ${remaining}ms pour atteindre 3s minimum`)
+        await new Promise(resolve => setTimeout(resolve, remaining))
+      }
+
+      console.log(`✅ [useAsyncData] Produits chargés en ${Date.now() - startTime}ms`)
+
+      return response.success ? response.data : []
+    } catch (e) {
+      console.error('❌ [useAsyncData] Error fetching products:', e)
+      throw e
+    }
+  },
+  {
+    server: true,   // SSR enabled
+    lazy: false,    // Bloque le rendu jusqu'à ce que les données arrivent (spinner garanti visible)
+    immediate: true // Exécute immédiatement
+  }
 )
 
-// Gérer le spinner global basé sur l'état `isPending` de TanStack Query
-watch(isPending, (loading) => {
-  if (loading) {
-    if (process.dev) {
-      console.log('🔄 [TanStack Query] Spinner activé - Chargement en cours...')
-    }
+// Convertir Ref<Product[]> en computed pour réactivité
+const products = computed(() => productsData.value || [])
+
+// Gérer le spinner global basé sur l'état `pending` de useAsyncData (pattern [id].vue)
+watch(pending, (isPending) => {
+  if (isPending) {
+    console.log('🔄 [watch(pending)] Spinner activé - Chargement en cours...')
     startLoading('Chargement des produits...')
   } else {
-    if (process.dev) {
-      console.log('✅ [TanStack Query] Spinner désactivé - Chargement terminé')
-    }
+    console.log('✅ [watch(pending)] Spinner désactivé - Chargement terminé')
+    // Petit délai pour fluidité visuelle (comme dans [id].vue)
     setTimeout(() => stopLoading(), 300)
   }
 }, { immediate: true })
 
-// ⭐ PHASE 3: Event Bus SUPPRIMÉ - TanStack Query gère invalidation automatiquement
-// L'invalidation dans [id].vue (queryClient.invalidateQueries) suffit maintenant
-// car index.vue et [id].vue partagent le même cache TanStack Query
-
 // Créer isLoading et isFetching pour compatibilité template
-const isLoading = computed(() => isPending.value)
-const isFetching = computed(() => isPending.value)
+const isLoading = computed(() => pending.value)
+const isFetching = computed(() => pending.value)
+
+// ===== SYNCHRONISATION CACHE (Phase 3 Reversal Final) =====
+// ⭐ Synchronisation via refreshNuxtData() - Pas besoin d'Event Bus
+// [id].vue appelle refreshNuxtData('admin-products-list') après chaque mutation
+// → useAsyncData('admin-products-list') détecte cache stale et refetch automatiquement
+// → Fonctionne même si index.vue n'est pas encore monté (zéro problème de chronologie)
 
 // Search query (separate for performance)
 const {
@@ -347,7 +378,7 @@ const {
   isLoading: isSearching
 } = useProductSearchQuery(debouncedSearch, currentFilters, {
   enabled: computed(() => debouncedSearch.value.length >= 2)
-})
+} as any)
 
 // Categories query - Vue Query cohérent
 const { data: categories } = useCategoriesQuery()
@@ -439,9 +470,9 @@ const columns = [
 
 // ===== METHODS - Simples et focalisées =====
 function resetFilters() {
-  filters.search = ''
-  filters.category = ''
-  filters.status = ''
+  filters.value.search = ''
+  filters.value.category = ''
+  filters.value.status = ''
 }
 
 async function exportProducts() {
@@ -461,7 +492,7 @@ async function exportProducts() {
         `"${product.name}"`,
         `"${product.reference || ''}"`,
         product.price || product.basePrice || 0,
-        `"${product.categoryDetails?.name || product.category || ''}"`,
+        `"${product.category || ''}"`,
         `"${getProductStatusLabel(product)}"`
       ].join(','))
     ].join('\n')

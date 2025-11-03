@@ -539,6 +539,10 @@
 </template>
 
 <script setup lang="ts">
+// Imports explicites (doivent être en haut)
+import { useQueryClient } from '@tanstack/vue-query'
+import { productQueryKeys } from '~/composables/useProductsQuery'
+
 // Layout admin
 definePageMeta({
   layout: 'admin',
@@ -620,24 +624,21 @@ watch(pending, (isPending) => {
   }
 }, { immediate: true })
 
-// Gérer les erreurs de chargement
-if (fetchError.value) {
-  console.error('❌ [useAsyncData] Failed to load product:', fetchError.value)
-  crudError.read('product', `Erreur lors du chargement du produit "${productId.value}"`)
-  await router.push('/admin/products')
-}
-
 // 🚨 PATCH URGENCE GPT-5: Contourner useProducts cassé (storeToRefs exclut méthodes)
 // Railway n'a pas rebuild avec commits b2121bd + 5ca5232
 // Solution temporaire: $fetch direct + TanStack Query invalidation
-import { useQueryClient } from '@tanstack/vue-query'
-import { productQueryKeys } from '~/composables/useProductsQuery'
-
 const queryClient = useQueryClient()
 
-// Notifications
+// Notifications - DOIT être déclaré avant son utilisation
 // Auto-imported via Nuxt 3: globalNotifications
 const { crudSuccess, crudError } = globalNotifications
+
+// Gérer les erreurs de chargement
+if (fetchError.value) {
+  console.error('❌ [useAsyncData] Failed to load product:', fetchError.value)
+  crudError.loaded('product', `Erreur lors du chargement du produit "${productId.value}"`)
+  await router.push('/admin/products')
+}
 
 // Reactive data
 const isSubmitting = ref(false)
@@ -852,9 +853,9 @@ async function handleSubmit() {
       }) as { success: boolean; data: any }
 
       if (response.success && response.data) {
-        // Invalider cache TanStack Query
-        // ⭐ PHASE 3: TanStack Query unifié - invalidation suffit (Event Bus supprimé)
-        await queryClient.invalidateQueries({ queryKey: productQueryKeys.all })
+        // ⭐ PHASE 3 REVERSAL: refreshNuxtData invalide cache index.vue (useAsyncData)
+        // Fonctionne même si index.vue n'est pas encore monté (pas de problème de chronologie)
+        await refreshNuxtData('admin-products-list')
 
         crudSuccess.created(`Produit "${response.data.name}" créé avec succès`, 'product')
         await router.push('/admin/products')
@@ -867,15 +868,13 @@ async function handleSubmit() {
       }) as { success: boolean; data: any }
 
       if (response.success && response.data) {
-        // Mettre à jour cache TanStack Query directement
-        queryClient.setQueryData(productQueryKeys.lists(), (old?: any[]) =>
-          Array.isArray(old) ? old.map(p => (p.id === response.data.id ? response.data : p)) : old
-        )
-        queryClient.setQueryData(productQueryKeys.detail(response.data.id), response.data)
+        console.log('🔍 [DEBUG UPDATE] AVANT refreshNuxtData() - response.data.base_price =', response.data.base_price)
 
-        // Invalider par sécurité
-        // ⭐ PHASE 3: TanStack Query unifié - invalidation suffit (Event Bus supprimé)
-        await queryClient.invalidateQueries({ queryKey: productQueryKeys.all })
+        // ⭐ PHASE 3 REVERSAL: refreshNuxtData invalide cache index.vue (useAsyncData)
+        // Fonctionne même si index.vue n'est pas encore monté (pas de problème de chronologie)
+        await refreshNuxtData('admin-products-list')
+
+        console.log('✅ [DEBUG UPDATE] APRÈS refreshNuxtData() - Cache invalidé pour clé: admin-products-list')
 
         // Rafraîchir form local
         mapProductToForm(response.data)
@@ -920,9 +919,9 @@ async function deleteProduct() {
     }) as { success: boolean }
 
     if (response.success) {
-      // Invalider cache TanStack Query
-      // ⭐ PHASE 3: TanStack Query unifié - invalidation suffit (Event Bus supprimé)
-      await queryClient.invalidateQueries({ queryKey: productQueryKeys.all })
+      // ⭐ PHASE 3 REVERSAL: refreshNuxtData invalide cache index.vue (useAsyncData)
+      // Fonctionne même si index.vue n'est pas encore monté (pas de problème de chronologie)
+      await refreshNuxtData('admin-products-list')
 
       crudSuccess.deleted(`Produit "${form.name}" supprimé avec succès`, 'product')
       await router.push('/admin/products')

@@ -156,6 +156,14 @@ export default defineEventHandler(async (event) => {
 
       console.log(`✅ Produit et relations supprimés avec succès: ${productId} (${productName})`)
 
+      // ⭐ INVALIDATION CACHE NITRO: Force le refetch de la liste produits
+      try {
+        await useStorage('cache').removeItem('products:list:active')
+        console.log('🗑️ Cache Nitro invalidé après DELETE produit')
+      } catch (cacheError) {
+        console.warn('⚠️ Échec invalidation cache (non-bloquant):', cacheError)
+      }
+
       const response = {
         success: true,
         message: `Produit "${productName}" supprimé avec succès${deleteImages ? ` avec ${deletedAssets.length} asset(s)` : ''}`,
