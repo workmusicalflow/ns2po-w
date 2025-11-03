@@ -240,17 +240,18 @@
 
 <script setup lang="ts">
 /**
- * Admin Products List Page - REFACTORED
- * SOLID Architecture - Cohérent avec l'interface Bundles
- * Vue Query exclusif - Pas de cache manuel ni événements globaux
+ * Admin Products List Page - AUDIT FIX
+ * Architecture hybride: useAsyncData (liste principale) + TanStack Query (mutations/recherche)
+ * Pattern identique Page Édition pour spinner global garanti
+ * FIX: Migration useProductsQuery → useAsyncData pour résoudre spinner invisible
  */
 
 import AdminDataTable from '../../../components/admin/AdminDataTable.vue'
 import { StatusBadge } from '@ns2po/ui'
 import AdvancedResponsiveImage from '../../../components/AdvancedResponsiveImage.vue'
 
-// SOLID Architecture imports - Vue Query exclusif
-import { useProductsQuery, useProductSearchQuery } from '../../../composables/useProductsQuery'
+// SOLID Architecture imports - Hybride useAsyncData + Vue Query
+import { useProductSearchQuery } from '../../../composables/useProductsQuery'
 import { useCategoriesQuery } from '../../../composables/useCategoriesQuery'
 import { useMultipleProductBundleInfoQuery, useProductBundleUsageBadge, useProductBundleActions } from '../../../composables/useProductBundlesQuery'
 import { useCreateProductMutation, useUpdateProductMutation, useDeleteProductMutation } from '../../../composables/useProductMutations'
@@ -273,8 +274,8 @@ useHead({
 // Global notifications - Pattern Bundles
 const { crudSuccess, crudError } = globalNotifications
 
-// Global loading control - FIX: Spinner reste bloqué
-const { stopLoading } = useGlobalLoading()
+// Global loading control - Pattern Page Édition
+const { startLoading, stopLoading } = useGlobalLoading()
 
 // ===== FILTERS - Simple et cohérent avec Bundles =====
 const filters = reactive({
@@ -304,15 +305,55 @@ const currentFilters = computed((): ProductFilters => {
   return result
 })
 
-// ===== VUE QUERY INTEGRATION - Exclusif et cohérent =====
-// Main products query
+// ===== MAIN DATA LOADING - useAsyncData Pattern (identique Page Édition) =====
+// 🎯 FIX AUDIT: Migration useProductsQuery → useAsyncData pour spinner global garanti
 const {
   data: products,
+  pending,
   error,
-  isLoading,
-  isFetching,
-  refetch
-} = useProductsQuery(currentFilters)
+  refresh: refetch
+} = await useAsyncData(
+  'products-list',
+  async (): Promise<Product[]> => {
+    try {
+      const response = await $fetch('/api/products', {
+        query: {
+          ...(currentFilters.value || {})
+        }
+      }) as { success: boolean; data: Product[] }
+
+      if (!response.success) {
+        throw new Error('Failed to fetch products')
+      }
+
+      return response.data || []
+    } catch (e) {
+      console.error('❌ [useAsyncData] Failed to load products:', e)
+      throw e
+    }
+  },
+  {
+    server: true,  // SSR enabled
+    lazy: false,   // 🔧 Bloque le rendu jusqu'aux données (comme Page Édition)
+    immediate: true,
+    watch: [currentFilters] // 🔧 Re-fetch automatique quand filtres changent
+  }
+)
+
+// Gérer le spinner global basé sur l'état `pending` de useAsyncData (Pattern Page Édition)
+watch(pending, (isPending) => {
+  if (isPending) {
+    console.log('🔄 [watch(pending)] Spinner activé - Chargement en cours...')
+    startLoading('Chargement des produits...')
+  } else {
+    console.log('✅ [watch(pending)] Spinner désactivé - Chargement terminé')
+    setTimeout(() => stopLoading(), 300)
+  }
+}, { immediate: true })
+
+// Créer isLoading et isFetching pour compatibilité template
+const isLoading = computed(() => pending.value)
+const isFetching = computed(() => pending.value)
 
 // Search query (separate for performance)
 const {
@@ -325,12 +366,6 @@ const {
 
 // Categories query - Vue Query cohérent
 const { data: categories } = useCategoriesQuery()
-
-// FIX: Arrêter spinner global au chargement de la page
-onMounted(() => {
-  console.log('[PRODUCTS/INDEX] onMounted - Force stopLoading()')
-  stopLoading()
-})
 
 // ===== MUTATIONS CRUD - Vue Query intégré =====
 const createProductMutation = useCreateProductMutation()
