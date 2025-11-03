@@ -333,8 +333,8 @@ const {
     }
   },
   {
-    server: true,  // SSR enabled
-    lazy: false,   // 🔧 Bloque le rendu jusqu'aux données (comme Page Édition)
+    server: false, // 🔧 FIX: Client-only pour garantir spinner visible pendant fetch
+    lazy: false,   // 🔧 Bloque le rendu jusqu'aux données
     immediate: true,
     watch: [currentFilters] // 🔧 Re-fetch automatique quand filtres changent
   }
