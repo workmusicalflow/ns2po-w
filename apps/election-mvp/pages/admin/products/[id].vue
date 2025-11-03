@@ -841,9 +841,8 @@ async function handleSubmit() {
 
   isSubmitting.value = true
   try {
-    const productData = {
-      ...form
-    }
+    // 🔧 FIX: Utiliser toRaw() pour éviter erreurs sérialisation reactive() → 502
+    const productData = toRaw(form)
 
     if (isNew.value) {
       // 🚨 PATCH GPT-5: Création directe via $fetch
