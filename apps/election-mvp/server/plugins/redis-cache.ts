@@ -15,13 +15,17 @@ export default defineNitroPlugin(() => {
     console.log('🔄 [REDIS PLUGIN] Détection REDIS_URL, montage driver Redis...')
 
     try {
+      // Démonte le namespace 'cache' existant (memory driver par défaut de nuxt.config.ts)
+      storage.unmount('cache')
+      console.log('🔄 [REDIS PLUGIN] Namespace "cache" démonté')
+
       // Monte le driver Redis avec ioredis
       const driver = redisDriver({
         url: redisUrl, // redis://default:password@redis.railway.internal:6379
         ttl: 300,      // TTL par défaut 5 minutes
       })
 
-      // Remplace le storage 'cache' par le driver Redis
+      // Monte le storage 'cache' avec le driver Redis
       storage.mount('cache', driver)
 
       console.log('✅ [REDIS PLUGIN] Driver Redis monté sur namespace "cache"')
