@@ -156,14 +156,11 @@ export default defineNuxtConfig({
       },
     },
 
-    // Storage pour le cache - Redis pour production distribuée, memory pour dev local
+    // Storage pour le cache - Driver Redis monté dynamiquement via plugin (server/plugins/redis-cache.ts)
+    // Railway injecte REDIS_URL au runtime, donc montage dans plugin au lieu de config build-time
     storage: {
       cache: {
-        driver: process.env.REDIS_URL ? "redis" : "memory",
-        ...(process.env.REDIS_URL && {
-          url: process.env.REDIS_URL, // Format: redis://default:password@host:port/0 (auto-injecté par Railway)
-          ttl: 300 // TTL par défaut 5 minutes (peut être overridé par setItem)
-        })
+        driver: "memory", // Default fallback, overridé par plugin si REDIS_URL présent
       },
     },
 
