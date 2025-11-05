@@ -41,20 +41,35 @@ export function useCacheInvalidation() {
    * Fonction getCachedData pour useAsyncData qui respecte les invalidations
    * Retourne cached data SI disponible ET pas récemment invalidée
    * Sinon retourne undefined pour forcer refetch
+   *
+   * FIX Gemini: Consomme le flag d'invalidation après décision de refetch
+   * pour éviter des refetchs répétés inutiles
    */
   function getCachedDataOrRefetch(key: string) {
     const cached = useNuxtData(key)
 
-    // Si pas de données en cache, refetch
+    // Si pas de données en cache Nuxt (premier chargement ou purgé par Nuxt)
     if (!cached.data.value) {
-      console.log(`ℹ️ [CACHE INVALIDATION] Clé "${key}" sans données, refetch`)
-      return undefined
+      console.log(`ℹ️ [CACHE INVALIDATION] Clé "${key}" sans données Nuxt, refetch`)
+
+      // Si notre map indique une invalidation, la consommer ici
+      if (invalidationMap.value[key]) {
+        delete invalidationMap.value[key]
+        console.log(`🗑️ [CACHE INVALIDATION] Flag d'invalidation pour "${key}" supprimé (cache Nuxt vide)`)
+      }
+
+      return undefined // Force le refetch
     }
 
     // Si invalidée récemment (10 secondes), refetch
     if (wasRecentlyInvalidated(key)) {
       console.log(`🔄 [CACHE INVALIDATION] Clé "${key}" invalidée récemment, force refetch`)
-      return undefined
+
+      // Consomme le flag d'invalidation après avoir décidé de refetch
+      delete invalidationMap.value[key]
+      console.log(`🗑️ [CACHE INVALIDATION] Flag d'invalidation pour "${key}" supprimé après décision refetch`)
+
+      return undefined // Force le refetch
     }
 
     // Utiliser cache existant
