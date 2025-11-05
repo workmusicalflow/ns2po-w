@@ -30,14 +30,21 @@ const UpdateProductSchema = z.object({
 
   // Relations normalisées
   materials: z.array(z.string()).optional(),
-  colors: z.array(z.object({
-    name: z.string(),
-    hex: z.string().regex(/^#[0-9A-Fa-f]{6}$/).optional()
-  })).optional(),
-  sizes: z.array(z.object({
-    name: z.string(),
-    category: z.enum(['XS-XL', 'numeric', 'custom']).optional()
-  })).optional(),
+  // ⭐ FIX: Accept BOTH strings (legacy) and objects (new format)
+  colors: z.array(z.union([
+    z.string(), // Legacy format: "Rouge"
+    z.object({   // New format: {name: "Rouge", hex: "#FF0000"}
+      name: z.string(),
+      hex: z.string().regex(/^#[0-9A-Fa-f]{6}$/).optional()
+    })
+  ])).optional(),
+  sizes: z.array(z.union([
+    z.string(), // Legacy format: "M"
+    z.object({   // New format: {name: "M", category: "XS-XL"}
+      name: z.string(),
+      category: z.enum(['XS-XL', 'numeric', 'custom']).optional()
+    })
+  ])).optional(),
   gallery: z.array(z.object({
     url: z.string().url(),
     type: z.enum(['main', 'variant', 'detail']).optional()
