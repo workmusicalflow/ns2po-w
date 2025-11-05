@@ -93,11 +93,23 @@ export default defineEventHandler(async (event) => {
         const duration = Date.now() - startTime
         console.log(`✅ ${products.length} produits récupérés en ${duration}ms (schéma normalisé)`)
 
-        // ⭐ Stocker dans cache Nitro (TTL 5 minutes)
-        await cacheStorage.setItem(cacheKey, products, {
-          ttl: 300 // 5 minutes
-        })
-        console.log('💾 Produits mis en cache Nitro (TTL: 5min)')
+        // ⭐ Stocker dans cache Nitro (TTL 5 minutes) avec diagnostic erreur
+        try {
+          // Log payload pour diagnostic
+          const payloadSize = new TextEncoder().encode(JSON.stringify(products)).length
+          console.log(`🔍 [GET PRODUCTS] Tentative setItem - Clé: "${cacheKey}", Products: ${products.length}, Taille payload: ${payloadSize} bytes`)
+
+          await cacheStorage.setItem(cacheKey, products, { ttl: 300 })
+
+          console.log(`💾 [GET PRODUCTS] ✅ Cache Redis créé avec succès pour "${cacheKey}"`)
+        } catch (cacheError) {
+          // Exception silencieuse capturée! (Diagnostic Gemini)
+          console.error(`❌ [GET PRODUCTS] ÉCHEC CRITIQUE setItem pour "${cacheKey}":`, cacheError)
+          console.error(`❌ [GET PRODUCTS] Error name:`, cacheError instanceof Error ? cacheError.name : 'Unknown')
+          console.error(`❌ [GET PRODUCTS] Error message:`, cacheError instanceof Error ? cacheError.message : String(cacheError))
+          console.error(`❌ [GET PRODUCTS] Error stack:`, cacheError instanceof Error ? cacheError.stack : 'N/A')
+          // Ne pas bloquer la requête, continuer sans cache
+        }
 
         return {
           success: true,
