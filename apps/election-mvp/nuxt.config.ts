@@ -108,13 +108,14 @@ export default defineNuxtConfig({
         },
       },
 
-      // API routes caching - cache étendu pour catalogue
+      // API routes caching - DÉSACTIVÉ car géré manuellement dans handler avec Redis
+      // Le cache Nitro automatique (swr) entre en conflit avec notre cache manuel
+      // et empêche l'invalidation de fonctionner correctement
       "/api/products/**": {
         cors: true,
-        swr: 86400,
+        // swr: 86400, // ❌ SUPPRIMÉ - Créait cache automatique non-invalidable
         headers: {
-          "Cache-Control":
-            "public, max-age=300, s-maxage=600, stale-while-revalidate=86400",
+          "Cache-Control": "no-store", // Pas de cache HTTP, seulement Redis manuel
           Vary: "Accept-Encoding",
         },
       },
