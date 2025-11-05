@@ -1,6 +1,12 @@
 /**
  * API Route: GET /api/campaign-bundles
- * Récupère tous les campaign bundles avec stratégie Turso-first → Fallback statique
+ * Récupère tous les campaign bundles avec stratégie Redis Cache-Aside → Turso → Fallback statique
+ *
+ * ARCHITECTURE CACHE UNIFIÉE (Gemini 20 sources):
+ * - Redis cache layer (TTL 300s, clé: campaign-bundles:list:active)
+ * - Invalidation programmatique après mutations admin
+ * - Headers HTTP adaptatifs (CDN + Browser)
+ * - Synchronisation avec /api/admin/products mutations
  */
 
 // Note: Airtable service removed - now using Turso-first → Static fallback architecture
@@ -58,7 +64,7 @@ export default defineEventHandler(async (event): Promise<BundleApiResponse> => {
   const startTime = Date.now()
 
   try {
-    console.log("📦 GET /api/campaign-bundles - Début récupération hybride");
+    console.log("📦 GET /api/campaign-bundles - Début récupération Redis → Turso → Fallback");
 
     // Récupération des query parameters
     const query = getQuery(event);
@@ -67,8 +73,48 @@ export default defineEventHandler(async (event): Promise<BundleApiResponse> => {
 
     let bundles;
     let source = 'unknown';
+    let cached = false;
 
-    // 1. Priorité : Turso Database (performance optimale)
+    // ⭐ ÉTAPE 1: Check Redis Cache (NOUVEAU - Architecture unifiée)
+    const cacheKey = 'campaign-bundles:list:active'
+    const cacheStorage = useStorage('cache')
+
+    try {
+      const cachedData = await cacheStorage.getItem(cacheKey)
+      if (cachedData) {
+        bundles = cachedData as any[]
+        source = 'redis-cache'
+        cached = true
+
+        const duration = Date.now() - startTime
+        console.log(`✅ [GET CAMPAIGN-BUNDLES] Cache HIT Redis: ${bundles.length} bundles en ${duration}ms`)
+
+        // Appliquer filtres sur cache (pas de re-query Turso)
+        if (audience && audience !== "all") {
+          bundles = bundles.filter(bundle => bundle.targetAudience === audience)
+        }
+        if (featured) {
+          bundles = bundles.filter(bundle => bundle.isFeatured)
+        }
+
+        // Headers conservateurs pour données cachées
+        setHeader(event, 'Cache-Control', 'public, max-age=30, must-revalidate')
+        setHeader(event, 'CDN-Cache-Control', 'public, s-maxage=180') // 3 min CDN (vs 30 min avant)
+
+        return {
+          success: true,
+          data: bundles,
+          source,
+          duration,
+          cached: true
+        }
+      }
+      console.log('ℹ️ [GET CAMPAIGN-BUNDLES] Cache MISS Redis - Fetch Turso')
+    } catch (cacheError) {
+      console.warn('⚠️ [GET CAMPAIGN-BUNDLES] Erreur Redis (continue sans cache):', cacheError)
+    }
+
+    // ⭐ ÉTAPE 2: Cache MISS → Fetch Turso Database
     const tursoClient = getDatabase()
     if (tursoClient) {
       try {
@@ -155,9 +201,18 @@ export default defineEventHandler(async (event): Promise<BundleApiResponse> => {
           }
         }))
 
-        source = 'turso'
+        source = 'turso-fresh'
         const duration = Date.now() - startTime
-        console.log(`✅ Turso OK: ${bundles.length} bundles en ${duration}ms`)
+        console.log(`✅ [GET CAMPAIGN-BUNDLES] Turso OK: ${bundles.length} bundles en ${duration}ms`)
+
+        // ⭐ ÉTAPE 3: Store Redis Cache (TTL 5 min = aligné /api/products)
+        try {
+          await cacheStorage.setItem(cacheKey, bundles, { ttl: 300 })
+          console.log(`💾 [GET CAMPAIGN-BUNDLES] Cache Redis créé avec succès (TTL 300s)`)
+        } catch (cacheStoreError) {
+          console.error('❌ [GET CAMPAIGN-BUNDLES] Échec stockage cache Redis:', cacheStoreError)
+          // Continue sans bloquer (fallback graceful)
+        }
 
       } catch (tursoError) {
         console.warn('⚠️ Turso failed, using static fallback...', tursoError)
@@ -184,19 +239,26 @@ export default defineEventHandler(async (event): Promise<BundleApiResponse> => {
 
     console.log(`✅ Récupération réussie: ${bundles.length} campaign bundles (source: ${source})`);
 
-    // Cache headers pour optimiser les performances
-    if (source === 'turso') {
-      setHeader(event, "Cache-Control", "public, max-age=900"); // 15 minutes pour Turso
-    } else {
-      setHeader(event, "Cache-Control", "public, max-age=60"); // 1 minute pour fallback statique
+    // ⭐ ÉTAPE 4: Headers HTTP adaptatifs (NOUVEAU - Validé Gemini)
+    if (source === 'turso-fresh') {
+      // Données fraîches Turso → Permettre cache CDN modéré + SWR
+      setHeader(event, 'Cache-Control', 'public, max-age=60, stale-while-revalidate=300')
+      setHeader(event, 'CDN-Cache-Control', 'public, s-maxage=300') // 5 min CDN (aligné Redis, vs 30 min avant)
+      console.log('📤 [HEADERS] Fresh Turso: CDN 5min + Browser 60s + SWR')
+    } else if (source === 'static') {
+      // Fallback statique → Cache court
+      setHeader(event, 'Cache-Control', 'public, max-age=60')
+      setHeader(event, 'CDN-Cache-Control', 'public, s-maxage=60')
+      console.log('📤 [HEADERS] Static fallback: CDN/Browser 60s')
     }
-    setHeader(event, "CDN-Cache-Control", "public, max-age=1800"); // 30 minutes sur CDN
+    // Note: Headers pour 'redis-cache' déjà définis au return early (ligne 101-102)
 
     const response: BundleApiResponse = {
       success: true,
       data: bundles,
       source,
       duration: Date.now() - startTime,
+      cached,
       pagination: {
         page: 1,
         limit: bundles.length,

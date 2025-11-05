@@ -4,6 +4,7 @@
  */
 
 import { getDatabase } from "../../utils/database"
+import { invalidateCampaignBundlesCache } from "../../utils/cache-invalidation"
 
 /**
  * Vérifie les contraintes référentielles avant suppression d'un bundle
@@ -138,6 +139,14 @@ export default defineEventHandler(async (event) => {
 
         console.log(`✅ Bundle désactivé avec succès: ${bundleId} (${bundleName})`)
 
+        // ⭐ INVALIDATION CACHE REDIS (architecture unifiée)
+        try {
+          await invalidateCampaignBundlesCache()
+          console.log('🗑️ [DELETE BUNDLE - SOFT] Cache Redis invalidé')
+        } catch (cacheError) {
+          console.error('❌ [DELETE BUNDLE - SOFT] Échec invalidation cache:', cacheError)
+        }
+
         const response = {
           success: true,
           message: `Bundle "${bundleName}" désactivé avec succès`,
@@ -165,6 +174,14 @@ export default defineEventHandler(async (event) => {
         })
 
         console.log(`✅ Bundle supprimé avec succès: ${bundleId} (${bundleName})`)
+
+        // ⭐ INVALIDATION CACHE REDIS (architecture unifiée)
+        try {
+          await invalidateCampaignBundlesCache()
+          console.log('🗑️ [DELETE BUNDLE - HARD] Cache Redis invalidé')
+        } catch (cacheError) {
+          console.error('❌ [DELETE BUNDLE - HARD] Échec invalidation cache:', cacheError)
+        }
 
         const response = {
           success: true,

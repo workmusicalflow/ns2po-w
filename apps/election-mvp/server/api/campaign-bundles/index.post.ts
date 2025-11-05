@@ -6,6 +6,7 @@
 import { getDatabase } from "../../utils/database"
 import { campaignBundleSchema, validateBundleProducts, validateBundleTotal, validateBundleBusinessRules, validateFeaturedBundleLimit } from "~/schemas/bundle"
 import { z } from "zod"
+import { invalidateCampaignBundlesCache } from "../../utils/cache-invalidation"
 
 export default defineEventHandler(async (event) => {
   const startTime = Date.now()
@@ -119,6 +120,15 @@ export default defineEventHandler(async (event) => {
       }
 
       console.log(`✅ Bundle créé avec succès: ${newBundleId}`)
+
+      // ⭐ INVALIDATION CACHE REDIS (architecture unifiée)
+      try {
+        await invalidateCampaignBundlesCache()
+        console.log('🗑️ [POST BUNDLE] Cache Redis invalidé')
+      } catch (cacheError) {
+        console.error('❌ [POST BUNDLE] Échec invalidation cache:', cacheError)
+        // Continue sans bloquer (non-critique pour cette création)
+      }
 
       // Retourner le bundle créé
       const response = {

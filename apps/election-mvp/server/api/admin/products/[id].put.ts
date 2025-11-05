@@ -15,6 +15,7 @@ import {
   updateProductWithRelations,
   updateProductFTS
 } from '../../../utils/db-queries'
+import { invalidateProductRelatedCaches } from '../../../utils/cache-invalidation'
 
 // Schéma de validation pour update produit
 const UpdateProductSchema = z.object({
@@ -193,16 +194,12 @@ export default defineEventHandler(async (event) => {
       basePrice: updatedProduct.basePrice
     })
 
-    // ⭐ INVALIDATION CACHE REDIS (strict, pas de fallback memory)
-    const cacheKey = 'products:list:active'
+    // ⭐ INVALIDATION CACHE REDIS + BUNDLES (architecture unifiée)
     try {
-      console.log(`➡️ [PUT PRODUCT] Tentative d'invalidation cache Redis pour "${cacheKey}"...`)
-      await useStorage('cache').removeItem(cacheKey)
-      console.log(`🗑️ [PUT PRODUCT] Cache Redis invalidé avec succès pour "${cacheKey}"`)
+      await invalidateProductRelatedCaches(`PUT /api/admin/products/${productId}`)
     } catch (cacheError) {
-      // Échec critique: cache distribué cassé, invalidation multi-instances impossible
-      console.error(`❌ [PUT PRODUCT] ÉCHEC CRITIQUE invalidation cache pour "${cacheKey}":`, cacheError)
-      console.error('❌ [PUT PRODUCT] WARNING: Autres instances Railway peuvent servir données stale!')
+      console.error(`❌ [PUT PRODUCT] ÉCHEC CRITIQUE invalidation cache:`, cacheError)
+      console.error('❌ [PUT PRODUCT] WARNING: Désynchronisation admin/public possible!')
       // Ne pas bloquer la requête PUT, mais alerter fortement
     }
 

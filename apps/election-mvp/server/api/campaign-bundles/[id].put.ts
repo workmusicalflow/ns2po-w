@@ -7,6 +7,7 @@ import { getDatabase } from "../../utils/database"
 import { campaignBundleUpdateSchema, validateBundleProducts, validateBundleTotal, validateBundleBusinessRules, validateFeaturedBundleLimit } from "~/schemas/bundle"
 import { broadcastSSEEvent } from '~/server/api/sse'
 import { z } from "zod"
+import { invalidateCampaignBundlesCache } from "../../utils/cache-invalidation"
 
 export default defineEventHandler(async (event) => {
   const startTime = Date.now()
@@ -413,6 +414,15 @@ export default defineEventHandler(async (event) => {
           version: Number(bundleData.version) || 1
         },
         duration: Date.now() - startTime
+      }
+
+      // ⭐ INVALIDATION CACHE REDIS (architecture unifiée)
+      try {
+        await invalidateCampaignBundlesCache()
+        console.log('🗑️ [PUT BUNDLE] Cache Redis invalidé')
+      } catch (cacheError) {
+        console.error('❌ [PUT BUNDLE] Échec invalidation cache:', cacheError)
+        // Continue sans bloquer (non-critique pour cette mutation)
       }
 
       // Broadcast SSE event for real-time synchronization

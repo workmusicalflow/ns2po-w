@@ -16,6 +16,7 @@ import {
   updateProductWithRelations,
   updateProductFTS
 } from '../../../utils/db-queries'
+import { invalidateProductRelatedCaches } from '../../../utils/cache-invalidation'
 
 // Schéma de validation pour création produit
 const CreateProductSchema = z.object({
@@ -157,15 +158,12 @@ export default defineEventHandler(async (event) => {
       name: createdProduct.name
     })
 
-    // ⭐ INVALIDATION CACHE REDIS (strict, pas de fallback memory)
-    const cacheKey = 'products:list:active'
+    // ⭐ INVALIDATION CACHE REDIS + BUNDLES (architecture unifiée)
     try {
-      console.log(`➡️ [POST PRODUCT] Tentative d'invalidation cache Redis pour "${cacheKey}"...`)
-      await useStorage('cache').removeItem(cacheKey)
-      console.log(`🗑️ [POST PRODUCT] Cache Redis invalidé avec succès pour "${cacheKey}"`)
+      await invalidateProductRelatedCaches(`POST /api/admin/products (new: ${productId})`)
     } catch (cacheError) {
-      console.error(`❌ [POST PRODUCT] ÉCHEC CRITIQUE invalidation cache pour "${cacheKey}":`, cacheError)
-      console.error('❌ [POST PRODUCT] WARNING: Autres instances Railway peuvent servir données stale!')
+      console.error(`❌ [POST PRODUCT] ÉCHEC CRITIQUE invalidation cache:`, cacheError)
+      console.error('❌ [POST PRODUCT] WARNING: Désynchronisation admin/public possible!')
     }
 
     console.log(`✅ [API POST] Fin du handler, renvoi de la réponse pour produit ${productId}`)

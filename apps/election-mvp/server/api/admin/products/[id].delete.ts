@@ -9,6 +9,7 @@
 
 import { getDatabase } from "../../../utils/database"
 import { assetService } from "../../../services/assetService"
+import { invalidateProductRelatedCaches } from "../../../utils/cache-invalidation"
 
 export default defineEventHandler(async (event) => {
   const startTime = Date.now()
@@ -156,15 +157,12 @@ export default defineEventHandler(async (event) => {
 
       console.log(`✅ [API DELETE] Suppression BDD réussie. Produit ${productId} (${productName}) supprimé`)
 
-      // ⭐ INVALIDATION CACHE REDIS (strict, pas de fallback memory)
-      const cacheKey = 'products:list:active'
+      // ⭐ INVALIDATION CACHE REDIS + BUNDLES (architecture unifiée)
       try {
-        console.log(`➡️ [DELETE PRODUCT] Tentative d'invalidation cache Redis pour "${cacheKey}"...`)
-        await useStorage('cache').removeItem(cacheKey)
-        console.log(`🗑️ [DELETE PRODUCT] Cache Redis invalidé avec succès pour "${cacheKey}"`)
+        await invalidateProductRelatedCaches(`DELETE /api/admin/products/${productId}`)
       } catch (cacheError) {
-        console.error(`❌ [DELETE PRODUCT] ÉCHEC CRITIQUE invalidation cache pour "${cacheKey}":`, cacheError)
-        console.error('❌ [DELETE PRODUCT] WARNING: Autres instances Railway peuvent servir données stale!')
+        console.error(`❌ [DELETE PRODUCT] ÉCHEC CRITIQUE invalidation cache:`, cacheError)
+        console.error('❌ [DELETE PRODUCT] WARNING: Désynchronisation admin/public possible!')
       }
 
       console.log(`✅ [API DELETE] Fin du handler, renvoi de la réponse pour produit ${productId}`)
