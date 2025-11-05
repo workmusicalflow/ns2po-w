@@ -121,12 +121,8 @@ export default defineNuxtConfig({
       },
       "/api/campaign-bundles/**": {
         cors: true,
-        swr: 3600,
-        headers: {
-          "Cache-Control":
-            "public, max-age=600, s-maxage=1200, stale-while-revalidate=86400",
-          Vary: "Accept-Encoding",
-        },
+        // swr: 3600, // ❌ SUPPRIMÉ - Créait cache automatique non-invalidable (conflit avec Redis manual)
+        // Headers gérés dynamiquement dans le handler (adaptatifs selon source: redis-cache vs turso-fresh)
       },
       "/api/realisations/**": {
         cors: true,
