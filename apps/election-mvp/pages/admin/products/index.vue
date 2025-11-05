@@ -367,6 +367,22 @@ watch(pending, (isPending) => {
   }
 }, { immediate: true })
 
+// ⭐ FIX FINAL: Pinia Store + refresh() explicite (Solution Gemini Google Search)
+// Résout problème bfcache: refreshNuxtData inter-pages ne fonctionne pas
+// Pattern validé communauté 2024-2025 (24 sources citées)
+const productStore = useProductStore()
+
+onMounted(async () => {
+  console.log('🔄 [LISTE PRODUITS] onMounted - Check flag Pinia needsProductListRefresh:', productStore.needsProductListRefresh)
+
+  if (productStore.needsProductListRefresh) {
+    console.log('🔄 [LISTE PRODUITS] Détection besoin rafraîchissement via Pinia. Forçage refetch.')
+    await refresh() // Appel explicite refresh() de useAsyncData
+    productStore.clearProductListStaleFlag()
+    console.log('✅ [LISTE PRODUITS] Rafraîchissement terminé, flag réinitialisé')
+  }
+})
+
 // Créer isLoading et isFetching pour compatibilité template
 const isLoading = computed(() => pending.value)
 const isFetching = computed(() => pending.value)

@@ -859,6 +859,10 @@ async function handleSubmit() {
         await refreshNuxtData('admin-products-list')
         markInvalidated('admin-products-list')
 
+        // ⭐ FIX FINAL: Pinia Store flag pour refresh() explicite (Solution Gemini)
+        const productStore = useProductStore()
+        productStore.markProductListAsStale()
+
         crudSuccess.created(`Produit "${response.data.name}" créé avec succès`, 'product')
         await router.push('/admin/products')
       }
@@ -877,6 +881,10 @@ async function handleSubmit() {
         const { markInvalidated } = useCacheInvalidation()
         await refreshNuxtData('admin-products-list')
         markInvalidated('admin-products-list')
+
+        // ⭐ FIX FINAL: Pinia Store flag pour refresh() explicite (Solution Gemini)
+        const productStore = useProductStore()
+        productStore.markProductListAsStale()
 
         console.log('✅ [DEBUG UPDATE] APRÈS refreshNuxtData() + markInvalidated - Cache invalidé pour clé: admin-products-list')
 
