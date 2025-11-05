@@ -4,6 +4,33 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ---
 
+## 📋 Conventions & Principes de Conception
+
+**TypeScript**: `strict: true` obligatoire
+**Nommage**: Fichiers `kebab-case.ts` • Classes `PascalCase` • etc.
+**Vue.js**: Toujours `<script setup lang="ts">`
+**API Routes**: Validation Zod systématique + error handling
+**Git**: Conventional Commits (`feat(scope): Message`)
+
+---
+### **🧠 Principes de Conception (SOLID in Practice)**
+
+Tu dois appliquer ces principes fondamentaux pour garantir la maintenabilité et la scalabilité du code.
+
+*   **Single Responsibility Principle (SRP) - Un rôle par fichier :**
+    *   **Composables (`/composables`) :** Doivent gérer UNE SEULE logique métier (ex: `useProductCalculator` ne fait que des calculs, il ne fetch pas de données).
+    *   **Composants (`/packages/ui`) :** Doivent se concentrer sur l'affichage et l'émission d'événements. La logique métier complexe doit être déléguée à un composable.
+    *   **API Routes (`/server/api`) :** Doivent se limiter à la validation de la requête (Zod), l'appel au service correspondant, et la transformation de la réponse. **Pas de logique métier dans le handler de route.**
+
+*   **Open/Closed Principle (OCP) - Extensible sans modification :**
+    *   Lors de l'ajout d'une nouvelle méthode de paiement ou d'un nouveau type de produit, tu dois chercher à **étendre** le code existant (ex: ajouter une nouvelle classe qui implémente une interface `PaymentProvider`) plutôt que de **modifier** une longue instruction `if/else` ou `switch`.
+
+*   **Interface Segregation Principle (ISP) - Des interfaces précises :**
+    *   Lorsque tu définis des types dans `/packages/types`, crée des interfaces petites et spécifiques. Par exemple, au lieu d'une énorme interface `IProduct`, tu pourrais avoir `IProductSummary` (pour les listes) et `IProductDetail` (pour la page de détail). Cela évite de surcharger les composants avec des données inutiles.
+
+*   **Dependency Inversion Principle (DIP) - Dépendre d'abstractions :**
+    *   Nos services (ex: `ProductService` dans l'API) ne doivent pas dépendre directement de Drizzle ou d'une autre implémentation de base de données. Ils doivent dépendre d'une **interface** (ex: `IProductRepository`). Cela nous permettra de changer d'ORM ou de source de données à l'avenir sans avoir à réécrire toute la logique métier.
+
 ## 👤 Persona & Principes
 
 **NS2PO-Architect**: Ingénieur full-stack TypeScript/Nuxt 3, spécialiste MVP e-commerce + TanStack Query + Turso Database
@@ -32,9 +59,40 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 | ------------------------ | ----------------------------------------------------------------------------- | -------- |
 | **Serena**               | Navigation codebase + manipulation symboles (TOUJOURS en priorité)            | ⭐⭐⭐   |
 | **Perplexity Copilot**   | Docs officielles 2025 (Nuxt 3, Vue Query, Turso, Railway)                     | ⭐⭐⭐   |
-| **Gemini Copilot**       | Debugging complexe + sessions persistantes (1M tokens)                        | ⭐⭐⭐   |
+| **Gemini Copilot**       | Debugging complexe + **Google Search Grounding** + sessions 1M tokens         | ⭐⭐⭐   |
 | **Task Master v3**       | Roadmap sprints + Pareto (Core 20% / Enhancement 80%)                         | ⭐⭐     |
 | **ESLint Master**        | Lint monorepo intelligent                                                     | ⭐⭐     |
+
+### 🆕 Gemini Copilot - Nouvelles Capacités (2025)
+
+**Google Search Grounding** ✨ *Feature majeure activée*
+
+- **Recherche web temps réel** intégrée aux réponses Gemini
+- **Citations sourcées** (nuxt.com, Reddit, Medium, docs officielles)
+- **Validation communauté** pour solutions éprouvées
+- **Mode intelligent**: Grounding automatique si incertitude détectée
+
+**Configuration disponible:**
+```typescript
+// Activer Google Search Grounding
+configure_google_search({
+  enabled: true,
+  includeCitations: true,
+  citationFormat: 'inline+sources', // inline | sources | inline+sources
+  showSearchQueries: true
+})
+```
+
+**Outils spécialisés:**
+- `smart_research_query()` - Recherche garantie avec grounding
+- `smart_fact_check()` - Vérification factuelle avec sources
+- `smart_code_review()` - Analyse code + best practices communauté
+- `process_files_with_gemini()` - Analyse multi-fichiers (1M tokens context)
+
+**Use Case validé (Sprint 0):**
+- Problème: Cache client Nuxt 3 ne se rafraîchit pas après mutation
+- Solution: Gemini + Google Search → 6 recherches web, 10 sources citées
+- Résultat: Fix précis avec références docs officielles Nuxt 3.8+
 
 ---
 
@@ -171,15 +229,7 @@ const productQueryKeys = {
 
 ---
 
-## 🚀 Roadmap & Checklist
-
-### Phases Développement
-
-**✅ Phase 0+1: Infrastructure + Catalogue** (COMPLET) - Monorepo, Turso, TanStack Query, CMS admin
-
-**🔄 Phase 2: Devis & Personnalisation** (EN COURS) - Génération devis, upload Cloudinary, export PDF, E2E tests
-
-**📅 Phase 3: Production Ready** (PLANIFIÉ) - Auth admin, Sentry monitoring, Lighthouse > 90
+## Checklist
 
 ### Checklist Avant Déploiement Railway
 
