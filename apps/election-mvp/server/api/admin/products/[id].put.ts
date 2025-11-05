@@ -159,10 +159,18 @@ export default defineEventHandler(async (event) => {
 
     // 5. Mise à jour relations normalisées (APRÈS l'UPDATE principal)
     if (validatedData.materials || validatedData.colors || validatedData.sizes) {
+      // ⭐ NORMALISATION: Convertir strings → objects pour updateProductWithRelations()
+      const normalizedColors = validatedData.colors?.map(color =>
+        typeof color === 'string' ? { name: color } : color
+      )
+      const normalizedSizes = validatedData.sizes?.map(size =>
+        typeof size === 'string' ? { name: size } : size
+      )
+
       await updateProductWithRelations(tursoClient, productId, {
         materials: validatedData.materials,
-        colors: validatedData.colors as Array<{ name: string; hex?: string }> | undefined,
-        sizes: validatedData.sizes as Array<{ name: string; category?: string }> | undefined
+        colors: normalizedColors,
+        sizes: normalizedSizes
       })
     }
 
