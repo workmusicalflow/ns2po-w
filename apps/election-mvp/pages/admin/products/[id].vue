@@ -854,8 +854,10 @@ async function handleSubmit() {
 
       if (response.success && response.data) {
         // ⭐ PHASE 3 REVERSAL: refreshNuxtData invalide cache index.vue (useAsyncData)
-        // Fonctionne même si index.vue n'est pas encore monté (pas de problème de chronologie)
+        // + Mark cache as invalidated pour forcer refetch même avec payload client
+        const { markInvalidated } = useCacheInvalidation()
         await refreshNuxtData('admin-products-list')
+        markInvalidated('admin-products-list')
 
         crudSuccess.created(`Produit "${response.data.name}" créé avec succès`, 'product')
         await router.push('/admin/products')
@@ -871,10 +873,12 @@ async function handleSubmit() {
         console.log('🔍 [DEBUG UPDATE] AVANT refreshNuxtData() - response.data.base_price =', response.data.base_price)
 
         // ⭐ PHASE 3 REVERSAL: refreshNuxtData invalide cache index.vue (useAsyncData)
-        // Fonctionne même si index.vue n'est pas encore monté (pas de problème de chronologie)
+        // + Mark cache as invalidated pour forcer refetch même avec payload client
+        const { markInvalidated } = useCacheInvalidation()
         await refreshNuxtData('admin-products-list')
+        markInvalidated('admin-products-list')
 
-        console.log('✅ [DEBUG UPDATE] APRÈS refreshNuxtData() - Cache invalidé pour clé: admin-products-list')
+        console.log('✅ [DEBUG UPDATE] APRÈS refreshNuxtData() + markInvalidated - Cache invalidé pour clé: admin-products-list')
 
         // Rafraîchir form local
         mapProductToForm(response.data)
@@ -920,8 +924,10 @@ async function deleteProduct() {
 
     if (response.success) {
       // ⭐ PHASE 3 REVERSAL: refreshNuxtData invalide cache index.vue (useAsyncData)
-      // Fonctionne même si index.vue n'est pas encore monté (pas de problème de chronologie)
+      // + Mark cache as invalidated pour forcer refetch même avec payload client
+      const { markInvalidated } = useCacheInvalidation()
       await refreshNuxtData('admin-products-list')
+      markInvalidated('admin-products-list')
 
       crudSuccess.deleted(`Produit "${form.name}" supprimé avec succès`, 'product')
       await router.push('/admin/products')

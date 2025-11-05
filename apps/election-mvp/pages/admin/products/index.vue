@@ -258,6 +258,7 @@ import { useMultipleProductBundleInfoQuery, useProductBundleUsageBadge, useProdu
 import { useCreateProductMutation, useUpdateProductMutation, useDeleteProductMutation } from '../../../composables/useProductMutations'
 import { globalNotifications } from '../../../composables/useNotifications'
 import { useGlobalLoading } from '../../../composables/useGlobalLoading'
+import { useCacheInvalidation } from '../../../composables/useCacheInvalidation'
 import { refDebounced } from '@vueuse/core'
 import type { Product, ProductFilters, ProductStatus } from '../../../types/domain/Product'
 
@@ -310,6 +311,10 @@ const currentFilters = computed((): Partial<ProductFilters> => {
 // ⭐ REVERSEMENT PHASE 3: Migration TanStack Query → useAsyncData pour copier le pattern réussi de [id].vue
 // Pattern identique à [Page Édition [id].vue] → useAsyncData → Nuxt Cache
 // Utilise /api/products car /api/admin/products GET liste n'existe pas (seulement POST/PUT/DELETE)
+
+// ⭐ FIX 6: Cache invalidation tracker pour forcer refetch après mutations (sans F5)
+const { getCachedDataOrRefetch } = useCacheInvalidation()
+
 const { data: productsData, pending, error, refresh } = await useAsyncData(
   'admin-products-list', // Key unique pour le cache Nuxt
   async () => {
@@ -342,7 +347,8 @@ const { data: productsData, pending, error, refresh } = await useAsyncData(
   {
     server: true,   // SSR enabled
     lazy: false,    // Bloque le rendu jusqu'à ce que les données arrivent (spinner garanti visible)
-    immediate: true // Exécute immédiatement
+    immediate: true, // Exécute immédiatement
+    getCachedData: (key) => getCachedDataOrRefetch(key) // ⭐ FIX 6: Force refetch si cache invalidé récemment
   }
 )
 
