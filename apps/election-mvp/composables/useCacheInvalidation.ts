@@ -6,10 +6,15 @@
  *
  * Problème résolu: useAsyncData utilise le payload client même après refreshNuxtData().
  * Solution: Marquer explicitement les invalidations et vérifier dans getCachedData.
+ *
+ * FIX CRITIQUE: Utiliser useState() au lieu de ref() pour persistance entre navigations
+ * ref() est réinitialisé à chaque changement de page → invalidationMap perdu
+ * useState() persiste entre navigations client-side → flag survit au retour liste
  */
 
 // Map globale des timestamps d'invalidation par clé de cache
-const invalidationMap = ref<Record<string, number>>({})
+// useState() garantit persistance cross-page (ref() serait réinitialisé)
+const invalidationMap = useState<Record<string, number>>('cache-invalidation-map', () => ({}))
 
 export function useCacheInvalidation() {
   /**
