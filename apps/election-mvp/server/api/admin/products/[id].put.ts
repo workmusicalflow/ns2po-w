@@ -178,13 +178,17 @@ export default defineEventHandler(async (event) => {
       basePrice: updatedProduct.basePrice
     })
 
-    // ⭐ INVALIDATION CACHE NITRO: Force le refetch de la liste produits
+    // ⭐ INVALIDATION CACHE REDIS (strict, pas de fallback memory)
+    const cacheKey = 'products:list:active'
     try {
-      console.log(`➡️ [API PUT] Tentative d'invalidation du cache Nitro...`)
-      await useStorage('cache').removeItem('products:list:active')
-      console.log('🗑️ [API PUT] Cache Nitro invalidé après UPDATE produit')
+      console.log(`➡️ [PUT PRODUCT] Tentative d'invalidation cache Redis pour "${cacheKey}"...`)
+      await useStorage('cache').removeItem(cacheKey)
+      console.log(`🗑️ [PUT PRODUCT] Cache Redis invalidé avec succès pour "${cacheKey}"`)
     } catch (cacheError) {
-      console.warn('⚠️ [API PUT] Échec invalidation cache (non-bloquant):', cacheError)
+      // Échec critique: cache distribué cassé, invalidation multi-instances impossible
+      console.error(`❌ [PUT PRODUCT] ÉCHEC CRITIQUE invalidation cache pour "${cacheKey}":`, cacheError)
+      console.error('❌ [PUT PRODUCT] WARNING: Autres instances Railway peuvent servir données stale!')
+      // Ne pas bloquer la requête PUT, mais alerter fortement
     }
 
     console.log(`✅ [API PUT] Fin du handler, renvoi de la réponse pour produit ${productId}`)

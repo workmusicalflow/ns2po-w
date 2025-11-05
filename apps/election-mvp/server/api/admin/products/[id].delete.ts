@@ -156,13 +156,15 @@ export default defineEventHandler(async (event) => {
 
       console.log(`✅ [API DELETE] Suppression BDD réussie. Produit ${productId} (${productName}) supprimé`)
 
-      // ⭐ INVALIDATION CACHE NITRO: Force le refetch de la liste produits
+      // ⭐ INVALIDATION CACHE REDIS (strict, pas de fallback memory)
+      const cacheKey = 'products:list:active'
       try {
-        console.log(`➡️ [API DELETE] Tentative d'invalidation du cache Nitro...`)
-        await useStorage('cache').removeItem('products:list:active')
-        console.log('🗑️ [API DELETE] Cache Nitro invalidé après DELETE produit')
+        console.log(`➡️ [DELETE PRODUCT] Tentative d'invalidation cache Redis pour "${cacheKey}"...`)
+        await useStorage('cache').removeItem(cacheKey)
+        console.log(`🗑️ [DELETE PRODUCT] Cache Redis invalidé avec succès pour "${cacheKey}"`)
       } catch (cacheError) {
-        console.warn('⚠️ [API DELETE] Échec invalidation cache (non-bloquant):', cacheError)
+        console.error(`❌ [DELETE PRODUCT] ÉCHEC CRITIQUE invalidation cache pour "${cacheKey}":`, cacheError)
+        console.error('❌ [DELETE PRODUCT] WARNING: Autres instances Railway peuvent servir données stale!')
       }
 
       console.log(`✅ [API DELETE] Fin du handler, renvoi de la réponse pour produit ${productId}`)

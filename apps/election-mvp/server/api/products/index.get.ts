@@ -65,17 +65,19 @@ export default defineEventHandler(async (event) => {
     const cachedData = await cacheStorage.getItem(cacheKey)
     if (cachedData) {
       const duration = Date.now() - startTime
-      console.log(`⚡ Cache hit: ${(cachedData as any).length} produits en ${duration}ms`)
+      console.log(`⚡ [GET PRODUCTS] Cache HIT pour "${cacheKey}" - ${(cachedData as any).length} produits en ${duration}ms`)
 
       return {
         success: true,
         data: cachedData,
-        source: 'nitro-cache',
+        source: 'nitro-cache-redis',
         count: (cachedData as any).length,
         duration,
         cached: true
       }
     }
+
+    console.log(`ℹ️ [GET PRODUCTS] Cache MISS pour "${cacheKey}" - Fetch depuis Turso`)
 
     // 2. Cache miss → Fetch depuis Turso
     const tursoClient = getDatabase()

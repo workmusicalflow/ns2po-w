@@ -1,12 +1,15 @@
 /**
- * Nitro Plugin: Monte un driver lazy proxy pour Redis/Memory
+ * Nitro Plugin: Monte un driver Redis STRICT (pas de fallback memory)
  *
- * Solution au problème de double exécution du plugin:
- * - Monte un proxy lazy qui décide au premier usage quel driver utiliser
- * - Guard global pour idempotence (évite double-mount dans même process)
- * - Résout le timing Railway (REDIS_URL disponible ou non)
+ * FIX RÉGRESSION: Supprime fallback memory silencieux qui causait:
+ * - Cache invalidé localement sur instance A
+ * - Mais instance B (F5) servait données stale de son memory cache local
+ * - Multi-instances Railway nécessite cache distribué STRICT
  *
- * Crédit: Solution GPT-5 (2025-11-05)
+ * Solution: Redis OBLIGATOIRE en production, échec explicite si indisponible
+ * Dev local: Utilise memory driver si REDIS_URL absent (normal)
+ *
+ * Crédit: Diagnostic Gemini + Solution GPT-5 (2025-11-05)
  */
 
 import memoryDriver from 'unstorage/drivers/memory'
@@ -17,16 +20,25 @@ const GLOBAL_KEY = '__nuxt_unstorage_cache_mounted__'
 
 function createDriverFromEnv() {
   const url = process.env.REDIS_URL
+
+  // Production Railway: Redis OBLIGATOIRE
   if (url) {
+    console.log('🔄 [REDIS PROXY] Création driver Redis (production mode)...')
+
     try {
-      console.log('🔄 [REDIS PROXY] Création driver Redis...')
-      return redisDriverFactory({ url, ttl: 300 })
+      const driver = redisDriverFactory({ url, ttl: 300 })
+      console.log('✅ [REDIS PROXY] Driver Redis créé avec succès')
+      return driver
     } catch (e) {
-      console.error('❌ [REDIS PROXY] Erreur création redis driver, fallback memory:', e)
-      return memoryDriver()
+      // ⚠️ PAS DE FALLBACK MEMORY! Échec explicite en production
+      console.error('❌ [REDIS PROXY] ÉCHEC CRITIQUE création driver Redis:', e)
+      console.error('❌ [REDIS PROXY] Cache distribué indisponible, invalidation multi-instances cassée')
+      throw new Error(`Redis driver creation failed: ${e instanceof Error ? e.message : String(e)}`)
     }
   }
-  console.log('ℹ️ [REDIS PROXY] Pas de REDIS_URL, utilise memory driver')
+
+  // Dev local: Memory driver acceptable (pas de multi-instances)
+  console.log('ℹ️ [REDIS PROXY] Pas de REDIS_URL, utilise memory driver (dev local uniquement)')
   return memoryDriver()
 }
 
