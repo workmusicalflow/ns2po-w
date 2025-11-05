@@ -156,13 +156,10 @@ export default defineNuxtConfig({
       },
     },
 
-    // Storage pour le cache - Driver Redis monté dynamiquement via plugin (server/plugins/redis-cache.ts)
-    // Railway injecte REDIS_URL au runtime, donc montage dans plugin au lieu de config build-time
-    storage: {
-      cache: {
-        driver: "memory", // Default fallback, overridé par plugin si REDIS_URL présent
-      },
-    },
+    // Storage pour le cache - Géré 100% par plugin (server/plugins/redis-cache.ts)
+    // Ne PAS définir 'cache' ici pour éviter conflit "already mounted"
+    // Le plugin monte le lazy proxy au runtime
+    // storage: {}, // Commenté pour laisser plugin gérer
 
     // Compression
     compressPublicAssets: true,
