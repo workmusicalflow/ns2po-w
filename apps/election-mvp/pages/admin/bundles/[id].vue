@@ -22,7 +22,7 @@
     </div>
 
     <!-- Form -->
-    <form class="space-y-8" @submit.prevent="handleSubmit">
+    <form class="space-y-8" @submit.prevent="handleSubmit()">
       <!-- Basic Information -->
       <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
         <h2 class="text-lg font-medium text-gray-900 mb-6">
@@ -198,14 +198,56 @@
                 :max="50000"
                 :step-small="10"
                 :step-large="100"
-                :presets="[1000, 2500, 5000, 10000]"
+                :presets="[100, 250, 500, 1000]"
                 @update:model-value="(newQuantity) => updateProductTotal(index, newQuantity)"
                 @error="handleQuantityError(index, $event)"
               />
 
-              <div class="text-sm font-medium text-gray-900">
-                {{ formatPrice(product.subtotal) }}
+              <!-- Price Lock Checkbox (Pareto 80/20) - Phase 3.3: Tooltip enrichi -->
+              <div class="flex items-center gap-2 min-w-[140px]">
+                <label class="flex items-center gap-2 cursor-pointer group relative">
+                  <input
+                    type="checkbox"
+                    v-model="product.priceLocked"
+                    class="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
+                  />
+                  <span class="text-xs text-gray-600">
+                    {{ product.priceLocked ? '🔒 Prix fixe' : '🔄 Auto-sync' }}
+                  </span>
+
+                  <!-- Tooltip enrichi (Phase 3.3) -->
+                  <div class="invisible group-hover:visible absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-64 p-3 bg-gray-900 text-white text-xs rounded-lg shadow-lg z-50">
+                    <div class="font-semibold mb-2">{{ product.priceLocked ? '🔒 Prix Fixe' : '🔄 Auto-Sync' }}</div>
+                    <div v-if="product.priceLocked" class="space-y-1">
+                      <p>• Prix figé indépendamment du catalogue</p>
+                      <p>• Idéal pour promotions/tarifs négociés</p>
+                      <p>• ⚠️ Ne se met PAS à jour automatiquement</p>
+                    </div>
+                    <div v-else class="space-y-1">
+                      <p>• Prix synchronisé avec le produit catalogue</p>
+                      <p>• Mise à jour automatique si prix modifié</p>
+                      <p>• ✅ Recommandé (80% des cas)</p>
+                    </div>
+                    <!-- Flèche du tooltip -->
+                    <div class="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900"></div>
+                  </div>
+                </label>
               </div>
+
+              <div class="flex flex-col items-end gap-1">
+                <div class="text-sm font-medium text-gray-900">
+                  {{ formatPrice(product.subtotal) }}
+                </div>
+
+                <!-- 🔔 Price Warning (Phase 3.2): Alerte si écart > 5% -->
+                <div v-if="getPriceWarning(product)" class="flex items-center gap-1 text-xs text-amber-600 bg-amber-50 px-2 py-1 rounded">
+                  <Icon name="heroicons:exclamation-triangle" class="w-3 h-3" />
+                  <span :title="getPriceWarning(product)?.message">
+                    Écart {{ getPriceWarning(product)?.percentage }}%
+                  </span>
+                </div>
+              </div>
+
               <button
                 type="button"
                 class="text-red-600 hover:text-red-700"
@@ -232,7 +274,7 @@
             :total-quantity="bundleValidationState.quantity || 0"
             :total-price="calculatedTotal"
             :original-price="form.originalTotal"
-            :minimum-quantity="1000"
+            :minimum-quantity="1"
             :show-progress-bar="true"
           />
         </div>
@@ -538,6 +580,9 @@
  * Uses VueQuery + Pinia for optimal state management and caching
  * Synchronized with Product store for cross-interface consistency
  */
+
+// Vue 3 imports
+import { toRaw } from 'vue'
 
 // SOLID Architecture imports
 import { useBundleQuery, useCreateBundleMutation, useUpdateBundleMutation, useDeleteBundleMutation, bundleQueryKeys } from '../../../composables/useBundlesQuery'
@@ -845,7 +890,11 @@ function initializeFormFromBundle(bundle: Bundle | BundleAggregate) {
 
   // Use centralized bundle calculations for products (only if BundleAggregate)
   if ('products' in bundle && bundle.products && bundle.products.length > 0) {
-    bundleCalculations.updateProducts(bundle.products)
+    // 🔧 FIX TEST 3.2: Transform TanStack Query products into reactive objects
+    // TanStack Query returns data in shallowRef, so nested objects aren't reactive
+    // We need to make each product reactive BEFORE passing to bundleCalculations
+    const reactiveProducts = bundle.products.map(p => reactive({ ...p }))
+    bundleCalculations.updateProducts(reactiveProducts)
   }
 
   // Set tags
@@ -933,7 +982,9 @@ async function manualSync() {
             }
 
             // Mettre à jour le produit avec synchronisation Cloudinary
-            const updatedBundleProduct = {
+            const catalogPrice = latestProduct.base_price || latestProduct.price || bundleProduct.basePrice
+            // 🔧 FIX: Utiliser reactive() pour que v-model fonctionne correctement
+            const updatedBundleProduct = reactive({
               ...bundleProduct,
               name: latestProduct.name || bundleProduct.name,
               basePrice: latestProduct.base_price || latestProduct.price || bundleProduct.basePrice,
@@ -942,8 +993,12 @@ async function manualSync() {
               subtotal: bundleProduct.quantity * (latestProduct.base_price || latestProduct.price || bundleProduct.basePrice),
               // Ajouter métadonnées de synchronisation
               lastSynced: new Date().toISOString(),
-              cloudinarySync
-            }
+              cloudinarySync,
+              // Price Lock: préserve le flag lors de la sync manuelle
+              priceLocked: bundleProduct.priceLocked ?? false,
+              // Price Warning: stocke le prix catalogue pour calcul d'écart (Phase 3.2)
+              catalogPrice: catalogPrice
+            })
 
             // Log des changements détectés
             const changes = []
@@ -1097,14 +1152,14 @@ function removeProduct(index: number) {
 
   // Si la suppression créerait des violations, afficher modal de conséquences
   if (validationErrors.length > 0) {
-    // Construire la liste des violations pour la modal (contrainte unique : quantité)
+    // Construire la liste des violations pour la modal
     const violations = []
 
-    if (newQuantity < 1000) {
+    if (newQuantity < 1) {
       violations.push({
         type: 'quantity',
         label: 'Quantité insuffisante',
-        message: `${newQuantity}/1000 articles minimum requis`
+        message: `Le bundle doit contenir au moins 1 article`
       })
     }
 
@@ -1213,53 +1268,79 @@ function validateForm(): boolean {
   clearErrors()
   let isValid = true
 
+  // 🐛 DEBUG: Log form state before validation
+  console.log('🔍 [DEBUG validateForm] Début validation:', {
+    name: form.name,
+    description: form.description?.substring(0, 50),
+    targetAudience: form.targetAudience,
+    estimatedTotal: form.estimatedTotal,
+    popularity: form.popularity
+  })
+
   if (!form.name.trim()) {
     errors.name = 'Le nom est requis'
     isValid = false
+    console.log('❌ [DEBUG validateForm] Échec: name vide')
   }
 
   if (!form.description.trim()) {
     errors.description = 'La description est requise'
     isValid = false
+    console.log('❌ [DEBUG validateForm] Échec: description vide')
   }
 
   if (!form.targetAudience) {
     errors.targetAudience = 'L\'audience cible est requise'
     isValid = false
+    console.log('❌ [DEBUG validateForm] Échec: targetAudience manquant')
   }
 
   if (form.estimatedTotal <= 0) {
     errors.estimatedTotal = 'Le prix total doit être supérieur à 0'
     isValid = false
+    console.log('❌ [DEBUG validateForm] Échec: estimatedTotal <=', form.estimatedTotal)
   }
 
   if (form.popularity < 0 || form.popularity > 100) {
     errors.popularity = 'La popularité doit être entre 0 et 100'
     isValid = false
+    console.log('❌ [DEBUG validateForm] Échec: popularity hors limites', form.popularity)
   }
 
+  console.log(`🔍 [DEBUG validateForm] Résultat final: isValid = ${isValid}`)
   return isValid
 }
 
 async function handleSubmit() {
   if (!validateForm()) return
 
+  // 🔧 FIX TEST 3.2: Extract plain objects from Vue Proxies before API submission
+  // Both form and selectedProducts are reactive() objects that need toRaw()
+  const rawForm = toRaw(form)
+
   // Prepare bundle data with proper type casting
   const bundleData = {
-    ...form,
-    targetAudience: form.targetAudience as BundleTargetAudience,
-    products: selectedProducts.value.map(p => ({
-      id: p.id,
-      name: p.name,
-      basePrice: p.basePrice,
-      quantity: p.quantity,
-      subtotal: p.subtotal
-    })),
+    ...rawForm,
+    targetAudience: rawForm.targetAudience as BundleTargetAudience,
+    products: selectedProducts.value.map(p => {
+      const rawProduct = toRaw(p)
+      return {
+        id: rawProduct.id,
+        name: rawProduct.name,
+        basePrice: rawProduct.basePrice,
+        quantity: rawProduct.quantity,
+        subtotal: rawProduct.subtotal,
+        priceLocked: rawProduct.priceLocked ?? false // Price Lock: préserve le flag lors de la soumission
+      }
+    }),
     tags: tagsInput.value.split(',').map(tag => tag.trim()).filter(Boolean),
-    savings: form.originalTotal && form.originalTotal > form.estimatedTotal
-      ? form.originalTotal - form.estimatedTotal
+    savings: rawForm.originalTotal && rawForm.originalTotal > rawForm.estimatedTotal
+      ? rawForm.originalTotal - rawForm.estimatedTotal
       : 0
   }
+
+  // 🐛 DEBUG: Log payload before API submission
+  console.log('🔍 [DEBUG handleSubmit] bundleData:', JSON.stringify(bundleData, null, 2))
 
   if (isNew.value) {
     createBundleMutation.mutate(bundleData)
@@ -1294,6 +1375,33 @@ function formatPrice(price: number | undefined | null): string {
   }).format(price)
 }
 
+// 🔔 PRICE WARNING HELPER (Phase 3.2)
+// Calcule l'écart entre prix bundle et prix catalogue
+function getPriceWarning(product: any): { hasWarning: boolean; percentage: number; message: string } | null {
+  if (!product.catalogPrice || !product.basePrice) {
+    return null
+  }
+
+  const catalog = product.catalogPrice
+  const bundle = product.basePrice
+
+  // Calcul de l'écart en pourcentage (|catalog - bundle| / catalog * 100)
+  const diff = Math.abs(catalog - bundle)
+  const percentage = Math.round((diff / catalog) * 100)
+
+  // Warning si écart > 5%
+  if (percentage > 5) {
+    const direction = bundle > catalog ? 'supérieur' : 'inférieur'
+    return {
+      hasWarning: true,
+      percentage,
+      message: `Prix ${direction} de ${percentage}% au prix catalogue (${formatPrice(catalog)})`
+    }
+  }
+
+  return null
+}
+
 // ===== LIFECYCLE & WATCHERS =====
 // Initialize form when bundle data is loaded
 watchEffect(() => {
@@ -1326,14 +1434,20 @@ onMounted(async () => {
 
           if (latestProduct) {
             // Mettre à jour les données du produit dans le bundle
-            const updatedBundleProduct = {
+            const catalogPrice = latestProduct.base_price || latestProduct.price || bundleProduct.basePrice
+            // 🔧 FIX: Utiliser reactive() pour que v-model fonctionne correctement
+            const updatedBundleProduct = reactive({
               ...bundleProduct,
               name: latestProduct.name || bundleProduct.name,
               basePrice: latestProduct.base_price || latestProduct.price || bundleProduct.basePrice,
               image_url: latestProduct.image_url || bundleProduct.image_url,
               images: latestProduct.images || bundleProduct.images || [],
-              subtotal: bundleProduct.quantity * (latestProduct.base_price || latestProduct.price || bundleProduct.basePrice)
-            }
+              subtotal: bundleProduct.quantity * (latestProduct.base_price || latestProduct.price || bundleProduct.basePrice),
+              // Price Lock: préserve le flag lors de la sync automatique
+              priceLocked: bundleProduct.priceLocked ?? false,
+              // Price Warning: stocke le prix catalogue pour calcul d'écart (Phase 3.2)
+              catalogPrice: catalogPrice
+            })
 
             console.log(`✅ Produit "${latestProduct.name}" synchronisé`)
             return updatedBundleProduct

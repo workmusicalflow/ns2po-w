@@ -178,6 +178,7 @@ export interface BundleProduct {
   subtotal: number;
   image_url?: string;
   isRequired?: boolean;
+  priceLocked?: boolean; // Price Lock: false = auto-sync (80%), true = fixé (20%)
 }
 
 export type BundleTargetAudience = 'local' | 'regional' | 'national' | 'universal';

@@ -68,7 +68,7 @@
     <!-- Barre de progression visuelle -->
     <div v-if="showProgressBar" class="mt-3">
       <div class="flex items-center justify-between text-xs text-gray-500 mb-1">
-        <span>Progression vers 1000 articles</span>
+        <span>Progression du bundle</span>
         <span>{{ Math.min(100, progressPercentage) }}%</span>
       </div>
       <div class="w-full bg-gray-200 rounded-full h-2">
@@ -96,7 +96,7 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
   totalPrice: 0,
   originalPrice: 0,
-  minimumQuantity: 1000,
+  minimumQuantity: 1,
   showProgressBar: true
 })
 

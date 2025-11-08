@@ -105,12 +105,26 @@ export default defineEventHandler(async (event): Promise<BundleApiResponse> => {
             SELECT
               bp.product_id, p.name as product_name, p.description as product_description,
               p.id as product_reference,
-              COALESCE(bp.custom_price, p.base_price) as base_price,
-              COALESCE(bp.custom_price, p.base_price) as unit_price,
-              COALESCE(bp.custom_price, p.base_price) as price,
+              p.base_price as product_base_price,
+              bp.custom_price,
+              CASE
+                WHEN bp.price_locked = 1 THEN bp.custom_price
+                ELSE p.base_price
+              END as base_price,
+              CASE
+                WHEN bp.price_locked = 1 THEN bp.custom_price
+                ELSE p.base_price
+              END as unit_price,
+              CASE
+                WHEN bp.price_locked = 1 THEN bp.custom_price
+                ELSE p.base_price
+              END as price,
               bp.quantity,
-              (COALESCE(bp.custom_price, p.base_price) * bp.quantity) as subtotal,
-              bp.is_required, p.image_url, p.category,
+              (CASE
+                WHEN bp.price_locked = 1 THEN bp.custom_price
+                ELSE p.base_price
+              END * bp.quantity) as subtotal,
+              bp.is_required, bp.price_locked, p.image_url, p.category,
               bp.created_at as bp_created_at
             FROM bundle_products bp
             LEFT JOIN products p ON bp.product_id = p.id
@@ -139,14 +153,41 @@ export default defineEventHandler(async (event): Promise<BundleApiResponse> => {
           updatedAt: row.updated_at
         }
 
+        // 🐛 DEBUG ULTRA-DETAILLÉ: Afficher TOUTES les colonnes SQL brutes
+        console.log('🔍 [GET BUNDLE] RAW SQL ROWS COUNT:', productsResult.rows.length)
+        console.log('🔍 [GET BUNDLE] RAW SQL ROWS:', JSON.stringify(productsResult.rows, null, 2))
+        console.log('🔍 [GET BUNDLE] Bundle ID utilisé dans LEFT JOIN:', row.id)
+        console.log('🔍 [GET BUNDLE] SQL QUERY:', `
+          SELECT bp.product_id, p.name as product_name
+          FROM bundle_products bp
+          LEFT JOIN products p ON bp.product_id = p.id
+          WHERE bp.bundle_id = ${row.id}
+        `)
+
         // Transform products to external format (matching @ns2po/types BundleProduct)
-        const externalProducts: ExternalBundleProduct[] = productsResult.rows.map((productRow: any) => ({
-          id: productRow.product_id,
-          name: productRow.product_name || 'Produit sans nom',
-          basePrice: Number(productRow.base_price) || 0,
-          quantity: Number(productRow.quantity) || 1,
-          subtotal: Number(productRow.subtotal) || 0
-        }))
+        const externalProducts: ExternalBundleProduct[] = productsResult.rows.map((productRow: any) => {
+          // 🐛 DEBUG: Logs pour diagnostiquer échecs tests E2E
+          console.log(`🔍 [GET BUNDLE] Produit récupéré:`, {
+            product_id: productRow.product_id,
+            product_base_price_catalog: productRow.product_base_price,
+            custom_price_from_db: productRow.custom_price,
+            price_locked_from_db: productRow.price_locked,
+            case_when_result_base_price: productRow.base_price,
+            case_when_result_unit_price: productRow.unit_price,
+            case_when_result_price: productRow.price,
+            final_basePrice: Number(productRow.base_price) || 0,
+            '⚠️_IF_NULL_OR_ZERO': Number(productRow.base_price) === 0 ? 'ZERO!' : 'OK'
+          })
+
+          return {
+            id: productRow.product_id,
+            name: productRow.product_name || 'Produit sans nom',
+            basePrice: Number(productRow.base_price) || 0,
+            quantity: Number(productRow.quantity) || 1,
+            subtotal: Number(productRow.subtotal) || 0,
+            priceLocked: Boolean(productRow.price_locked) // Price Lock: expose le flag dans l'API
+          }
+        })
 
         // Calculate totals
         const originalTotal = externalProducts.reduce((sum, p) => sum + (p.basePrice * p.quantity), 0)

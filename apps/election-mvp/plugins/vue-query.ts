@@ -45,6 +45,14 @@ export default defineNuxtPlugin({
           hydrate(queryClient, nuxtApp.ssrContext.nuxt.vueQueryState)
         }
       })
+
+      // 🧪 EXPOSE QUERYCLIENT GLOBALEMENT POUR TESTS E2E PLAYWRIGHT
+      // Permet aux tests Playwright de vider le cache in-memory via:
+      // await page.evaluate(() => window.__VUE_QUERY_CLIENT__.clear())
+      // Solution recommandée par Gemini Copilot + Google Search Grounding
+      if (typeof window !== 'undefined') {
+        (window as any).__VUE_QUERY_CLIENT__ = queryClient
+      }
     }
   }
 })

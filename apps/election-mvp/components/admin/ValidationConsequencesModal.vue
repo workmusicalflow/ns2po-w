@@ -65,8 +65,8 @@
               <span>Quantité:</span>
               <span class="font-medium">{{ afterState.quantity }} articles</span>
             </div>
-            <div v-if="afterState.quantity < 1000" class="mt-2 text-xs text-red-700">
-              <span class="font-medium">⚠️ Minimum requis: 1000 articles</span>
+            <div v-if="afterState.quantity < 1" class="mt-2 text-xs text-red-700">
+              <span class="font-medium">⚠️ Minimum requis: 1 article</span>
             </div>
           </div>
         </div>
@@ -83,7 +83,7 @@
             <p>Le bundle ne pourra plus être sauvegardé tant que la quantité minimale ne sera pas atteinte. Vous devrez :</p>
             <ul class="mt-2 space-y-1 ml-4">
               <li class="list-disc">
-                Ajouter d'autres produits pour atteindre 1000 articles minimum
+                Ajouter d'autres produits pour atteindre le minimum requis
               </li>
               <li class="list-disc">
                 Ou augmenter les quantités des produits existants

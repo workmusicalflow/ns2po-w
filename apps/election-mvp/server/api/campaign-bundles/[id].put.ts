@@ -1,20 +1,45 @@
 /**
  * API Route: PUT /api/campaign-bundles/[id]
  * Met à jour un campaign bundle existant avec la nouvelle structure Turso
+ *
+ * ⚠️ IMPORTANT: Utilise imports dynamiques pour éviter silent 500 errors
+ * Solution validée: https://github.com/workmusicalflow/ns2po-w/PUT-HANDLER-500-RESOLUTION.md
  */
-
-import { getDatabase } from "../../utils/database"
-import { campaignBundleUpdateSchema, validateBundleProducts, validateBundleTotal, validateBundleBusinessRules, validateFeaturedBundleLimit } from "~/schemas/bundle"
-import { broadcastSSEEvent } from '~/server/api/sse'
-import { z } from "zod"
-import { invalidateCampaignBundlesCache } from "../../utils/cache-invalidation"
 
 export default defineEventHandler(async (event) => {
   const startTime = Date.now()
 
   try {
     const bundleId = getRouterParam(event, 'id')
-    console.log(`📦 PUT /api/campaign-bundles/${bundleId} - Mise à jour bundle`)
+    console.log(`📦 PUT /api/campaign-bundles/${bundleId}`)
+
+    // ⚡ Dynamic imports (prevents module load-time failures)
+    let getDatabase, campaignBundleUpdateSchema, validateBundleProducts, validateBundleTotal, validateBundleBusinessRules, validateFeaturedBundleLimit, broadcastSSEEvent, z
+
+    try {
+      const [dbModule, bundleSchemas, sseModule, zodModule] = await Promise.all([
+        import("../../utils/database"),
+        import("../../../schemas/bundle"),
+        import('../sse'),
+        import("zod")
+      ])
+
+      getDatabase = dbModule.getDatabase
+      campaignBundleUpdateSchema = bundleSchemas.campaignBundleUpdateSchema
+      validateBundleProducts = bundleSchemas.validateBundleProducts
+      validateBundleTotal = bundleSchemas.validateBundleTotal
+      validateBundleBusinessRules = bundleSchemas.validateBundleBusinessRules
+      validateFeaturedBundleLimit = bundleSchemas.validateFeaturedBundleLimit
+      broadcastSSEEvent = sseModule.broadcastSSEEvent
+      z = zodModule.z
+    } catch (error) {
+      console.error('❌ Module import failed:', error)
+      throw createError({
+        statusCode: 500,
+        statusMessage: 'Failed to load required modules',
+        data: { error: error.message }
+      })
+    }
 
     if (!bundleId) {
       throw createError({
@@ -307,15 +332,16 @@ export default defineEventHandler(async (event) => {
           try {
             await db.execute({
               sql: `INSERT INTO bundle_products (
-                bundle_id, product_id, quantity, custom_price, is_required, display_order
-              ) VALUES (?, ?, ?, ?, ?, ?)`,
+                bundle_id, product_id, quantity, custom_price, is_required, display_order, price_locked
+              ) VALUES (?, ?, ?, ?, ?, ?, ?)`,
               args: [
                 bundleId,
                 productId,
                 product.quantity,
                 product.basePrice,
                 product.isRequired !== false ? 1 : 0,
-                i + 1
+                i + 1,
+                product.priceLocked ? 1 : 0
               ]
             })
           } catch (insertError) {
@@ -416,15 +442,6 @@ export default defineEventHandler(async (event) => {
         duration: Date.now() - startTime
       }
 
-      // ⭐ INVALIDATION CACHE REDIS (architecture unifiée)
-      try {
-        await invalidateCampaignBundlesCache()
-        console.log('🗑️ [PUT BUNDLE] Cache Redis invalidé')
-      } catch (cacheError) {
-        console.error('❌ [PUT BUNDLE] Échec invalidation cache:', cacheError)
-        // Continue sans bloquer (non-critique pour cette mutation)
-      }
-
       // Broadcast SSE event for real-time synchronization
       console.log('📡 Émission SSE pour bundle mis à jour:', bundleData.name)
       const broadcastResult = broadcastSSEEvent({
@@ -446,6 +463,14 @@ export default defineEventHandler(async (event) => {
     }
 
   } catch (error) {
+    // 🔍 Capture détaillée pour debugging Playwright/Nitro silent 500
+    console.error('❌ [PUT HANDLER CATCH] Error caught:', {
+      message: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined,
+      statusCode: error?.statusCode,
+      type: typeof error,
+      constructor: error?.constructor?.name
+    })
     console.error(`❌ Erreur PUT /api/campaign-bundles/${getRouterParam(event, 'id')}:`, error)
 
     if (error.statusCode) {
@@ -457,6 +482,7 @@ export default defineEventHandler(async (event) => {
       statusMessage: 'Erreur interne du serveur',
       data: {
         error: error instanceof Error ? error.message : "Erreur inconnue",
+        errorType: error?.constructor?.name || typeof error,
         duration: Date.now() - startTime
       }
     })

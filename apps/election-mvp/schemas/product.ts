@@ -29,7 +29,6 @@ export const productSchema = z.object({
   min_quantity: z.number()
     .int('La quantité minimum doit être un nombre entier')
     .min(1, 'La quantité minimum doit être au moins 1')
-    .max(1000, 'La quantité minimum ne peut pas dépasser 1000')
     .optional()
     .default(1),
 
