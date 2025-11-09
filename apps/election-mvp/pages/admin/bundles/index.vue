@@ -474,9 +474,39 @@ async function deleteBundle(bundle: BundleAggregate) {
   try {
     await deleteBundleMutation.mutateAsync(bundle.id)
     crudSuccess.deleted(`Bundle "${bundle.name}" supprimé avec succès`, 'bundle')
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error deleting bundle:', error)
-    crudError.deleted('bundle', `Erreur lors de la suppression du bundle "${bundle.name}"`)
+
+    // Gérer spécifiquement l'erreur 409 (contraintes référentielles)
+    if (error?.statusCode === 409 || error?.data?.statusCode === 409) {
+      const constraints = error?.data?.data?.constraints || []
+      const alternatives = error?.data?.data?.alternatives || []
+
+      let detailedMessage = `❌ Impossible de supprimer "${bundle.name}"\n\n`
+
+      // Afficher les contraintes
+      if (constraints.length > 0) {
+        detailedMessage += '🔒 Raisons:\n'
+        constraints.forEach((c: any) => {
+          detailedMessage += `• ${c.message}\n`
+        })
+        detailedMessage += '\n'
+      }
+
+      // Afficher les alternatives
+      if (alternatives.length > 0) {
+        detailedMessage += '💡 Solutions:\n'
+        alternatives.forEach((alt: string) => {
+          detailedMessage += `• ${alt}\n`
+        })
+      }
+
+      // Afficher avec un alert détaillé (temporaire - à remplacer par modal)
+      alert(detailedMessage)
+    } else {
+      // Autres erreurs (500, etc.)
+      crudError.deleted('bundle', `Erreur lors de la suppression du bundle "${bundle.name}"`)
+    }
   }
 }
 
