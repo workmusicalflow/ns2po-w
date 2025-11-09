@@ -232,19 +232,22 @@
           >
             Dupliquer
           </button>
-          <button
-            :class="item.isActive ? 'text-red-600 hover:text-red-700' : 'text-green-600 hover:text-green-700'"
-            class="text-sm font-medium"
+          <!-- Toggle Status Button avec loading state -->
+          <MutationButton
+            :is-pending="updateBundleMutation.isPending.value"
+            :text="item.isActive ? 'Désactiver' : 'Activer'"
+            :loading-text="item.isActive ? 'Désactivation...' : 'Activation...'"
+            :button-class="item.isActive ? 'text-red-600 hover:text-red-700 text-sm font-medium' : 'text-green-600 hover:text-green-700 text-sm font-medium'"
             @click="toggleStatus(item)"
-          >
-            {{ item.isActive ? 'Désactiver' : 'Activer' }}
-          </button>
-          <button
-            class="text-red-600 hover:text-red-700 text-sm font-medium"
+          />
+          <!-- Delete Button avec loading state -->
+          <MutationButton
+            :is-pending="deleteBundleMutation.isPending.value"
+            text="Supprimer"
+            loading-text="Suppression..."
+            button-class="text-red-600 hover:text-red-700 text-sm font-medium"
             @click="deleteBundle(item)"
-          >
-            Supprimer
-          </button>
+          />
         </div>
       </template>
     </AdminDataTable>
