@@ -10,31 +10,7 @@
     </div>
 
     <div class="grid md:grid-cols-2 gap-4 max-w-3xl mx-auto">
-      <!-- Option Bundle -->
-      <button
-        :class="[
-          'choice-card group relative overflow-hidden rounded-xl p-6 transition-all duration-300',
-          'bg-white border-2 hover:border-primary hover:shadow-lg cursor-pointer',
-          'min-h-[200px] flex flex-col items-center justify-center text-center'
-        ]"
-        @click="$emit('select-mode', 'bundle')"
-      >
-        <!-- Icône -->
-        <div class="w-16 h-16 mb-4 bg-primary/10 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
-          <svg class="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-          </svg>
-        </div>
-
-        <h3 class="text-lg font-bold text-accent mb-2">
-          Packs Campagne
-        </h3>
-        <p class="text-sm text-gray-600">
-          Solutions clés en main optimisées pour chaque niveau d'élection
-        </p>
-      </button>
-
-      <!-- Option Custom -->
+      <!-- Option Custom (REPOSITIONNÉ EN PREMIER) -->
       <button
         :class="[
           'choice-card group relative overflow-hidden rounded-xl p-6 transition-all duration-300',
@@ -61,6 +37,30 @@
         <span class="absolute top-4 right-4 bg-green-100 text-green-800 text-xs font-bold px-3 py-1 rounded-full">
           Recommandé
         </span>
+      </button>
+
+      <!-- Option Bundle (REPOSITIONNÉ EN SECOND) -->
+      <button
+        :class="[
+          'choice-card group relative overflow-hidden rounded-xl p-6 transition-all duration-300',
+          'bg-white border-2 hover:border-primary hover:shadow-lg cursor-pointer',
+          'min-h-[200px] flex flex-col items-center justify-center text-center'
+        ]"
+        @click="$emit('select-mode', 'bundle')"
+      >
+        <!-- Icône -->
+        <div class="w-16 h-16 mb-4 bg-primary/10 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
+          <svg class="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+          </svg>
+        </div>
+
+        <h3 class="text-lg font-bold text-accent mb-2">
+          Packs Campagne
+        </h3>
+        <p class="text-sm text-gray-600">
+          Solutions clés en main optimisées pour chaque niveau d'élection
+        </p>
       </button>
     </div>
 
