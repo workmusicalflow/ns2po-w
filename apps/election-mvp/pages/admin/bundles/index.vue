@@ -456,7 +456,7 @@ async function toggleStatus(bundle: BundleAggregate) {
   try {
     await updateBundleMutation.mutateAsync({
       id: bundle.id,
-      data: {
+      updates: {  // FIX: "data" → "updates" (paramètre correct mutation)
         isActive: !bundle.isActive
       }
     })
