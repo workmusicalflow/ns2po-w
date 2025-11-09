@@ -1,6 +1,55 @@
 <template>
   <div class="step-validation">
-    <!-- Formulaire minimal -->
+    <!-- Récapitulatif collapsible (REPOSITIONNÉ EN HAUT) -->
+    <div class="summary-section mb-8">
+      <button
+        class="w-full flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+        @click="showSummary = !showSummary"
+      >
+        <div class="flex items-center gap-3">
+          <svg
+            :class="['w-5 h-5 transition-transform', showSummary ? 'rotate-90' : '']"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+          </svg>
+          <span class="font-medium">Récapitulatif du devis</span>
+        </div>
+
+        <div class="text-right">
+          <p class="text-sm text-gray-600">
+            {{ cartItems.length }} produits
+          </p>
+          <p class="font-bold text-primary">
+            {{ formatPrice(total) }}
+          </p>
+        </div>
+      </button>
+
+      <!-- Détails du récap -->
+      <div v-if="showSummary" class="mt-4 p-4 bg-white rounded-lg border border-gray-200">
+        <div class="space-y-2">
+          <div v-for="item in cartItems" :key="item.id" class="flex justify-between text-sm">
+            <span>{{ item.name }} x{{ item.quantity }}</span>
+            <span class="font-medium">{{ formatPrice(item.total) }}</span>
+          </div>
+        </div>
+
+        <div class="border-t mt-4 pt-4">
+          <div class="flex justify-between font-bold">
+            <span>Total TTC</span>
+            <span class="text-primary">{{ formatPrice(total) }}</span>
+          </div>
+          <p class="text-xs text-gray-500 mt-2">
+            Délai estimé: 5-7 jours ouvrés
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Formulaire minimal (REPOSITIONNÉ APRÈS LE RÉCAP) -->
     <div class="form-section mb-8">
       <h3 class="text-lg font-bold mb-4">
         Vos coordonnées
@@ -119,55 +168,6 @@
       </form>
     </div>
 
-    <!-- Récapitulatif collapsible -->
-    <div class="summary-section mb-8">
-      <button
-        class="w-full flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
-        @click="showSummary = !showSummary"
-      >
-        <div class="flex items-center gap-3">
-          <svg
-            :class="['w-5 h-5 transition-transform', showSummary ? 'rotate-90' : '']"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-          </svg>
-          <span class="font-medium">Récapitulatif du devis</span>
-        </div>
-
-        <div class="text-right">
-          <p class="text-sm text-gray-600">
-            {{ cartItems.length }} produits
-          </p>
-          <p class="font-bold text-primary">
-            {{ formatPrice(total) }}
-          </p>
-        </div>
-      </button>
-
-      <!-- Détails du récap -->
-      <div v-if="showSummary" class="mt-4 p-4 bg-white rounded-lg border border-gray-200">
-        <div class="space-y-2">
-          <div v-for="item in cartItems" :key="item.id" class="flex justify-between text-sm">
-            <span>{{ item.name }} x{{ item.quantity }}</span>
-            <span class="font-medium">{{ formatPrice(item.total) }}</span>
-          </div>
-        </div>
-
-        <div class="border-t mt-4 pt-4">
-          <div class="flex justify-between font-bold">
-            <span>Total TTC</span>
-            <span class="text-primary">{{ formatPrice(total) }}</span>
-          </div>
-          <p class="text-xs text-gray-500 mt-2">
-            Délai estimé: 5-7 jours ouvrés
-          </p>
-        </div>
-      </div>
-    </div>
-
     <!-- Actions -->
     <div class="actions-section">
       <button
@@ -208,7 +208,7 @@ const form = ref({
   channel: 'whatsapp' as 'whatsapp' | 'email'
 })
 
-const showSummary = ref(false)
+const showSummary = ref(true) // Ouvert par défaut (meilleure visibilité en haut)
 
 // Computed
 const isValid = computed(() => {
