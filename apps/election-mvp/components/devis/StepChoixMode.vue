@@ -32,11 +32,6 @@
         <p class="text-sm text-gray-600">
           Solutions clés en main optimisées pour chaque niveau d'élection
         </p>
-
-        <!-- Badge recommandé -->
-        <span class="absolute top-4 right-4 bg-green-100 text-green-800 text-xs font-bold px-3 py-1 rounded-full">
-          Recommandé
-        </span>
       </button>
 
       <!-- Option Custom -->
@@ -61,6 +56,11 @@
         <p class="text-sm text-gray-600">
           Composez votre sélection produit par produit selon vos besoins
         </p>
+
+        <!-- Badge recommandé -->
+        <span class="absolute top-4 right-4 bg-green-100 text-green-800 text-xs font-bold px-3 py-1 rounded-full">
+          Recommandé
+        </span>
       </button>
     </div>
 
