@@ -90,7 +90,7 @@ const availableProducts = ref<Product[]>([])
 // Methods
 const handleSubmit = async (bundle: Bundle) => {
   try {
-    const response = await $fetch('/api/bundles', {
+    const response = await $fetch('/api/campaign-bundles', {
       method: 'POST',
       body: bundle
     }) as ApiResponse<{ id: string }>
