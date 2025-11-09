@@ -225,6 +225,35 @@ export class BundleService {
     }
   }
 
+  /**
+   * ⚠️ DÉCISION ARCHITECTURALE (Pareto 80/20) - Documenté dans AUDIT_COHERENCE_API_BACKEND_FRONTEND.md
+   *
+   * Les endpoints granulaires suivants N'EXISTENT PAS intentionnellement :
+   * - POST /api/campaign-bundles/[id]/products (appelé ligne 276)
+   * - PUT /api/campaign-bundles/[id]/products/[productId] (appelé ligne 318)
+   * - DELETE /api/campaign-bundles/[id]/products/[productId] (appelé ligne 360)
+   *
+   * Justification Pareto 80/20 :
+   * - 80% des cas = Modification bundle complet (créer nouveau bundle ou éditer via formulaire admin)
+   * - 20% des cas = Modifier 1 produit isolé (cas d'usage rare, non prioritaire MVP)
+   *
+   * Workaround actuel :
+   * - Frontend utilise PUT /api/campaign-bundles/[id] avec tableau products[] complet
+   * - Composable useCampaignBundles.ts gère état optimiste TanStack Query
+   * - Pattern "full bundle update" = 1 requête au lieu de 3+ (POST+PUT+DELETE)
+   *
+   * Avantages :
+   * ✅ Performance : 1 requête PUT au lieu de multiples requêtes (latence 3G Côte d'Ivoire)
+   * ✅ Complexité : Gestion état optimiste simplifiée (snapshot bundle entier)
+   * ✅ Atomicité : Mise à jour transactionnelle complète du bundle
+   * ✅ Cache : Invalidation TanStack Query plus simple (1 clé au lieu de N)
+   *
+   * Ces méthodes addProductToBundle/updateProductInBundle/removeProductFromBundle
+   * restent pour compatibilité future mais appellent des endpoints non implémentés.
+   *
+   * ⚡ RECOMMANDATION : Utiliser les composables Vue Query (useCampaignBundles.ts)
+   *    au lieu de BundleService directement pour manipulation produits dans bundles.
+   */
   async addProductToBundle(bundleId: string, productId: string, quantity: number = 1): Promise<BundleProduct> {
     this.validateId(bundleId)
     this.validateId(productId)

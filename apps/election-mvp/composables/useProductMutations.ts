@@ -221,63 +221,8 @@ export function useDeleteProductMutation(
   })
 }
 
-// Bulk Update Products Mutation
-export function useBulkUpdateProductsMutation(
-  options?: UseMutationOptions<Product[], Error, { ids: string[]; updates: Partial<Product> }>
-) {
-  const queryClient = useQueryClient()
-
-  return useMutation({
-    mutationFn: async ({ ids, updates }: { ids: string[]; updates: Partial<Product> }): Promise<Product[]> => {
-      // TODO: Créer endpoint /api/admin/products/bulk-update.put.ts avec schéma normalisé
-      // Pour l'instant, faire des updates individuels
-      const response = await $fetch('/api/admin/products/bulk-update', {
-        method: 'PUT',
-        body: { ids, updates }
-      }) as { success: boolean; data: Product[] }
-
-      if (!response.success) {
-        throw new Error('Failed to bulk update products')
-      }
-
-      return response.data
-    },
-    onMutate: async ({ ids, updates }) => {
-      // Cancel outgoing refetches
-      await queryClient.cancelQueries({ queryKey: productQueryKeys.lists() })
-
-      // Snapshot previous value
-      const previousProducts = queryClient.getQueryData(productQueryKeys.list())
-
-      // Optimistically update
-      queryClient.setQueryData(productQueryKeys.list(), (old: Product[] = []) =>
-        old.map(product => ids.includes(product.id) ? { ...product, ...updates, updatedAt: new Date().toISOString() } : product)
-      )
-
-      return { previousProducts, ids, updates }
-    },
-    onError: (error, _variables, context) => {
-      // Rollback optimistic update
-      if ((context as any)?.previousProducts) {
-        queryClient.setQueryData(productQueryKeys.list(), (context as any).previousProducts)
-      }
-    },
-    onSuccess: (data, { ids }) => {
-      // ⚡ Invalidation ciblée listes
-      queryClient.invalidateQueries({
-        queryKey: productQueryKeys.lists(),
-        exact: false
-      })
-
-      // Invalidation details individuels (exact match)
-      ids.forEach(id => {
-        queryClient.invalidateQueries({
-          queryKey: productQueryKeys.detail(id),
-          exact: true
-        })
-      })
-    },
-    ...options
-  })
-}
+// ⚠️ DEAD CODE REMOVED (Audit 2025-11-09)
+// useBulkUpdateProductsMutation() supprimé car jamais utilisé
+// Endpoint backend /api/admin/products/bulk-update n'existe pas
+// Justification: Update bulk non nécessaire (pattern update individuel suffit)
 
