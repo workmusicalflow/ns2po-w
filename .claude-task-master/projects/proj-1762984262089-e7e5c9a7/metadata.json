@@ -1,0 +1,11 @@
+{
+  "id": "proj-1762984262089-e7e5c9a7",
+  "name": "Quote PDF Generation + Email Integration",
+  "description": "Implémentation complète système génération devis PDF avec Puppeteer + intégration email Resend (MJML). Phase 2 Email Delivery + PDF attachment. Timeline: 10h30. Stack: Nuxt 3 + Puppeteer + @sparticuz/chromium-min + Resend + MJML. Performance target: < 600ms génération PDF, < 2MB taille.",
+  "created": "2025-11-12T21:51:02.089Z",
+  "sprints": [
+    "sprint-1762984276530-52b0f7b2"
+  ],
+  "activeSprint": "sprint-1762984276530-52b0f7b2",
+  "updated": "2025-11-12T21:51:16.531Z"
+}

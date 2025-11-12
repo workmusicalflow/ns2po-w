@@ -47,6 +47,15 @@ export default defineNuxtConfig({
     smtpPassword: process.env.SMTP_PASSWORD,
     smtpSecure: process.env.SMTP_SECURE,
 
+    // Resend Email Configuration (Phase 2 - PDF Email Delivery)
+    resendApiKey: process.env.RESEND_API_KEY,
+    resendFromEmail: process.env.RESEND_FROM_EMAIL,
+
+    // Puppeteer PDF Configuration
+    chromiumExecutablePath: process.env.CHROMIUM_EXECUTABLE_PATH,
+    puppeteerSkipDownload: process.env.PUPPETEER_SKIP_CHROMIUM_DOWNLOAD,
+    puppeteerCacheDir: process.env.PUPPETEER_CACHE_DIR,
+
     // Public keys (exposed to client-side)
     public: {
       appName: "NS2PO Election MVP",
@@ -69,7 +78,8 @@ export default defineNuxtConfig({
     "@nuxt/image",
     "@nuxt/icon",
     "@pinia/nuxt",
-    "@nuxt/devtools"
+    "@nuxt/devtools",
+    "@sidebase/nuxt-pdf"
   ],
 
   // Nitro configuration for caching and performance

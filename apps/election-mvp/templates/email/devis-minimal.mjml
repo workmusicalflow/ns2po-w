@@ -1,0 +1,71 @@
+<mjml>
+  <mj-body background-color="#f4f4f4">
+    <!-- Header Logo -->
+    <mj-section background-color="#ffffff" padding="20px">
+      <mj-column>
+        <mj-image
+          src="https://res.cloudinary.com/dsrvzogof/image/upload/c_scale,w_150,f_auto/ns2po-logo.png"
+          width="150px"
+          alt="NS2PO"
+        />
+      </mj-column>
+    </mj-section>
+
+    <!-- Contenu Principal -->
+    <mj-section background-color="#ffffff" padding="30px">
+      <mj-column>
+        <mj-text font-size="20px" color="#333333" font-weight="bold">
+          Bonjour {{clientName}},
+        </mj-text>
+
+        <mj-text font-size="16px" color="#666666" line-height="1.6">
+          Votre devis de campagne électorale est prêt.
+        </mj-text>
+
+        <mj-text font-size="24px" color="#C99A3B" font-weight="bold" align="center" padding="20px 0">
+          {{totalAmount}} FCFA
+        </mj-text>
+
+        <mj-button
+          background-color="#C99A3B"
+          href="{{ctaUrl}}"
+          font-size="18px"
+          padding="15px 40px"
+          border-radius="6px"
+        >
+          Voir mon devis
+        </mj-button>
+
+        <mj-text font-size="14px" color="#999999" align="center" padding-top="20px">
+          Référence : {{reference}}
+        </mj-text>
+
+        <mj-text font-size="13px" color="#666666" line-height="1.6" padding-top="20px">
+          Vous trouverez le détail complet de votre devis en pièce jointe au format PDF.
+        </mj-text>
+      </mj-column>
+    </mj-section>
+
+    <!-- Footer -->
+    <mj-section background-color="#f4f4f4" padding="30px 20px">
+      <mj-column>
+        <mj-text font-size="14px" color="#6A2B3A" align="center" font-weight="600" padding-bottom="8px">
+          NS2PO
+        </mj-text>
+
+        <mj-text font-size="13px" color="#C99A3B" align="center" font-style="italic" padding-bottom="12px">
+          Publicité par l'Objet depuis 2011
+        </mj-text>
+
+        <mj-text font-size="12px" color="#999999" align="center" line-height="1.8">
+          Abidjan, Côte d'Ivoire<br/>
+          <a href="mailto:devis@ns2po.ci" style="color:#C99A3B; text-decoration:none;">devis@ns2po.ci</a>
+        </mj-text>
+
+        <mj-text font-size="11px" color="#BBB" align="center" padding-top="16px">
+          Ce devis est valable 30 jours à compter de la date d'émission
+        </mj-text>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>

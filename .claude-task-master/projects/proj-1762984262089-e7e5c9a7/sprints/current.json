@@ -1,0 +1,314 @@
+{
+  "id": "sprint-1762984276530-52b0f7b2",
+  "name": "Sprint 1 - PDF Generation Core Implementation",
+  "startDate": "2025-01-12",
+  "endDate": "2025-01-14",
+  "goals": "Implémenter génération PDF devis avec Puppeteer + intégration Resend email. Livrable: API /quotes/send fonctionnelle avec PDF attachment. Performance: < 600ms, < 2MB. Phase complète: Installation → Template → Service → API → Tests → Deploy.",
+  "status": "active",
+  "created": "2025-11-12T21:51:16.530Z",
+  "tasks": [
+    {
+      "id": 1,
+      "title": "🔴 [UTILISATEUR] Configurer compte Resend + vérifier domaine ns2po.ci",
+      "description": "**ACTION UTILISATEUR REQUISE**\n\n1. Créer compte sur resend.com\n2. Récupérer RESEND_API_KEY\n3. Vérifier domaine ns2po.ci (DNS: SPF, DKIM)\n4. Test mail-tester.com (score ≥ 9/10)\n5. Fournir API key à Claude pour configuration .env\n\n**Durée**: 2h (Phase 1 delivery-quotes-email.md)\n**Critère succès**: API key fournie + domaine vérifié",
+      "status": "completed",
+      "priority": 5,
+      "dependencies": [],
+      "created": "2025-11-12T21:54:02.586Z",
+      "updated": "2025-11-12T22:01:31.357Z",
+      "isPareto80": false
+    },
+    {
+      "id": 2,
+      "title": "📦 Installer dépendances PDF generation (puppeteer + chromium-min + nuxt-pdf + handlebars)",
+      "description": "**Commandes**:\n```bash\ncd apps/election-mvp\npnpm add puppeteer @sparticuz/chromium-min @sidebase/nuxt-pdf handlebars\n```\n\n**Packages**:\n- puppeteer: ~2 MB\n- @sparticuz/chromium-min: ~50 MB\n- @sidebase/nuxt-pdf: ~500 KB\n- handlebars: Template engine\n\n**Vérifications**:\n- package.json mis à jour\n- pnpm-lock.yaml regénéré\n- node_modules installés\n\n**Durée**: 5min",
+      "status": "completed",
+      "priority": 5,
+      "dependencies": [],
+      "created": "2025-11-12T21:54:04.249Z",
+      "updated": "2025-11-12T22:05:36.792Z",
+      "isPareto80": false
+    },
+    {
+      "id": 3,
+      "title": "⚙️ Configurer variables environnement (.env + nuxt.config.ts)",
+      "description": "**Fichiers à modifier**:\n\n1. `.env`:\n```bash\n# Resend (Phase 2)\nRESEND_API_KEY=re_xxxxx  # Fourni par utilisateur\nRESEND_FROM_EMAIL=devis@ns2po.ci\n\n# Puppeteer PDF\nCHROMIUM_EXECUTABLE_PATH=/tmp/chromium\nPUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true\nPUPPETEER_CACHE_DIR=/tmp/.cache/puppeteer\n```\n\n2. `nuxt.config.ts`:\n- Ajouter module @sidebase/nuxt-pdf\n- Config runtimeConfig.chromiumPath\n- Config runtimeConfig.pdf\n\n**Vérifications**:\n- pnpm type-check (zéro erreur)\n- Serena: Vérifier syntax config\n\n**Durée**: 10min",
+      "status": "completed",
+      "priority": 5,
+      "dependencies": [
+        1,
+        2
+      ],
+      "created": "2025-11-12T21:54:05.799Z",
+      "updated": "2025-11-12T22:07:22.297Z",
+      "isPareto80": false
+    },
+    {
+      "id": 4,
+      "title": "🎨 Créer template HTML devis (server/templates/quote-pdf.html)",
+      "description": "**Fichier**: `apps/election-mvp/server/templates/quote-pdf.html`\n\n**Structure**:\n- Header: Logo NS2PO + Référence devis\n- Client info: Nom, email, téléphone, organisation\n- Tableau produits: Image, nom, customization, qté, prix\n- Totaux: Sous-total, remise, TVA 18%, Total TTC\n- Footer: Coordonnées NS2PO, mentions légales\n\n**Branding**:\n- Primaire: #C99A3B (Ocre)\n- Accent: #6A2B3A (Bourgogne)\n- Fond: #F8F8F8\n- Police: System fonts (-apple-system, Roboto)\n\n**CSS**: Inline uniquement (performance)\n\n**Template engine**: Handlebars ({{variable}}, {{#each}})\n\n**Vérifications**:\n- Serena: Vérifier structure HTML\n- Responsive (A4 format)\n- Images Cloudinary placeholders\n\n**Durée**: 1h30",
+      "status": "completed",
+      "priority": 5,
+      "dependencies": [
+        3
+      ],
+      "created": "2025-11-12T21:54:07.440Z",
+      "updated": "2025-11-12T22:08:31.278Z",
+      "isPareto80": false
+    },
+    {
+      "id": 5,
+      "title": "🖼️ Intégrer optimisations images Cloudinary dans template",
+      "description": "**Transformations Cloudinary**:\n```\nf_auto (format optimal: webp)\nq_auto (qualité auto)\nw_600 (largeur max 600px)\nc_scale (maintenir ratio)\n```\n\n**URLs template**:\n```html\n<img src=\"{{imageUrl}}\" />\n```\n\n**Helper à créer** (dans service):\n```typescript\nfunction optimizeCloudinaryUrl(url: string): string {\n  return url.replace('/upload/', '/upload/f_auto,q_auto,w_600,c_scale/')\n}\n```\n\n**Logo NS2PO**:\n```\nhttps://res.cloudinary.com/dsrvzogof/image/upload/c_scale,w_150,f_auto/logo-ns2po.png\n```\n\n**Vérifications**:\n- URLs optimisées dans template\n- Serena: Vérifier syntaxe src images\n\n**Durée**: 30min",
+      "status": "completed",
+      "priority": 4,
+      "dependencies": [
+        4
+      ],
+      "created": "2025-11-12T21:54:09.004Z",
+      "updated": "2025-11-12T22:09:42.468Z",
+      "isPareto80": false
+    },
+    {
+      "id": 6,
+      "title": "🔧 Créer service pdf-generator.ts avec types TypeScript stricts",
+      "description": "**Fichier**: `apps/election-mvp/server/services/pdf-generator.ts`\n\n**Interfaces TypeScript**:\n```typescript\ninterface QuoteData {\n  reference: string\n  date: string\n  clientName: string\n  clientEmail: string\n  clientPhone: string\n  clientOrganization?: string\n  items: QuoteItem[]\n  subtotal: number\n  discount?: number\n  discountPercent?: number\n  tax: number\n  total: number\n  logoUrl: string\n}\n\ninterface QuoteItem {\n  name: string\n  imageUrl: string\n  customization?: string\n  quantity: number\n  unitPrice: number\n  totalPrice: number\n}\n```\n\n**Fonctions**:\n- `generateQuotePDF(data: QuoteData): Promise<Buffer>`\n- `renderQuoteHTML(data: QuoteData): string`\n- `formatQuoteData(rawData: any): QuoteData`\n- `optimizeCloudinaryUrl(url: string): string`\n- `getBrowser(): Promise<Browser>` (pool)\n- `closeBrowser(): Promise<void>`\n\n**Vérifications**:\n- pnpm type-check (strict mode)\n- Serena: find_symbol vérifier exports\n- ESLint clean\n\n**Durée**: 1h",
+      "status": "completed",
+      "priority": 5,
+      "dependencies": [
+        5
+      ],
+      "created": "2025-11-12T21:54:10.028Z",
+      "updated": "2025-11-12T22:09:42.641Z",
+      "isPareto80": false
+    },
+    {
+      "id": 7,
+      "title": "🌐 Implémenter Puppeteer + chromium-min + pool browser",
+      "description": "**Logique Puppeteer** (dans pdf-generator.ts):\n\n1. **Configuration**:\n```typescript\nconst chromiumPath = process.env.CHROMIUM_EXECUTABLE_PATH || chromium.executablePath\n```\n\n2. **Pool browser** (réutilisation):\n```typescript\nlet browserInstance: Browser | null = null\n\nasync function getBrowser() {\n  if (browserInstance?.isConnected()) return browserInstance\n  \n  browserInstance = await puppeteer.launch({\n    executablePath: await chromiumPath,\n    args: chromium.args,\n    headless: chromium.headless,\n    defaultViewport: { width: 1920, height: 1080 }\n  })\n  \n  return browserInstance\n}\n```\n\n3. **Génération PDF**:\n```typescript\nconst browser = await getBrowser()\nconst page = await browser.newPage()\nawait page.setContent(html, { waitUntil: 'networkidle0', timeout: 10000 })\nconst pdfBuffer = await page.pdf({\n  format: 'A4',\n  printBackground: true,\n  margin: { top: '20px', right: '20px', bottom: '20px', left: '20px' }\n})\nawait page.close() // Pas browser (pool)\nreturn pdfBuffer\n```\n\n**Optimisations**:\n- Timeout 10s max\n- networkidle0 (attendre images)\n- Logs détaillés (timing)\n\n**Vérifications**:\n- Serena: Vérifier logique async/await\n- Gestion mémoire (close page)\n- Error handling try/catch\n\n**Durée**: 1h30",
+      "status": "completed",
+      "priority": 5,
+      "dependencies": [
+        6
+      ],
+      "created": "2025-11-12T21:54:11.695Z",
+      "updated": "2025-11-12T22:09:42.821Z",
+      "isPareto80": false
+    },
+    {
+      "id": 8,
+      "title": "⚡ Implémenter helpers (renderQuoteHTML + formatQuoteData + optimizeCloudinaryUrl)",
+      "description": "**Helper 1: renderQuoteHTML**\n```typescript\nimport Handlebars from 'handlebars'\nimport { readFileSync } from 'fs'\nimport { resolve } from 'path'\n\nfunction renderQuoteHTML(data: QuoteData): string {\n  const templatePath = resolve(process.cwd(), 'server/templates/quote-pdf.html')\n  const templateSource = readFileSync(templatePath, 'utf-8')\n  const template = Handlebars.compile(templateSource)\n  return template(data)\n}\n```\n\n**Helper 2: formatQuoteData**\n- Transformer données Turso → QuoteData\n- Formater dates (toLocaleDateString 'fr-FR')\n- Calculer totalPrice items\n- Ajouter logoUrl\n\n**Helper 3: optimizeCloudinaryUrl**\n- Regex replace '/upload/' → '/upload/f_auto,q_auto,w_600,c_scale/'\n- Vérifier URL contient 'cloudinary.com'\n\n**Vérifications**:\n- pnpm type-check\n- Serena: find_symbol vérifier exports\n- Tests unitaires (optionnel)\n\n**Durée**: 30min",
+      "status": "completed",
+      "priority": 4,
+      "dependencies": [
+        7
+      ],
+      "created": "2025-11-12T21:54:13.346Z",
+      "updated": "2025-11-12T22:09:42.998Z",
+      "isPareto80": false
+    },
+    {
+      "id": 9,
+      "title": "🔍 TYPE-CHECK: Vérifier types service PDF (pnpm type-check)",
+      "description": "**Commande**:\n```bash\ncd apps/election-mvp\npnpm type-check\n```\n\n**Vérifications Serena**:\n- `find_symbol pdf-generator` : Vérifier exports\n- `get_symbols_overview server/services/pdf-generator.ts`\n- Vérifier interfaces QuoteData, QuoteItem\n- Vérifier return types fonctions async\n\n**Critères succès**:\n- ✅ Zéro erreur TypeScript\n- ✅ Strict mode respecté\n- ✅ Tous les types exportés utilisés\n\n**Si erreurs**:\n- Fixer immédiatement avant continuer\n- Serena: Analyser erreurs TypeScript\n\n**Durée**: 10min",
+      "status": "completed",
+      "priority": 5,
+      "dependencies": [
+        8
+      ],
+      "created": "2025-11-12T21:54:15.071Z",
+      "updated": "2025-11-12T22:10:40.508Z",
+      "isPareto80": false
+    },
+    {
+      "id": 10,
+      "title": "📡 Créer API route server/api/quotes/send.post.ts",
+      "description": "**Fichier**: `apps/election-mvp/server/api/quotes/send.post.ts`\n\n**Structure**:\n```typescript\nimport { z } from 'zod'\nimport { Resend } from 'resend'\nimport { mjml2html } from 'mjml'\nimport { generateQuotePDF, formatQuoteData } from '~/server/services/pdf-generator'\nimport { getQuoteById } from '~/server/database/queries/quotes'\n\nconst resend = new Resend(process.env.RESEND_API_KEY)\n\nconst SendQuoteSchema = z.object({\n  quoteId: z.string().min(1),\n  clientEmail: z.string().email(),\n  clientName: z.string().min(2),\n})\n\nexport default defineEventHandler(async (event) => {\n  // 1. Validation Zod\n  // 2. Fetch quote Turso\n  // 3. Format data\n  // 4. Generate PDF\n  // 5. Compile MJML\n  // 6. Send Resend\n  // 7. Return response\n})\n```\n\n**Vérifications**:\n- Serena: Vérifier imports\n- Serena: Vérifier structure defineEventHandler\n- Error handling try/catch\n\n**Durée**: 45min",
+      "status": "completed",
+      "priority": 5,
+      "dependencies": [
+        9
+      ],
+      "created": "2025-11-12T21:54:16.696Z",
+      "updated": "2025-11-12T22:19:00.807Z",
+      "isPareto80": false
+    },
+    {
+      "id": 11,
+      "title": "📧 Intégrer Resend + compilation MJML + PDF attachment",
+      "description": "**1. Compiler MJML** (réutiliser Phase 2):\n```typescript\nconst mjmlPath = resolve(process.cwd(), 'templates/email/devis-minimal.mjml')\nlet mjmlContent = readFileSync(mjmlPath, 'utf-8')\n\n// Variables\nmjmlContent = mjmlContent\n  .replace(/{{clientName}}/g, validated.clientName)\n  .replace(/{{totalAmount}}/g, quoteData.total.toLocaleString('fr-FR'))\n  .replace(/{{ctaUrl}}/g, `${baseUrl}/quotes/${quoteId}`)\n  .replace(/{{reference}}/g, quoteData.reference)\n\nconst { html, errors } = mjml2html(mjmlContent, { minify: true })\n```\n\n**2. Resend avec attachment**:\n```typescript\nconst { data, error } = await resend.emails.send({\n  from: process.env.RESEND_FROM_EMAIL || 'devis@ns2po.ci',\n  to: validated.clientEmail,\n  subject: `Votre devis NS2PO - ${quoteData.reference}`,\n  html,\n  attachments: [{\n    filename: `devis-${quoteData.reference}.pdf`,\n    content: pdfBuffer,\n    contentType: 'application/pdf'\n  }]\n})\n```\n\n**Vérifications**:\n- Serena: Vérifier syntaxe Resend API\n- Template MJML existe (delivery-quotes-email.md Phase 2)\n- Attachment format correct\n\n**Durée**: 45min",
+      "status": "completed",
+      "priority": 5,
+      "dependencies": [
+        10
+      ],
+      "created": "2025-11-12T21:54:18.364Z",
+      "updated": "2025-11-12T22:19:00.993Z",
+      "isPareto80": false
+    },
+    {
+      "id": 12,
+      "title": "🛡️ Implémenter gestion erreurs + retry Resend + fallback",
+      "description": "**1. Retry logic** (1x):\n```typescript\nif (error) {\n  console.error('[Send Quote] Resend error:', error)\n  console.log('[Send Quote] Retrying...')\n  await sleep(1000)\n  \n  const retryResult = await resend.emails.send({...})\n  \n  if (retryResult.error) {\n    // Fallback\n    await sendEmailWithoutPDF(...)\n    await notifyAdmin('PDF attachment failed', {...})\n    throw createError({...})\n  }\n}\n```\n\n**2. Fallback email sans PDF**:\n```typescript\nasync function sendEmailWithoutPDF(...) {\n  await resend.emails.send({\n    ...\n    html: html + '<p style=\"color:red;\">Note: Le PDF sera envoyé séparément.</p>'\n  })\n}\n```\n\n**3. Notification admin**:\n```typescript\nasync function notifyAdmin(subject, data) {\n  await resend.emails.send({\n    from: process.env.RESEND_FROM_EMAIL,\n    to: 'admin@ns2po.ci',\n    subject: `[NS2PO Alert] ${subject}`,\n    text: JSON.stringify(data, null, 2)\n  })\n}\n```\n\n**4. Libération buffer**:\n```typescript\nfinally {\n  pdfBuffer = null // GC\n}\n```\n\n**Vérifications**:\n- Serena: Vérifier try/catch/finally\n- Error logging détaillé\n- Tous les chemins d'erreur couverts\n\n**Durée**: 30min",
+      "status": "completed",
+      "priority": 4,
+      "dependencies": [
+        11
+      ],
+      "created": "2025-11-12T21:54:19.448Z",
+      "updated": "2025-11-12T22:19:01.186Z",
+      "isPareto80": false
+    },
+    {
+      "id": 13,
+      "title": "🔍 TYPE-CHECK: Vérifier types API route (pnpm type-check)",
+      "description": "**Commande**:\n```bash\npnpm type-check\n```\n\n**Vérifications Serena**:\n- `find_symbol send.post` : Vérifier exports\n- `get_symbols_overview server/api/quotes/send.post.ts`\n- Vérifier schema Zod\n- Vérifier types Resend API\n\n**Critères succès**:\n- ✅ Zéro erreur TypeScript\n- ✅ Imports résolus\n- ✅ Types defineEventHandler corrects\n\n**Si erreurs**: Fixer immédiatement\n\n**Durée**: 5min",
+      "status": "completed",
+      "priority": 5,
+      "dependencies": [
+        12
+      ],
+      "created": "2025-11-12T21:54:21.192Z",
+      "updated": "2025-11-12T22:31:21.681Z",
+      "isPareto80": false
+    },
+    {
+      "id": 14,
+      "title": "✨ LINT: Linter tous les fichiers créés (pnpm lint --fix)",
+      "description": "**Commande**:\n```bash\npnpm lint --fix\n```\n\n**Fichiers à linter**:\n- server/services/pdf-generator.ts\n- server/api/quotes/send.post.ts\n- server/templates/quote-pdf.html (si applicable)\n- nuxt.config.ts (modifications)\n\n**Vérifications ESLint**:\n- Indentation correcte\n- Quotes consistency\n- No unused imports\n- No console.log (remplacer par logger)\n\n**Critères succès**:\n- ✅ Zéro warning ESLint\n- ✅ Code formatté uniformément\n- ✅ Conventions respectées\n\n**Si erreurs**: Fixer manuellement si --fix insuffisant\n\n**Durée**: 10min",
+      "status": "completed",
+      "priority": 4,
+      "dependencies": [
+        13
+      ],
+      "created": "2025-11-12T21:54:22.915Z",
+      "updated": "2025-11-12T22:32:03.879Z",
+      "isPareto80": false
+    },
+    {
+      "id": 15,
+      "title": "🧪 Tests manuels: Génération PDF standalone",
+      "description": "**Créer script test**: `test-pdf-generator.ts`\n\n```typescript\nimport { generateQuotePDF } from './server/services/pdf-generator'\nimport { writeFileSync } from 'fs'\n\nconst mockQuoteData = {\n  reference: 'DEV-TEST-001',\n  date: '12/11/2025',\n  clientName: 'Jean Dupont',\n  clientEmail: 'jean@test.com',\n  clientPhone: '+225 07 00 00 00 00',\n  items: [\n    { name: 'T-Shirt', imageUrl: 'cloudinary-url', quantity: 100, unitPrice: 2500, totalPrice: 250000 },\n    { name: 'Casquette', imageUrl: 'cloudinary-url', quantity: 50, unitPrice: 3000, totalPrice: 150000 }\n  ],\n  subtotal: 400000,\n  tax: 72000,\n  total: 472000,\n  logoUrl: 'cloudinary-logo-url'\n}\n\nconst buffer = await generateQuotePDF(mockQuoteData)\nwriteFileSync('./test-devis.pdf', buffer)\nconsole.log(`✅ PDF: ${(buffer.length/1024).toFixed(2)} KB`)\n```\n\n**Exécuter**:\n```bash\nnpx tsx test-pdf-generator.ts\nopen test-devis.pdf\n```\n\n**Vérifications**:\n- ✅ PDF généré sans erreur\n- ✅ Layout correct (header, tableau, footer)\n- ✅ Images Cloudinary chargées\n- ✅ Branding NS2PO (#C99A3B, #6A2B3A)\n- ✅ Taille < 2 MB\n\n**Durée**: 30min",
+      "status": "pending",
+      "priority": 5,
+      "dependencies": [
+        14
+      ],
+      "created": "2025-11-12T21:54:24.627Z",
+      "updated": "2025-11-12T21:54:24.627Z",
+      "isPareto80": false
+    },
+    {
+      "id": 16,
+      "title": "🧪 Tests API: Route complète /quotes/send (curl local)",
+      "description": "**1. Lancer serveur dev**:\n```bash\npnpm dev\n```\n\n**2. Test API** (nouveau terminal):\n```bash\ncurl -X POST http://localhost:3003/api/quotes/send \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"quoteId\": \"test-quote-123\",\n    \"clientEmail\": \"votre-email@test.com\",\n    \"clientName\": \"Test Client\"\n  }'\n```\n\n**3. Vérifier logs serveur**:\n- `[PDF Generator] Starting...`\n- `[PDF Generator] Success in XXXms`\n- `[Send Quote] Sending email...`\n- `[Send Quote] Success - Email ID: re_xxx`\n\n**4. Vérifier email**:\n- ✅ Email reçu inbox (pas spam)\n- ✅ PDF attachment présent\n- ✅ PDF téléchargeable et lisible\n- ✅ Images Cloudinary affichées\n\n**Critères succès**:\n- API retourne 200 + emailId\n- Temps total < 1s\n- Email + PDF fonctionnels\n\n**Durée**: 45min",
+      "status": "pending",
+      "priority": 5,
+      "dependencies": [
+        15
+      ],
+      "created": "2025-11-12T21:54:25.784Z",
+      "updated": "2025-11-12T21:54:25.784Z",
+      "isPareto80": false
+    },
+    {
+      "id": 17,
+      "title": "📊 Validation performance: Logs timing < 600ms",
+      "description": "**Mesures à collecter** (logs serveur):\n\n1. **Génération PDF seule**:\n```\n[PDF Generator] Success in XXXms\n```\nTarget: < 400ms\n\n2. **API response totale**:\n```bash\ncurl -w \"Time: %{time_total}s\\n\" -X POST ...\n```\nTarget: < 600ms\n\n3. **Taille PDF**:\n```\nSize: X.XX KB\n```\nTarget: < 2 MB (2048 KB)\n\n**Optimisations si > target**:\n- Réduire qualité images Cloudinary (q_80)\n- Activer pool Puppeteer\n- Augmenter RAM Railway\n\n**Vérifications Serena**:\n- `grep_code \"[PDF Generator]\"` dans logs\n- Analyser bottlenecks\n\n**Critères succès**:\n- ✅ Génération PDF < 400ms\n- ✅ API totale < 600ms\n- ✅ PDF < 2 MB\n\n**Durée**: 15min",
+      "status": "pending",
+      "priority": 4,
+      "dependencies": [
+        16
+      ],
+      "created": "2025-11-12T21:54:27.444Z",
+      "updated": "2025-11-12T21:54:27.444Z",
+      "isPareto80": false
+    },
+    {
+      "id": 18,
+      "title": "💾 COMMIT: Implémentation complète PDF generation + Resend integration",
+      "description": "**Git workflow**:\n\n```bash\ngit status\ngit add .\ngit commit -m \"feat(quotes): implement PDF generation with Puppeteer + Resend email integration\n\n- Add pdf-generator service with Puppeteer + chromium-min\n- Create quote-pdf.html template with NS2PO branding\n- Implement /api/quotes/send.post.ts with PDF attachment\n- Add Resend integration with MJML compilation\n- Implement error handling + retry logic + fallback\n- Add Cloudinary image optimizations\n- Configure Railway Runtime V2 compatibility\n- Performance: < 600ms API response, < 2MB PDF size\n\n🤖 Generated with Claude Code\nCo-Authored-By: Claude <noreply@anthropic.com>\"\n```\n\n**Vérifications avant commit**:\n- ✅ pnpm type-check (zéro erreur)\n- ✅ pnpm lint (zéro warning)\n- ✅ Tests manuels passés\n- ✅ Performance validée\n\n**Fichiers inclus**:\n- server/services/pdf-generator.ts\n- server/templates/quote-pdf.html\n- server/api/quotes/send.post.ts\n- nuxt.config.ts\n- package.json\n- .env.example (pas .env!)\n\n**Durée**: 10min",
+      "status": "pending",
+      "priority": 5,
+      "dependencies": [
+        17
+      ],
+      "created": "2025-11-12T21:54:29.140Z",
+      "updated": "2025-11-12T21:54:29.140Z",
+      "isPareto80": false
+    },
+    {
+      "id": 19,
+      "title": "🔴 [UTILISATEUR] Configurer variables Railway (CHROMIUM_EXECUTABLE_PATH + RESEND)",
+      "description": "**ACTION UTILISATEUR REQUISE**\n\n**Commandes Railway CLI**:\n```bash\n# 1. Vérifier variables existantes\nrailway variables | grep RESEND\n\n# 2. Ajouter variables PDF\nrailway variables --set \"CHROMIUM_EXECUTABLE_PATH=/tmp/chromium\"\nrailway variables --set \"PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true\"\nrailway variables --set \"PUPPETEER_CACHE_DIR=/tmp/.cache/puppeteer\"\n\n# 3. Vérifier Runtime V2\nrailway variables --set \"RAILWAY_BETA_ENABLE_BUILD_V2=1\"\n\n# 4. Lister toutes variables\nrailway variables\n```\n\n**Variables à vérifier**:\n- ✅ RESEND_API_KEY (Phase 2)\n- ✅ RESEND_FROM_EMAIL=devis@ns2po.ci\n- ✅ CHROMIUM_EXECUTABLE_PATH=/tmp/chromium\n- ✅ RAILWAY_BETA_ENABLE_BUILD_V2=1\n\n**Critère succès**: Toutes variables configurées + confirmation utilisateur\n\n**Durée**: 15min",
+      "status": "pending",
+      "priority": 5,
+      "dependencies": [
+        18
+      ],
+      "created": "2025-11-12T21:54:30.875Z",
+      "updated": "2025-11-12T21:54:30.875Z",
+      "isPareto80": false
+    },
+    {
+      "id": 20,
+      "title": "🏗️ Build local + validation (pnpm build --force)",
+      "description": "**Commandes**:\n```bash\ncd apps/election-mvp\n\n# 1. Clean build\nrm -rf .nuxt .output\n\n# 2. Type-check final\npnpm type-check\n\n# 3. Build\npnpm build --force\n\n# 4. Vérifier output\nls -lh .output\n```\n\n**Vérifications**:\n- ✅ Build réussit sans erreur\n- ✅ Bundle size raisonnable (< 200 MB avec chromium-min)\n- ✅ .output/server/chunks contient pdf-generator\n- ✅ Templates copiés dans .output\n\n**Critères succès**:\n- Build success\n- Zéro erreur TypeScript\n- Zéro warning critique\n\n**Si échec**:\n- Serena: Analyser erreurs build\n- Vérifier imports\n- Vérifier chemins templates\n\n**Durée**: 10min",
+      "status": "pending",
+      "priority": 5,
+      "dependencies": [
+        19
+      ],
+      "created": "2025-11-12T21:54:32.546Z",
+      "updated": "2025-11-12T21:54:32.546Z",
+      "isPareto80": false
+    },
+    {
+      "id": 21,
+      "title": "🚀 Deploy Railway (railway up --detach + monitoring logs)",
+      "description": "**Commandes**:\n```bash\n# 1. Deploy\nrailway up --detach\n\n# 2. Surveiller logs temps réel\nrailway logs --tail\n\n# 3. Vérifier build Railway\n# Dashboard: Build logs\n# - Installation puppeteer + chromium-min\n# - Nuxt build success\n# - Deploy success\n```\n\n**Attendre logs**:\n```\n✅ Build complete\n✅ Deployment live\n✅ Service healthy\n```\n\n**Vérifications Railway Dashboard**:\n- ✅ Status: Active\n- ✅ Build: Success\n- ✅ Memory: < 512 MB idle\n- ✅ Variables env configurées\n\n**Critères succès**:\n- Deploy success\n- Service healthy\n- Pas d'erreur logs\n\n**Si échec**:\n- railway logs (dernières erreurs)\n- Vérifier variables env\n- Vérifier chromium binary path\n\n**Durée**: 15min",
+      "status": "pending",
+      "priority": 5,
+      "dependencies": [
+        20
+      ],
+      "created": "2025-11-12T21:54:33.717Z",
+      "updated": "2025-11-12T21:54:33.717Z",
+      "isPareto80": false
+    },
+    {
+      "id": 22,
+      "title": "✅ Tests production: Health check + envoi devis réel",
+      "description": "**Test 1: Health check**\n```bash\ncurl https://ns2po-railway.app/api/health\n# Expected: { \"status\": \"ok\", \"turso\": \"up\" }\n```\n\n**Test 2: Envoi devis production**\n```bash\ncurl -X POST https://ns2po-railway.app/api/quotes/send \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"quoteId\": \"PROD-TEST-001\",\n    \"clientEmail\": \"votre-email@test.com\",\n    \"clientName\": \"Test Production\"\n  }'\n\n# Expected: { \"success\": true, \"emailId\": \"re_xxx\", ... }\n```\n\n**Test 3: Vérifier email reçu**\n- ✅ Email inbox (pas spam)\n- ✅ PDF attachment présent (téléchargeable)\n- ✅ PDF lisible (layout correct)\n- ✅ Images Cloudinary chargées\n- ✅ Taille PDF raisonnable\n\n**Test 4: Railway logs**\n```bash\nrailway logs --tail | grep \"PDF Generator\"\n# Vérifier timing < 600ms\n```\n\n**Test 5: Dashboard Resend**\n- Status: delivered\n- Bounce: 0\n- Open rate: À suivre J+1\n\n**Critères succès**:\n- ✅ API production 200\n- ✅ Email + PDF reçus\n- ✅ Performance OK\n- ✅ Zéro erreur logs\n\n**Durée**: 30min",
+      "status": "pending",
+      "priority": 5,
+      "dependencies": [
+        21
+      ],
+      "created": "2025-11-12T21:54:35.398Z",
+      "updated": "2025-11-12T21:54:35.398Z",
+      "isPareto80": false
+    },
+    {
+      "id": 23,
+      "title": "📈 Monitoring semaine 1: Railway logs + Resend dashboard + feedback",
+      "description": "**Monitoring quotidien (J+1 à J+7)**:\n\n**1. Railway logs**:\n```bash\nrailway logs --since 24h | grep \"PDF Generator\"\nrailway logs --since 24h | grep \"ERROR\"\n```\n\nMétriques:\n- Temps génération PDF moyen\n- Taux erreur\n- Consommation RAM/CPU\n\n**2. Dashboard Resend**:\nhttps://resend.com/emails\n\nMétriques:\n- Emails envoyés\n- Delivered rate (target: ≥ 95%)\n- Open rate (target: ≥ 50%)\n- Bounce rate (target: < 5%)\n- Spam complaints (target: 0%)\n\n**3. Feedback clients** (optionnel):\n- Contacter 5-10 clients ayant reçu devis\n- Vérifier PDF reçu et lisible\n- Collecter retours UX\n\n**4. Optimisations si nécessaire**:\n- Si génération > 600ms → Optimiser Puppeteer pool\n- Si bounce > 5% → Vérifier emails clients\n- Si spam > 0 → Ajuster contenu email\n\n**Critères succès semaine 1**:\n- ✅ Delivered ≥ 95%\n- ✅ Open rate ≥ 50%\n- ✅ Bounce < 5%\n- ✅ Performance stable < 600ms\n- ✅ Zéro incident critique\n\n**Durée**: 30min/jour × 7 jours = 3h30",
+      "status": "pending",
+      "priority": 3,
+      "dependencies": [
+        22
+      ],
+      "created": "2025-11-12T21:54:37.136Z",
+      "updated": "2025-11-12T21:54:37.136Z",
+      "isPareto80": true
+    }
+  ],
+  "paretoDecisions": [],
+  "metrics": {
+    "tasksCompleted": 14,
+    "tasksMovedToVault": 0,
+    "velocityPoints": 0
+  },
+  "updated": "2025-11-12T22:32:03.880Z"
+}
