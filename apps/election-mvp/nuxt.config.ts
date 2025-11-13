@@ -95,14 +95,6 @@ export default defineNuxtConfig({
       wasm: false
     },
 
-    // Server assets - Include templates for PDF generation
-    serverAssets: [
-      {
-        baseName: 'templates',
-        dir: './server/templates'
-      }
-    ],
-
     routeRules: {
       // Static pages - cache 1 hour
       "/": {

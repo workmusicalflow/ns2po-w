@@ -11,9 +11,7 @@
 import puppeteer, { Browser, Page } from 'puppeteer'
 import * as chromiumModule from '@sparticuz/chromium-min'
 import Handlebars from 'handlebars'
-import { readFileSync, existsSync } from 'fs'
-import { resolve } from 'path'
-import { useStorage } from 'nitropack/runtime'
+import { QUOTE_PDF_TEMPLATE } from '../templates/quote-pdf-template'
 
 // @sparticuz/chromium-min export type
 const chromium = chromiumModule as unknown as {
@@ -211,30 +209,11 @@ export function optimizeCloudinaryUrl(url: string): string {
 
 /**
  * Compile Handlebars template with data
- * Utilise Nitro storage en production, filesystem en développement
+ * Utilise template embarqué pour garantir disponibilité en production
  */
-async function compileTemplate(templatePath: string, data: QuoteData): Promise<string> {
+function compileTemplate(data: QuoteData): string {
   try {
-    let templateContent: string
-
-    // Production: utiliser Nitro storage assets
-    if (process.env.NODE_ENV === 'production') {
-      const storage = useStorage('assets:templates')
-      const templateKey = 'quote-pdf.html'
-      templateContent = await storage.getItem(templateKey) as string
-
-      if (!templateContent) {
-        throw new Error(`Template not found in storage: ${templateKey}`)
-      }
-    } else {
-      // Développement: utiliser filesystem
-      if (!existsSync(templatePath)) {
-        throw new Error(`Template file not found: ${templatePath}`)
-      }
-      templateContent = readFileSync(templatePath, 'utf-8')
-    }
-
-    const template = Handlebars.compile(templateContent)
+    const template = Handlebars.compile(QUOTE_PDF_TEMPLATE)
     return template(data)
   } catch (error) {
     console.error('[PDF Generator] Template compilation error:', error)
@@ -274,12 +253,8 @@ export async function generateQuotePDF(
     // 1. Format data
     const formattedData = formatQuoteData(data)
 
-    // 2. Compile template
-    const templatePath = resolve(
-      process.cwd(),
-      'server/templates/quote-pdf.html'
-    )
-    const html = await compileTemplate(templatePath, formattedData)
+    // 2. Compile template (template embarqué)
+    const html = compileTemplate(formattedData)
 
     // 3. Get browser instance
     const browser = await getBrowser()
