@@ -9,17 +9,9 @@
  */
 
 import puppeteer, { Browser, Page } from 'puppeteer'
-import * as chromiumModule from '@sparticuz/chromium-min'
+import chromium from '@sparticuz/chromium-min'
 import Handlebars from 'handlebars'
 import { QUOTE_PDF_TEMPLATE } from '../templates/quote-pdf-template'
-
-// @sparticuz/chromium-min export type
-const chromium = chromiumModule as unknown as {
-  executablePath: (path?: string) => Promise<string>
-  args: string[]
-  headless: boolean | 'shell'
-  defaultViewport: { width: number; height: number }
-}
 
 // ============================================================================
 // Types & Interfaces
