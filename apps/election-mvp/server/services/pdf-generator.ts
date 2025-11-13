@@ -8,8 +8,8 @@
  * @module server/services/pdf-generator
  */
 
-import puppeteer, { Browser, Page } from 'puppeteer'
-import chromium from '@sparticuz/chromium-min'
+import puppeteer, { Browser, Page } from 'puppeteer-core'
+import chromium from '@sparticuz/chromium'
 import Handlebars from 'handlebars'
 import { QUOTE_PDF_TEMPLATE } from '../templates/quote-pdf-template'
 
@@ -97,19 +97,19 @@ async function getBrowser(): Promise<Browser> {
   try {
     const isProduction = process.env.NODE_ENV === 'production'
     const isRailway = process.env.RAILWAY_ENVIRONMENT !== undefined
-    const chromiumPath = process.env.CHROMIUM_EXECUTABLE_PATH || '/tmp/chromium'
 
-    // Configuration Railway avec chromium-min
+    // Configuration Railway avec @sparticuz/chromium (binaries inclus)
     if (isProduction && isRailway) {
       browserInstance = await puppeteer.launch({
         args: chromium.args,
         defaultViewport: chromium.defaultViewport,
-        executablePath: await chromium.executablePath(chromiumPath),
+        executablePath: await chromium.executablePath(),
         headless: chromium.headless,
       })
     } else {
-      // Configuration local development
-      browserInstance = await puppeteer.launch({
+      // Configuration local development (utilise Puppeteer installé localement)
+      const puppeteerLocal = await import('puppeteer')
+      browserInstance = await puppeteerLocal.default.launch({
         headless: true,
         args: [
           '--no-sandbox',
