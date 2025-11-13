@@ -101,6 +101,8 @@ WORKDIR /app
 COPY --from=builder --chown=nuxtjs:nuxtjs /app/apps/election-mvp/.output ./.output
 COPY --from=builder --chown=nuxtjs:nuxtjs /app/package.json /app/pnpm-lock.yaml /app/pnpm-workspace.yaml /app/.npmrc ./
 COPY --from=builder --chown=nuxtjs:nuxtjs /app/apps/election-mvp/package.json ./apps/election-mvp/
+# Copier le dossier templates pour les emails MJML
+COPY --from=builder --chown=nuxtjs:nuxtjs /app/apps/election-mvp/templates ./templates/
 # Copier les packages pour les dépendances workspace
 COPY --from=builder --chown=nuxtjs:nuxtjs /app/packages ./packages/
 
