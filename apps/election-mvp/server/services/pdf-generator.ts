@@ -11,8 +11,9 @@
 import puppeteer, { Browser, Page } from 'puppeteer'
 import * as chromiumModule from '@sparticuz/chromium-min'
 import Handlebars from 'handlebars'
-import { readFileSync } from 'fs'
+import { readFileSync, existsSync } from 'fs'
 import { resolve } from 'path'
+import { useStorage } from 'nitropack/runtime'
 
 // @sparticuz/chromium-min export type
 const chromium = chromiumModule as unknown as {
@@ -210,10 +211,29 @@ export function optimizeCloudinaryUrl(url: string): string {
 
 /**
  * Compile Handlebars template with data
+ * Utilise Nitro storage en production, filesystem en développement
  */
-function compileTemplate(templatePath: string, data: QuoteData): string {
+async function compileTemplate(templatePath: string, data: QuoteData): Promise<string> {
   try {
-    const templateContent = readFileSync(templatePath, 'utf-8')
+    let templateContent: string
+
+    // Production: utiliser Nitro storage assets
+    if (process.env.NODE_ENV === 'production') {
+      const storage = useStorage('assets:templates')
+      const templateKey = 'quote-pdf.html'
+      templateContent = await storage.getItem(templateKey) as string
+
+      if (!templateContent) {
+        throw new Error(`Template not found in storage: ${templateKey}`)
+      }
+    } else {
+      // Développement: utiliser filesystem
+      if (!existsSync(templatePath)) {
+        throw new Error(`Template file not found: ${templatePath}`)
+      }
+      templateContent = readFileSync(templatePath, 'utf-8')
+    }
+
     const template = Handlebars.compile(templateContent)
     return template(data)
   } catch (error) {
@@ -259,7 +279,7 @@ export async function generateQuotePDF(
       process.cwd(),
       'server/templates/quote-pdf.html'
     )
-    const html = compileTemplate(templatePath, formattedData)
+    const html = await compileTemplate(templatePath, formattedData)
 
     // 3. Get browser instance
     const browser = await getBrowser()
