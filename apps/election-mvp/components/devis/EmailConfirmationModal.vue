@@ -71,29 +71,9 @@
             </div>
           </div>
 
-          <!-- Option 2: Suivi en ligne -->
-          <div v-if="trackingUrl" class="action-option">
-            <span class="option-number">2.</span>
-            <div class="option-content">
-              <p class="option-label">Suivre votre demande</p>
-              <p class="option-desc">Consultez le statut de votre devis en ligne</p>
-              <a
-                :href="trackingUrl"
-                target="_blank"
-                class="btn btn-primary"
-                @click="trackAction('tracking_opened')"
-              >
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
-                </svg>
-                Suivre en ligne
-              </a>
-            </div>
-          </div>
-
-          <!-- Option 3: Contact direct -->
+          <!-- Option 2: Contact direct -->
           <div class="action-option">
-            <span class="option-number">3.</span>
+            <span class="option-number">2.</span>
             <div class="option-content">
               <p class="option-label">Contact direct</p>
               <p class="option-desc">Appelez notre équipe commerciale</p>

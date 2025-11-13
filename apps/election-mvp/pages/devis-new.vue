@@ -81,6 +81,7 @@
           v-else-if="currentStep === 3"
           :cart-items="cartItems"
           :total="cartTotal"
+          :is-submitting="isEmailSubmitting"
           @submit="handleSubmit"
         />
       </div>
