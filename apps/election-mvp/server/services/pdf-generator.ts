@@ -275,12 +275,12 @@ export async function generateQuotePDF(
     const pdfBuffer = await page.pdf({
       format: options.format || 'A4',
       printBackground: options.printBackground ?? true,
-      preferCSSPageSize: options.preferCSSPageSize ?? false,
+      preferCSSPageSize: options.preferCSSPageSize ?? true,
       margin: {
-        top: '20px',
-        right: '20px',
-        bottom: '20px',
-        left: '20px',
+        top: '15px',
+        right: '15px',
+        bottom: '15px',
+        left: '15px',
       },
     })
 

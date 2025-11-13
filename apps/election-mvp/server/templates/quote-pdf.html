@@ -13,11 +13,11 @@
 
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-      font-size: 14px;
+      font-size: 12px;
       line-height: 1.6;
       color: #2D2D2D;
       background: #ffffff;
-      padding: 40px 30px;
+      padding: 30px 30px;
     }
 
     .container {
@@ -30,8 +30,8 @@
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
-      margin-bottom: 40px;
-      padding-bottom: 20px;
+      margin-bottom: 24px;
+      padding-bottom: 12px;
       border-bottom: 3px solid #C99A3B;
     }
 
@@ -52,6 +52,12 @@
       margin-bottom: 8px;
     }
 
+    .header-info .meta {
+      font-size: 14px;
+      color: #C99A3B;
+      font-weight: 600;
+    }
+
     .header-info .reference {
       font-size: 16px;
       color: #C99A3B;
@@ -67,20 +73,20 @@
     /* Informations client */
     .client-section {
       background: #F8F8F8;
-      padding: 24px;
+      padding: 16px 20px;
       border-radius: 8px;
-      margin-bottom: 32px;
+      margin-bottom: 20px;
     }
 
     .client-section h2 {
-      font-size: 18px;
+      font-size: 16px;
       color: #6A2B3A;
-      margin-bottom: 12px;
+      margin-bottom: 8px;
       font-weight: 600;
     }
 
     .client-section p {
-      margin-bottom: 6px;
+      margin-bottom: 4px;
       color: #555;
     }
 
@@ -91,13 +97,13 @@
 
     /* Tableau produits */
     .products-section {
-      margin-bottom: 32px;
+      margin-bottom: 20px;
     }
 
     .products-section h2 {
-      font-size: 20px;
+      font-size: 18px;
       color: #6A2B3A;
-      margin-bottom: 20px;
+      margin-bottom: 16px;
       font-weight: 600;
     }
 
@@ -113,10 +119,10 @@
     }
 
     thead th {
-      padding: 14px 12px;
+      padding: 10px 10px;
       text-align: left;
       font-weight: 600;
-      font-size: 13px;
+      font-size: 12px;
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
@@ -134,7 +140,7 @@
     }
 
     tbody td {
-      padding: 16px 12px;
+      padding: 12px 8px;
       vertical-align: top;
     }
 
@@ -151,14 +157,18 @@
     }
 
     .product-customization {
-      font-size: 12px;
+      font-size: 11px;
       color: #666;
       font-style: italic;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 300px;
     }
 
     .product-image {
-      width: 80px;
-      height: 80px;
+      width: 65px;
+      height: 65px;
       object-fit: cover;
       border-radius: 6px;
       border: 1px solid #E0E0E0;
@@ -166,30 +176,31 @@
 
     /* Section totaux */
     .totals-section {
-      margin-top: 32px;
+      margin-top: 20px;
       display: flex;
       justify-content: flex-end;
     }
 
     .totals-box {
-      width: 340px;
-      background: #F8F8F8;
-      padding: 24px;
+      width: 360px;
+      background: #FAFAFA;
+      padding: 20px 24px;
       border-radius: 8px;
+      border: 1px solid #E8E8E8;
     }
 
     .totals-row {
       display: flex;
       justify-content: space-between;
-      padding: 10px 0;
-      border-bottom: 1px solid #E0E0E0;
+      align-items: baseline;
+      padding: 8px 0;
+      border-bottom: 1px solid #E8E8E8;
     }
 
     .totals-row:last-child {
       border-bottom: none;
-      margin-top: 8px;
-      padding-top: 16px;
-      border-top: 2px solid #C99A3B;
+      margin-top: 10px;
+      padding: 14px 0 0 0;
     }
 
     .totals-row.total {
@@ -200,22 +211,35 @@
 
     .totals-label {
       font-weight: 500;
-      color: #555;
+      color: #666;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+
+    .totals-row.total .totals-label {
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
     }
 
     .totals-value {
       font-weight: 600;
       color: #2D2D2D;
+      font-size: 14px;
+      font-variant-numeric: tabular-nums;
     }
 
     .totals-row.total .totals-value {
       color: #C99A3B;
+      font-size: 22px;
+      font-weight: 700;
     }
 
     /* Footer */
     .footer {
-      margin-top: 48px;
-      padding-top: 24px;
+      margin-top: 32px;
+      padding-top: 16px;
       border-top: 2px solid #E0E0E0;
       text-align: center;
       color: #999;
@@ -226,17 +250,17 @@
       font-weight: 600;
       color: #6A2B3A;
       font-size: 14px;
-      margin-bottom: 8px;
+      margin-bottom: 4px;
     }
 
     .footer .tagline {
       font-style: italic;
       color: #C99A3B;
-      margin-bottom: 12px;
+      margin-bottom: 8px;
     }
 
     .footer .contact {
-      margin-top: 8px;
+      margin-top: 6px;
     }
 
     .footer .contact a {
@@ -262,17 +286,14 @@
       <img src="{{logoUrl}}" alt="NS2PO Logo" class="logo">
       <div class="header-info">
         <h1>DEVIS</h1>
-        <div class="reference">{{reference}}</div>
-        <div class="date">{{date}}</div>
+        <div class="meta">{{reference}} • {{date}}</div>
       </div>
     </div>
 
     <!-- Client Information -->
     <div class="client-section">
       <h2>Informations Client</h2>
-      <p><strong>Nom :</strong> {{clientName}}</p>
-      <p><strong>Email :</strong> {{clientEmail}}</p>
-      <p><strong>Téléphone :</strong> {{clientPhone}}</p>
+      <p><strong>Client:</strong> {{clientName}} • {{clientEmail}} • {{clientPhone}}</p>
     </div>
 
     <!-- Products Table -->
@@ -338,9 +359,7 @@
       <div class="company-name">NS2PO</div>
       <div class="tagline">Publicité par l'Objet depuis 2011</div>
       <div class="contact">
-        Abidjan, Côte d'Ivoire<br>
-        <a href="mailto:devis@ns2po.ci">devis@ns2po.ci</a> |
-        <a href="tel:+2250000000000">+225 00 00 00 00 00</a>
+        Abidjan, CI • ns2pomail@ns2po.ci • +225 05 75 12 97 37 • +225 27 21 24 88 03
       </div>
       <div style="margin-top: 16px; font-size: 11px; color: #BBB;">
         Ce devis est valable 30 jours à compter de la date d'émission
