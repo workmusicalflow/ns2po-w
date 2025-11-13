@@ -366,10 +366,9 @@ const handleSubmit = async (formData: any) => {
 const handleWhatsAppSubmission = async (formData: any) => {
   console.log('📱 Traitement soumission WhatsApp')
 
-  // StepValidation envoie: { organization, name, phone, email, channel, items, total, timestamp }
+  // StepValidation envoie: { name, phone, email, channel, items, total, timestamp }
   // Transformer les données pour le format WhatsApp
   const whatsappData = {
-    organization: formData.organization?.trim() || 'Organisation à préciser',
     projectType: selectedMode.value === 'bundle'
       ? 'Campagne Électorale (Pack NS2PO)'
       : 'Campagne Électorale (Sélection Personnalisée)',
@@ -440,7 +439,6 @@ const modalWhatsAppLink = computed(() => {
   if (!hasSubmitted.value || cartItems.value.length === 0) return '#'
 
   const mockData = {
-    organization: 'Votre Organisation',
     projectType: 'Projet Électoral',
     contactName: 'Votre Nom',
     contactPhone: 'Votre Téléphone',
@@ -462,7 +460,6 @@ const modalWebWhatsAppLink = computed(() => {
   if (!hasSubmitted.value || cartItems.value.length === 0) return '#'
 
   const mockData = {
-    organization: 'Votre Organisation',
     projectType: 'Projet Électoral',
     contactName: 'Votre Nom',
     contactPhone: 'Votre Téléphone',
@@ -484,7 +481,6 @@ const modalRawMessage = computed(() => {
   if (!hasSubmitted.value || cartItems.value.length === 0) return ''
 
   const mockData = {
-    organization: 'Votre Organisation',
     projectType: 'Projet Électoral',
     contactName: 'Votre Nom',
     contactPhone: 'Votre Téléphone',

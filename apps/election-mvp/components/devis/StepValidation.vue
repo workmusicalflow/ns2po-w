@@ -56,21 +56,6 @@
       </h3>
 
       <form class="space-y-4" @submit.prevent="handleSubmit">
-        <!-- Organisation -->
-        <div>
-          <label for="organization" class="block text-sm font-medium text-gray-700 mb-1">
-            Organisation / Parti Politique *
-          </label>
-          <input
-            id="organization"
-            v-model="form.organization"
-            type="text"
-            required
-            placeholder="Ex: Parti Démocratique de Côte d'Ivoire"
-            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"
-          >
-        </div>
-
         <!-- Nom -->
         <div>
           <label for="name" class="block text-sm font-medium text-gray-700 mb-1">
@@ -105,6 +90,21 @@
               class="flex-1 px-4 py-3 border border-gray-300 rounded-r-lg focus:ring-2 focus:ring-primary focus:border-primary"
             >
           </div>
+        </div>
+
+        <!-- Email (toujours visible) -->
+        <div>
+          <label for="email" class="block text-sm font-medium text-gray-700 mb-1">
+            Adresse email *
+          </label>
+          <input
+            id="email"
+            v-model="form.email"
+            type="email"
+            required
+            placeholder="exemple@email.com"
+            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"
+          >
         </div>
 
         <!-- Canal de réception -->
@@ -150,21 +150,6 @@
             </button>
           </div>
         </div>
-
-        <!-- Email (si sélectionné) -->
-        <div v-if="form.channel === 'email'">
-          <label for="email" class="block text-sm font-medium text-gray-700 mb-1">
-            Adresse email *
-          </label>
-          <input
-            id="email"
-            v-model="form.email"
-            type="email"
-            required
-            placeholder="exemple@email.com"
-            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"
-          >
-        </div>
       </form>
     </div>
 
@@ -201,7 +186,6 @@ const emit = defineEmits<{
 
 // State
 const form = ref({
-  organization: '',
   name: '',
   phone: '',
   email: '',
@@ -212,12 +196,11 @@ const showSummary = ref(true) // Ouvert par défaut (meilleure visibilité en ha
 
 // Computed
 const isValid = computed(() => {
-  const hasOrganization = form.value.organization.trim().length > 0
   const hasName = form.value.name.trim().length > 0
   const hasPhone = form.value.phone.length >= 10
-  const hasEmail = form.value.channel === 'email' ? form.value.email.includes('@') : true
+  const hasEmail = form.value.email.includes('@')
 
-  return hasOrganization && hasName && hasPhone && hasEmail
+  return hasName && hasPhone && hasEmail
 })
 
 // Methods
