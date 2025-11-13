@@ -4,7 +4,7 @@
     <mj-section background-color="#ffffff" padding="20px">
       <mj-column>
         <mj-image
-          src="https://res.cloudinary.com/dsrvzogof/image/upload/c_scale,w_150,f_auto/ns2po-logo.png"
+          src="https://nuxt-app-production-8b86.up.railway.app/logos/logo-ns2po.jpg"
           width="150px"
           alt="NS2PO"
         />
