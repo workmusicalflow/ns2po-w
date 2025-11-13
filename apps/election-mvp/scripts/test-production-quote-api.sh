@@ -33,7 +33,7 @@ echo ""
 # Payload de test (sans champ organization - refactor effectué)
 PAYLOAD='{
   "clientName": "Marie Koné",
-  "clientEmail": "test@ns2po-demo.com",
+  "clientEmail": "studioabidjanpro1@gmail.com",
   "clientPhone": "+225 07 89 12 34 56",
   "reference": "PROD-TEST-'$(date +%s)'",
   "items": [

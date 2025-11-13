@@ -90,7 +90,7 @@ curl -X POST https://nuxt-app-production-8b86.up.railway.app/api/quotes/send \
   -H "Content-Type: application/json" \
   -d '{
     "clientName": "Test Utilisateur",
-    "clientEmail": "votre-email@example.com",
+    "clientEmail": "studioabidjanpro1@gmail.com",
     "clientPhone": "+225 07 12 34 56 78",
     "reference": "TEST-PROD-'$(date +%s)'",
     "items": [{
@@ -109,7 +109,7 @@ curl -X POST https://nuxt-app-production-8b86.up.railway.app/api/quotes/send \
   }' | jq '.'
 ```
 
-**⚠️ Important**: Remplacer `votre-email@example.com` par votre vraie adresse email pour recevoir le devis.
+**⚠️ Note**: Email configuré sur `studioabidjanpro1@gmail.com` pour tests production.
 
 ### Réponse Attendue
 
@@ -131,7 +131,7 @@ curl -X POST https://nuxt-app-production-8b86.up.railway.app/api/quotes/send \
 
 ### Étape 1: Vérifier Inbox
 
-1. **Ouvrir inbox** de l'email test (`votre-email@example.com`)
+1. **Ouvrir inbox Gmail**: `studioabidjanpro1@gmail.com`
 2. **Rechercher email** de `noreply@reachup.site`
 3. **Sujet attendu**: "Votre devis NS2PO - TEST-PROD-XXXXXX"
 

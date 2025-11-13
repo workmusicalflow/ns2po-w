@@ -14,7 +14,7 @@ echo ""
 PAYLOAD='{
   "reference": "DEV-2025-API-TEST",
   "clientName": "Marie Koné",
-  "clientEmail": "m.kone@example.ci",
+  "clientEmail": "studioabidjanpro1@gmail.com",
   "clientPhone": "+225 07 99 88 77 66",
   "items": [
     {

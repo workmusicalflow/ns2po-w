@@ -18,7 +18,7 @@ const mockQuoteData: QuoteData = {
   reference: 'DEV-2025-001-TEST',
   date: new Date().toLocaleDateString('fr-FR'),
   clientName: 'Jean Kouassi',
-  clientEmail: 'j.kouassi@example.ci',
+  clientEmail: 'studioabidjanpro1@gmail.com',
   clientPhone: '+225 07 12 34 56 78',
   items: [
     {
