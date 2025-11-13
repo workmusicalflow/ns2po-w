@@ -2,15 +2,17 @@
  * PDF Generator Service
  *
  * Service de génération de PDF pour les devis NS2PO
- * Utilise Puppeteer + @sparticuz/chromium-min pour Railway
+ * Utilise Puppeteer + Chromium système (Debian) pour Railway
  * Performance target: <400ms génération, <2MB taille
+ *
+ * Migration: @sparticuz/chromium → Chromium système Debian Bookworm
+ * Basé sur recommandations Gemini + Google Search Grounding (2025)
  *
  * @module server/services/pdf-generator
  */
 
-import puppeteer, { Browser, Page } from 'puppeteer-core'
-import chromium from '@sparticuz/chromium'
-import Handlebars from 'handlebars'
+import puppeteer, { Browser, Page } from 'puppeteer'
+import * as Handlebars from 'handlebars'
 import { QUOTE_PDF_TEMPLATE } from '../templates/quote-pdf-template'
 
 // ============================================================================
@@ -77,7 +79,11 @@ let browserInitializing = false
 
 /**
  * Get or create browser instance (singleton pattern for performance)
- * Railway Runtime V2 compatible avec @sparticuz/chromium-min
+ * Railway Runtime V2 avec Chromium système Debian Bookworm
+ *
+ * Configuration:
+ * - Production: Utilise PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium (Debian)
+ * - Dev local: Utilise Puppeteer bundled Chromium
  */
 async function getBrowser(): Promise<Browser> {
   // Si browser existe et est connecté, le retourner
@@ -98,18 +104,29 @@ async function getBrowser(): Promise<Browser> {
     const isProduction = process.env.NODE_ENV === 'production'
     const isRailway = process.env.RAILWAY_ENVIRONMENT !== undefined
 
-    // Configuration Railway avec @sparticuz/chromium (binaries inclus)
+    // Configuration Railway avec Chromium système Debian (plus stable que @sparticuz)
     if (isProduction && isRailway) {
+      const executablePath = process.env.PUPPETEER_EXECUTABLE_PATH || '/usr/bin/chromium'
+
+      console.log(`[PDF Generator] Using system Chromium: ${executablePath}`)
+
       browserInstance = await puppeteer.launch({
-        args: chromium.args,
-        defaultViewport: chromium.defaultViewport,
-        executablePath: await chromium.executablePath(),
-        headless: chromium.headless,
+        executablePath,
+        headless: true,
+        args: [
+          '--no-sandbox',
+          '--disable-setuid-sandbox',
+          '--disable-dev-shm-usage',
+          '--disable-gpu',
+          '--disable-software-rasterizer',
+          '--disable-extensions',
+        ],
       })
     } else {
-      // Configuration local development (utilise Puppeteer installé localement)
-      const puppeteerLocal = await import('puppeteer')
-      browserInstance = await puppeteerLocal.default.launch({
+      // Configuration local development (utilise Puppeteer bundled Chromium)
+      console.log('[PDF Generator] Using Puppeteer bundled Chromium (dev mode)')
+
+      browserInstance = await puppeteer.launch({
         headless: true,
         args: [
           '--no-sandbox',
