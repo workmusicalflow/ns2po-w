@@ -1,0 +1,89 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e4]:
+  - banner [ref=e5]:
+    - navigation [ref=e6]:
+      - generic [ref=e7]:
+        - link "NS2PO - Spécialiste publicité par l'objet NS2PO | Élections" [ref=e8] [cursor=pointer]:
+          - /url: /
+          - img "NS2PO - Spécialiste publicité par l'objet" [ref=e9]
+          - generic [ref=e10]: NS2PO | Élections
+        - button [ref=e11] [cursor=pointer]:
+          - img [ref=e12]
+  - main [ref=e14]:
+    - generic [ref=e15]:
+      - generic [ref=e16]:
+        - generic [ref=e17]:
+          - heading "Générateur de Devis" [level=1] [ref=e18]
+          - paragraph [ref=e19]: Créez votre devis personnalisé en quelques étapes simples
+        - generic [ref=e21]:
+          - generic [ref=e22]: Étape 1 sur 3
+          - generic [ref=e23]: 33%
+        - generic [ref=e27]:
+          - generic [ref=e28]:
+            - heading "Comment souhaitez-vous procéder ?" [level=2] [ref=e29]
+            - paragraph [ref=e30]: Choisissez un pack prêt à l'emploi ou créez votre sélection sur mesure
+          - generic [ref=e31]:
+            - button "Sur Mesure Composez votre sélection produit par produit selon vos besoins Recommandé" [ref=e32] [cursor=pointer]:
+              - img [ref=e34]
+              - heading "Sur Mesure" [level=3] [ref=e36]
+              - paragraph [ref=e37]: Composez votre sélection produit par produit selon vos besoins
+              - generic [ref=e38]: Recommandé
+            - button "Packs Campagne Solutions clés en main optimisées pour chaque niveau d'élection" [ref=e39] [cursor=pointer]:
+              - img [ref=e41]
+              - heading "Packs Campagne" [level=3] [ref=e43]
+              - paragraph [ref=e44]: Solutions clés en main optimisées pour chaque niveau d'élection
+          - paragraph [ref=e46]: 👆 Tapez pour choisir votre mode
+      - generic [ref=e48]:
+        - generic [ref=e49]:
+          - generic [ref=e50]:
+            - generic [ref=e52]: Total
+            - generic [ref=e53]: 0 F CFA
+          - button "Continuer" [ref=e54] [cursor=pointer]:
+            - generic [ref=e55]: Continuer
+            - img [ref=e56]
+        - generic [ref=e59]:
+          - generic [ref=e60]: Étape 1 sur 3
+          - generic [ref=e61]: 33%
+  - contentinfo [ref=e64]:
+    - generic [ref=e65]:
+      - generic [ref=e66]:
+        - generic [ref=e67]:
+          - generic [ref=e68]:
+            - img "NS2PO Logo" [ref=e69]
+            - generic [ref=e70]: NS2PO
+          - paragraph [ref=e71]: Spécialiste de la publicité par l'objet en Côte d'Ivoire depuis 2011. Nous accompagnons les acteurs politiques dans leur communication visuelle.
+          - generic [ref=e72]:
+            - link "Facebook" [ref=e73] [cursor=pointer]:
+              - /url: "#"
+              - generic [ref=e74]: Facebook
+              - img [ref=e75]
+            - link "LinkedIn" [ref=e77] [cursor=pointer]:
+              - /url: "#"
+              - generic [ref=e78]: LinkedIn
+              - img [ref=e79]
+        - generic [ref=e81]:
+          - heading "Liens rapides" [level=3] [ref=e82]
+          - list [ref=e83]:
+            - listitem [ref=e84]:
+              - link "Nos réalisations" [ref=e85] [cursor=pointer]:
+                - /url: /realisations
+            - listitem [ref=e86]:
+              - link "Devis en ligne" [ref=e87] [cursor=pointer]:
+                - /url: /devis-new
+            - listitem [ref=e88]:
+              - link "Nous contacter" [ref=e89] [cursor=pointer]:
+                - /url: /contacts
+            - listitem [ref=e90]:
+              - link "À propos" [ref=e91] [cursor=pointer]:
+                - /url: "#"
+        - generic [ref=e92]:
+          - heading "Contact" [level=3] [ref=e93]
+          - list [ref=e94]:
+            - listitem [ref=e95]: 📍 Abidjan, Côte d'Ivoire
+            - listitem [ref=e96]: 📞 +225 XX XX XX XX
+            - listitem [ref=e97]: ✉️ contact@ns2po.ci
+            - listitem [ref=e98]: "🕒 Lun-Ven: 8h-17h"
+      - paragraph [ref=e100]: © 2025 NS2PO. Tous droits réservés. | Spécialiste publicité par l'objet depuis 2011
+```

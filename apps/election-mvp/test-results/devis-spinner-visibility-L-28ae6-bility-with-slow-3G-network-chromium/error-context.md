@@ -1,0 +1,96 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e4]:
+  - banner [ref=e5]:
+    - navigation [ref=e6]:
+      - generic [ref=e7]:
+        - link "NS2PO - Spécialiste publicité par l'objet NS2PO | Élections" [ref=e8] [cursor=pointer]:
+          - /url: /
+          - img "NS2PO - Spécialiste publicité par l'objet" [ref=e9]
+          - generic [ref=e10]: NS2PO | Élections
+        - generic [ref=e11]:
+          - link "Accueil" [ref=e12] [cursor=pointer]:
+            - /url: /
+          - link "Réalisations" [ref=e13] [cursor=pointer]:
+            - /url: /realisations
+          - link "Devis" [ref=e14] [cursor=pointer]:
+            - /url: /devis-new
+          - link "Contact" [ref=e15] [cursor=pointer]:
+            - /url: /contacts
+        - button "Créer un devis" [ref=e17] [cursor=pointer]
+  - main [ref=e18]:
+    - generic [ref=e19]:
+      - generic [ref=e20]:
+        - generic [ref=e21]:
+          - heading "Générateur de Devis" [level=1] [ref=e22]
+          - paragraph [ref=e23]: Créez votre devis personnalisé en quelques étapes simples
+        - generic [ref=e25]:
+          - generic [ref=e26]: Étape 1 sur 3
+          - generic [ref=e27]: 33%
+        - generic [ref=e31]:
+          - generic [ref=e32]:
+            - heading "Comment souhaitez-vous procéder ?" [level=2] [ref=e33]
+            - paragraph [ref=e34]: Choisissez un pack prêt à l'emploi ou créez votre sélection sur mesure
+          - generic [ref=e35]:
+            - button "Sur Mesure Composez votre sélection produit par produit selon vos besoins Recommandé" [ref=e36] [cursor=pointer]:
+              - img [ref=e38]
+              - heading "Sur Mesure" [level=3] [ref=e40]
+              - paragraph [ref=e41]: Composez votre sélection produit par produit selon vos besoins
+              - generic [ref=e42]: Recommandé
+            - button "Packs Campagne Solutions clés en main optimisées pour chaque niveau d'élection" [ref=e43] [cursor=pointer]:
+              - img [ref=e45]
+              - heading "Packs Campagne" [level=3] [ref=e47]
+              - paragraph [ref=e48]: Solutions clés en main optimisées pour chaque niveau d'élection
+      - generic [ref=e50]:
+        - generic [ref=e51]:
+          - generic [ref=e52]:
+            - generic [ref=e54]: Total
+            - generic [ref=e55]: 0 F CFA
+          - button "Continuer" [ref=e56] [cursor=pointer]:
+            - generic [ref=e57]: Continuer
+            - img [ref=e58]
+        - generic [ref=e61]:
+          - generic [ref=e62]: Étape 1 sur 3
+          - generic [ref=e63]: 33%
+  - contentinfo [ref=e66]:
+    - generic [ref=e67]:
+      - generic [ref=e68]:
+        - generic [ref=e69]:
+          - generic [ref=e70]:
+            - img "NS2PO Logo" [ref=e71]
+            - generic [ref=e72]: NS2PO
+          - paragraph [ref=e73]: Spécialiste de la publicité par l'objet en Côte d'Ivoire depuis 2011. Nous accompagnons les acteurs politiques dans leur communication visuelle.
+          - generic [ref=e74]:
+            - link "Facebook" [ref=e75] [cursor=pointer]:
+              - /url: "#"
+              - generic [ref=e76]: Facebook
+              - img [ref=e77]
+            - link "LinkedIn" [ref=e79] [cursor=pointer]:
+              - /url: "#"
+              - generic [ref=e80]: LinkedIn
+              - img [ref=e81]
+        - generic [ref=e83]:
+          - heading "Liens rapides" [level=3] [ref=e84]
+          - list [ref=e85]:
+            - listitem [ref=e86]:
+              - link "Nos réalisations" [ref=e87] [cursor=pointer]:
+                - /url: /realisations
+            - listitem [ref=e88]:
+              - link "Devis en ligne" [ref=e89] [cursor=pointer]:
+                - /url: /devis-new
+            - listitem [ref=e90]:
+              - link "Nous contacter" [ref=e91] [cursor=pointer]:
+                - /url: /contacts
+            - listitem [ref=e92]:
+              - link "À propos" [ref=e93] [cursor=pointer]:
+                - /url: "#"
+        - generic [ref=e94]:
+          - heading "Contact" [level=3] [ref=e95]
+          - list [ref=e96]:
+            - listitem [ref=e97]: 📍 Abidjan, Côte d'Ivoire
+            - listitem [ref=e98]: 📞 +225 XX XX XX XX
+            - listitem [ref=e99]: ✉️ contact@ns2po.ci
+            - listitem [ref=e100]: "🕒 Lun-Ven: 8h-17h"
+      - paragraph [ref=e102]: © 2025 NS2PO. Tous droits réservés. | Spécialiste publicité par l'objet depuis 2011
+```

@@ -4,6 +4,8 @@
     "jsx": "preserve",
     "types": ["node"],
     "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
     "paths": {
       "~/*": ["./*"],
       "~~/*": ["./*"],

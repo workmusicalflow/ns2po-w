@@ -12,7 +12,7 @@
  */
 
 import puppeteer, { Browser, Page } from 'puppeteer'
-import * as Handlebars from 'handlebars'
+import Handlebars from 'handlebars'
 import { QUOTE_PDF_TEMPLATE } from '../templates/quote-pdf-template'
 
 // ============================================================================

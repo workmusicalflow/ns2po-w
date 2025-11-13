@@ -1,0 +1,192 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e4]:
+  - banner [ref=e5]:
+    - navigation [ref=e6]:
+      - generic [ref=e7]:
+        - link "NS2PO - Spécialiste publicité par l'objet NS2PO | Élections" [ref=e8] [cursor=pointer]:
+          - /url: /
+          - img "NS2PO - Spécialiste publicité par l'objet" [ref=e9]
+          - generic [ref=e10]: NS2PO | Élections
+        - generic [ref=e11]:
+          - link "Accueil" [ref=e12] [cursor=pointer]:
+            - /url: /
+          - link "Réalisations" [ref=e13] [cursor=pointer]:
+            - /url: /realisations
+          - link "Devis" [ref=e14] [cursor=pointer]:
+            - /url: /devis-new
+          - link "Contact" [ref=e15] [cursor=pointer]:
+            - /url: /contacts
+        - button "Créer un devis" [ref=e17] [cursor=pointer]
+  - main [ref=e18]:
+    - generic [ref=e19]:
+      - generic [ref=e20]:
+        - generic [ref=e21]:
+          - heading "Générateur de Devis" [level=1] [ref=e22]
+          - paragraph [ref=e23]: Créez votre devis personnalisé en quelques étapes simples
+        - generic [ref=e25]:
+          - generic [ref=e26]: Étape 2 sur 3
+          - generic [ref=e27]: 67%
+        - generic [ref=e31]:
+          - generic [ref=e33]:
+            - button "Produits" [ref=e34] [cursor=pointer]
+            - button "Panier" [ref=e35] [cursor=pointer]
+          - generic [ref=e37]:
+            - generic [ref=e38]:
+              - generic [ref=e41]: 34 compléments disponibles
+              - searchbox "Rechercher un produit..." [ref=e42]
+              - button "goodies" [ref=e45] [cursor=pointer]
+            - generic [ref=e47]:
+              - generic [ref=e50]:
+                - img [ref=e53]
+                - generic [ref=e55]:
+                  - heading "Test UI Product 1762600588920" [level=4] [ref=e57]
+                  - paragraph [ref=e59]: 5 800 F CFA
+                - generic [ref=e60]:
+                  - button "0" [ref=e61] [cursor=pointer]
+                  - button "+ •••" [ref=e62] [cursor=pointer]:
+                    - text: +
+                    - generic [ref=e63]: •••
+              - generic [ref=e66]:
+                - img [ref=e69]
+                - generic [ref=e71]:
+                  - heading "Test UI Product 1762597437680" [level=4] [ref=e73]
+                  - paragraph [ref=e75]: 5 800 F CFA
+                - generic [ref=e76]:
+                  - button "0" [ref=e77] [cursor=pointer]
+                  - button "+ •••" [ref=e78] [cursor=pointer]:
+                    - text: +
+                    - generic [ref=e79]: •••
+              - generic [ref=e82]:
+                - img [ref=e85]
+                - generic [ref=e87]:
+                  - heading "Test UI Product 1762595729610" [level=4] [ref=e89]
+                  - paragraph [ref=e91]: 5 800 F CFA
+                - generic [ref=e92]:
+                  - button "0" [ref=e93] [cursor=pointer]
+                  - button "+ •••" [ref=e94] [cursor=pointer]:
+                    - text: +
+                    - generic [ref=e95]: •••
+              - generic [ref=e98]:
+                - img [ref=e101]
+                - generic [ref=e103]:
+                  - heading "Test UI Product 1762595221296" [level=4] [ref=e105]
+                  - paragraph [ref=e107]: 5 800 F CFA
+                - generic [ref=e108]:
+                  - button "0" [ref=e109] [cursor=pointer]
+                  - button "+ •••" [ref=e110] [cursor=pointer]:
+                    - text: +
+                    - generic [ref=e111]: •••
+              - generic [ref=e114]:
+                - img [ref=e117]
+                - generic [ref=e119]:
+                  - heading "Test UI Product 1762594713532" [level=4] [ref=e121]
+                  - paragraph [ref=e123]: 5 800 F CFA
+                - generic [ref=e124]:
+                  - button "0" [ref=e125] [cursor=pointer]
+                  - button "+ •••" [ref=e126] [cursor=pointer]:
+                    - text: +
+                    - generic [ref=e127]: •••
+              - generic [ref=e130]:
+                - img [ref=e133]
+                - generic [ref=e135]:
+                  - heading "Test UI Product 1762594251805" [level=4] [ref=e137]
+                  - paragraph [ref=e139]: 5 800 F CFA
+                - generic [ref=e140]:
+                  - button "0" [ref=e141] [cursor=pointer]
+                  - button "+ •••" [ref=e142] [cursor=pointer]:
+                    - text: +
+                    - generic [ref=e143]: •••
+              - generic [ref=e146]:
+                - img [ref=e149]
+                - generic [ref=e151]:
+                  - heading "Test UI Product 1762593936426" [level=4] [ref=e153]
+                  - paragraph [ref=e155]: 5 800 F CFA
+                - generic [ref=e156]:
+                  - button "0" [ref=e157] [cursor=pointer]
+                  - button "+ •••" [ref=e158] [cursor=pointer]:
+                    - text: +
+                    - generic [ref=e159]: •••
+              - generic [ref=e162]:
+                - img [ref=e165]
+                - generic [ref=e167]:
+                  - heading "Test UI Product 1762592947438" [level=4] [ref=e169]
+                  - paragraph [ref=e171]: 5 800 F CFA
+                - generic [ref=e172]:
+                  - button "0" [ref=e173] [cursor=pointer]
+                  - button "+ •••" [ref=e174] [cursor=pointer]:
+                    - text: +
+                    - generic [ref=e175]: •••
+              - generic [ref=e178]:
+                - img [ref=e181]
+                - generic [ref=e183]:
+                  - heading "Test UI Product 1762503868731" [level=4] [ref=e185]
+                  - paragraph [ref=e187]: 5 800 F CFA
+                - generic [ref=e188]:
+                  - button "0" [ref=e189] [cursor=pointer]
+                  - button "+ •••" [ref=e190] [cursor=pointer]:
+                    - text: +
+                    - generic [ref=e191]: •••
+              - generic [ref=e194]:
+                - img [ref=e197]
+                - generic [ref=e199]:
+                  - heading "Test UI Product 1762503320533" [level=4] [ref=e201]
+                  - paragraph [ref=e203]: 5 800 F CFA
+                - generic [ref=e204]:
+                  - button "0" [ref=e205] [cursor=pointer]
+                  - button "+ •••" [ref=e206] [cursor=pointer]:
+                    - text: +
+                    - generic [ref=e207]: •••
+      - generic [ref=e209]:
+        - generic [ref=e210]:
+          - generic [ref=e211]:
+            - generic [ref=e213]: Total
+            - generic [ref=e214]: 0 F CFA
+          - button "Valider la sélection" [disabled] [ref=e215]:
+            - generic [ref=e216]: Valider la sélection
+            - img [ref=e217]
+        - generic [ref=e220]:
+          - generic [ref=e221]: Étape 2 sur 3
+          - generic [ref=e222]: 67%
+  - contentinfo [ref=e225]:
+    - generic [ref=e226]:
+      - generic [ref=e227]:
+        - generic [ref=e228]:
+          - generic [ref=e229]:
+            - img "NS2PO Logo" [ref=e230]
+            - generic [ref=e231]: NS2PO
+          - paragraph [ref=e232]: Spécialiste de la publicité par l'objet en Côte d'Ivoire depuis 2011. Nous accompagnons les acteurs politiques dans leur communication visuelle.
+          - generic [ref=e233]:
+            - link "Facebook" [ref=e234] [cursor=pointer]:
+              - /url: "#"
+              - generic [ref=e235]: Facebook
+              - img [ref=e236]
+            - link "LinkedIn" [ref=e238] [cursor=pointer]:
+              - /url: "#"
+              - generic [ref=e239]: LinkedIn
+              - img [ref=e240]
+        - generic [ref=e242]:
+          - heading "Liens rapides" [level=3] [ref=e243]
+          - list [ref=e244]:
+            - listitem [ref=e245]:
+              - link "Nos réalisations" [ref=e246] [cursor=pointer]:
+                - /url: /realisations
+            - listitem [ref=e247]:
+              - link "Devis en ligne" [ref=e248] [cursor=pointer]:
+                - /url: /devis-new
+            - listitem [ref=e249]:
+              - link "Nous contacter" [ref=e250] [cursor=pointer]:
+                - /url: /contacts
+            - listitem [ref=e251]:
+              - link "À propos" [ref=e252] [cursor=pointer]:
+                - /url: "#"
+        - generic [ref=e253]:
+          - heading "Contact" [level=3] [ref=e254]
+          - list [ref=e255]:
+            - listitem [ref=e256]: 📍 Abidjan, Côte d'Ivoire
+            - listitem [ref=e257]: 📞 +225 XX XX XX XX
+            - listitem [ref=e258]: ✉️ contact@ns2po.ci
+            - listitem [ref=e259]: "🕒 Lun-Ven: 8h-17h"
+      - paragraph [ref=e261]: © 2025 NS2PO. Tous droits réservés. | Spécialiste publicité par l'objet depuis 2011
+```
