@@ -67,6 +67,13 @@ export default defineEventHandler(async (event) => {
     console.log(`[Test PDF API] Validated data for ${validated.reference}`)
 
     // 2. Préparer données pour PDF
+    const config = useRuntimeConfig()
+    const siteUrl = config.public.siteUrl || 'http://localhost:3000'
+
+    // Fallback logo par défaut si logoUrl invalide
+    const defaultLogoUrl = `${siteUrl}/logos/logo-ns2po.jpg`
+    const logoUrl = validated.logoUrl || defaultLogoUrl
+
     const pdfData: QuoteData = {
       reference: validated.reference,
       date: new Date().toLocaleDateString('fr-FR', {
@@ -83,7 +90,7 @@ export default defineEventHandler(async (event) => {
       discountPercent: validated.discountPercent,
       tax: validated.tax,
       total: validated.total,
-      logoUrl: validated.logoUrl,
+      logoUrl,
     }
 
     // 3. Générer PDF
