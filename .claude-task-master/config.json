@@ -1,7 +1,7 @@
 {
   "version": "3.0",
   "created": "2025-09-20T18:38:27.616Z",
-  "activeProject": "proj-1762102136104-db0992a9",
+  "activeProject": "proj-1762984262089-e7e5c9a7",
   "projects": [
     {
       "id": "bundles-crud-enhancement",
@@ -56,7 +56,22 @@
       "id": "proj-1762102136104-db0992a9",
       "name": "Migration TanStack Query Pure",
       "path": "/Users/logansery/Documents/ns2po-w/.claude-task-master/projects/proj-1762102136104-db0992a9"
+    },
+    {
+      "id": "nitro-cache-redis-migration",
+      "name": "Nitro Cache Redis Migration Production-Ready",
+      "path": "/Users/logansery/Documents/ns2po-w/.claude-task-master/projects/nitro-cache-redis-migration"
+    },
+    {
+      "id": "proj-1762353954477-e379efc0",
+      "name": "Cache Admin-Public Synchronization",
+      "path": "/Users/logansery/Documents/ns2po-w/.claude-task-master/projects/proj-1762353954477-e379efc0"
+    },
+    {
+      "id": "proj-1762984262089-e7e5c9a7",
+      "name": "Quote PDF Generation + Email Integration",
+      "path": "/Users/logansery/Documents/ns2po-w/.claude-task-master/projects/proj-1762984262089-e7e5c9a7"
     }
   ],
-  "updated": "2025-11-02T16:48:56.114Z"
+  "updated": "2025-11-12T21:51:02.090Z"
 }

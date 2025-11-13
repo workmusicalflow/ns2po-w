@@ -1,0 +1,196 @@
+{
+  "id": "sprint-1762215737051-639e05e3",
+  "name": "Sprint 0 - Setup Redis Infrastructure",
+  "startDate": "2025-11-04",
+  "endDate": "2025-11-05",
+  "goals": "Configurer l'infrastructure Redis (Railway + Local) et migrer la configuration Nitro Cache vers Redis distribué",
+  "status": "closed",
+  "created": "2025-11-04T00:22:17.052Z",
+  "tasks": [
+    {
+      "id": 1,
+      "title": "[USER ACTION] Ajouter service Redis sur Railway Dashboard",
+      "description": "**ACTION UTILISATEUR REQUISE**\n\n1. Aller sur Railway Dashboard du projet NS2PO\n2. Cliquer sur \"New\" → \"Database\" → \"Redis\"\n3. Attendre provisioning (1-2 minutes)\n4. Railway générera automatiquement la variable `REDIS_URL`\n5. Noter l'URL Redis pour tests locaux si besoin\n\n**Validation** : Variable `REDIS_URL` visible dans Railway Dashboard",
+      "status": "pending",
+      "priority": 5,
+      "dependencies": [],
+      "created": "2025-11-04T00:23:33.919Z",
+      "updated": "2025-11-04T00:23:33.919Z",
+      "isPareto80": false
+    },
+    {
+      "id": 2,
+      "title": "Documenter synthèse des 3 experts (Gemini + GPT-5 + Web)",
+      "description": "Créer document `.playwright-mcp/SYNTHESE_EXPERTS_REDIS_CACHE.md` avec :\n- Diagnostic consensuel (instances multiples Railway + cache local)\n- Recommandations Gemini (Redis + unstorage)\n- Validation GPT-5 (alternatives + pièges)\n- Docs officielles 2025 (Nitro Cache + Redis)\n\n**Validation** : Document markdown créé et commit",
+      "status": "completed",
+      "priority": 4,
+      "dependencies": [],
+      "created": "2025-11-04T00:23:34.650Z",
+      "updated": "2025-11-04T00:29:48.599Z",
+      "isPareto80": false
+    },
+    {
+      "id": 3,
+      "title": "Installer unstorage + driver Redis (@upstash/redis)",
+      "description": "Installer dépendances Redis :\n```bash\npnpm add unstorage @upstash/redis\n```\n\n**Validation** : `package.json` contient les 2 dépendances",
+      "status": "completed",
+      "priority": 5,
+      "dependencies": [],
+      "created": "2025-11-04T00:23:35.305Z",
+      "updated": "2025-11-04T00:32:08.837Z",
+      "isPareto80": false
+    },
+    {
+      "id": 4,
+      "title": "Configurer nuxt.config.ts avec Redis driver",
+      "description": "Modifier `apps/election-mvp/nuxt.config.ts` :\n\n```typescript\nexport default defineNuxtConfig({\n  nitro: {\n    storage: {\n      cache: {\n        driver: 'redis',\n        url: process.env.REDIS_URL || 'redis://localhost:6379/0'\n      }\n    }\n  }\n})\n```\n\n**Validation** : Config sauvegardée, pnpm type-check passe",
+      "status": "completed",
+      "priority": 5,
+      "dependencies": [],
+      "created": "2025-11-04T00:23:35.912Z",
+      "updated": "2025-11-04T00:33:08.073Z",
+      "isPareto80": false
+    },
+    {
+      "id": 5,
+      "title": "Créer .env.example avec REDIS_URL template",
+      "description": "Ajouter dans `.env.example` :\n```\n# Redis Cache (Production: Railway auto-inject, Local: Docker ou Upstash)\nREDIS_URL=redis://localhost:6379/0\n```\n\n**Validation** : Fichier `.env.example` mis à jour",
+      "status": "completed",
+      "priority": 3,
+      "dependencies": [],
+      "created": "2025-11-04T00:23:36.594Z",
+      "updated": "2025-11-04T00:34:47.046Z",
+      "isPareto80": false
+    },
+    {
+      "id": 6,
+      "title": "Tester connexion Redis local (Docker ou mock)",
+      "description": "Option 1 (Docker) :\n```bash\ndocker run -d -p 6379:6379 redis:alpine\n```\n\nOption 2 (Upstash gratuit) : Utiliser REDIS_URL depuis Upstash Console\n\nPuis tester :\n```bash\npnpm dev\n# Vérifier logs : \"Nitro storage 'cache' using 'redis' driver\"\n```\n\n**Validation** : Serveur dev démarre sans erreur Redis",
+      "status": "pending",
+      "priority": 4,
+      "dependencies": [],
+      "created": "2025-11-04T00:23:37.258Z",
+      "updated": "2025-11-04T00:23:37.258Z",
+      "isPareto80": false
+    },
+    {
+      "id": 7,
+      "title": "Vérifier tous les useStorage('cache') utilisent Redis",
+      "description": "Grep dans le code :\n```bash\ngrep -r \"useStorage('cache')\" apps/election-mvp/server/api/\n```\n\nConfirmer que les endpoints suivants utilisent le bon driver :\n- `server/api/products/index.get.ts` (cache GET)\n- `server/api/admin/products/[id].put.ts` (invalidation)\n- `server/api/admin/products/index.post.ts` (invalidation)\n- `server/api/admin/products/[id].delete.ts` (invalidation)\n\n**Validation** : Tous les endpoints utilisent `useStorage('cache')` correctement",
+      "status": "completed",
+      "priority": 4,
+      "dependencies": [],
+      "created": "2025-11-04T00:23:38.014Z",
+      "updated": "2025-11-04T00:36:34.140Z",
+      "isPareto80": false
+    },
+    {
+      "id": 8,
+      "title": "Ajouter logs Redis debug dans endpoints cache",
+      "description": "Ajouter dans `server/api/products/index.get.ts` :\n```typescript\nconsole.log('🔧 [REDIS] Cache storage driver:', useStorage('cache').driver)\n```\n\nEt dans endpoints invalidation :\n```typescript\nconsole.log('🔧 [REDIS] Invalidating cache key: products:list:active')\n```\n\n**Validation** : Logs Redis ajoutés, code compile",
+      "status": "completed",
+      "priority": 3,
+      "dependencies": [],
+      "created": "2025-11-04T00:23:42.360Z",
+      "updated": "2025-11-04T00:36:34.988Z",
+      "isPareto80": false
+    },
+    {
+      "id": 9,
+      "title": "Tester invalidation cache Redis en local",
+      "description": "Flow de test complet :\n1. `pnpm dev` (avec Redis local actif)\n2. GET `/api/products` → cache MISS\n3. GET `/api/products` → cache HIT\n4. PUT `/api/admin/products/:id` (modifier prix)\n5. GET `/api/products` → cache MISS (invalidé)\n6. Vérifier nouveau prix dans réponse\n\n**Validation** : Cache Redis fonctionne + invalidation OK en local",
+      "status": "pending",
+      "priority": 5,
+      "dependencies": [],
+      "created": "2025-11-04T00:23:48.073Z",
+      "updated": "2025-11-04T00:23:48.073Z",
+      "isPareto80": false
+    },
+    {
+      "id": 10,
+      "title": "[USER ACTION] Vérifier REDIS_URL dans Railway variables",
+      "description": "**ACTION UTILISATEUR REQUISE**\n\n1. Aller sur Railway Dashboard\n2. Sélectionner le service Nuxt App\n3. Onglet \"Variables\"\n4. Confirmer que `REDIS_URL` est présente (auto-inject par Railway)\n\n**Validation** : Variable `REDIS_URL` visible et correcte",
+      "status": "completed",
+      "priority": 5,
+      "dependencies": [],
+      "created": "2025-11-04T00:23:54.197Z",
+      "updated": "2025-11-04T22:46:58.541Z",
+      "isPareto80": false
+    },
+    {
+      "id": 11,
+      "title": "Commit + Push solution Redis vers Railway",
+      "description": "Git commit avec message conventionnel :\n```bash\ngit add apps/election-mvp/nuxt.config.ts package.json pnpm-lock.yaml .env.example\ngit commit -m \"feat(cache): Migration Nitro Cache vers Redis distribué (fix instances Railway)\n\n- Ajout driver Redis (@upstash/redis + unstorage)\n- Config nitro.storage.cache avec driver redis\n- REDIS_URL depuis Railway env vars\n- Fix invalidation cache entre instances multiples\n\nDiagnostic: Gemini + GPT-5 + Web Search\nRefs: #cache-invalidation-distributed\"\n\ngit push origin feat/sprint-0-survival\n```\n\n**Validation** : Commit pushed, Railway CI/CD déclenché",
+      "status": "completed",
+      "priority": 5,
+      "dependencies": [],
+      "created": "2025-11-04T00:24:02.932Z",
+      "updated": "2025-11-04T22:41:38.587Z",
+      "isPareto80": false
+    },
+    {
+      "id": 12,
+      "title": "[USER ACTION] Vérifier logs Railway après déploiement",
+      "description": "**ACTION UTILISATEUR REQUISE**\n\n1. Attendre fin déploiement Railway (2-3 minutes)\n2. Aller dans Railway Dashboard → Logs\n3. Chercher logs de démarrage :\n   - `🔧 [REDIS] Cache storage driver: redis`\n   - Pas d'erreur \"Redis connection failed\"\n\n**Validation** : Logs confirment connexion Redis OK",
+      "status": "pending",
+      "priority": 5,
+      "dependencies": [],
+      "created": "2025-11-04T00:24:12.359Z",
+      "updated": "2025-11-04T00:24:12.359Z",
+      "isPareto80": false
+    },
+    {
+      "id": 13,
+      "title": "[USER ACTION] Tester flow complet sur Railway production",
+      "description": "**ACTION UTILISATEUR REQUISE** - Test E2E production\n\n1. Aller sur `https://nuxt-app-production-8b86.up.railway.app/admin/products`\n2. Noter le prix d'un produit (ex: 300 XAF)\n3. Modifier le produit → nouveau prix (ex: 275 XAF)\n4. Sauvegarder\n5. Retourner à la liste `/admin/products`\n6. **VALIDATION CRITIQUE** : Le nouveau prix (275 XAF) s'affiche immédiatement\n\n**Validation** : Prix mis à jour visible sans F5, cache invalidé globalement",
+      "status": "pending",
+      "priority": 5,
+      "dependencies": [],
+      "created": "2025-11-04T00:24:23.769Z",
+      "updated": "2025-11-04T00:24:23.769Z",
+      "isPareto80": false
+    },
+    {
+      "id": 14,
+      "title": "Valider logs Railway `🗑️ Cache Nitro invalidé`",
+      "description": "Dans Railway Dashboard → Logs, après le test de modification produit, chercher :\n\n```\n✅ [API PUT] Mise à jour BDD réussie\n➡️ [API PUT] Tentative d'invalidation du cache Nitro...\n🗑️ [API PUT] Cache Nitro invalidé après UPDATE produit\n```\n\n**Validation** : Log d'invalidation présent = cache Redis distribué fonctionne",
+      "status": "pending",
+      "priority": 4,
+      "dependencies": [],
+      "created": "2025-11-04T00:24:37.155Z",
+      "updated": "2025-11-04T00:24:37.155Z",
+      "isPareto80": false
+    },
+    {
+      "id": 15,
+      "title": "Documenter solution Redis dans CLAUDE.md",
+      "description": "Ajouter section dans `CLAUDE.md` :\n\n```markdown\n## 🚀 Redis Cache Distribué (Ajouté 2025-11-04)\n\n**Problème Résolu** : Cache Nitro local ne fonctionnait pas avec instances multiples Railway\n\n**Solution** : Migration vers Redis comme cache externe partagé\n\n**Configuration** :\n- Driver: `@upstash/redis` + `unstorage`\n- Variable env: `REDIS_URL` (auto-inject Railway)\n- TTL: 5 minutes (300s)\n\n**Validation Experts** : Gemini + GPT-5 + Web Search (docs Nitro 2025)\n```\n\n**Validation** : Documentation à jour, commit séparé",
+      "status": "pending",
+      "priority": 3,
+      "dependencies": [],
+      "created": "2025-11-04T00:24:52.878Z",
+      "updated": "2025-11-04T00:24:52.878Z",
+      "isPareto80": false
+    },
+    {
+      "id": 16,
+      "title": "Fermer Sprint 0 + Générer rapport Task Master",
+      "description": "Clôturer le sprint avec :\n```bash\n# Via Task Master MCP\nclose_sprint(summary=\"Migration Redis réussie - Cache distribué fonctionnel Railway\")\ngenerate_progress_report()\n```\n\n**Validation** : Sprint fermé, rapport généré, tâches completed",
+      "status": "pending",
+      "priority": 2,
+      "dependencies": [],
+      "created": "2025-11-04T00:25:16.013Z",
+      "updated": "2025-11-04T00:25:16.013Z",
+      "isPareto80": false
+    }
+  ],
+  "paretoDecisions": [],
+  "metrics": {
+    "tasksCompleted": 8,
+    "tasksMovedToVault": 0,
+    "velocityPoints": 0
+  },
+  "updated": "2025-11-05T14:45:43.891Z",
+  "closedAt": "2025-11-05T14:45:43.884Z",
+  "summary": "Sprint Redis Migration terminé - Problème cache admin résolu avec Pinia Store. Désynchronisation cache public détectée, nécessite nouveau sprint architecture unifiée."
+}

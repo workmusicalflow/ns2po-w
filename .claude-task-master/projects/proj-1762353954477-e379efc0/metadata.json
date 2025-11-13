@@ -1,0 +1,12 @@
+{
+  "id": "proj-1762353954477-e379efc0",
+  "name": "Cache Admin-Public Synchronization",
+  "description": "Implémentation architecture cache unifiée Redis + HTTP headers pour synchroniser mutations admin avec site public. Résolution désynchronisation 30min → 5sec (validé Gemini 20 sources). Pattern: invalidateProductRelatedCaches() centralisé + migration /api/campaign-bundles vers Redis.",
+  "created": "2025-11-05T14:45:54.480Z",
+  "sprints": [
+    "sprint-1762353964867-05c55c3d",
+    "sprint-1762371317645-d9787d87"
+  ],
+  "activeSprint": null,
+  "updated": "2025-11-12T21:50:54.088Z"
+}

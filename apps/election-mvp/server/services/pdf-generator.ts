@@ -10,7 +10,7 @@
 
 import puppeteer, { Browser, Page } from 'puppeteer'
 import * as chromiumModule from '@sparticuz/chromium-min'
-import * as Handlebars from 'handlebars'
+import Handlebars from 'handlebars'
 import { readFileSync } from 'fs'
 import { resolve } from 'path'
 

@@ -82,7 +82,7 @@ export default defineEventHandler(async (event) => {
       sql: `INSERT INTO products (
         id, name, description, category, subcategory,
         base_price, min_quantity, max_quantity,
-        image, is_active, created_at, updated_at
+        image_url, is_active, created_at, updated_at
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       args: [
         productId,
@@ -93,7 +93,7 @@ export default defineEventHandler(async (event) => {
         validatedData.basePrice,
         validatedData.minQuantity,
         validatedData.maxQuantity || validatedData.minQuantity * 10,
-        validatedData.image || null,
+        validatedData.image || null, // Utilise image_url dans la table
         validatedData.isActive ? 1 : 0,
         now,
         now

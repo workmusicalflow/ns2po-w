@@ -1,0 +1,450 @@
+════════════════════════════════════════════════════════════════════════
+🧪 BUNDLE PRICE LOCK - Résultats Tests E2E
+════════════════════════════════════════════════════════════════════════
+
+Browser:    chromium
+Timestamp:  2025-11-05 23:29:55
+Test File:  bundles-price-lock.spec.ts
+Strategy:   Découpage par Browser (10 tests)
+
+════════════════════════════════════════════════════════════════════════
+
+
+Running 10 tests using 4 workers
+
+[1A[2K[1/10] [chromium] › tests/e2e/admin/bundles-price-lock.spec.ts:254:3 › 🔒 Scénario 2: Prix Fixe (price_locked = 1) › 2.2 - Modification catalogue → Bundle reste figé
+[1A[2K[2/10] [chromium] › tests/e2e/admin/bundles-price-lock.spec.ts:393:3 › ⚠️ Scénario 4: Warning Visuel - Écart Prix > 5% › 4.1 - Warning badge visible si écart > 5%
+[1A[2K[3/10] [chromium] › tests/e2e/admin/bundles-price-lock.spec.ts:179:3 › 🔄 Scénario 1: Auto-Sync (price_locked = 0) › 1.1 - Bundle reflète prix initial du catalogue
+[1A[2K[4/10] [chromium] › tests/e2e/admin/bundles-price-lock.spec.ts:529:3 › 🎯 Scénario 6: Intégration Complète - Workflow Réel › 6.1 - Workflow complet: Création → Modification → Validation
+[1A[2K[chromium] › tests/e2e/admin/bundles-price-lock.spec.ts:393:3 › ⚠️ Scénario 4: Warning Visuel - Écart Prix > 5% › 4.1 - Warning badge visible si écart > 5%
+🔧 Création produit test: Test Warning Product 1762385403068 - Prix: 10000 FCFA
+
+[1A[2K[chromium] › tests/e2e/admin/bundles-price-lock.spec.ts:254:3 › 🔒 Scénario 2: Prix Fixe (price_locked = 1) › 2.2 - Modification catalogue → Bundle reste figé
+🔧 Création produit test: Test Locked Product 1762385403068 - Prix: 5800 FCFA
+
+[1A[2K[chromium] › tests/e2e/admin/bundles-price-lock.spec.ts:179:3 › 🔄 Scénario 1: Auto-Sync (price_locked = 0) › 1.1 - Bundle reflète prix initial du catalogue
+🔧 Création produit test: Test Auto-Sync Product 1762385403072 - Prix: 5800 FCFA
+
+[1A[2K[chromium] › tests/e2e/admin/bundles-price-lock.spec.ts:529:3 › 🎯 Scénario 6: Intégration Complète - Workflow Réel › 6.1 - Workflow complet: Création → Modification → Validation
+📋 Test 6.1: Workflow complet Price Lock...
+
+[1A[2K🔧 Création produit test: Integration Product 1 1762385403188 - Prix: 5000 FCFA
+
+[1A[2K[chromium] › tests/e2e/admin/bundles-price-lock.spec.ts:254:3 › 🔒 Scénario 2: Prix Fixe (price_locked = 1) › 2.2 - Modification catalogue → Bundle reste figé
+✅ Produit créé: ID=prod_1762385403429_lssvona
+
+[1A[2K🔧 Création bundle test: Test Locked Bundle 1762385403068
+
+[1A[2K[chromium] › tests/e2e/admin/bundles-price-lock.spec.ts:179:3 › 🔄 Scénario 1: Auto-Sync (price_locked = 0) › 1.1 - Bundle reflète prix initial du catalogue
+✅ Produit créé: ID=prod_1762385403425_h180ewm
+
+[1A[2K🔧 Création bundle test: Test Auto-Sync Bundle 1762385403072
+
+[1A[2K[chromium] › tests/e2e/admin/bundles-price-lock.spec.ts:393:3 › ⚠️ Scénario 4: Warning Visuel - Écart Prix > 5% › 4.1 - Warning badge visible si écart > 5%
+✅ Produit créé: ID=prod_1762385403423_gtdgirv
+
+[1A[2K🔧 Création bundle test: Test Warning Bundle 1762385403068
+
+[1A[2K[chromium] › tests/e2e/admin/bundles-price-lock.spec.ts:529:3 › 🎯 Scénario 6: Intégration Complète - Workflow Réel › 6.1 - Workflow complet: Création → Modification → Validation
+✅ Produit créé: ID=prod_1762385404101_fpnlqu9
+
+[1A[2K🔧 Création produit test: Integration Product 2 1762385403188 - Prix: 8000 FCFA
+
+[1A[2K[chromium] › tests/e2e/admin/bundles-price-lock.spec.ts:179:3 › 🔄 Scénario 1: Auto-Sync (price_locked = 0) › 1.1 - Bundle reflète prix initial du catalogue
+✅ Bundle créé: ID=146
+
+[1A[2K📋 Test 1.1: Vérification prix initial auto-sync...
+
+[1A[2K[chromium] › tests/e2e/admin/bundles-price-lock.spec.ts:254:3 › 🔒 Scénario 2: Prix Fixe (price_locked = 1) › 2.2 - Modification catalogue → Bundle reste figé
+✅ Bundle créé: ID=147
+
+[1A[2K📋 Test 2.2: Test prix figé malgré changement catalogue...
+
+[1A[2K💲 Mise à jour prix produit prod_1762385403429_lssvona: 6200 FCFA
+
+[1A[2K[chromium] › tests/e2e/admin/bundles-price-lock.spec.ts:179:3 › 🔄 Scénario 1: Auto-Sync (price_locked = 0) › 1.1 - Bundle reflète prix initial du catalogue
+✅ Prix bundle = 5800 FCFA (catalogue: 5800 FCFA)
+
+[1A[2K[5/10] [chromium] › tests/e2e/admin/bundles-price-lock.spec.ts:190:3 › 🔄 Scénario 1: Auto-Sync (price_locked = 0) › 1.2 - Modification catalogue → Bundle auto-sync
+[1A[2K[chromium] › tests/e2e/admin/bundles-price-lock.spec.ts:190:3 › 🔄 Scénario 1: Auto-Sync (price_locked = 0) › 1.2 - Modification catalogue → Bundle auto-sync
+📋 Test 1.2: Test synchronisation automatique...
+
+[1A[2K💲 Mise à jour prix produit prod_1762385403425_h180ewm: 6200 FCFA
+
+[1A[2K[chromium] › tests/e2e/admin/bundles-price-lock.spec.ts:393:3 › ⚠️ Scénario 4: Warning Visuel - Écart Prix > 5% › 4.1 - Warning badge visible si écart > 5%
+✅ Bundle créé: ID=148
+
+[1A[2K[chromium] › tests/e2e/admin/bundles-price-lock.spec.ts:529:3 › 🎯 Scénario 6: Intégration Complète - Workflow Réel › 6.1 - Workflow complet: Création → Modification → Validation
+✅ Produit créé: ID=prod_1762385406252_vtzv5ii
+
+[1A[2K🔧 Création bundle test: Integration Bundle 1762385403188
+
+[1A[2K[chromium] › tests/e2e/admin/bundles-price-lock.spec.ts:393:3 › ⚠️ Scénario 4: Warning Visuel - Écart Prix > 5% › 4.1 - Warning badge visible si écart > 5%
+📋 Test 4.1: Vérification warning écart prix...
+
+[1A[2K[chromium] › tests/e2e/admin/bundles-price-lock.spec.ts:254:3 › 🔒 Scénario 2: Prix Fixe (price_locked = 1) › 2.2 - Modification catalogue → Bundle reste figé
+✅ Prix produit mis à jour: 6200 FCFA
+
+[1A[2K[chromium] › tests/e2e/admin/bundles-price-lock.spec.ts:529:3 › 🎯 Scénario 6: Intégration Complète - Workflow Réel › 6.1 - Workflow complet: Création → Modification → Validation
+✅ Bundle créé: ID=149
+
+[1A[2K💲 Mise à jour prix produit prod_1762385404101_fpnlqu9: 5500 FCFA
+
+[1A[2K[chromium] › tests/e2e/admin/bundles-price-lock.spec.ts:190:3 › 🔄 Scénario 1: Auto-Sync (price_locked = 0) › 1.2 - Modification catalogue → Bundle auto-sync
+✅ Prix produit mis à jour: 6200 FCFA
+
+[1A[2K[chromium] › tests/e2e/admin/bundles-price-lock.spec.ts:529:3 › 🎯 Scénario 6: Intégration Complète - Workflow Réel › 6.1 - Workflow complet: Création → Modification → Validation
+✅ Prix produit mis à jour: 5500 FCFA
+
+[1A[2K💲 Mise à jour prix produit prod_1762385406252_vtzv5ii: 8500 FCFA
+
+[1A[2K[chromium] › tests/e2e/admin/bundles-price-lock.spec.ts:254:3 › 🔒 Scénario 2: Prix Fixe (price_locked = 1) › 2.2 - Modification catalogue → Bundle reste figé
+✅ PRIX FIGÉ MAINTENU: 5500 FCFA (catalogue modifié à 6200 FCFA)
+
+[1A[2K🧹 Nettoyage: Suppression bundle et produit test...
+
+[1A[2K[chromium] › tests/e2e/admin/bundles-price-lock.spec.ts:393:3 › ⚠️ Scénario 4: Warning Visuel - Écart Prix > 5% › 4.1 - Warning badge visible si écart > 5%
+✅ Login admin réussi
+
+[1A[2K[chromium] › tests/e2e/admin/bundles-price-lock.spec.ts:190:3 › 🔄 Scénario 1: Auto-Sync (price_locked = 0) › 1.2 - Modification catalogue → Bundle auto-sync
+🧹 Nettoyage: Suppression bundle et produit test...
+
+[1A[2K[chromium] › tests/e2e/admin/bundles-price-lock.spec.ts:529:3 › 🎯 Scénario 6: Intégration Complète - Workflow Réel › 6.1 - Workflow complet: Création → Modification → Validation
+✅ Prix produit mis à jour: 8500 FCFA
+
+[1A[2K[chromium] › tests/e2e/admin/bundles-price-lock.spec.ts:254:3 › 🔒 Scénario 2: Prix Fixe (price_locked = 1) › 2.2 - Modification catalogue → Bundle reste figé
+✅ Nettoyage terminé
+
+[1A[2K[6/10] [chromium] › tests/e2e/admin/bundles-price-lock.spec.ts:304:3 › 🎨 Scénario 3: Admin UI - Checkbox Price Lock › 3.1 - Checkbox visible et cliquable
+[1A[2K[chromium] › tests/e2e/admin/bundles-price-lock.spec.ts:304:3 › 🎨 Scénario 3: Admin UI - Checkbox Price Lock › 3.1 - Checkbox visible et cliquable
+🔧 Création produit test: Test UI Product 1762385403070 - Prix: 5800 FCFA
+
+[1A[2K[chromium] › tests/e2e/admin/bundles-price-lock.spec.ts:190:3 › 🔄 Scénario 1: Auto-Sync (price_locked = 0) › 1.2 - Modification catalogue → Bundle auto-sync
+✅ Nettoyage terminé
+
+[1A[2K[chromium] › tests/e2e/admin/bundles-price-lock.spec.ts:304:3 › 🎨 Scénario 3: Admin UI - Checkbox Price Lock › 3.1 - Checkbox visible et cliquable
+✅ Produit créé: ID=prod_1762385415560_0ilx41k
+
+[1A[2K🔧 Création bundle test: Test UI Bundle 1762385403070
+
+[1A[2K  1) [chromium] › tests/e2e/admin/bundles-price-lock.spec.ts:190:3 › 🔄 Scénario 1: Auto-Sync (price_locked = 0) › 1.2 - Modification catalogue → Bundle auto-sync 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBe[2m([22m[32mexpected[39m[2m) // Object.is equality[22m
+
+    Expected: [32m6200[39m
+    Received: [31m5800[39m
+
+      202 |
+      203 |     // ASSERTION CRITIQUE: Prix bundle = Nouveau prix catalogue (auto-sync)
+    > 204 |     expect(bundleProduct.basePrice).toBe(UPDATED_CATALOG_PRICE)
+          |                                     ^
+      205 |     console.log(`✅ AUTO-SYNC RÉUSSI: Prix bundle synchronisé ${UPDATED_CATALOG_PRICE} FCFA`)
+      206 |   })
+      207 |
+        at /Users/logansery/Documents/ns2po-w/apps/election-mvp/tests/e2e/admin/bundles-price-lock.spec.ts:204:37
+
+
+[1A[2K✅ Bundle créé: ID=150
+
+[1A[2K📋 Test 3.1: Vérification UI checkbox...
+
+[1A[2K[chromium] › tests/e2e/admin/bundles-price-lock.spec.ts:529:3 › 🎯 Scénario 6: Intégration Complète - Workflow Réel › 6.1 - Workflow complet: Création → Modification → Validation
+✅ Login admin réussi
+
+[1A[2K[chromium] › tests/e2e/admin/bundles-price-lock.spec.ts:393:3 › ⚠️ Scénario 4: Warning Visuel - Écart Prix > 5% › 4.1 - Warning badge visible si écart > 5%
+🧹 Nettoyage: Suppression bundle et produit test...
+
+[1A[2K✅ Nettoyage terminé
+
+[1A[2K[7/10] [chromium] › tests/e2e/admin/bundles-price-lock.spec.ts:242:3 › 🔒 Scénario 2: Prix Fixe (price_locked = 1) › 2.1 - Bundle utilise prix custom (pas catalogue)
+[1A[2K[chromium] › tests/e2e/admin/bundles-price-lock.spec.ts:304:3 › 🎨 Scénario 3: Admin UI - Checkbox Price Lock › 3.1 - Checkbox visible et cliquable
+✅ Login admin réussi
+
+[1A[2K[chromium] › tests/e2e/admin/bundles-price-lock.spec.ts:242:3 › 🔒 Scénario 2: Prix Fixe (price_locked = 1) › 2.1 - Bundle utilise prix custom (pas catalogue)
+🔧 Création produit test: Test Locked Product 1762385431904 - Prix: 5800 FCFA
+
+[1A[2K  2) [chromium] › tests/e2e/admin/bundles-price-lock.spec.ts:393:3 › ⚠️ Scénario 4: Warning Visuel - Écart Prix > 5% › 4.1 - Warning badge visible si écart > 5% 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('.text-amber-600').filter({ hasText: /Écart/i })
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('.text-amber-600').filter({ hasText: /Écart/i })[22m
+
+
+      403 |
+      404 |     // ASSERTION: Warning visible
+    > 405 |     await expect(warningBadge).toBeVisible({ timeout: 5000 })
+          |                                ^
+      406 |
+      407 |     // Vérifier pourcentage affiché
+      408 |     const warningText = await warningBadge.textContent()
+        at /Users/logansery/Documents/ns2po-w/apps/election-mvp/tests/e2e/admin/bundles-price-lock.spec.ts:405:32
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/admin-bundles-price-lock-⚠-52892-g-badge-visible-si-écart-5--chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/admin-bundles-price-lock-⚠-52892-g-badge-visible-si-écart-5--chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/admin-bundles-price-lock-⚠-52892-g-badge-visible-si-écart-5--chromium/error-context.md
+
+
+[1A[2K✅ Produit créé: ID=prod_1762385435356_dwt0cei
+
+[1A[2K🔧 Création bundle test: Test Locked Bundle 1762385431904
+
+[1A[2K✅ Bundle créé: ID=151
+
+[1A[2K📋 Test 2.1: Vérification prix custom locked...
+
+[1A[2K🧹 Nettoyage: Suppression bundle et produit test...
+
+[1A[2K✅ Nettoyage terminé
+
+[1A[2K  3) [chromium] › tests/e2e/admin/bundles-price-lock.spec.ts:242:3 › 🔒 Scénario 2: Prix Fixe (price_locked = 1) › 2.1 - Bundle utilise prix custom (pas catalogue) 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBe[2m([22m[32mexpected[39m[2m) // Object.is equality[22m
+
+    Expected: [32m5500[39m
+    Received: [31m5800[39m
+
+      247 |
+      248 |     // ASSERTION: Prix bundle = Prix custom (pas catalogue)
+    > 249 |     expect(bundleProduct.basePrice).toBe(LOCKED_CUSTOM_PRICE)
+          |                                     ^
+      250 |     expect(bundleProduct.basePrice).not.toBe(INITIAL_PRODUCT_PRICE)
+      251 |     console.log(`✅ Prix bundle figé = ${bundleProduct.basePrice} FCFA (catalogue: ${INITIAL_PRODUCT_PRICE} FCFA)`)
+      252 |   })
+        at /Users/logansery/Documents/ns2po-w/apps/election-mvp/tests/e2e/admin/bundles-price-lock.spec.ts:249:37
+
+
+[1A[2K[8/10] [chromium] › tests/e2e/admin/bundles-price-lock.spec.ts:451:3 › 💬 Scénario 5: Tooltip - Information Contextuelle › 5.1 - Tooltip auto-sync visible au hover
+[1A[2K[chromium] › tests/e2e/admin/bundles-price-lock.spec.ts:451:3 › 💬 Scénario 5: Tooltip - Information Contextuelle › 5.1 - Tooltip auto-sync visible au hover
+🔧 Création produit test: Test Tooltip Product 1762385452821 - Prix: 5800 FCFA
+
+[1A[2K[chromium] › tests/e2e/admin/bundles-price-lock.spec.ts:304:3 › 🎨 Scénario 3: Admin UI - Checkbox Price Lock › 3.1 - Checkbox visible et cliquable
+🧹 Nettoyage: Suppression bundle et produit test...
+
+[1A[2K✅ Nettoyage terminé
+
+[1A[2K[chromium] › tests/e2e/admin/bundles-price-lock.spec.ts:451:3 › 💬 Scénario 5: Tooltip - Information Contextuelle › 5.1 - Tooltip auto-sync visible au hover
+✅ Produit créé: ID=prod_1762385454657_aynubnw
+
+[1A[2K🔧 Création bundle test: Test Tooltip Bundle 1762385452821
+
+[1A[2K✅ Bundle créé: ID=152
+
+[1A[2K📋 Test 5.1: Vérification tooltip auto-sync...
+
+[1A[2K✅ Login admin réussi
+
+[1A[2K  4) [chromium] › tests/e2e/admin/bundles-price-lock.spec.ts:304:3 › 🎨 Scénario 3: Admin UI - Checkbox Price Lock › 3.1 - Checkbox visible et cliquable 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBe[2m([22m[32mexpected[39m[2m) // Object.is equality[22m
+
+    Expected: [32mfalse[39m
+    Received: [31mtrue[39m
+
+      318 |     // Vérifier état initial (non coché = auto-sync)
+      319 |     const isChecked = await checkbox.isChecked()
+    > 320 |     expect(isChecked).toBe(false)
+          |                       ^
+      321 |     console.log(`✅ Checkbox visible - État initial: ${isChecked ? 'Prix fixe' : 'Auto-sync'}`)
+      322 |   })
+      323 |
+        at /Users/logansery/Documents/ns2po-w/apps/election-mvp/tests/e2e/admin/bundles-price-lock.spec.ts:320:23
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/admin-bundles-price-lock-�-2ba43-eckbox-visible-et-cliquable-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/admin-bundles-price-lock-�-2ba43-eckbox-visible-et-cliquable-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/admin-bundles-price-lock-�-2ba43-eckbox-visible-et-cliquable-chromium/error-context.md
+
+
+[1A[2K  5) [chromium] › tests/e2e/admin/bundles-price-lock.spec.ts:529:3 › 🎯 Scénario 6: Intégration Complète - Workflow Réel › 6.1 - Workflow complet: Création → Modification → Validation 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBe[2m([22m[32mexpected[39m[2m) // Object.is equality[22m
+
+    Expected: [32m5500[39m
+    Received: [31m5000[39m
+
+      579 |     // ASSERTIONS CRITIQUES:
+      580 |     // Produit 1 (auto-sync): prix doit être synchronisé à 5500
+    > 581 |     expect(prod1Bundle.basePrice).toBe(5500)
+          |                                   ^
+      582 |     console.log(`✅ Produit 1 AUTO-SYNC: ${prod1Bundle.basePrice} FCFA`)
+      583 |
+      584 |     // Produit 2 (locked): prix doit rester à 7500 (ignoré 8500)
+        at /Users/logansery/Documents/ns2po-w/apps/election-mvp/tests/e2e/admin/bundles-price-lock.spec.ts:581:35
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/admin-bundles-price-lock-�-75a05-→-Modification-→-Validation-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/admin-bundles-price-lock-�-75a05-→-Modification-→-Validation-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/admin-bundles-price-lock-�-75a05-→-Modification-→-Validation-chromium/error-context.md
+
+
+[1A[2K[9/10] [chromium] › tests/e2e/admin/bundles-price-lock.spec.ts:324:3 › 🎨 Scénario 3: Admin UI - Checkbox Price Lock › 3.2 - Toggle checkbox → Persistance état
+[1A[2K[chromium] › tests/e2e/admin/bundles-price-lock.spec.ts:324:3 › 🎨 Scénario 3: Admin UI - Checkbox Price Lock › 3.2 - Toggle checkbox → Persistance état
+🔧 Création produit test: Test UI Product 1762385516185 - Prix: 5800 FCFA
+
+[1A[2K✅ Produit créé: ID=prod_1762385518168_ob7rmpk
+
+[1A[2K🔧 Création bundle test: Test UI Bundle 1762385516185
+
+[1A[2K[chromium] › tests/e2e/admin/bundles-price-lock.spec.ts:451:3 › 💬 Scénario 5: Tooltip - Information Contextuelle › 5.1 - Tooltip auto-sync visible au hover
+🧹 Nettoyage: Suppression bundle et produit test...
+
+[1A[2K[chromium] › tests/e2e/admin/bundles-price-lock.spec.ts:324:3 › 🎨 Scénario 3: Admin UI - Checkbox Price Lock › 3.2 - Toggle checkbox → Persistance état
+✅ Bundle créé: ID=153
+
+[1A[2K[chromium] › tests/e2e/admin/bundles-price-lock.spec.ts:451:3 › 💬 Scénario 5: Tooltip - Information Contextuelle › 5.1 - Tooltip auto-sync visible au hover
+✅ Nettoyage terminé
+
+[1A[2K[chromium] › tests/e2e/admin/bundles-price-lock.spec.ts:324:3 › 🎨 Scénario 3: Admin UI - Checkbox Price Lock › 3.2 - Toggle checkbox → Persistance état
+📋 Test 3.2: Test toggle checkbox et persistance...
+
+[1A[2K  6) [chromium] › tests/e2e/admin/bundles-price-lock.spec.ts:451:3 › 💬 Scénario 5: Tooltip - Information Contextuelle › 5.1 - Tooltip auto-sync visible au hover 
+
+    TimeoutError: page.waitForSelector: Timeout 10000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('text=Test Tooltip Product 1762385452821') to be visible[22m
+
+
+      455 |     await page.goto(`${TEST_BASE_URL}/admin/bundles/${bundleId}`)
+      456 |     await page.waitForLoadState('networkidle')
+    > 457 |     await page.waitForSelector(`text=${productName}`, { timeout: 10000 })
+          |                ^
+      458 |
+      459 |     // Trouver le label du checkbox
+      460 |     const checkboxLabel = page.locator('label').filter({ hasText: /Auto-sync|Prix fixe/ }).first()
+        at /Users/logansery/Documents/ns2po-w/apps/election-mvp/tests/e2e/admin/bundles-price-lock.spec.ts:457:16
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/admin-bundles-price-lock-�-a8119--auto-sync-visible-au-hover-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/admin-bundles-price-lock-�-a8119--auto-sync-visible-au-hover-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/admin-bundles-price-lock-�-a8119--auto-sync-visible-au-hover-chromium/error-context.md
+
+
+[1A[2K✅ Login admin réussi
+
+[1A[2K[10/10] [chromium] › tests/e2e/admin/bundles-price-lock.spec.ts:479:3 › 💬 Scénario 5: Tooltip - Information Contextuelle › 5.2 - Tooltip prix fixe après toggle
+[1A[2K[chromium] › tests/e2e/admin/bundles-price-lock.spec.ts:479:3 › 💬 Scénario 5: Tooltip - Information Contextuelle › 5.2 - Tooltip prix fixe après toggle
+🔧 Création produit test: Test Tooltip Product 1762385546249 - Prix: 5800 FCFA
+
+[1A[2K✅ Produit créé: ID=prod_1762385548212_auhxxqj
+
+[1A[2K🔧 Création bundle test: Test Tooltip Bundle 1762385546249
+
+[1A[2K✅ Bundle créé: ID=154
+
+[1A[2K📋 Test 5.2: Vérification tooltip prix fixe...
+
+[1A[2K[chromium] › tests/e2e/admin/bundles-price-lock.spec.ts:324:3 › 🎨 Scénario 3: Admin UI - Checkbox Price Lock › 3.2 - Toggle checkbox → Persistance état
+🧹 Nettoyage: Suppression bundle et produit test...
+
+[1A[2K✅ Nettoyage terminé
+
+[1A[2K[chromium] › tests/e2e/admin/bundles-price-lock.spec.ts:479:3 › 💬 Scénario 5: Tooltip - Information Contextuelle › 5.2 - Tooltip prix fixe après toggle
+✅ Login admin réussi
+
+[1A[2K  7) [chromium] › tests/e2e/admin/bundles-price-lock.spec.ts:324:3 › 🎨 Scénario 3: Admin UI - Checkbox Price Lock › 3.2 - Toggle checkbox → Persistance état 
+
+    TimeoutError: page.waitForSelector: Timeout 10000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('text=Test UI Product 1762385516185') to be visible[22m
+
+
+      328 |     await page.goto(`${TEST_BASE_URL}/admin/bundles/${bundleId}`)
+      329 |     await page.waitForLoadState('networkidle')
+    > 330 |     await page.waitForSelector(`text=${productName}`, { timeout: 10000 })
+          |                ^
+      331 |
+      332 |     // Cocher le checkbox (activer prix fixe)
+      333 |     const checkbox = page.locator('input[type="checkbox"]').first()
+        at /Users/logansery/Documents/ns2po-w/apps/election-mvp/tests/e2e/admin/bundles-price-lock.spec.ts:330:16
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/admin-bundles-price-lock-�-8beb7-checkbox-→-Persistance-état-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/admin-bundles-price-lock-�-8beb7-checkbox-→-Persistance-état-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/admin-bundles-price-lock-�-8beb7-checkbox-→-Persistance-état-chromium/error-context.md
+
+
+[1A[2K🧹 Nettoyage: Suppression bundle et produit test...
+
+[1A[2K✅ Nettoyage terminé
+
+[1A[2K  8) [chromium] › tests/e2e/admin/bundles-price-lock.spec.ts:479:3 › 💬 Scénario 5: Tooltip - Information Contextuelle › 5.2 - Tooltip prix fixe après toggle 
+
+    TimeoutError: page.waitForSelector: Timeout 10000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('text=Test Tooltip Product 1762385546249') to be visible[22m
+
+
+      483 |     await page.goto(`${TEST_BASE_URL}/admin/bundles/${bundleId}`)
+      484 |     await page.waitForLoadState('networkidle')
+    > 485 |     await page.waitForSelector(`text=${productName}`, { timeout: 10000 })
+          |                ^
+      486 |
+      487 |     // Cocher checkbox pour activer prix fixe
+      488 |     const checkbox = page.locator('input[type="checkbox"]').first()
+        at /Users/logansery/Documents/ns2po-w/apps/election-mvp/tests/e2e/admin/bundles-price-lock.spec.ts:485:16
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/admin-bundles-price-lock-�-b4f5e-ltip-prix-fixe-après-toggle-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/admin-bundles-price-lock-�-b4f5e-ltip-prix-fixe-après-toggle-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/admin-bundles-price-lock-�-b4f5e-ltip-prix-fixe-après-toggle-chromium/error-context.md
+
+
+[1A[2K  8 failed
+    [chromium] › tests/e2e/admin/bundles-price-lock.spec.ts:190:3 › 🔄 Scénario 1: Auto-Sync (price_locked = 0) › 1.2 - Modification catalogue → Bundle auto-sync 
+    [chromium] › tests/e2e/admin/bundles-price-lock.spec.ts:242:3 › 🔒 Scénario 2: Prix Fixe (price_locked = 1) › 2.1 - Bundle utilise prix custom (pas catalogue) 
+    [chromium] › tests/e2e/admin/bundles-price-lock.spec.ts:304:3 › 🎨 Scénario 3: Admin UI - Checkbox Price Lock › 3.1 - Checkbox visible et cliquable 
+    [chromium] › tests/e2e/admin/bundles-price-lock.spec.ts:324:3 › 🎨 Scénario 3: Admin UI - Checkbox Price Lock › 3.2 - Toggle checkbox → Persistance état 
+    [chromium] › tests/e2e/admin/bundles-price-lock.spec.ts:393:3 › ⚠️ Scénario 4: Warning Visuel - Écart Prix > 5% › 4.1 - Warning badge visible si écart > 5% 
+    [chromium] › tests/e2e/admin/bundles-price-lock.spec.ts:451:3 › 💬 Scénario 5: Tooltip - Information Contextuelle › 5.1 - Tooltip auto-sync visible au hover 
+    [chromium] › tests/e2e/admin/bundles-price-lock.spec.ts:479:3 › 💬 Scénario 5: Tooltip - Information Contextuelle › 5.2 - Tooltip prix fixe après toggle 
+    [chromium] › tests/e2e/admin/bundles-price-lock.spec.ts:529:3 › 🎯 Scénario 6: Intégration Complète - Workflow Réel › 6.1 - Workflow complet: Création → Modification → Validation 
+  2 passed (3.2m)
+
+════════════════════════════════════════════════════════════════════════
+❌ RÉSULTAT: ÉCHEC
+════════════════════════════════════════════════════════════════════════
+
+Durée:      193s
+Browser:    chromium
+Status:     FAILED
+
+⚠️  Consulter la sortie ci-dessus pour détails des échecs
+

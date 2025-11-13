@@ -1,0 +1,11 @@
+{
+  "id": "nitro-cache-redis-migration",
+  "name": "Nitro Cache Redis Migration Production-Ready",
+  "description": "Migration du cache Nitro local vers Redis distribué pour résoudre le problème d'invalidation de cache sur Railway (instances multiples). Diagnostic validé par Gemini + GPT-5 + Web Search. Solution: Redis comme cache externe partagé entre toutes les instances Railway.",
+  "created": "2025-11-04T00:22:16.702Z",
+  "sprints": [
+    "sprint-1762215737051-639e05e3"
+  ],
+  "activeSprint": null,
+  "updated": "2025-11-05T14:45:43.892Z"
+}

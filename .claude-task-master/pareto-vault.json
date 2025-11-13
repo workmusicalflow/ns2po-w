@@ -831,7 +831,315 @@
       "estimatedValue": "medium",
       "revisitSuggestion": "Prochain sprint",
       "archivedAt": "2025-11-02T20:16:30.981Z"
+    },
+    {
+      "id": "pv-1762215718237-75200f50",
+      "originalProject": "proj-1762102136104-db0992a9",
+      "originalSprint": "sprint-1762114812127-f6b53537",
+      "task": {
+        "id": 4,
+        "title": "Rollback strategy + documentation procédure",
+        "description": "Enhancement 80% - P1: Documenter procédure rollback complète. Créer branche feat/rollback-strategy. Documenter: git revert commits migration, Railway redeploy version stable, backup DB Turso. Fichier: docs/ROLLBACK_STRATEGY.md. Impact: Minimise risques déploiement, assure continuité service, protège activité business.",
+        "status": "pending",
+        "priority": 4,
+        "dependencies": [],
+        "created": "2025-11-02T20:22:02.040Z",
+        "updated": "2025-11-02T20:22:02.040Z",
+        "isPareto80": true
+      },
+      "reason": "Sprint terminé - tâche non complétée",
+      "tags": [
+        "incomplete",
+        "deferred"
+      ],
+      "estimatedValue": "medium",
+      "revisitSuggestion": "Prochain sprint",
+      "archivedAt": "2025-11-04T00:21:58.243Z"
+    },
+    {
+      "id": "pv-1762215718243-1329580d",
+      "originalProject": "proj-1762102136104-db0992a9",
+      "originalSprint": "sprint-1762114812127-f6b53537",
+      "task": {
+        "id": 5,
+        "title": "Métriques performance baseline Lighthouse (Core Web Vitals)",
+        "description": "Enhancement 80% - P1: Établir baseline performance avec Lighthouse mobile 3G. Mesurer Core Web Vitals: LCP, FID/INP, CLS, TTFB, TBT sur pages /admin/products (index + [id]). Target: >90 Lighthouse score. Impact: Base référence mesurable pour valider gains optimisation. Fichier: docs/PERFORMANCE_BASELINE.md",
+        "status": "pending",
+        "priority": 4,
+        "dependencies": [],
+        "created": "2025-11-02T20:22:11.220Z",
+        "updated": "2025-11-02T20:22:11.220Z",
+        "isPareto80": true
+      },
+      "reason": "Sprint terminé - tâche non complétée",
+      "tags": [
+        "incomplete",
+        "deferred"
+      ],
+      "estimatedValue": "medium",
+      "revisitSuggestion": "Prochain sprint",
+      "archivedAt": "2025-11-04T00:21:58.243Z"
+    },
+    {
+      "id": "pv-1762215718243-52cbd899",
+      "originalProject": "proj-1762102136104-db0992a9",
+      "originalSprint": "sprint-1762114812127-f6b53537",
+      "task": {
+        "id": 6,
+        "title": "Optimisation bundle size (tree-shaking, lazy loading)",
+        "description": "Enhancement 80% - P1: Optimiser taille bundle pour améliorer temps chargement. Actions: Bundle analyzer avant/après, tree-shaking dépendances inutilisées, lazy loading routes/composants non-critiques, code splitting. Target: Réduire < 250KB bundle initial. Impact: Meilleure première impression utilisateur, réduit consommation bande passante mobile 3G.",
+        "status": "pending",
+        "priority": 4,
+        "dependencies": [],
+        "created": "2025-11-02T20:22:19.982Z",
+        "updated": "2025-11-02T20:22:19.983Z",
+        "isPareto80": true
+      },
+      "reason": "Sprint terminé - tâche non complétée",
+      "tags": [
+        "incomplete",
+        "deferred"
+      ],
+      "estimatedValue": "medium",
+      "revisitSuggestion": "Prochain sprint",
+      "archivedAt": "2025-11-04T00:21:58.243Z"
+    },
+    {
+      "id": "pv-1762215718243-fc809d62",
+      "originalProject": "proj-1762102136104-db0992a9",
+      "originalSprint": "sprint-1762114812127-f6b53537",
+      "task": {
+        "id": 7,
+        "title": "Monitoring production (Sentry, Railway Analytics)",
+        "description": "Enhancement 80% - P1: Configurer monitoring production pour détection proactive incidents. Setup Sentry (error tracking, source maps), Railway Analytics (métriques infra). Alertes: erreurs runtime, dégradation performance API > 500ms, CPU/Memory spikes. Impact: Réactivité rapide incidents, stabilité continue application, visibilité production.",
+        "status": "pending",
+        "priority": 4,
+        "dependencies": [],
+        "created": "2025-11-02T20:22:28.780Z",
+        "updated": "2025-11-02T20:22:28.780Z",
+        "isPareto80": true
+      },
+      "reason": "Sprint terminé - tâche non complétée",
+      "tags": [
+        "incomplete",
+        "deferred"
+      ],
+      "estimatedValue": "medium",
+      "revisitSuggestion": "Prochain sprint",
+      "archivedAt": "2025-11-04T00:21:58.243Z"
+    },
+    {
+      "id": "pv-1762215718243-5662acc5",
+      "originalProject": "proj-1762102136104-db0992a9",
+      "originalSprint": "sprint-1762114812127-f6b53537",
+      "task": {
+        "id": 8,
+        "title": "Documentation architecture state management avancée",
+        "description": "Enhancement 80% - P2: Créer documentation architecture complète. Couvrir: patterns TanStack Query (queries/mutations/invalidation), stratégies cache, SSE synchronisation, Pinia client state (bundles). Diagrammes architecture, exemples code, best practices. Fichier: docs/STATE_MANAGEMENT_ARCHITECTURE.md. Impact: Facilite onboarding développeurs, réduit dépendance connaissances individuelles.",
+        "status": "pending",
+        "priority": 3,
+        "dependencies": [],
+        "created": "2025-11-02T20:22:39.057Z",
+        "updated": "2025-11-02T20:22:39.057Z",
+        "isPareto80": true
+      },
+      "reason": "Sprint terminé - tâche non complétée",
+      "tags": [
+        "incomplete",
+        "deferred"
+      ],
+      "estimatedValue": "medium",
+      "revisitSuggestion": "Prochain sprint",
+      "archivedAt": "2025-11-04T00:21:58.244Z"
+    },
+    {
+      "id": "pv-1762215718244-1697995e",
+      "originalProject": "proj-1762102136104-db0992a9",
+      "originalSprint": "sprint-1762114812127-f6b53537",
+      "task": {
+        "id": 9,
+        "title": "Tests E2E SSE synchronisation temps réel",
+        "description": "Enhancement 80% - P2: Créer tests E2E validant synchronisation SSE temps réel. Scénarios: événement product:updated multi-onglets, invalidation cache automatique, notifications visuelles, reconnexion après perte connexion. Fichier: tests/e2e/admin/sse-sync.spec.ts. Impact: Assure fiabilité synchronisation temps réel, améliore UX interactions dynamiques.",
+        "status": "pending",
+        "priority": 3,
+        "dependencies": [],
+        "created": "2025-11-02T20:22:47.160Z",
+        "updated": "2025-11-02T20:22:47.160Z",
+        "isPareto80": true
+      },
+      "reason": "Sprint terminé - tâche non complétée",
+      "tags": [
+        "incomplete",
+        "deferred"
+      ],
+      "estimatedValue": "medium",
+      "revisitSuggestion": "Prochain sprint",
+      "archivedAt": "2025-11-04T00:21:58.246Z"
+    },
+    {
+      "id": "pv-1762984254085-8f70a84d",
+      "originalProject": "proj-1762353954477-e379efc0",
+      "originalSprint": "sprint-1762371317645-d9787d87",
+      "task": {
+        "id": 7,
+        "title": "Phase 3.1: Admin UI [id].vue - Checkbox \"Figer prix bundle\"",
+        "description": "Modifier /admin/bundles/[id].vue. Ajouter checkbox priceLocked pour chaque bundleProduct (après input prix). Label: \"Figer prix (ignorer futures modifs produit)\". Lier v-model=\"product.priceLocked\". CSS: indigo-600 pour checked",
+        "status": "in-progress",
+        "priority": 4,
+        "dependencies": [
+          4,
+          5,
+          6
+        ],
+        "created": "2025-11-05T19:36:50.464Z",
+        "updated": "2025-11-05T20:30:46.293Z",
+        "isPareto80": false
+      },
+      "reason": "Sprint terminé - tâche non complétée",
+      "tags": [
+        "incomplete",
+        "deferred"
+      ],
+      "estimatedValue": "medium",
+      "revisitSuggestion": "Prochain sprint",
+      "archivedAt": "2025-11-12T21:50:54.086Z"
+    },
+    {
+      "id": "pv-1762984254086-8c561085",
+      "originalProject": "proj-1762353954477-e379efc0",
+      "originalSprint": "sprint-1762371317645-d9787d87",
+      "task": {
+        "id": 8,
+        "title": "Phase 3.2: Warning visuel écart prix > 5%",
+        "description": "Ajouter computed priceDiscrepancies dans [id].vue. Comparer product.basePrice vs getProductPrice(id). Si |écart| > 5%, afficher badge warning orange \"Prix désynchronisé -X%\". Position: à côté input prix. Tooltip: \"Prix produit actuel: X FCFA\"",
+        "status": "pending",
+        "priority": 4,
+        "dependencies": [
+          7
+        ],
+        "created": "2025-11-05T19:36:51.396Z",
+        "updated": "2025-11-05T19:36:51.396Z",
+        "isPareto80": false
+      },
+      "reason": "Sprint terminé - tâche non complétée",
+      "tags": [
+        "incomplete",
+        "deferred"
+      ],
+      "estimatedValue": "medium",
+      "revisitSuggestion": "Prochain sprint",
+      "archivedAt": "2025-11-12T21:50:54.086Z"
+    },
+    {
+      "id": "pv-1762984254086-27d7e4d7",
+      "originalProject": "proj-1762353954477-e379efc0",
+      "originalSprint": "sprint-1762371317645-d9787d87",
+      "task": {
+        "id": 9,
+        "title": "Phase 3.3: Tooltip explicatif \"Sync auto vs Prix fixe\"",
+        "description": "Ajouter composant TooltipInfo à côté checkbox priceLocked. Texte: \"Décoché (défaut): Prix se met à jour automatiquement avec le produit. Coché: Prix reste fixe même si produit modifié\". Icon: HeroIcon InformationCircleIcon gray-400",
+        "status": "pending",
+        "priority": 3,
+        "dependencies": [
+          7
+        ],
+        "created": "2025-11-05T19:36:52.523Z",
+        "updated": "2025-11-05T19:36:52.523Z",
+        "isPareto80": false
+      },
+      "reason": "Sprint terminé - tâche non complétée",
+      "tags": [
+        "incomplete",
+        "deferred"
+      ],
+      "estimatedValue": "medium",
+      "revisitSuggestion": "Prochain sprint",
+      "archivedAt": "2025-11-12T21:50:54.086Z"
+    },
+    {
+      "id": "pv-1762984254086-a3bd1af6",
+      "originalProject": "proj-1762353954477-e379efc0",
+      "originalSprint": "sprint-1762371317645-d9787d87",
+      "task": {
+        "id": 10,
+        "title": "Phase 4.1: Tests E2E price sync scenarios",
+        "description": "Créer tests/e2e/admin/bundle-price-lock.spec.ts. Tests: 1) price_locked=0 → prix suit produit, 2) price_locked=1 → prix figé, 3) toggle checkbox → changement persiste, 4) warning affiché si écart > 5%. Utiliser pattern cache-redis-cross-concern-sync.spec.ts",
+        "status": "pending",
+        "priority": 4,
+        "dependencies": [
+          7,
+          8,
+          9
+        ],
+        "created": "2025-11-05T19:36:54.013Z",
+        "updated": "2025-11-05T19:36:54.013Z",
+        "isPareto80": false
+      },
+      "reason": "Sprint terminé - tâche non complétée",
+      "tags": [
+        "incomplete",
+        "deferred"
+      ],
+      "estimatedValue": "medium",
+      "revisitSuggestion": "Prochain sprint",
+      "archivedAt": "2025-11-12T21:50:54.086Z"
+    },
+    {
+      "id": "pv-1762984254086-3fea7fd1",
+      "originalProject": "proj-1762353954477-e379efc0",
+      "originalSprint": "sprint-1762371317645-d9787d87",
+      "task": {
+        "id": 11,
+        "title": "Phase 4.2: Migration data Turso production",
+        "description": "Exécuter migration ALTER TABLE sur Turso prod via Drizzle. Vérifier price_locked=0 pour tous bundles existants (comportement par défaut). Script: pnpm db:migrate. Backup avant migration. Valider avec SELECT COUNT(*) WHERE price_locked IS NULL = 0",
+        "status": "pending",
+        "priority": 5,
+        "dependencies": [
+          1,
+          4,
+          5,
+          6
+        ],
+        "created": "2025-11-05T19:36:55.032Z",
+        "updated": "2025-11-05T19:36:55.032Z",
+        "isPareto80": false
+      },
+      "reason": "Sprint terminé - tâche non complétée",
+      "tags": [
+        "incomplete",
+        "deferred"
+      ],
+      "estimatedValue": "medium",
+      "revisitSuggestion": "Prochain sprint",
+      "archivedAt": "2025-11-12T21:50:54.086Z"
+    },
+    {
+      "id": "pv-1762984254086-1ccc3e2f",
+      "originalProject": "proj-1762353954477-e379efc0",
+      "originalSprint": "sprint-1762371317645-d9787d87",
+      "task": {
+        "id": 12,
+        "title": "Phase 4.3: Deploy Railway + monitoring post-deploy",
+        "description": "git commit + push Railway. Commit msg: \"feat(bundles): price_locked pour sync auto vs prix fixe\". Monitoring 30 min: logs erreurs SQL, cache invalidation OK, UI admin responsive. Test manuel: créer bundle, toggle checkbox, vérifier prix public sync",
+        "status": "pending",
+        "priority": 5,
+        "dependencies": [
+          10,
+          11
+        ],
+        "created": "2025-11-05T19:36:56.255Z",
+        "updated": "2025-11-05T19:36:56.256Z",
+        "isPareto80": false
+      },
+      "reason": "Sprint terminé - tâche non complétée",
+      "tags": [
+        "incomplete",
+        "deferred"
+      ],
+      "estimatedValue": "medium",
+      "revisitSuggestion": "Prochain sprint",
+      "archivedAt": "2025-11-12T21:50:54.086Z"
     }
   ],
-  "updated": "2025-11-02T20:16:30.981Z"
+  "updated": "2025-11-12T21:50:54.086Z"
 }

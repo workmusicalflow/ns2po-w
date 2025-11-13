@@ -1,0 +1,230 @@
+{
+  "id": "sprint-1762353964867-05c55c3d",
+  "name": "Sprint 1 - Cache Unified Architecture Implementation",
+  "startDate": "2025-11-05",
+  "endDate": "2025-11-06",
+  "goals": "Implémenter architecture cache unifiée Redis + HTTP headers pour synchroniser admin/public. Objectif: Désynchronisation 30min → 5sec. Pattern validé Gemini (20 sources).",
+  "status": "closed",
+  "created": "2025-11-05T14:46:04.867Z",
+  "tasks": [
+    {
+      "id": 1,
+      "title": "Créer server/utils/cache-invalidation.ts avec invalidateProductRelatedCaches()",
+      "description": "Implémenter utilitaire centralisé d'invalidation cache. Export: invalidateProductRelatedCaches(context, options) et invalidateCampaignBundlesCache(). Pattern Promise.allSettled pour robustesse. Logging structuré.",
+      "status": "completed",
+      "priority": 5,
+      "dependencies": [],
+      "created": "2025-11-05T14:46:22.088Z",
+      "updated": "2025-11-05T14:51:17.658Z",
+      "isPareto80": false
+    },
+    {
+      "id": 2,
+      "title": "Modifier /api/admin/products/[id].put.ts pour utiliser invalidateProductRelatedCaches()",
+      "description": "Remplacer ligne 196-207 (bloc invalidation actuel) par appel await invalidateProductRelatedCaches(`PUT /api/admin/products/${productId}`). Conserver try/catch pour traçabilité erreurs.",
+      "status": "completed",
+      "priority": 5,
+      "dependencies": [
+        1
+      ],
+      "created": "2025-11-05T14:46:32.445Z",
+      "updated": "2025-11-05T14:52:31.888Z",
+      "isPareto80": false
+    },
+    {
+      "id": 3,
+      "title": "Modifier /api/admin/products/[id].delete.ts pour invalidation cache",
+      "description": "Ajouter après DELETE réussi: await invalidateProductRelatedCaches(`DELETE /api/admin/products/${productId}`). Gestion erreurs avec try/catch.",
+      "status": "completed",
+      "priority": 5,
+      "dependencies": [
+        1
+      ],
+      "created": "2025-11-05T14:46:46.688Z",
+      "updated": "2025-11-05T14:53:20.274Z",
+      "isPareto80": false
+    },
+    {
+      "id": 4,
+      "title": "Modifier /api/admin/products/index.post.ts pour invalidation cache",
+      "description": "Ajouter après CREATE réussi: await invalidateProductRelatedCaches(`POST /api/admin/products (new: ${newProduct.id})`). Gestion erreurs avec try/catch.",
+      "status": "completed",
+      "priority": 5,
+      "dependencies": [
+        1
+      ],
+      "created": "2025-11-05T14:47:00.460Z",
+      "updated": "2025-11-05T14:54:26.312Z",
+      "isPareto80": false
+    },
+    {
+      "id": 5,
+      "title": "Migrer /api/campaign-bundles/index.get.ts vers pattern Redis Cache-Aside",
+      "description": "CRITIQUE: Remplacer cache HTTP pur par Redis. Implémenter: 1) Check cache Redis 'campaign-bundles:list:active', 2) If MISS → fetch Turso + store Redis TTL 300s, 3) Headers adaptatifs (fresh: s-maxage=300 SWR, cached: s-maxage=180 must-revalidate). Désync 30min→5s.",
+      "status": "completed",
+      "priority": 5,
+      "dependencies": [
+        1
+      ],
+      "created": "2025-11-05T14:47:17.098Z",
+      "updated": "2025-11-05T14:57:45.154Z",
+      "isPareto80": false
+    },
+    {
+      "id": 6,
+      "title": "Modifier /api/admin/campaign-bundles/[id].put.ts pour invalidation cache",
+      "description": "Ajouter après UPDATE bundle ligne ~436: await invalidateCampaignBundlesCache(). Logging '🗑️ [PUT BUNDLE] Cache invalidé'. Try/catch pour erreurs.",
+      "status": "completed",
+      "priority": 4,
+      "dependencies": [
+        1
+      ],
+      "created": "2025-11-05T14:47:28.634Z",
+      "updated": "2025-11-05T14:59:32.863Z",
+      "isPareto80": false
+    },
+    {
+      "id": 7,
+      "title": "Modifier /api/admin/campaign-bundles/index.post.ts pour invalidation cache",
+      "description": "Ajouter après CREATE bundle: await invalidateCampaignBundlesCache(). Logging structuré. Try/catch gestion erreurs.",
+      "status": "completed",
+      "priority": 4,
+      "dependencies": [
+        1
+      ],
+      "created": "2025-11-05T14:47:40.005Z",
+      "updated": "2025-11-05T15:00:31.716Z",
+      "isPareto80": false
+    },
+    {
+      "id": 8,
+      "title": "Modifier /api/admin/campaign-bundles/[id].delete.ts pour invalidation cache",
+      "description": "Ajouter après DELETE bundle: await invalidateCampaignBundlesCache(). Logging structuré. Try/catch gestion erreurs.",
+      "status": "completed",
+      "priority": 4,
+      "dependencies": [
+        1
+      ],
+      "created": "2025-11-05T14:47:49.351Z",
+      "updated": "2025-11-05T15:02:31.063Z",
+      "isPareto80": false
+    },
+    {
+      "id": 9,
+      "title": "Tester local: pnpm type-check && pnpm lint (zéro erreur)",
+      "description": "Vérifier TypeScript et ESLint après modifications. Corriger toute erreur de type ou lint. Validation zéro erreur obligatoire avant commit.",
+      "status": "in-progress",
+      "priority": 5,
+      "dependencies": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "created": "2025-11-05T14:47:57.591Z",
+      "updated": "2025-11-05T15:03:01.175Z",
+      "isPareto80": false
+    },
+    {
+      "id": 10,
+      "title": "Test manuel local: Mutation admin → Vérification cache invalidé",
+      "description": "Lancer pnpm dev. Test flow: 1) Modifier produit /admin/products/[id], 2) Vérifier logs console invalidation Redis, 3) GET /api/campaign-bundles → doit refetch (cache MISS), 4) Vérifier nouveau prix affiché. Validation pattern complet.",
+      "status": "pending",
+      "priority": 5,
+      "dependencies": [
+        9
+      ],
+      "created": "2025-11-05T14:48:23.010Z",
+      "updated": "2025-11-05T14:48:23.010Z",
+      "isPareto80": false
+    },
+    {
+      "id": 11,
+      "title": "Créer test E2E: Admin price update → Public site sync < 5s",
+      "description": "Créer tests/e2e/admin/cache-cross-concern.spec.ts. Test: 1) Modifier prix produit admin, 2) Naviguer /devis immédiatement, 3) GET /api/campaign-bundles, 4) Assert prix à jour. Validation désync < 5s (vs 30min avant).",
+      "status": "pending",
+      "priority": 3,
+      "dependencies": [
+        10
+      ],
+      "created": "2025-11-05T14:48:32.101Z",
+      "updated": "2025-11-05T14:48:32.101Z",
+      "isPareto80": false
+    },
+    {
+      "id": 12,
+      "title": "Commit: feat(cache): Unified Redis + HTTP headers architecture",
+      "description": "Conventional commit après validation tests. Message: 'feat(cache): Unified Redis + HTTP headers architecture\\n\\nAjoute invalidateProductRelatedCaches() centralisé.\\nMigre /api/campaign-bundles vers Redis Cache-Aside.\\nSynchronise admin mutations avec cache public.\\nDésync 30min→5s (validé Gemini 20 sources).'",
+      "status": "pending",
+      "priority": 5,
+      "dependencies": [
+        10
+      ],
+      "created": "2025-11-05T14:48:46.093Z",
+      "updated": "2025-11-05T14:48:46.093Z",
+      "isPareto80": false
+    },
+    {
+      "id": 13,
+      "title": "Déployer Railway: railway up --detach",
+      "description": "Déployer vers production Railway après commit. Commande: railway up --detach. Surveiller logs: railway logs --follow. Vérifier santé: /api/health endpoint.",
+      "status": "pending",
+      "priority": 5,
+      "dependencies": [
+        12
+      ],
+      "created": "2025-11-05T14:48:54.085Z",
+      "updated": "2025-11-05T14:48:54.086Z",
+      "isPareto80": false
+    },
+    {
+      "id": 14,
+      "title": "Test production Railway: Validation désynchronisation < 5s",
+      "description": "Test production: 1) Modifier produit admin Railway, 2) Attendre 3s, 3) Naviguer /devis public, 4) Inspecter /api/campaign-bundles, 5) Valider prix à jour. Vérifier logs invalidation Redis Railway. Métrique success: désync < 5s.",
+      "status": "pending",
+      "priority": 5,
+      "dependencies": [
+        13
+      ],
+      "created": "2025-11-05T14:49:11.988Z",
+      "updated": "2025-11-05T14:49:11.988Z",
+      "isPareto80": false
+    },
+    {
+      "id": 15,
+      "title": "Documenter: Mettre à jour CACHE_CROSS_CONCERN_ANALYSIS.md (statut résolu)",
+      "description": "Ajouter section finale dans CACHE_CROSS_CONCERN_ANALYSIS.md: Statut RÉSOLU, solution implémentée, métriques avant/après (désync 30min→5s), commits référencés. Archiver document comme référence historique.",
+      "status": "pending",
+      "priority": 3,
+      "dependencies": [
+        14
+      ],
+      "created": "2025-11-05T14:49:42.008Z",
+      "updated": "2025-11-05T14:49:42.008Z",
+      "isPareto80": false
+    },
+    {
+      "id": 16,
+      "title": "Documenter: Mettre à jour CLAUDE.md (section Cache Invalidation Pattern)",
+      "description": "Ajouter section dans CLAUDE.md: \"Cache Invalidation Pattern\" avec référence invalidateProductRelatedCaches(), pattern Redis + HTTP headers, métriques performance. Inclure exemple code pour futurs développements.",
+      "status": "pending",
+      "priority": 3,
+      "dependencies": [
+        14
+      ],
+      "created": "2025-11-05T14:49:52.706Z",
+      "updated": "2025-11-05T14:49:52.706Z",
+      "isPareto80": false
+    }
+  ],
+  "paretoDecisions": [],
+  "metrics": {
+    "tasksCompleted": 8,
+    "tasksMovedToVault": 0,
+    "velocityPoints": 0
+  },
+  "updated": "2025-11-05T19:35:17.669Z"
+}

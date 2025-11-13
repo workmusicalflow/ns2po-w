@@ -1,0 +1,154 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e4]:
+  - banner [ref=e5]:
+    - generic [ref=e7]:
+      - link "NS NS2PO Admin CMS d'administration" [ref=e9] [cursor=pointer]:
+        - /url: /admin
+        - generic [ref=e11]: NS
+        - generic [ref=e12]:
+          - heading "NS2PO Admin" [level=1] [ref=e13]
+          - paragraph [ref=e14]: CMS d'administration
+      - generic [ref=e15]:
+        - generic [ref=e18]: Sync actif
+        - button "A Admin" [ref=e20] [cursor=pointer]:
+          - generic [ref=e22]: A
+          - generic [ref=e23]: Admin
+  - generic [ref=e24]:
+    - navigation [ref=e25]:
+      - generic [ref=e27]:
+        - link "Dashboard" [ref=e28] [cursor=pointer]:
+          - /url: /admin
+          - generic [ref=e30]: Dashboard
+        - link "Produits" [ref=e31] [cursor=pointer]:
+          - /url: /admin/products
+          - generic [ref=e33]: Produits
+        - link "Packs Campagne" [ref=e34] [cursor=pointer]:
+          - /url: /admin/bundles
+          - generic [ref=e36]: Packs Campagne
+        - link "Catégories" [ref=e37] [cursor=pointer]:
+          - /url: /admin/categories
+          - generic [ref=e39]: Catégories
+        - link "Réalisations" [ref=e40] [cursor=pointer]:
+          - /url: /admin/realisations
+          - generic [ref=e42]: Réalisations
+        - link "Assets Cloudinary" [ref=e43] [cursor=pointer]:
+          - /url: /admin/assets
+          - generic [ref=e45]: Assets Cloudinary
+        - link "Synchronisation" [ref=e46] [cursor=pointer]:
+          - /url: /admin/sync
+          - generic [ref=e48]: Synchronisation
+        - link "Blacklist" [ref=e49] [cursor=pointer]:
+          - /url: /admin/blacklist
+          - generic [ref=e51]: Blacklist
+        - separator [ref=e52]
+        - link "Paramètres" [ref=e53] [cursor=pointer]:
+          - /url: /admin/settings
+          - generic [ref=e55]: Paramètres
+        - link "Retour au site" [ref=e56] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e58]: Retour au site
+    - main [ref=e59]:
+      - generic [ref=e62]:
+        - generic [ref=e64]:
+          - link "Retour" [ref=e65] [cursor=pointer]:
+            - /url: /admin/bundles
+            - text: Retour
+          - generic [ref=e67]:
+            - heading "Modifier le Bundle" [level=1] [ref=e68]
+            - paragraph [ref=e69]: Modification de Test UI Bundle 1762600588920
+        - generic [ref=e70]:
+          - generic [ref=e71]:
+            - heading "Informations générales" [level=2] [ref=e72]
+            - generic [ref=e73]:
+              - generic [ref=e74]:
+                - generic [ref=e75]: Nom du bundle *
+                - textbox "Nom du bundle *" [ref=e76]:
+                  - /placeholder: "Ex: Pack Campagne Municipale"
+                  - text: Test UI Bundle 1762600588920
+              - generic [ref=e77]:
+                - generic [ref=e78]: Audience Cible *
+                - combobox "Audience Cible *" [ref=e79]
+              - generic [ref=e80]:
+                - generic [ref=e81]: Score de Popularité
+                - spinbutton "Score de Popularité" [ref=e82]: "90"
+                - paragraph [ref=e83]: Score de 0 à 100 pour le classement
+              - generic [ref=e84]:
+                - generic [ref=e85]: Prix Total Estimé (XOF) *
+                - spinbutton "Prix Total Estimé (XOF) *" [ref=e86]: "29000"
+                - paragraph [ref=e87]: Prix total du bundle
+              - generic [ref=e88]:
+                - generic [ref=e89]: Prix Original (XOF)
+                - spinbutton "Prix Original (XOF)" [ref=e90]: "29000"
+                - paragraph [ref=e91]: Prix avant remise (optionnel)
+            - generic [ref=e93]:
+              - generic [ref=e94]: Description *
+              - textbox "Description *" [ref=e95]:
+                - /placeholder: Décrivez ce pack de campagne...
+                - text: Test bundle for Price Lock feature - Test UI Bundle 1762600588920
+            - generic [ref=e96]:
+              - generic [ref=e98]:
+                - checkbox "Bundle actif" [checked] [ref=e99]
+                - generic [ref=e100]: Bundle actif
+              - generic [ref=e102]:
+                - checkbox "Bundle vedette" [checked] [ref=e103]
+                - generic [ref=e104]: Bundle vedette
+            - generic [ref=e105]:
+              - generic [ref=e106]: Tags (séparés par des virgules)
+              - textbox "municipale, affichage, flyers" [ref=e107]
+              - paragraph [ref=e108]: Utilisez des virgules pour séparer les tags
+          - generic [ref=e109]:
+            - generic [ref=e110]:
+              - heading "Produits du Bundle" [level=2] [ref=e111]
+              - button "Ajouter Produit" [ref=e112] [cursor=pointer]: Ajouter Produit
+            - generic [ref=e115]:
+              - generic [ref=e119]:
+                - heading "Test UI Product 1762600588920" [level=3] [ref=e120]
+                - paragraph [ref=e121]: 5 800 F CFA
+              - generic [ref=e122]:
+                - generic [ref=e123]:
+                  - generic [ref=e124]: Quantité pour Test UI Product 1762600588920
+                  - generic [ref=e125]:
+                    - generic [ref=e126]:
+                      - button "Décrémenter de 100 pour Test UI Product 1762600588920" [ref=e127] [cursor=pointer]: "-100"
+                      - button "Décrémenter de 10 pour Test UI Product 1762600588920" [ref=e128] [cursor=pointer]: "-10"
+                    - textbox "Quantité pour Test UI Product 1762600588920" [ref=e130]: "5"
+                    - generic [ref=e131]:
+                      - button "Incrémenter de 10 pour Test UI Product 1762600588920" [ref=e132] [cursor=pointer]: "+10"
+                      - button "Incrémenter de 100 pour Test UI Product 1762600588920" [ref=e133] [cursor=pointer]: "+100"
+                  - generic [ref=e134]:
+                    - generic [ref=e135]: "Rapide:"
+                    - button "Définir à 100 pour Test UI Product 1762600588920" [ref=e136] [cursor=pointer]: "100"
+                    - button "Définir à 250 pour Test UI Product 1762600588920" [ref=e137] [cursor=pointer]: "250"
+                    - button "Définir à 500 pour Test UI Product 1762600588920" [ref=e138] [cursor=pointer]: "500"
+                    - button "Définir à 1 000 pour Test UI Product 1762600588920" [ref=e139] [cursor=pointer]: 1 000
+                  - generic [ref=e140]: Saisissez la quantité pour Test UI Product 1762600588920. Minimum 1, maximum 50 000. Utilisez les boutons + et - pour ajuster rapidement.
+                - generic [ref=e142] [cursor=pointer]:
+                  - checkbox "🔒 Prix fixe" [checked] [ref=e143]
+                  - generic [ref=e144]: 🔒 Prix fixe
+                - generic [ref=e146]: 29 000 F CFA
+                - button "Supprimer ce produit du bundle" [ref=e147] [cursor=pointer]
+            - generic [ref=e150]:
+              - generic [ref=e151]:
+                - generic [ref=e154]: "Total des articles :"
+                - generic [ref=e156]: 5 articles
+              - generic [ref=e160]:
+                - paragraph [ref=e161]: Bundle valide
+                - paragraph [ref=e162]: Le bundle contient suffisamment d'articles et peut être sauvegardé.
+              - generic [ref=e164]:
+                - generic [ref=e165]: "Total estimé :"
+                - generic [ref=e166]: 29 000 F CFA
+              - generic [ref=e168]:
+                - generic [ref=e169]: Progression du bundle
+                - generic [ref=e170]: 100%
+          - generic [ref=e173]:
+            - generic [ref=e174]:
+              - link "Annuler" [ref=e175] [cursor=pointer]:
+                - /url: /admin/bundles
+              - button "Synchroniser" [ref=e176] [cursor=pointer]: Synchroniser
+              - button "Dupliquer" [ref=e178] [cursor=pointer]
+            - generic [ref=e179]:
+              - button "Supprimer" [ref=e180] [cursor=pointer]
+              - button "Sauvegarder" [disabled] [ref=e181]: Sauvegarder
+```

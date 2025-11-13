@@ -229,13 +229,13 @@
       "id": 18,
       "title": "💾 COMMIT: Implémentation complète PDF generation + Resend integration",
       "description": "**Git workflow**:\n\n```bash\ngit status\ngit add .\ngit commit -m \"feat(quotes): implement PDF generation with Puppeteer + Resend email integration\n\n- Add pdf-generator service with Puppeteer + chromium-min\n- Create quote-pdf.html template with NS2PO branding\n- Implement /api/quotes/send.post.ts with PDF attachment\n- Add Resend integration with MJML compilation\n- Implement error handling + retry logic + fallback\n- Add Cloudinary image optimizations\n- Configure Railway Runtime V2 compatibility\n- Performance: < 600ms API response, < 2MB PDF size\n\n🤖 Generated with Claude Code\nCo-Authored-By: Claude <noreply@anthropic.com>\"\n```\n\n**Vérifications avant commit**:\n- ✅ pnpm type-check (zéro erreur)\n- ✅ pnpm lint (zéro warning)\n- ✅ Tests manuels passés\n- ✅ Performance validée\n\n**Fichiers inclus**:\n- server/services/pdf-generator.ts\n- server/templates/quote-pdf.html\n- server/api/quotes/send.post.ts\n- nuxt.config.ts\n- package.json\n- .env.example (pas .env!)\n\n**Durée**: 10min",
-      "status": "pending",
+      "status": "completed",
       "priority": 5,
       "dependencies": [
         17
       ],
       "created": "2025-11-12T21:54:29.140Z",
-      "updated": "2025-11-12T21:54:29.140Z",
+      "updated": "2025-11-12T22:34:09.261Z",
       "isPareto80": false
     },
     {
@@ -255,13 +255,13 @@
       "id": 20,
       "title": "🏗️ Build local + validation (pnpm build --force)",
       "description": "**Commandes**:\n```bash\ncd apps/election-mvp\n\n# 1. Clean build\nrm -rf .nuxt .output\n\n# 2. Type-check final\npnpm type-check\n\n# 3. Build\npnpm build --force\n\n# 4. Vérifier output\nls -lh .output\n```\n\n**Vérifications**:\n- ✅ Build réussit sans erreur\n- ✅ Bundle size raisonnable (< 200 MB avec chromium-min)\n- ✅ .output/server/chunks contient pdf-generator\n- ✅ Templates copiés dans .output\n\n**Critères succès**:\n- Build success\n- Zéro erreur TypeScript\n- Zéro warning critique\n\n**Si échec**:\n- Serena: Analyser erreurs build\n- Vérifier imports\n- Vérifier chemins templates\n\n**Durée**: 10min",
-      "status": "pending",
+      "status": "completed",
       "priority": 5,
       "dependencies": [
         19
       ],
       "created": "2025-11-12T21:54:32.546Z",
-      "updated": "2025-11-12T21:54:32.546Z",
+      "updated": "2025-11-13T05:21:02.875Z",
       "isPareto80": false
     },
     {
@@ -306,9 +306,9 @@
   ],
   "paretoDecisions": [],
   "metrics": {
-    "tasksCompleted": 14,
+    "tasksCompleted": 16,
     "tasksMovedToVault": 0,
     "velocityPoints": 0
   },
-  "updated": "2025-11-12T22:32:03.880Z"
+  "updated": "2025-11-13T05:21:02.876Z"
 }

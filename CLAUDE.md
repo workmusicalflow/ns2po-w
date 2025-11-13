@@ -58,6 +58,7 @@ Tu dois appliquer ces principes fondamentaux pour garantir la maintenabilité et
 | Serveur                  | Usage                                                                         | Priorité |
 | ------------------------ | ----------------------------------------------------------------------------- | -------- |
 | **Serena**               | Navigation codebase + manipulation symboles (TOUJOURS en priorité)            | ⭐⭐⭐   |
+| **Railway**              | Déploiement, logs, monitoring, variables env (préférer MCP au CLI)            | ⭐⭐⭐   |
 | **Perplexity Copilot**   | Docs officielles 2025 (Nuxt 3, Vue Query, Turso, Railway)                     | ⭐⭐⭐   |
 | **Gemini Copilot**       | Debugging complexe + **Google Search Grounding** + sessions 1M tokens         | ⭐⭐⭐   |
 | **Task Master v3**       | Roadmap sprints + Pareto (Core 20% / Enhancement 80%)                         | ⭐⭐     |

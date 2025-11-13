@@ -1,4 +1,12 @@
 import { defineConfig, devices } from '@playwright/test'
+import * as dotenv from 'dotenv'
+import * as path from 'path'
+import { fileURLToPath } from 'url'
+
+// 🧪 Charger .env.test pour utiliser SQLite local (évite replication lag Turso)
+// Solution validée par Perplexity Copilot: DB locale = consistance immédiate pour tests E2E
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
+dotenv.config({ path: path.resolve(__dirname, '.env.test') })
 
 /**
  * Configuration Playwright pour tests de performance
@@ -36,11 +44,27 @@ export default defineConfig({
     },
   ],
   // webServer activé pour tests E2E cache invalidation
+  // 🧪 Charge .env.test pour utiliser SQLite local au lieu de Turso distant
   webServer: {
-    command: 'pnpm dev',
+    command: 'NODE_ENV=test pnpm dev',
     url: 'http://localhost:3003',
     reuseExistingServer: !process.env.CI,
     timeout: 120 * 1000, // 2 minutes
+    env: {
+      // ⚠️ IMPORTANT: Forcer l'utilisation de SQLite local pour tests E2E
+      // Nuxt charge .env par défaut, on doit override explicitement avec .env.test
+      TURSO_DATABASE_URL: 'file:./test.db',
+      TURSO_AUTH_TOKEN: '', // Pas de token pour SQLite local
+      NODE_ENV: 'test',
+      // Hériter des autres vars (Cloudinary, SMTP, etc.)
+      CLOUDINARY_CLOUD_NAME: process.env.CLOUDINARY_CLOUD_NAME,
+      CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY,
+      CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET,
+      SMTP_HOST: process.env.SMTP_HOST,
+      SMTP_PORT: process.env.SMTP_PORT,
+      SMTP_USERNAME: process.env.SMTP_USERNAME,
+      SMTP_PASSWORD: process.env.SMTP_PASSWORD,
+    }
   },
   expect: {
     timeout: 10000, // 10 secondes pour les assertions

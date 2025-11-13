@@ -22,13 +22,18 @@ export function getDatabase() {
     const databaseUrl = tursoConfig?.databaseUrl || process.env.TURSO_DATABASE_URL
     const authToken = tursoConfig?.authToken || process.env.TURSO_AUTH_TOKEN
 
-    if (!databaseUrl || !authToken) {
+    // ✅ Pour SQLite local (file://), authToken n'est PAS requis
+    // Seulement Turso distant (libsql://) nécessite authToken
+    const isLocalSQLite = databaseUrl?.startsWith('file:')
+
+    if (!databaseUrl || (!authToken && !isLocalSQLite)) {
       console.warn('⚠️ Turso database not configured - using in-memory fallback')
       console.warn('  Debug info:', {
         runtimeConfig: !!tursoConfig,
-        databaseUrl: !!databaseUrl,
+        databaseUrl: databaseUrl || 'MISSING',
         authToken: !!authToken,
-        env_TURSO_DATABASE_URL: !!process.env.TURSO_DATABASE_URL,
+        isLocalSQLite,
+        env_TURSO_DATABASE_URL: process.env.TURSO_DATABASE_URL,
         env_TURSO_AUTH_TOKEN: !!process.env.TURSO_AUTH_TOKEN
       })
       // Return null to indicate database is not available
@@ -36,13 +41,19 @@ export function getDatabase() {
     }
 
     try {
-      dbClient = createClient({
-        url: databaseUrl as string,
-        authToken: authToken as string,
-      })
-      console.log('✅ Connected to Turso database via', tursoConfig?.databaseUrl ? 'runtimeConfig' : 'process.env fallback')
+      // ✅ SQLite local: pas d'authToken • Turso distant: authToken requis
+      const clientOptions: any = { url: databaseUrl as string }
+      if (!isLocalSQLite && authToken) {
+        clientOptions.authToken = authToken as string
+      }
+
+      dbClient = createClient(clientOptions)
+
+      const dbType = isLocalSQLite ? 'SQLite local (file://)' : 'Turso distant (libsql://)'
+      const configSource = tursoConfig?.databaseUrl ? 'runtimeConfig' : 'process.env fallback'
+      console.log(`✅ Connected to ${dbType} via ${configSource}`)
     } catch (error) {
-      console.error('❌ Failed to connect to Turso database:', error)
+      console.error('❌ Failed to connect to database:', error)
       return null
     }
   }

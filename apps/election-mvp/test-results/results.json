@@ -1,0 +1,281 @@
+{
+  "config": {
+    "configFile": "/Users/logansery/Documents/ns2po-w/apps/election-mvp/playwright.config.ts",
+    "rootDir": "/Users/logansery/Documents/ns2po-w/apps/election-mvp/tests/e2e",
+    "forbidOnly": false,
+    "fullyParallel": true,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "reporter": [
+      [
+        "html",
+        null
+      ],
+      [
+        "json",
+        {
+          "outputFile": "test-results/results.json"
+        }
+      ],
+      [
+        "junit",
+        {
+          "outputFile": "test-results/junit.xml"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "quiet": false,
+    "projects": [
+      {
+        "outputDir": "/Users/logansery/Documents/ns2po-w/apps/election-mvp/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "chromium",
+        "name": "chromium",
+        "testDir": "/Users/logansery/Documents/ns2po-w/apps/election-mvp/tests/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 60000
+      },
+      {
+        "outputDir": "/Users/logansery/Documents/ns2po-w/apps/election-mvp/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "firefox",
+        "name": "firefox",
+        "testDir": "/Users/logansery/Documents/ns2po-w/apps/election-mvp/tests/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 60000
+      },
+      {
+        "outputDir": "/Users/logansery/Documents/ns2po-w/apps/election-mvp/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "mobile-chrome",
+        "name": "mobile-chrome",
+        "testDir": "/Users/logansery/Documents/ns2po-w/apps/election-mvp/tests/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 60000
+      }
+    ],
+    "shard": null,
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.56.1",
+    "workers": 1,
+    "webServer": {
+      "command": "NODE_ENV=test pnpm dev",
+      "url": "http://localhost:3003",
+      "reuseExistingServer": true,
+      "timeout": 120000,
+      "env": {
+        "TURSO_DATABASE_URL": "file:./test.db",
+        "TURSO_AUTH_TOKEN": "",
+        "NODE_ENV": "test",
+        "CLOUDINARY_CLOUD_NAME": "dsrvzogof",
+        "CLOUDINARY_API_KEY": "775318993136791",
+        "CLOUDINARY_API_SECRET": "ywTgN-mioXQXW1lOWmq2xNAIK7U",
+        "SMTP_HOST": "mail.topdigitalevel.site",
+        "SMTP_PORT": "587",
+        "SMTP_USERNAME": "info@topdigitalevel.site",
+        "SMTP_PASSWORD": "undPzZ3x3U"
+      }
+    }
+  },
+  "suites": [
+    {
+      "title": "admin/bundles-price-lock.spec.ts",
+      "file": "admin/bundles-price-lock.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "🎨 Scénario 3: Admin UI - Checkbox Price Lock",
+          "file": "admin/bundles-price-lock.spec.ts",
+          "line": 313,
+          "column": 6,
+          "specs": [
+            {
+              "title": "3.2 - Toggle checkbox → Persistance état",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 13245,
+                      "error": {
+                        "message": "Error: Le handler PUT /api/campaign-bundles/37 n'a jamais répondu. Le problème vient du backend. Erreur originale: Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32mtrue\u001b[39m\nReceived: \u001b[31mfalse\u001b[39m",
+                        "stack": "Error: Le handler PUT /api/campaign-bundles/37 n'a jamais répondu. Le problème vient du backend. Erreur originale: Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32mtrue\u001b[39m\nReceived: \u001b[31mfalse\u001b[39m\n    at /Users/logansery/Documents/ns2po-w/apps/election-mvp/tests/e2e/admin/bundles-price-lock.spec.ts:546:13",
+                        "location": {
+                          "file": "/Users/logansery/Documents/ns2po-w/apps/election-mvp/tests/e2e/admin/bundles-price-lock.spec.ts",
+                          "column": 13,
+                          "line": 546
+                        },
+                        "snippet": "  544 |       console.error('❌ ERREUR CRITIQUE: Le handler PUT n\\'a pas répondu dans le temps imparti.')\n  545 |       // Faire échouer le test avec un message clair\n> 546 |       throw new Error(`Le handler PUT /api/campaign-bundles/${bundleId} n'a jamais répondu. Le problème vient du backend. Erreur originale: ${error}`)\n      |             ^\n  547 |     }\n  548 |\n  549 |     // 5. (Optionnel mais recommandé) Vérifier que le toast de succès apparaît APRÈS la confirmation de l'API"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Users/logansery/Documents/ns2po-w/apps/election-mvp/tests/e2e/admin/bundles-price-lock.spec.ts",
+                            "column": 13,
+                            "line": 546
+                          },
+                          "message": "Error: Le handler PUT /api/campaign-bundles/37 n'a jamais répondu. Le problème vient du backend. Erreur originale: Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32mtrue\u001b[39m\nReceived: \u001b[31mfalse\u001b[39m\n\n  544 |       console.error('❌ ERREUR CRITIQUE: Le handler PUT n\\'a pas répondu dans le temps imparti.')\n  545 |       // Faire échouer le test avec un message clair\n> 546 |       throw new Error(`Le handler PUT /api/campaign-bundles/${bundleId} n'a jamais répondu. Le problème vient du backend. Erreur originale: ${error}`)\n      |             ^\n  547 |     }\n  548 |\n  549 |     // 5. (Optionnel mais recommandé) Vérifier que le toast de succès apparaît APRÈS la confirmation de l'API\n    at /Users/logansery/Documents/ns2po-w/apps/election-mvp/tests/e2e/admin/bundles-price-lock.spec.ts:546:13"
+                        }
+                      ],
+                      "stdout": [
+                        {
+                          "text": "🔧 Création produit test: Test UI Product 1762600588920 - Prix: 5800 FCFA\n"
+                        },
+                        {
+                          "text": "✅ Produit créé: ID=prod_1762600589106_s2ngcgy\n"
+                        },
+                        {
+                          "text": "🔧 Création bundle test: Test UI Bundle 1762600588920\n"
+                        },
+                        {
+                          "text": "✅ Bundle créé: ID=37\n"
+                        },
+                        {
+                          "text": "🔍 [DEBUG POST] Valeurs insérées dans DB: {\n  \"inserted_db_values\": [\n    {\n      \"product_id\": \"prod_1762600589106_s2ngcgy\",\n      \"custom_price\": 5800,\n      \"price_locked\": 0\n    }\n  ]\n}\n"
+                        },
+                        {
+                          "text": "⏳ Attente 500ms réplication Turso (primary → replica)...\n"
+                        },
+                        {
+                          "text": "✅ Délai réplication OK\n"
+                        },
+                        {
+                          "text": "📋 Test 3.2: Test toggle checkbox et persistance...\n"
+                        },
+                        {
+                          "text": "✅ Login admin réussi\n"
+                        },
+                        {
+                          "text": "✅ Checkbox coché - Label: \"🔒 Prix fixe\"\n"
+                        },
+                        {
+                          "text": "🔍 [DEBUG] Bouton Save - Disabled: false, Text: \" Sauvegarder\"\n"
+                        },
+                        {
+                          "text": "⏳ Clic sur \"Enregistrer\" et attente de la réponse PUT...\n"
+                        },
+                        {
+                          "text": "[Browser LOG] 🔍 [DEBUG validateForm] Début validation: {name: Test UI Bundle 1762600588920, description: Test bundle for Price Lock feature - Test UI Bundl, targetAudience: local, estimatedTotal: 29000, popularity: 90}\n"
+                        },
+                        {
+                          "text": "[Browser LOG] 🔍 [DEBUG validateForm] Résultat final: isValid = true\n"
+                        },
+                        {
+                          "text": "[Browser LOG] 🔍 [DEBUG handleSubmit] bundleData: {\n  \"name\": \"Test UI Bundle 1762600588920\",\n  \"description\": \"Test bundle for Price Lock feature - Test UI Bundle 1762600588920\",\n  \"targetAudience\": \"local\",\n  \"estimatedTotal\": 29000,\n  \"originalTotal\": 29000,\n  \"popularity\": 90,\n  \"isActive\": true,\n  \"isFeatured\": true,\n  \"products\": [\n    {\n      \"id\": \"prod_1762600589106_s2ngcgy\",\n      \"name\": \"Test UI Product 1762600588920\",\n      \"basePrice\": 5800,\n      \"quantity\": 5,\n      \"subtotal\": 29000,\n      \"priceLocked\": true\n    }\n  ],\n  \"tags\": [],\n  \"savings\": 0\n}\n"
+                        },
+                        {
+                          "text": "✅ Réponse API reçue: 500 - Erreur interne du serveur\n"
+                        },
+                        {
+                          "text": "[Browser ERROR] Failed to load resource: the server responded with a status of 500 (Erreur interne du serveur)\n"
+                        },
+                        {
+                          "text": "[Browser ERROR] Error updating bundle 37: FetchError: [PUT] \"/api/campaign-bundles/37\": 500 Erreur interne du serveur\n    at async $fetch2 (http://localhost:3003/_nuxt/@fs/Users/logansery/Documents/ns2po-w/node_modules/.pnpm/ofetch@1.5.1/node_modules/ofetch/dist/shared/ofetch.CWycOUEr.mjs?v=5b883131:332:15)\n    at async BundleService.updateBundle (http://localhost:3003/_nuxt/services/BundleService.ts:266:24)\n    at async Object.mutationFn (http://localhost:3003/_nuxt/composables/useBundlesQuery.ts:174:14)\n"
+                        },
+                        {
+                          "text": "🧹 Nettoyage: Suppression bundle et produit test...\n"
+                        },
+                        {
+                          "text": "✅ Nettoyage terminé\n"
+                        }
+                      ],
+                      "stderr": [
+                        {
+                          "text": "❌ ERREUR CRITIQUE: Le handler PUT n'a pas répondu dans le temps imparti.\n"
+                        }
+                      ],
+                      "retry": 0,
+                      "startTime": "2025-11-08T11:16:29.014Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/logansery/Documents/ns2po-w/apps/election-mvp/test-results/admin-bundles-price-lock-\ud83c-8beb7-checkbox-→-Persistance-état-chromium/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/logansery/Documents/ns2po-w/apps/election-mvp/test-results/admin-bundles-price-lock-\ud83c-8beb7-checkbox-→-Persistance-état-chromium/video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/Users/logansery/Documents/ns2po-w/apps/election-mvp/test-results/admin-bundles-price-lock-\ud83c-8beb7-checkbox-→-Persistance-état-chromium/error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/Users/logansery/Documents/ns2po-w/apps/election-mvp/tests/e2e/admin/bundles-price-lock.spec.ts",
+                        "column": 13,
+                        "line": 546
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "f78200291159de394273-a785efdbd36076c5c159",
+              "file": "admin/bundles-price-lock.spec.ts",
+              "line": 447,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2025-11-08T11:15:58.838Z",
+    "duration": 45236.716,
+    "expected": 0,
+    "skipped": 0,
+    "unexpected": 1,
+    "flaky": 0
+  }
+}

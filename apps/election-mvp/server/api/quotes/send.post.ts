@@ -10,7 +10,7 @@
  */
 
 import { Resend } from 'resend'
-import { mjml2html } from 'mjml'
+import mjml2html from 'mjml'
 import { z } from 'zod'
 import { readFileSync } from 'fs'
 import { resolve } from 'path'
