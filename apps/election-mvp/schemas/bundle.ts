@@ -152,7 +152,6 @@ export const bundleQuoteRequestSchema = z.object({
     name: z.string().min(1, 'Le nom est requis'),
     email: z.string().email('Email invalide'),
     phone: z.string().min(8, 'Le téléphone doit contenir au moins 8 caractères'),
-    organization: z.string().optional(),
     position: z.string().optional()
   }),
 

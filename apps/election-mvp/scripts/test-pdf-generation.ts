@@ -20,7 +20,6 @@ const mockQuoteData: QuoteData = {
   clientName: 'Jean Kouassi',
   clientEmail: 'j.kouassi@example.ci',
   clientPhone: '+225 07 12 34 56 78',
-  clientOrganization: 'Parti Démocratique de Côte d\'Ivoire',
   items: [
     {
       name: 'T-Shirts personnalisés - Coton Premium',
@@ -59,7 +58,7 @@ async function runPdfTest() {
   console.log('🧪 Démarrage test génération PDF standalone\n')
   console.log('📋 Configuration:')
   console.log(`  - Référence: ${mockQuoteData.reference}`)
-  console.log(`  - Client: ${mockQuoteData.clientName} (${mockQuoteData.clientOrganization})`)
+  console.log(`  - Client: ${mockQuoteData.clientName}`)
   console.log(`  - Nombre de produits: ${mockQuoteData.items.length}`)
   console.log(`  - Montant total: ${(mockQuoteData.total / 1000).toFixed(0)} k FCFA\n`)
 

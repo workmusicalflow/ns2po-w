@@ -41,7 +41,6 @@ const SendQuoteEmailSchema = z.object({
   clientName: z.string().min(2),
   clientEmail: z.string().email(),
   clientPhone: z.string().min(8),
-  clientOrganization: z.string().optional(),
 
   // Quote data
   reference: z.string().min(5),
@@ -159,7 +158,6 @@ export default defineEventHandler(async (event) => {
       clientName: validated.clientName,
       clientEmail: validated.clientEmail,
       clientPhone: validated.clientPhone,
-      clientOrganization: validated.clientOrganization,
       items: validated.items as QuoteItem[],
       subtotal: validated.subtotal,
       discount: validated.discount,

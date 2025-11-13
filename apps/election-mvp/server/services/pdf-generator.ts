@@ -47,7 +47,6 @@ export interface QuoteData {
   clientName: string
   clientEmail: string
   clientPhone: string
-  clientOrganization?: string
   items: QuoteItem[]
   subtotal: number
   discount?: number

@@ -10,7 +10,6 @@ interface CartItem {
 }
 
 interface QuoteFormData {
-  organization: string;
   projectType: string;
   contactName: string;
   contactPhone: string;
@@ -44,7 +43,6 @@ export function useWhatsAppQuote(config: WhatsAppConfig) {
     const totalAmount = formData.cart.reduce((sum, item) => sum + item.total, 0);
 
     let message = `*DEMANDE DE DEVIS ELECTORAL NS2PO*\n\n`;
-    message += `*Client:* ${formData.organization}\n`;
     message += `*Type de Projet:* ${formData.projectType}\n`;
     message += `*Contact:* ${formData.contactName}\n`;
     message += `*Telephone:* ${formData.contactPhone}\n`;
@@ -89,7 +87,7 @@ export function useWhatsAppQuote(config: WhatsAppConfig) {
 
     try {
       // Validation côté client
-      if (!formData.organization || !formData.contactName || !formData.contactPhone) {
+      if (!formData.contactName || !formData.contactPhone) {
         throw new Error('Les champs obligatoires doivent être renseignés');
       }
 
@@ -118,7 +116,6 @@ export function useWhatsAppQuote(config: WhatsAppConfig) {
       // Analytics: track successful quote attempt
       if (process.client && window.gtag) {
         window.gtag('event', 'quote_whatsapp_attempt', {
-          'organization': formData.organization,
           'project_type': formData.projectType,
           'cart_items': formData.cart.length,
           'total_amount': formData.cart.reduce((sum, item) => sum + item.total, 0)

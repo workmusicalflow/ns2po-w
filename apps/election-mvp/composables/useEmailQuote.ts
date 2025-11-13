@@ -10,7 +10,6 @@ interface CartItem {
 }
 
 interface QuoteFormData {
-  organization: string;
   name: string;
   phone: string;
   email: string;
@@ -50,15 +49,13 @@ export function useEmailQuote() {
         firstName: formData.name?.split(' ')[0] || 'Prénom',
         lastName: formData.name?.split(' ').slice(1).join(' ') || 'Nom',
         email: formData.email.trim(),
-        phone: formData.phone.trim(),
-        organization: formData.organization?.trim() || ''
+        phone: formData.phone.trim()
       },
-      subject: `Demande de devis électoral - ${formData.organization || 'Organisation'}`,
+      subject: `Demande de devis électoral - ${formData.name}`,
       message: `Bonjour,
 
 Je souhaite recevoir un devis détaillé pour ma campagne électorale.
 
-Organisation/Parti: ${formData.organization || 'À préciser'}
 Type de projet: ${selectedMode === 'bundle' ? 'Pack Campagne NS2PO' : 'Sélection personnalisée'}
 Budget total estimé: ${formatCurrency(formData.total)}
 
@@ -83,8 +80,7 @@ ${formData.name}`,
         })),
         totalAmount: formData.total,
         currency: 'XOF',
-        campaignType: 'electoral',
-        organization: formData.organization
+        campaignType: 'electoral'
       }
     };
   };
@@ -97,11 +93,6 @@ ${formData.name}`,
 
     if (!formData.name?.trim()) {
       error.value = 'Le nom est requis';
-      return false;
-    }
-
-    if (!formData.organization?.trim()) {
-      error.value = 'L\'organisation est requise';
       return false;
     }
 
@@ -151,7 +142,6 @@ ${formData.name}`,
         // Analytics: track successful email quote
         if (process.client && window.gtag) {
           window.gtag('event', 'quote_email_submitted', {
-            'organization': formData.organization,
             'project_type': selectedMode,
             'cart_items': cartItems.length,
             'total_amount': formData.total

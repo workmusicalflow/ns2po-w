@@ -69,7 +69,6 @@ export const useQuoteCalculator = (
       seasonalDiscounts: [],
       customerTypeDiscounts: [
         { customerType: "party", discountPercentage: 12 },
-        { customerType: "organization", discountPercentage: 8 },
       ],
     },
   };
