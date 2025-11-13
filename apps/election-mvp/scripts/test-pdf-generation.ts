@@ -27,7 +27,7 @@ const mockQuoteData: QuoteData = {
       quantity: 500,
       unitPrice: 3500,
       totalPrice: 1750000,
-      imageUrl: 'https://res.cloudinary.com/dsrvzogof/image/upload/v1/products/tshirt-sample.jpg'
+      imageUrl: 'https://res.cloudinary.com/dsrvzogof/image/upload/v1735994796/ns2po/gallery/creative/tshirt-001.jpg'
     },
     {
       name: 'Casquettes brodées - Qualité Premium',
@@ -35,23 +35,23 @@ const mockQuoteData: QuoteData = {
       quantity: 300,
       unitPrice: 2500,
       totalPrice: 750000,
-      imageUrl: 'https://res.cloudinary.com/dsrvzogof/image/upload/v1/products/cap-sample.jpg'
+      imageUrl: 'https://res.cloudinary.com/dsrvzogof/image/upload/v1735994796/ns2po/gallery/creative/casquette-001.jpg'
     },
     {
-      name: 'Flyers A5 - Papier Glacé 150g',
-      customization: 'Impression couleur recto-verso',
-      quantity: 10000,
-      unitPrice: 75,
-      totalPrice: 750000,
-      imageUrl: 'https://res.cloudinary.com/dsrvzogof/image/upload/v1/products/flyer-sample.jpg'
+      name: 'Stylos publicitaires - Métal Premium',
+      customization: 'Gravure laser nom candidat + slogan',
+      quantity: 1000,
+      unitPrice: 850,
+      totalPrice: 850000,
+      imageUrl: 'https://res.cloudinary.com/dsrvzogof/image/upload/v1735994796/ns2po/gallery/creative/stylo-001.jpg'
     }
   ],
-  subtotal: 3250000,
-  discount: 162500,
+  subtotal: 3350000,
+  discount: 167500,
   discountPercent: 5,
-  tax: 555750, // TVA 18% sur (subtotal - discount)
-  total: 3643250,
-  logoUrl: 'https://res.cloudinary.com/dsrvzogof/image/upload/v1/ns2po/logo-ns2po.png'
+  tax: 572850, // TVA 18% sur (subtotal - discount)
+  total: 3755350,
+  logoUrl: 'https://res.cloudinary.com/dsrvzogof/image/upload/w_200,c_fit,q_auto,f_auto/v1759082596/logo-ns2po-mailing_vzelsq.png'
 }
 
 async function runPdfTest() {

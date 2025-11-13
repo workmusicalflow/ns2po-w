@@ -18,7 +18,7 @@ echo "=================================================="
 echo ""
 
 # Configuration
-PRODUCTION_URL="${PRODUCTION_URL:-https://ns2po-election-mvp-production.up.railway.app}"
+PRODUCTION_URL="${PRODUCTION_URL:-https://nuxt-app-production-8b86.up.railway.app}"
 API_ENDPOINT="$PRODUCTION_URL/api/quotes/send"
 
 # Couleurs
@@ -39,26 +39,34 @@ PAYLOAD='{
   "items": [
     {
       "name": "T-Shirts personnalisés - Coton Premium",
-      "imageUrl": "https://res.cloudinary.com/dsrvzogof/image/upload/v1/products/tshirt-sample.jpg",
-      "customization": "Impression logo recto-verso",
+      "imageUrl": "https://res.cloudinary.com/dsrvzogof/image/upload/v1735994796/ns2po/gallery/creative/tshirt-001.jpg",
+      "customization": "Impression logo recto-verso, tailles variées (S-XXL)",
       "quantity": 100,
       "unitPrice": 3500,
       "totalPrice": 350000
     },
     {
       "name": "Casquettes brodées - Qualité Premium",
-      "imageUrl": "https://res.cloudinary.com/dsrvzogof/image/upload/v1/products/cap-sample.jpg",
-      "customization": "Logo brodé 3D",
+      "imageUrl": "https://res.cloudinary.com/dsrvzogof/image/upload/v1735994796/ns2po/gallery/creative/casquette-001.jpg",
+      "customization": "Logo brodé 3D sur visière, réglable",
       "quantity": 50,
       "unitPrice": 2500,
       "totalPrice": 125000
+    },
+    {
+      "name": "Stylos publicitaires - Métal Premium",
+      "imageUrl": "https://res.cloudinary.com/dsrvzogof/image/upload/v1735994796/ns2po/gallery/creative/stylo-001.jpg",
+      "customization": "Gravure laser nom candidat",
+      "quantity": 500,
+      "unitPrice": 850,
+      "totalPrice": 425000
     }
   ],
-  "subtotal": 475000,
+  "subtotal": 900000,
   "discount": 0,
-  "tax": 85500,
-  "total": 560500,
-  "logoUrl": "https://res.cloudinary.com/dsrvzogof/image/upload/v1/ns2po/logo-ns2po.png"
+  "tax": 162000,
+  "total": 1062000,
+  "logoUrl": "https://res.cloudinary.com/dsrvzogof/image/upload/w_200,c_fit,q_auto,f_auto/v1759082596/logo-ns2po-mailing_vzelsq.png"
 }'
 
 echo "📦 Payload de test:"

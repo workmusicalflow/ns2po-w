@@ -10,37 +10,44 @@ ENDPOINT="/api/quotes/send"
 echo "🧪 Test API: POST $API_URL$ENDPOINT"
 echo ""
 
-# Payload JSON (données mock réalistes)
+# Payload JSON (données mock réalistes avec assets Cloudinary réels)
 PAYLOAD='{
   "reference": "DEV-2025-API-TEST",
   "clientName": "Marie Koné",
   "clientEmail": "m.kone@example.ci",
   "clientPhone": "+225 07 99 88 77 66",
-  "clientOrganization": "Coalition Pour le Changement",
   "items": [
     {
-      "name": "T-Shirts personnalisés Premium",
-      "customization": "Impression 4 couleurs recto-verso + logo brodé col",
-      "quantity": 1000,
-      "unitPrice": 4500,
-      "totalPrice": 4500000,
-      "imageUrl": "https://res.cloudinary.com/dsrvzogof/image/upload/v1/products/tshirt-premium.jpg"
-    },
-    {
-      "name": "Casquettes brodées Deluxe",
-      "customization": "Broderie 3D premium + visière renforcée",
+      "name": "T-Shirts personnalisés - Coton Premium",
+      "customization": "Impression logo recto-verso, tailles variées (S-XXL)",
       "quantity": 500,
       "unitPrice": 3500,
       "totalPrice": 1750000,
-      "imageUrl": "https://res.cloudinary.com/dsrvzogof/image/upload/v1/products/cap-deluxe.jpg"
+      "imageUrl": "https://res.cloudinary.com/dsrvzogof/image/upload/v1735994796/ns2po/gallery/creative/tshirt-001.jpg"
+    },
+    {
+      "name": "Casquettes brodées - Qualité Premium",
+      "customization": "Logo brodé 3D sur visière, réglable",
+      "quantity": 300,
+      "unitPrice": 2500,
+      "totalPrice": 750000,
+      "imageUrl": "https://res.cloudinary.com/dsrvzogof/image/upload/v1735994796/ns2po/gallery/creative/casquette-001.jpg"
+    },
+    {
+      "name": "Parapluies personnalisés - Grande taille",
+      "customization": "Impression logo sur 2 panneaux, ouverture automatique",
+      "quantity": 200,
+      "unitPrice": 1800,
+      "totalPrice": 360000,
+      "imageUrl": "https://res.cloudinary.com/dsrvzogof/image/upload/v1735994796/ns2po/gallery/creative/parapluie-001.jpg"
     }
   ],
-  "subtotal": 6250000,
-  "discount": 312500,
+  "subtotal": 2860000,
+  "discount": 143000,
   "discountPercent": 5,
-  "tax": 1068750,
-  "total": 7006250,
-  "logoUrl": "https://res.cloudinary.com/dsrvzogof/image/upload/v1/ns2po/logo-ns2po.png"
+  "tax": 489060,
+  "total": 3206060,
+  "logoUrl": "https://res.cloudinary.com/dsrvzogof/image/upload/w_200,c_fit,q_auto,f_auto/v1759082596/logo-ns2po-mailing_vzelsq.png"
 }'
 
 echo "📋 Envoi requête..."

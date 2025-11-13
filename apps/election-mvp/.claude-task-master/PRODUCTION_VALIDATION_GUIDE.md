@@ -40,7 +40,7 @@ railway status
 # Ou: railway open (ouvre dashboard web)
 ```
 
-**URL attendue**: `https://ns2po-election-mvp-production.up.railway.app`
+**URL actuelle**: `https://nuxt-app-production-8b86.up.railway.app`
 
 ### Étape 2: Exécuter le Script de Test
 
@@ -86,7 +86,7 @@ Si temps > 5s au premier appel → Cold start Chromium (attendu)
 ### Curl Simple
 
 ```bash
-curl -X POST https://ns2po-election-mvp-production.up.railway.app/api/quotes/send \
+curl -X POST https://nuxt-app-production-8b86.up.railway.app/api/quotes/send \
   -H "Content-Type: application/json" \
   -d '{
     "clientName": "Test Utilisateur",
@@ -95,7 +95,7 @@ curl -X POST https://ns2po-election-mvp-production.up.railway.app/api/quotes/sen
     "reference": "TEST-PROD-'$(date +%s)'",
     "items": [{
       "name": "T-Shirt personnalisé",
-      "imageUrl": "https://res.cloudinary.com/dsrvzogof/image/upload/v1/products/tshirt-sample.jpg",
+      "imageUrl": "https://res.cloudinary.com/dsrvzogof/image/upload/v1735994796/ns2po/gallery/creative/tshirt-001.jpg",
       "customization": "Logo NS2PO",
       "quantity": 50,
       "unitPrice": 3500,
@@ -105,7 +105,7 @@ curl -X POST https://ns2po-election-mvp-production.up.railway.app/api/quotes/sen
     "discount": 0,
     "tax": 31500,
     "total": 206500,
-    "logoUrl": "https://res.cloudinary.com/dsrvzogof/image/upload/v1/ns2po/logo-ns2po.png"
+    "logoUrl": "https://res.cloudinary.com/dsrvzogof/image/upload/w_200,c_fit,q_auto,f_auto/v1759082596/logo-ns2po-mailing_vzelsq.png"
   }' | jq '.'
 ```
 
