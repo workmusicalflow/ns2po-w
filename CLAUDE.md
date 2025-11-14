@@ -242,13 +242,37 @@ const productQueryKeys = {
 
 ---
 
-## 🚢 Railway CLI Essentielles
+## 🚢 Railway - Workflow de Déploiement
+
+### Routine Standard de Déploiement
+
+**⚠️ IMPORTANT**: Pour garantir invalidation du cache Railway et déploiement propre :
+
+1. **Commit + Push vers GitHub**:
+   ```bash
+   git add <fichiers>
+   git commit -m "feat(scope): Message"
+   git push origin <branch>
+   ```
+
+2. **Déploiement Railway avec Invalidation Cache**:
+   - Ouvrir Railway Dashboard (`CMD+K` ou `railway open`)
+   - Sélectionner le service concerné (ex: `nuxt-app`)
+   - Déclencher nouveau déploiement depuis l'UI Railway (`CMD+K` → "Deploy Latest Commit")
+   - ✅ Cette méthode invalide automatiquement le cache build Docker
+
+**Pourquoi cette routine ?**
+- Railway auto-deploy peut réutiliser layers Docker en cache
+- Déploiement manuel UI garantit rebuild complet sans cache
+- Critique pour changements dépendances système (Chromium, Puppeteer, etc.)
+
+### Railway CLI Essentielles
 
 ```bash
 # Déploiement
-railway up --detach              # Deploy manuel (recommandé)
+railway up --detach              # Deploy manuel CLI (peut utiliser cache)
 railway logs --follow            # Logs temps réel
-railway redeploy                 # Redéployer
+railway redeploy                 # Redéployer (réutilise cache si possible)
 
 # Variables
 railway variables                # Lister
@@ -260,7 +284,7 @@ railway open                     # Dashboard web
 railway shell                    # Shell avec env
 ```
 
-**⚠️ Règle CLI-First**: Maximiser CLI, dashboard web uniquement pour l'impossible
+**⚠️ Règle Hybride**: CLI pour logs/monitoring, UI pour déploiements critiques (invalidation cache)
 
 ---
 
@@ -323,6 +347,65 @@ Lister tous les fichiers concernés par le problème à résoudre, puis prépare
 - Dictionnaire synonymes ivoiriens: `flyer → tract/depliant`, `tshirt → t-shirt/maillot`, `casquette → cap/chapeau`
 
 **Résultat**: < 50ms perçu, zéro appel API, 95% taux succès même avec fautes
+
+---
+
+### Architecture Unifiée Images Produits PDF (14/11/2025)
+
+**Innovation**: Propagation dynamique `image_url` end-to-end (Bundle + Sur Mesure → PDF)
+
+**Problème Initial**:
+- Logo NS2PO + images produits n'apparaissaient pas dans PDFs générés
+- Implémentation Base64 précédente (commit 0547994) échouait (HTTP 404)
+- PDF 120 KB (trop petit, images manquantes)
+
+**Solution Architecturale**:
+1. **Backend API** : SQL `p.image_url` dans `/api/campaign-bundles` (ligne 176)
+2. **Frontend Bundle** : Mapping `selectBundle()` → `image_url: p.image_url` (StepBuilder:1001)
+3. **Frontend Sur Mesure** : Mapping `handleQuantityConfirm()` → `image_url: data.product.image` (StepBuilder:1069)
+4. **UX Validation** : Thumbnails 64x64 dans `StepValidation.vue` (useCloudinary.getThumbnailUrl)
+5. **Server Transform** : Optimisation Cloudinary 400x400 q_85 dans `/api/quotes/send` (ligne 164)
+6. **Placeholder Robuste** : SVG `placeholder-produit_gz1yex` uploadé, fallback unifié frontend/backend
+
+**Pattern Cloudinary** :
+```typescript
+// Composable client (useCloudinary.ts)
+const getProductImageUrl = (imageUrl?: string) => {
+  const PLACEHOLDER = 'placeholder-produit_gz1yex'
+  if (!imageUrl) return buildCloudinaryUrl(PLACEHOLDER, {...})
+  if (imageUrl.includes('cloudinary.com')) {
+    const publicId = extractPublicId(imageUrl)
+    return buildCloudinaryUrl(publicId, { width: 400, quality: 85, crop: 'fit' })
+  }
+  return buildCloudinaryUrl(imageUrl, {...})
+}
+
+// Server-side (server/utils/cloudinary.ts)
+export function getProductImageUrl(publicId: string): string {
+  return buildCloudinaryUrl(publicId, { width: 400, height: 400, quality: 85, crop: 'fit' })
+}
+```
+
+**Résultat Production** :
+- ✅ PDF 188 KB (+57% = images embedded)
+- ✅ Génération PDF 769 ms (< 2s target)
+- ✅ Total API 1283 ms (< 2s target)
+- ✅ Thumbnails UX dans récapitulatif
+- ✅ Fallback placeholder SVG pour produits sans image
+- ✅ Tests validés : email `studioabidjanpro1@gmail.com` (DEV-TEST-IMG-001)
+
+**Risques Identifiés & Corrigés** (Audit Phase 10A-C):
+- 🔴 **Critique** : Fallback obsolète `useEmailQuote.ts:69` → Corrigé commit 4326e4a
+- 🟠 **Moyen** : Incohérence `image` vs `image_url` → Refactor Sprint 1
+- 🟡 **Bas** : Validation Zod trop stricte → Assouplir Sprint 2
+
+**Documentation** : `docs/architecture-audit-devis-flows.md` (cartographie 2 flux, risques, recommandations)
+
+**Commits Clés** :
+- `26f99d5` : Architecture unifiée (Bundle + Sur Mesure)
+- `4a20586` : Thumbnails UX StepValidation
+- `9ba7cb7` : Placeholder Cloudinary validé
+- `4326e4a` : Fix critique fallback + audit complet
 
 ---
 
