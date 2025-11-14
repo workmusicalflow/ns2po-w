@@ -128,6 +128,9 @@ import { useProductsQuery } from '~/composables/useProductsQuery'
 // Email Integration (Phase 2: WhatsApp supprimé)
 import { useEmailQuote } from '~/composables/useEmailQuote'
 
+// Toast Notifications
+import { globalNotifications } from '~/composables/useNotifications'
+
 // SEO
 useHead({
   title: 'Générateur de Devis - NS2PO Élections',
@@ -334,13 +337,21 @@ const handleEmailSubmission = async (formData: any) => {
       showEmailModal.value = true
     } else {
       console.error('❌ Échec soumission Email:', result.message)
-      // Phase 2: Afficher erreur (WhatsApp supprimé)
-      alert('Erreur lors de l\'envoi du devis. Veuillez réessayer.')
+      // Toast notification au lieu de alert()
+      globalNotifications.error(
+        'Erreur d\'envoi',
+        'Impossible d\'envoyer le devis. Veuillez réessayer.',
+        { duration: 6000 }
+      )
     }
   } catch (error) {
     console.error('❌ Erreur soumission Email:', error)
-    // Phase 2: Afficher erreur (WhatsApp supprimé)
-    alert('Erreur technique lors de l\'envoi du devis. Veuillez réessayer.')
+    // Toast notification au lieu de alert()
+    globalNotifications.error(
+      'Erreur technique',
+      'Une erreur technique est survenue. Veuillez réessayer dans quelques instants.',
+      { duration: 6000 }
+    )
   }
 }
 

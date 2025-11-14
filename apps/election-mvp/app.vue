@@ -20,6 +20,9 @@
 
     <!-- Modal d'image global -->
     <ImageModal />
+
+    <!-- Toast Notifications Global -->
+    <ToastContainer />
   </div>
 </template>
 
