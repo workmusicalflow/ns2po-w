@@ -19,6 +19,7 @@ import {
   type QuoteData,
   type QuoteItem,
 } from '../../services/pdf-generator'
+import { getLogoUrl, getProductImageUrl } from '../../utils/cloudinary'
 
 // Note: defineEventHandler, readBody, createError, useRuntimeConfig
 // sont auto-importés par Nuxt au runtime
@@ -147,13 +148,29 @@ export default defineEventHandler(async (event) => {
 
     console.log(`[Quote Email API] Validated data for ${validated.reference}`)
 
-    // 2. Préparer données pour PDF
-    const config = useRuntimeConfig()
-    const siteUrl = config.public.siteUrl || 'http://localhost:3000'
+    // 2. Préparer données pour PDF avec URLs Cloudinary optimisées
+    console.log('[Quote Email API] Building optimized Cloudinary URLs...')
 
-    // Fallback logo par défaut si logoUrl invalide
-    const defaultLogoUrl = `${siteUrl}/logos/logo-ns2po.jpg`
-    const logoUrl = validated.logoUrl || defaultLogoUrl
+    // Logo NS2PO optimisé (200x200, PNG, 90% quality)
+    const logoUrl = getLogoUrl()
+    console.log(`[Quote Email API] Logo URL: ${logoUrl}`)
+
+    // Transformer items avec images produits optimisées (400x400, JPEG, 85% quality)
+    const itemsWithOptimizedImages = validated.items.map((item) => {
+      // Extraire public_id depuis imageUrl du client
+      // Ex: "ns2po-w/products/textile-tshirt-001.jpg"
+      const publicId = item.imageUrl?.includes('cloudinary.com')
+        ? item.imageUrl.split('/upload/').pop()?.replace(/^v\d+\//, '') || 'ns2po-w/products/textile-tshirt-001.jpg'
+        : 'ns2po-w/products/textile-tshirt-001.jpg'
+
+      const optimizedImageUrl = getProductImageUrl(publicId)
+      console.log(`[Quote Email API] Product "${item.name}" image: ${optimizedImageUrl}`)
+
+      return {
+        ...item,
+        imageUrl: optimizedImageUrl,
+      }
+    })
 
     const pdfData: QuoteData = {
       reference: validated.reference,
@@ -165,7 +182,7 @@ export default defineEventHandler(async (event) => {
       clientName: validated.clientName,
       clientEmail: validated.clientEmail,
       clientPhone: validated.clientPhone,
-      items: validated.items as QuoteItem[],
+      items: itemsWithOptimizedImages as QuoteItem[],
       subtotal: validated.subtotal,
       discount: validated.discount,
       discountPercent: validated.discountPercent,

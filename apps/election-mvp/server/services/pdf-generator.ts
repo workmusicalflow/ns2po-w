@@ -172,22 +172,32 @@ export async function closeBrowser(): Promise<void> {
  */
 async function fetchImageAsBase64(url: string, mimeType: string = 'image/jpeg'): Promise<string> {
   try {
-    console.log(`[PDF Generator] Fetching image: ${url}`)
+    console.log(`[PDF Generator] 🔍 Fetching image: ${url}`)
 
     const response = await fetch(url)
+    console.log(`[PDF Generator] 📊 Response status: ${response.status} (${response.statusText})`)
+
     if (!response.ok) {
-      console.warn(`[PDF Generator] Failed to fetch image ${url}: ${response.statusText}`)
+      console.error(`[PDF Generator] ❌ Failed to fetch image ${url}: HTTP ${response.status} ${response.statusText}`)
+      console.error(`[PDF Generator] ❌ Content-Type: ${response.headers.get('content-type')}`)
       return '' // Return empty string on error
     }
 
+    const contentType = response.headers.get('content-type') || mimeType
+    console.log(`[PDF Generator] 📊 Content-Type: ${contentType}`)
+
     const arrayBuffer = await response.arrayBuffer()
     const base64 = Buffer.from(arrayBuffer).toString('base64')
-    const dataUri = `data:${mimeType};base64,${base64}`
+    // Utiliser Content-Type réel du serveur, fallback sur mimeType fourni
+    const dataUri = `data:${contentType};base64,${base64}`
 
-    console.log(`[PDF Generator] Image converted to Base64: ${url} (${(base64.length / 1024).toFixed(2)}KB)`)
+    console.log(`[PDF Generator] ✅ Image converted to Base64: ${url}`)
+    console.log(`[PDF Generator] 📏 Base64 size: ${(base64.length / 1024).toFixed(2)} KB`)
+    console.log(`[PDF Generator] 🔢 Data URI length: ${dataUri.length} chars`)
+
     return dataUri
   } catch (error) {
-    console.error(`[PDF Generator] Error fetching image ${url}:`, error)
+    console.error(`[PDF Generator] ❌ Exception fetching image ${url}:`, error)
     return '' // Return empty string on error
   }
 }
