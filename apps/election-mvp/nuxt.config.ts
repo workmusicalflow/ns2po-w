@@ -52,6 +52,9 @@ export default defineNuxtConfig({
     resendApiKey: '',
     resendFromEmail: '',
 
+    // Commercial Emails (BCC pour suivi devis)
+    commercialEmails: process.env.COMMERCIAL_EMAILS || 'ns2pomail@ns2po.ci,mkonan@ns2po.ci,arthurassi@ns2po.ci',
+
     // Puppeteer PDF Configuration (use NUXT_ prefix for runtime override)
     chromiumExecutablePath: '',
     puppeteerSkipDownload: process.env.PUPPETEER_SKIP_CHROMIUM_DOWNLOAD,

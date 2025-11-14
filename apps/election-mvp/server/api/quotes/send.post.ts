@@ -223,9 +223,19 @@ export default defineEventHandler(async (event) => {
     const resend = getResendClient()
     const fromEmail = config.resendFromEmail || 'noreply@send.reachup.site'
 
+    // Préparer emails commerciaux BCC (copie cachée pour suivi équipe)
+    const commercialEmailsRaw: string = (config.commercialEmails as string) || 'ns2pomail@ns2po.ci,mkonan@ns2po.ci,arthurassi@ns2po.ci'
+    const commercialEmails = commercialEmailsRaw
+      .split(',')
+      .map((email: string) => email.trim())
+      .filter((email: string) => email.length > 0)
+
+    console.log(`[Quote Email API] BCC: ${commercialEmails.length} email(s) équipe commerciale`)
+
     const { data, error } = await resend.emails.send({
       from: fromEmail,
       to: validated.clientEmail,
+      bcc: commercialEmails, // BCC multi-destinataires pour suivi commercial
       subject: `Votre devis NS2PO - ${validated.reference}`,
       html: emailHtml,
       attachments: [
