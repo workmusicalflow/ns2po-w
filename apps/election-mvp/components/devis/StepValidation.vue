@@ -30,13 +30,26 @@
 
       <!-- Détails du récap -->
       <div v-if="showSummary" class="mt-4 p-4 bg-white rounded-lg border border-gray-200">
-        <div class="space-y-2">
-          <div v-for="item in cartItems" :key="item.id" class="flex justify-between text-sm">
-            <span>{{ item.name }} x{{ item.quantity }}</span>
-            <span class="font-medium">{{ formatPrice(item.total) }}</span>
+        <div class="space-y-3">
+          <div v-for="item in cartItems" :key="item.id" class="flex items-center justify-between text-sm gap-3">
+            <div class="flex items-center gap-2 flex-1 min-w-0">
+              <!-- Thumbnail produit -->
+              <img
+                v-if="item.image_url"
+                :src="getThumbnailUrl(item.image_url)"
+                :alt="item.name"
+                class="w-10 h-10 object-cover rounded border border-gray-200 flex-shrink-0"
+              />
+              <div v-else class="w-10 h-10 bg-gray-100 rounded flex items-center justify-center flex-shrink-0">
+                <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+              </div>
+              <span class="truncate">{{ item.name }} x{{ item.quantity }}</span>
+            </div>
+            <span class="font-medium whitespace-nowrap">{{ formatPrice(item.total) }}</span>
           </div>
         </div>
-
         <div class="border-t mt-4 pt-4">
           <div class="flex justify-between font-bold">
             <span>Total TTC</span>
@@ -197,6 +210,9 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+
+// Composables
+const { getThumbnailUrl } = useCloudinary()
 
 // Props
 const props = defineProps<{
