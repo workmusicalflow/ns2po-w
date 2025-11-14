@@ -100,19 +100,6 @@
       @action="handleNext"
     />
 
-    <!-- WhatsApp Quote Confirmation Modal -->
-    <QuoteConfirmationModal
-      :show="showSuccessModal"
-      :whatsappOpened="whatsappOpened"
-      :error="whatsappError"
-      :fallbackEmail="whatsappConfig.fallbackEmail"
-      :fallbackPhone="whatsappConfig.fallbackPhone"
-      :whatsappLink="modalWhatsAppLink"
-      :webWhatsappLink="modalWebWhatsAppLink"
-      :rawMessage="modalRawMessage"
-      @close="resetForm"
-    />
-
     <!-- Email Confirmation Modal -->
     <EmailConfirmationModal
       :show="showEmailModal"
@@ -132,17 +119,13 @@ import StepChoixMode from '~/components/devis/StepChoixMode.vue'
 import StepBuilder from '~/components/devis/StepBuilder.vue'
 import StepValidation from '~/components/devis/StepValidation.vue'
 import StickyBottomBar from '~/components/StickyBottomBar.vue'
-import QuoteConfirmationModal from '~/components/devis/QuoteConfirmationModal.vue'
 import EmailConfirmationModal from '~/components/devis/EmailConfirmationModal.vue'
 
 // Composables Turso
 import { useCampaignBundles } from '~/composables/useCampaignBundles'
 import { useProductsQuery } from '~/composables/useProductsQuery'
 
-// WhatsApp Integration
-import { useWhatsAppQuote } from '~/composables/useWhatsAppQuote'
-
-// Email Integration
+// Email Integration (Phase 2: WhatsApp supprimé)
 import { useEmailQuote } from '~/composables/useEmailQuote'
 
 // SEO
@@ -161,30 +144,9 @@ const currentStep = ref(1)
 const totalSteps = 3
 const selectedMode = ref<'bundle' | 'custom'>('bundle')
 const cartItems = ref<any[]>([])
-const showSuccessModal = ref(false)
-const showEmailModal = ref(false)
+const showEmailModal = ref(false) // Phase 2: showSuccessModal (WhatsApp) supprimé
 
-// WhatsApp Configuration
-const whatsappConfig = {
-  phoneNumber: '2250777104936', // Numéro NS2PO réel utilisé dans les tests
-  fallbackEmail: 'info@ns2po.com',
-  fallbackPhone: '07 77 10 49 36'
-}
-
-// WhatsApp Quote Integration
-const {
-  isSubmitting,
-  hasSubmitted,
-  whatsappOpened,
-  error: whatsappError,
-  submitQuote,
-  getWhatsAppLink,
-  getWebWhatsAppLink,
-  generateWhatsAppMessage,
-  reset: resetWhatsApp
-} = useWhatsAppQuote(whatsappConfig)
-
-// Email Quote Integration
+// Email Quote Integration (Phase 2: WhatsApp supprimé)
 const {
   isSubmitting: isEmailSubmitting,
   hasSubmitted: hasEmailSubmitted,
@@ -356,51 +318,8 @@ const handleSubmit = async (formData: any) => {
   console.log('🔍 Structure formData reçue:', Object.keys(formData))
   console.log('📋 Contenu formData:', formData)
 
-  // Router selon le canal choisi par l'utilisateur
-  if (formData.channel === 'email') {
-    await handleEmailSubmission(formData)
-  } else {
-    await handleWhatsAppSubmission(formData)
-  }
-}
-
-const handleWhatsAppSubmission = async (formData: any) => {
-  console.log('📱 Traitement soumission WhatsApp')
-
-  // StepValidation envoie: { name, phone, email, channel, items, total, timestamp }
-  // Transformer les données pour le format WhatsApp
-  const whatsappData = {
-    projectType: selectedMode.value === 'bundle'
-      ? 'Campagne Électorale (Pack NS2PO)'
-      : 'Campagne Électorale (Sélection Personnalisée)',
-    contactName: formData.name?.trim() || 'Contact à préciser',
-    contactPhone: formData.phone?.trim() || 'Téléphone à préciser',
-    contactEmail: formData.email?.trim() || 'Contact via WhatsApp',
-    cart: cartItems.value.map(item => ({
-      id: item.id,
-      name: item.name,
-      quantity: item.quantity,
-      unitPrice: item.unitPrice || (item.total / item.quantity),
-      total: item.total
-    })),
-    notes: 'Demande envoyée via le générateur de devis NS2PO - Canal préféré: WhatsApp'
-  }
-
-  console.log('📋 Données transformées pour WhatsApp:', whatsappData)
-
-  try {
-    await submitQuote(whatsappData)
-    showSuccessModal.value = true
-
-    console.log('✅ Soumission WhatsApp terminée:', {
-      hasSubmitted: hasSubmitted.value,
-      whatsappOpened: whatsappOpened.value,
-      error: whatsappError.value
-    })
-  } catch (error) {
-    console.error('❌ Erreur soumission WhatsApp:', error)
-    showSuccessModal.value = true // Montrer la modal même en cas d'erreur pour les fallbacks
-  }
+  // Phase 2: Toujours utiliser email (WhatsApp supprimé)
+  await handleEmailSubmission(formData)
 }
 
 const handleEmailSubmission = async (formData: any) => {
@@ -415,13 +334,13 @@ const handleEmailSubmission = async (formData: any) => {
       showEmailModal.value = true
     } else {
       console.error('❌ Échec soumission Email:', result.message)
-      // En cas d'erreur, on peut fallback vers la modal WhatsApp ou afficher une erreur
-      showSuccessModal.value = true
+      // Phase 2: Afficher erreur (WhatsApp supprimé)
+      alert('Erreur lors de l\'envoi du devis. Veuillez réessayer.')
     }
   } catch (error) {
     console.error('❌ Erreur soumission Email:', error)
-    // En cas d'erreur technique, fallback vers WhatsApp
-    showSuccessModal.value = true
+    // Phase 2: Afficher erreur (WhatsApp supprimé)
+    alert('Erreur technique lors de l\'envoi du devis. Veuillez réessayer.')
   }
 }
 
@@ -429,75 +348,11 @@ const resetForm = () => {
   currentStep.value = 1
   selectedMode.value = 'bundle'
   cartItems.value = []
-  showSuccessModal.value = false
   showEmailModal.value = false
-  resetWhatsApp()
   resetEmail()
 }
 
-// Computed pour les données de la modal
-const modalWhatsAppLink = computed(() => {
-  if (!hasSubmitted.value || cartItems.value.length === 0) return '#'
-
-  const mockData = {
-    projectType: 'Projet Électoral',
-    contactName: 'Votre Nom',
-    contactPhone: 'Votre Téléphone',
-    contactEmail: 'votre@email.com',
-    cart: cartItems.value.map(item => ({
-      id: item.id,
-      name: item.name,
-      quantity: item.quantity,
-      unitPrice: item.unitPrice || (item.total / item.quantity),
-      total: item.total
-    })),
-    notes: ''
-  }
-
-  return getWhatsAppLink(mockData)
-})
-
-const modalWebWhatsAppLink = computed(() => {
-  if (!hasSubmitted.value || cartItems.value.length === 0) return '#'
-
-  const mockData = {
-    projectType: 'Projet Électoral',
-    contactName: 'Votre Nom',
-    contactPhone: 'Votre Téléphone',
-    contactEmail: 'votre@email.com',
-    cart: cartItems.value.map(item => ({
-      id: item.id,
-      name: item.name,
-      quantity: item.quantity,
-      unitPrice: item.unitPrice || (item.total / item.quantity),
-      total: item.total
-    })),
-    notes: ''
-  }
-
-  return getWebWhatsAppLink(mockData)
-})
-
-const modalRawMessage = computed(() => {
-  if (!hasSubmitted.value || cartItems.value.length === 0) return ''
-
-  const mockData = {
-    projectType: 'Projet Électoral',
-    contactName: 'Votre Nom',
-    contactPhone: 'Votre Téléphone',
-    contactEmail: 'votre@email.com',
-    cart: cartItems.value.map(item => ({
-      id: item.id,
-      name: item.name,
-      quantity: item.quantity,
-      unitPrice: item.unitPrice || (item.total / item.quantity),
-      total: item.total
-    })),
-    notes: ''
-  }
-
-  return generateWhatsAppMessage(mockData)
-})
+// Phase 2: Computed properties WhatsApp supprimées
 </script>
 
 <style scoped>

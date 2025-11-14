@@ -170,8 +170,9 @@ test.describe('Loading Spinner Visibility - Email Quote Submission', () => {
     // Spinner visible pendant tentative
     await expect(spinner).toBeVisible({ timeout: 100 })
 
-    // Attendre modal (fallback WhatsApp)
-    await page.waitForSelector('.modal-overlay', { timeout: 10000 })
+    // Phase 4: Attendre alerte d'erreur (WhatsApp supprimé)
+    page.on('dialog', dialog => dialog.accept())
+    await page.waitForTimeout(2000) // Attendre traitement erreur
 
     // ✅ Spinner doit disparaître même en cas d'erreur
     await expect(spinner).toBeHidden({ timeout: 1000 })

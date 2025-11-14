@@ -120,47 +120,20 @@
           >
         </div>
 
-        <!-- Canal de réception -->
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">
-            Comment souhaitez-vous recevoir votre devis ?
-          </label>
-          <div class="grid grid-cols-2 gap-3">
-            <button
-              type="button"
-              :class="[
-                'channel-option p-3 rounded-lg border-2 transition-all',
-                form.channel === 'whatsapp'
-                  ? 'border-primary bg-primary/5'
-                  : 'border-gray-200 hover:border-gray-300'
-              ]"
-              @click="form.channel = 'whatsapp'"
-            >
-              <div class="flex items-center justify-center gap-2">
-                <svg class="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.816 9.816 0 0012.04 2m.01 1.67c2.2 0 4.26.86 5.82 2.42a8.23 8.23 0 012.41 5.83c0 4.54-3.7 8.23-8.24 8.23-1.48 0-2.93-.39-4.19-1.15l-.3-.18-3.12.82.83-3.04-.2-.32a8.188 8.188 0 01-1.26-4.38c.01-4.54 3.7-8.23 8.25-8.23M8.53 7.33c-.16 0-.43.06-.66.31-.22.25-.87.85-.87 2.07 0 1.22.89 2.4 1 2.56.12.17 1.76 2.67 4.25 3.73.59.27 1.05.43 1.41.55.59.19 1.13.16 1.56.1.48-.07 1.46-.6 1.67-1.18.21-.58.21-1.07.14-1.18s-.22-.16-.47-.28-.72-.35-1.48-.71c-.75-.35-.87-.42-1.05-.14-.17.28-.68.85-.84 1.03-.16.18-.33.2-.61.06-.28-.13-1.19-.44-2.26-1.4-.84-.74-1.4-1.67-1.57-1.95-.17-.28-.02-.42.12-.56.27-.25.38-.41.57-.68.2-.27.13-.5.06-.71-.06-.2-.56-1.34-.76-1.84-.2-.48-.41-.41-.56-.43-.14-.01-.3-.02-.46-.02z" />
-                </svg>
-                <span class="font-medium">WhatsApp</span>
-              </div>
-            </button>
-
-            <button
-              type="button"
-              :class="[
-                'channel-option p-3 rounded-lg border-2 transition-all',
-                form.channel === 'email'
-                  ? 'border-primary bg-primary/5'
-                  : 'border-gray-200 hover:border-gray-300'
-              ]"
-              @click="form.channel = 'email'"
-            >
-              <div class="flex items-center justify-center gap-2">
-                <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                </svg>
-                <span class="font-medium">Email</span>
-              </div>
-            </button>
+        <!-- Phase 3: Confirmation réception email uniquement -->
+        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <div class="flex items-start gap-3">
+            <svg class="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+            </svg>
+            <div>
+              <p class="text-sm font-medium text-blue-900">
+                Votre devis sera envoyé par email
+              </p>
+              <p class="text-xs text-blue-700 mt-1">
+                Vous recevrez une confirmation dans les prochaines minutes
+              </p>
+            </div>
           </div>
         </div>
       </form>
@@ -235,7 +208,7 @@ const form = ref({
   name: '',
   phone: '',
   email: '',
-  channel: 'whatsapp' as 'whatsapp' | 'email'
+  channel: 'email' as 'email' // Phase 3: Email uniquement
 })
 
 const showSummary = ref(true) // Ouvert par défaut (meilleure visibilité en haut)
