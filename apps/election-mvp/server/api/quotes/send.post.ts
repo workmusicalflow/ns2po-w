@@ -149,6 +149,9 @@ export default defineEventHandler(async (event) => {
     console.log(`[Quote Email API] Validated data for ${validated.reference}`)
 
     // 2. Préparer données pour PDF avec URLs Cloudinary optimisées
+    const config = useRuntimeConfig()
+    const siteUrl = config.public.siteUrl || 'http://localhost:3000'
+
     console.log('[Quote Email API] Building optimized Cloudinary URLs...')
 
     // Logo NS2PO optimisé (200x200, PNG, 90% quality)
