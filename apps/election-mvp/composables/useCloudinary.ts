@@ -202,8 +202,100 @@ export const useCloudinary = () => {
     const timestamp = Date.now()
     const random = Math.random().toString(36).substring(2, 8)
     const cleanName = originalName.replace(/[^a-zA-Z0-9.-]/g, '_')
-    
+
     return prefix ? `${prefix}_${timestamp}_${random}_${cleanName}` : `${timestamp}_${random}_${cleanName}`
+  }
+
+  /**
+   * Extrait le public_id depuis une URL Cloudinary complète
+   */
+  const extractPublicId = (cloudinaryUrl: string): string | null => {
+    const match = cloudinaryUrl.match(/\/upload\/(?:v\d+\/)?(.+)$/)
+    return match ? match[1] : null
+  }
+
+  /**
+   * Optimise URL image produit pour affichage (PDF, UI)
+   * Gère plusieurs cas :
+   * - URL Cloudinary complète → Extrait public_id et optimise
+   * - Public ID direct → Optimise directement
+   * - Undefined/null → Retourne placeholder
+   * - URL non-Cloudinary → Retourne tel quel (no-op)
+   */
+  const getProductImageUrl = (
+    imageUrl?: string,
+    options: CloudinaryTransformOptions = {}
+  ): string => {
+    const PLACEHOLDER = 'ns2po-w/products/placeholder'
+
+    // Fallback placeholder si image manquante
+    if (!imageUrl) {
+      return buildCloudinaryUrl(PLACEHOLDER, {
+        width: 400,
+        height: 400,
+        quality: 85,
+        crop: 'fit',
+        format: 'auto',
+        ...options
+      })
+    }
+
+    // Si URL Cloudinary complète, extraire public_id
+    if (imageUrl.includes('cloudinary.com')) {
+      const publicId = extractPublicId(imageUrl)
+      if (!publicId) {
+        console.warn(`[useCloudinary] Impossible d'extraire public_id depuis: ${imageUrl}`)
+        return buildCloudinaryUrl(PLACEHOLDER, options)
+      }
+      return buildCloudinaryUrl(publicId, {
+        width: 400,
+        height: 400,
+        quality: 85,
+        crop: 'fit',
+        format: 'auto',
+        ...options
+      })
+    }
+
+    // Si URL externe non-Cloudinary, retourner tel quel
+    if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
+      console.warn(`[useCloudinary] URL externe non-Cloudinary: ${imageUrl}`)
+      return imageUrl // No-op
+    }
+
+    // Sinon, traiter comme public_id direct
+    return buildCloudinaryUrl(imageUrl, {
+      width: 400,
+      height: 400,
+      quality: 85,
+      crop: 'fit',
+      format: 'auto',
+      ...options
+    })
+  }
+
+  /**
+   * Preset thumbnail produit pour listes/cartes (64x64, optimisé)
+   */
+  const getThumbnailUrl = (imageUrl?: string): string => {
+    return getProductImageUrl(imageUrl, {
+      width: 64,
+      height: 64,
+      quality: 80,
+      crop: 'fill',
+    })
+  }
+
+  /**
+   * Preset image produit pour détail/modal (800x800, haute qualité)
+   */
+  const getDetailUrl = (imageUrl?: string): string => {
+    return getProductImageUrl(imageUrl, {
+      width: 800,
+      height: 800,
+      quality: 90,
+      crop: 'fit',
+    })
   }
 
   return {
@@ -220,6 +312,12 @@ export const useCloudinary = () => {
     validateFile,
     reset,
     removeUploadResult,
-    generateUniqueFilename
+    generateUniqueFilename,
+
+    // Nouvelles fonctions pour images produits
+    extractPublicId,
+    getProductImageUrl,
+    getThumbnailUrl,
+    getDetailUrl,
   }
 }

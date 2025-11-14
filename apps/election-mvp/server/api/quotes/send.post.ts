@@ -160,18 +160,14 @@ export default defineEventHandler(async (event) => {
 
     // Transformer items avec images produits optimisées (400x400, JPEG, 85% quality)
     const itemsWithOptimizedImages = validated.items.map((item) => {
-      // Extraire public_id depuis imageUrl du client
-      // Ex: "ns2po-w/products/textile-tshirt-001.jpg"
-      const publicId = item.imageUrl?.includes('cloudinary.com')
-        ? item.imageUrl.split('/upload/').pop()?.replace(/^v\d+\//, '') || 'ns2po-w/products/textile-tshirt-001.jpg'
-        : 'ns2po-w/products/textile-tshirt-001.jpg'
+      // Si imageUrl manquant, utiliser placeholder Cloudinary
+      const imageUrl = item.imageUrl || getProductImageUrl('ns2po-w/products/placeholder')
 
-      const optimizedImageUrl = getProductImageUrl(publicId)
-      console.log(`[Quote Email API] Product "${item.name}" image: ${optimizedImageUrl}`)
+      console.log(`[Quote Email API] Product "${item.name}" image: ${imageUrl}`)
 
       return {
         ...item,
-        imageUrl: optimizedImageUrl,
+        imageUrl,
       }
     })
 

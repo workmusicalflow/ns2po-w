@@ -156,7 +156,8 @@ export default defineEventHandler(async (event): Promise<BundleApiResponse> => {
                 COALESCE(bp.custom_price, p.base_price) as basePrice,
                 bp.quantity,
                 (COALESCE(bp.custom_price, p.base_price) * bp.quantity) as subtotal,
-                bp.is_required
+                bp.is_required,
+                p.image_url
               FROM bundle_products bp
               LEFT JOIN products p ON bp.product_id = p.id
               WHERE bp.bundle_id = ?
@@ -171,7 +172,8 @@ export default defineEventHandler(async (event): Promise<BundleApiResponse> => {
             basePrice: Number(productRow.basePrice) || 0,
             quantity: Number(productRow.quantity) || 1,
             subtotal: Number(productRow.subtotal) || 0,
-            isRequired: Boolean(productRow.is_required)
+            isRequired: Boolean(productRow.is_required),
+            image_url: productRow.image_url || null
           }))
 
           // Calculer les totaux

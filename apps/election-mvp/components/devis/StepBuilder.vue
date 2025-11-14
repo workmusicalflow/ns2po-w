@@ -997,7 +997,8 @@ const selectBundle = (bundle: CampaignBundle) => {
       name: p.name,
       quantity,
       unitPrice,
-      total
+      total,
+      image_url: p.image_url || undefined
     }
   })
 
@@ -1064,7 +1065,8 @@ const handleQuantityConfirm = (data: { product: Product; quantity: number; total
       name: data.product.name,
       quantity: data.quantity,
       unitPrice: data.product.basePrice || data.product.price || 0,
-      total: data.total
+      total: data.total,
+      image_url: data.product.image || data.product.image_url || undefined
     })
   }
 
