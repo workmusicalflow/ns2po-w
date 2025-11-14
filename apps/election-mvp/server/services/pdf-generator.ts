@@ -163,16 +163,60 @@ export async function closeBrowser(): Promise<void> {
 // ============================================================================
 
 /**
+ * Fetch image from URL and convert to Base64 data URI
+ * Solution validée par Gemini + Google Search Grounding (16 sources)
+ *
+ * @param url - Image URL to fetch
+ * @param mimeType - MIME type (default: image/jpeg)
+ * @returns Base64 data URI string
+ */
+async function fetchImageAsBase64(url: string, mimeType: string = 'image/jpeg'): Promise<string> {
+  try {
+    console.log(`[PDF Generator] Fetching image: ${url}`)
+
+    const response = await fetch(url)
+    if (!response.ok) {
+      console.warn(`[PDF Generator] Failed to fetch image ${url}: ${response.statusText}`)
+      return '' // Return empty string on error
+    }
+
+    const arrayBuffer = await response.arrayBuffer()
+    const base64 = Buffer.from(arrayBuffer).toString('base64')
+    const dataUri = `data:${mimeType};base64,${base64}`
+
+    console.log(`[PDF Generator] Image converted to Base64: ${url} (${(base64.length / 1024).toFixed(2)}KB)`)
+    return dataUri
+  } catch (error) {
+    console.error(`[PDF Generator] Error fetching image ${url}:`, error)
+    return '' // Return empty string on error
+  }
+}
+
+/**
  * Format quote data for template rendering
+ * Convertit les images en Base64 pour garantir affichage dans PDF
  * Formate les nombres avec séparateurs de milliers
  */
-export function formatQuoteData(data: QuoteData): QuoteData {
+export async function formatQuoteData(data: QuoteData): Promise<QuoteData> {
   const formatNumber = (num: number): string => {
     return num.toLocaleString('fr-FR', {
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
     })
   }
+
+  // Convert logo to Base64
+  const logoBase64 = await fetchImageAsBase64(data.logoUrl, 'image/jpeg')
+
+  // Convert product images to Base64
+  const itemsWithBase64 = await Promise.all(
+    data.items.map(async (item) => ({
+      ...item,
+      unitPrice: formatNumber(item.unitPrice) as any,
+      totalPrice: formatNumber(item.totalPrice) as any,
+      imageUrl: await fetchImageAsBase64(item.imageUrl, 'image/jpeg'),
+    }))
+  )
 
   return {
     ...data,
@@ -181,39 +225,9 @@ export function formatQuoteData(data: QuoteData): QuoteData {
     discountPercent: data.discountPercent,
     tax: formatNumber(data.tax) as any,
     total: formatNumber(data.total) as any,
-    items: data.items.map((item) => ({
-      ...item,
-      unitPrice: formatNumber(item.unitPrice) as any,
-      totalPrice: formatNumber(item.totalPrice) as any,
-      imageUrl: optimizeCloudinaryUrl(item.imageUrl),
-    })),
-    logoUrl: optimizeCloudinaryUrl(data.logoUrl),
+    items: itemsWithBase64,
+    logoUrl: logoBase64,
   }
-}
-
-/**
- * Optimize Cloudinary URLs for PDF rendering
- * Performance: f_auto, q_auto, w_600, c_scale
- * Timeout: 10s max pour éviter blocage
- */
-export function optimizeCloudinaryUrl(url: string): string {
-  if (!url) return ''
-
-  // Si déjà une URL Cloudinary
-  if (url.includes('res.cloudinary.com')) {
-    // Vérifier si déjà optimisée
-    if (url.includes('f_auto') && url.includes('q_auto')) {
-      return url
-    }
-
-    // Insérer transformations après /upload/
-    const parts = url.split('/upload/')
-    if (parts.length === 2) {
-      return `${parts[0]}/upload/f_auto,q_auto,w_600,c_scale/${parts[1]}`
-    }
-  }
-
-  return url
 }
 
 /**
@@ -259,23 +273,40 @@ export async function generateQuotePDF(
   try {
     console.log(`[PDF Generator] Starting PDF generation for ${data.reference}`)
 
-    // 1. Format data
-    const formattedData = formatQuoteData(data)
+    // 1. Format data + Convert images to Base64 (Gemini solution)
+    console.log('[PDF Generator] Converting images to Base64...')
+    const formattedData = await formatQuoteData(data)
 
-    // 2. Compile template (template embarqué)
+    // 2. Compile template (template embarqué avec images Base64)
     const html = compileTemplate(formattedData)
 
     // 3. Get browser instance
     const browser = await getBrowser()
     page = await browser.newPage()
 
-    // 4. Configure page
+    // 4. Set content with Base64 images
+    // domcontentloaded suffisant car images embarquées (plus rapide que networkidle0)
     await page.setContent(html, {
-      waitUntil: 'networkidle0',
+      waitUntil: 'domcontentloaded',
       timeout: options.timeout || 10000, // 10s max
     })
 
-    // 5. Generate PDF
+    // 5. Wait for all images to be complete (extra safety layer)
+    // Solution Gemini - garantit que toutes les images Base64 sont chargées
+    await page.evaluate(async () => {
+      const images = Array.from(document.images)
+      await Promise.all(images.map(img => {
+        if (img.complete) return Promise.resolve()
+        return new Promise((resolve, reject) => {
+          img.onload = resolve
+          img.onerror = reject
+        })
+      }))
+    })
+
+    console.log('[PDF Generator] All images loaded, generating PDF...')
+
+    // 6. Generate PDF
     const pdfBuffer = await page.pdf({
       format: options.format || 'A4',
       printBackground: options.printBackground ?? true,
