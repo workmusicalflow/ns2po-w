@@ -226,7 +226,7 @@ export const useCloudinary = () => {
     imageUrl?: string,
     options: CloudinaryTransformOptions = {}
   ): string => {
-    const PLACEHOLDER = 'ns2po-w/products/placeholder'
+    const PLACEHOLDER = 'placeholder-produit_gz1yex'
 
     // Fallback placeholder si image manquante
     if (!imageUrl) {

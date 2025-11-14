@@ -161,7 +161,7 @@ export default defineEventHandler(async (event) => {
     // Transformer items avec images produits optimisées (400x400, JPEG, 85% quality)
     const itemsWithOptimizedImages = validated.items.map((item) => {
       // Si imageUrl manquant, utiliser placeholder Cloudinary
-      const imageUrl = item.imageUrl || getProductImageUrl('ns2po-w/products/placeholder')
+      const imageUrl = item.imageUrl || getProductImageUrl('placeholder-produit_gz1yex')
 
       console.log(`[Quote Email API] Product "${item.name}" image: ${imageUrl}`)
 
