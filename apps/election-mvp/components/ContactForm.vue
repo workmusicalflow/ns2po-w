@@ -501,7 +501,7 @@ const getMessagePlaceholder = () => {
 
 const getSubmitButtonText = () => {
   const texts = {
-    quote: 'Demander un devis',
+    quote: 'Créer un devis',
     preorder: 'Valider la pré-commande',
     custom: 'Soumettre le projet',
     support: 'Envoyer la question',

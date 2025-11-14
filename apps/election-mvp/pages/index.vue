@@ -24,7 +24,7 @@
           <span class="line-reveal">Votre Campagne Électorale</span>
         </h1>
         <p class="hero-subtitle font-body">
-          Pré-commande et création de visuels gratuits
+          Budget et création de visuels gratuits
         </p>
 
         <!-- Intégration des drapeaux des pays d'opération -->
@@ -33,7 +33,7 @@
         </div>
 
         <Button size="large" class="hero-cta" @click="navigateTo('/devis')">
-          Demander un devis
+          Créer un devis
         </Button>
       </div>
 

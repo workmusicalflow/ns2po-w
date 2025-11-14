@@ -120,7 +120,7 @@ C'est là que la magie opère. Le développeur n'a plus à réfléchir aux coule
     <button
       class="mt-6 px-4 py-2 bg-primary text-white font-heading rounded-md hover:opacity-90"
     >
-      Obtenir un devis
+      Créer un devis
     </button>
   </div>
 </template>
