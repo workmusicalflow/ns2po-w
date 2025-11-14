@@ -124,7 +124,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted, onUnmounted, watch } from 'vue'
 
 interface Props {
   show: boolean
@@ -142,6 +142,26 @@ const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
 
 const copied = ref(false)
+
+// Escape key listener pour fermer le modal
+const handleEscapeKey = (event: KeyboardEvent) => {
+  if (event.key === 'Escape' && props.show) {
+    emit('close')
+  }
+}
+
+// Setup/cleanup des event listeners
+watch(() => props.show, (newShow) => {
+  if (newShow) {
+    document.addEventListener('keydown', handleEscapeKey)
+  } else {
+    document.removeEventListener('keydown', handleEscapeKey)
+  }
+})
+
+onUnmounted(() => {
+  document.removeEventListener('keydown', handleEscapeKey)
+})
 
 // Méthodes
 const copyReference = async () => {

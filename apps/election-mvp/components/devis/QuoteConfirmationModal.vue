@@ -117,7 +117,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, watch, onUnmounted } from 'vue';
 
 const props = defineProps<{
   show: boolean;
@@ -133,6 +133,26 @@ const props = defineProps<{
 const emit = defineEmits<{
   close: []
 }>();
+
+// Escape key listener pour fermer le modal
+const handleEscapeKey = (event: KeyboardEvent) => {
+  if (event.key === 'Escape' && props.show) {
+    emit('close')
+  }
+}
+
+// Setup/cleanup des event listeners
+watch(() => props.show, (newShow) => {
+  if (newShow) {
+    document.addEventListener('keydown', handleEscapeKey)
+  } else {
+    document.removeEventListener('keydown', handleEscapeKey)
+  }
+})
+
+onUnmounted(() => {
+  document.removeEventListener('keydown', handleEscapeKey)
+})
 
 // Computed properties pour l'UI dynamique
 const modalTitle = computed(() => {

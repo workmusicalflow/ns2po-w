@@ -171,6 +171,8 @@
       <button
         :disabled="!isValid || isSubmitting"
         class="w-full py-4 px-6 bg-primary text-white font-bold rounded-lg hover:bg-primary-dark disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-3"
+        :aria-busy="isSubmitting"
+        :aria-live="isSubmitting ? 'polite' : 'off'"
         @click="handleSubmit"
       >
         <!-- Loading spinner (visible pendant isSubmitting) -->
@@ -180,6 +182,8 @@
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
           viewBox="0 0 24 24"
+          role="status"
+          aria-hidden="true"
         >
           <circle
             class="opacity-25"
@@ -197,7 +201,7 @@
         </svg>
 
         <!-- Texte du bouton (change selon isSubmitting) -->
-        <span v-if="isSubmitting">Envoi en cours...</span>
+        <span v-if="isSubmitting" role="status">Envoi en cours...</span>
         <span v-else>Envoyer le devis</span>
       </button>
 
