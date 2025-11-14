@@ -102,9 +102,8 @@ export function buildCloudinaryUrl(
   publicId: string,
   options: CloudinaryTransformOptions = {}
 ): string {
-  const config = useRuntimeConfig();
-  const cloudName =
-    config.public.cloudinaryCloudName || config.cloudinaryCloudName;
+  // Cloud name fixe (ne change jamais pour NS2PO)
+  const cloudName = "dsrvzogof";
 
   if (!cloudName) {
     console.error("Cloudinary Cloud Name non configuré");
