@@ -66,7 +66,7 @@ export function useEmailQuote() {
     // Transformer items au format QuoteItem
     const items = cartItems.map(item => ({
       name: item.name,
-      imageUrl: item.image_url || 'https://res.cloudinary.com/dsrvzogof/image/upload/v1735994796/ns2po/gallery/creative/default-product.jpg',
+      imageUrl: item.image_url || 'https://res.cloudinary.com/dsrvzogof/image/upload/placeholder-produit_gz1yex.svg',
       customization: item.customization || undefined,
       quantity: item.quantity,
       unitPrice: item.unitPrice || (item.total / item.quantity),
