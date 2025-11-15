@@ -6,8 +6,8 @@
 import { getDatabase } from "../../utils/database"
 import { handleApiError } from "../../utils/errorHandler"
 
-// Import des services SOLID depuis assetService (temporaire - à déplacer vers services/domain)
-import { RealisationService } from "../../services/assetService"
+// ✅ REFACTOR Sprint 2-3: Import service simplifié (sans Strategy Pattern over-engineering)
+import { RealisationService } from "../../services/realisationService"
 
 export default defineEventHandler(async (event) => {
   const startTime = Date.now()

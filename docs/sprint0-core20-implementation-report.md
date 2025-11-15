@@ -297,17 +297,22 @@ Seulement warnings de style dans composants non modifiés.
 
 ## 🎯 Prochaines Étapes (Roadmap)
 
-### Sprint 1 - Stabilisation MVP (1-2 semaines)
+### Sprint 1 - Stabilisation MVP ✅ **COMPLÉTÉ**
 
-Tâches importantes restantes (Audit Phase 5) :
+Tâches importantes (Audit Phase 5) :
 
-- [ ] **🟠-2** : Éliminer Duplication Zod Schemas (1-2h) - IMPORTANT
-- [ ] Tests manuels complets feature réalisations
-- [ ] Monitoring cache hit rate production (Railway logs)
+- [x] **🟠-2** : Éliminer Duplication Zod Schemas (1-2h) - ✅ **FAIT** (commit `8348cc8`)
+- [ ] Tests manuels complets feature réalisations - ⏸️ **REPORTÉ**
+- [ ] Monitoring cache hit rate production (Railway logs) - 📋 **BACKLOG**
+
+**Résultat Sprint 1** :
+- ✅ Tâche 🟠-2 complétée : -30 lignes duplication, imports centralisés
+- ✅ Validation : Type-check & Lint exit code 0
+- ✅ Effort réel : 30min (budget 1-2h)
 
 ### Sprint 2-3 - Refactoring Qualité (2-3 semaines)
 
-- [ ] **🟠-1** : Simplifier Strategy Pattern → if/else (3-5h) - Si temps disponible
+- [ ] **🟠-1** : Simplifier Strategy Pattern → if/else (3-5h) - **EN COURS**
 - [ ] **🟡-1** : Tests unitaires critiques (useRealisations, cache)
 
 ### Q1 2026 - Roadmap
@@ -386,4 +391,4 @@ Co-Authored-By: Claude <noreply@anthropic.com>"
 
 **Dernière mise à jour** : 2025-01-15
 **Auteur** : Claude Code (Anthropic) + Task Master v3
-**Statut** : ✅ Sprint 0 complété - Prêt pour tests locaux + Sprint 1
+**Statut** : ✅ Sprint 0-1 complétés - Prêt pour Sprint 2-3 (Strategy Pattern)
