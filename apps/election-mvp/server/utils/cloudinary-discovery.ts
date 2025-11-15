@@ -144,6 +144,75 @@ export function generateTags(filename: string): string[] {
 }
 
 /**
+ * Génère une description intelligente et SEO-friendly basée sur le type de produit
+ * ✅ YAGNI Sprint 1: Descriptions naturelles vs générique "Image découverte..."
+ */
+export function generateSmartDescription(filename: string): string {
+  const parsed = parseCreativeFilename(filename);
+
+  // Dictionnaire descriptions par type (français naturel, SEO-optimisé)
+  const typeDescriptions: Record<string, string> = {
+    // Textile & Vêtements
+    banderole: "Banderole textile grand format personnalisée, idéale pour affichage campagne électorale et événements corporate.",
+    tshirt: "T-shirt en coton personnalisable avec impression logo et slogan au choix, parfait pour campagnes et teams.",
+    polo: "Polo élégant broderie logo haute qualité, idéal pour campagnes professionnelles et événements corporate.",
+    casquette: "Casquette personnalisée de qualité supérieure, idéale pour campagnes électorales et visibilité de marque.",
+    foulard: "Foulard personnalisé avec impression logo, accessoire élégant pour campagnes et événements.",
+    gilet: "Gilet personnalisé avec broderie ou sérigraphie, parfait pour équipes et campagnes terrain.",
+
+    // EPI & Protection
+    visiere: "Visière de protection personnalisée avec logo, équipement professionnel pour campagnes sanitaires.",
+    casque: "Casque de protection personnalisé avec logo entreprise, équipement professionnel aux normes.",
+
+    // Communication & Politique
+    affiche: "Affiche électorale grand format impression haute qualité, visibilité maximale pour votre campagne politique.",
+    affichebois: "Affiche grand format sur support bois, installation solide pour campagne longue durée.",
+    flyer: "Flyer publicitaire personnalisé impression qualité, distribution massive pour votre campagne électorale.",
+    drapeau: "Drapeau personnalisé tissu résistant, visibilité optimale pour campagnes et événements outdoor.",
+    kakemono: "Kakemono enrouleur personnalisé, support communication vertical pour salons et événements.",
+
+    // Gadgets Corporate & Bureautique
+    calendrier: "Calendrier personnalisé avec logo entreprise, cadeau corporate utile toute l'année.",
+    agenda: "Agenda personnalisé broderie ou sérigraphie logo, cadeau corporate apprécié et fonctionnel.",
+    pins: "Pins personnalisé métal émaillé, petit gadget impactant pour campagnes et événements.",
+    badge: "Badge personnalisé avec logo et slogan, identification visuelle pour équipes et événements.",
+    stylo: "Stylo publicitaire métallique personnalisé gravure laser, cadeau corporate élégant et durable.",
+    mug: "Mug personnalisé avec logo entreprise, cadeau corporate utile au quotidien.",
+    gourde: "Gourde personnalisée isotherme avec logo, cadeau écologique apprécié pour campagnes outdoor.",
+    cle: "Porte-clés personnalisé métal ou plastique avec logo, petit gadget mémorable pour campagnes.",
+
+    // Sacs & Accessoires
+    sac: "Sac personnalisé avec logo sérigraphié, accessoire pratique pour campagnes et événements.",
+    sacbandouliere: "Sac bandoulière personnalisé avec impression logo, accessoire tendance pour campagnes jeunes.",
+    totebag: "Tote bag personnalisé en coton, accessoire écologique parfait pour campagnes et salons.",
+
+    // Événements & Outdoor
+    parapluie: "Parapluie grand format personnalisé avec logo, visibilité maximale lors d'événements outdoor.",
+    parasol: "Parasol personnalisé grand format, couverture événements outdoor avec visibilité marque optimale.",
+
+    // Autres
+    eventail: "Éventail personnalisé avec impression recto-verso, gadget rafraîchissant pour événements été.",
+    briquet: "Briquet personnalisé avec logo gravé, petit gadget mémorable pour campagnes adultes.",
+  };
+
+  // Description de base selon le type
+  const baseDescription = typeDescriptions[parsed.type]
+    || "Gadget personnalisé de qualité pour campagnes électorales, événements corporate et communication de marque.";
+
+  // Enrichissement avec numéro de référence si présent
+  if (parsed.identifier && /^\d+$/.test(parsed.identifier)) {
+    return `${baseDescription} (Référence #${parsed.identifier})`;
+  }
+
+  // Enrichissement avec identifiant texte si présent
+  if (parsed.identifier) {
+    return `${baseDescription} (${parsed.identifier})`;
+  }
+
+  return baseDescription;
+}
+
+/**
  * Récupère toutes les images du dossier creative Cloudinary
  */
 export async function getCloudinaryCreativeImages(): Promise<any[]> {
@@ -181,7 +250,7 @@ export function cloudinaryImageToHybridRealisation(
   return {
     id: `cloudinary_${image.public_id.replace(/[^a-zA-Z0-9]/g, "_")}`,
     title: generateSmartTitle(filename),
-    description: `Image découverte automatiquement depuis Cloudinary. Type: ${parseCreativeFilename(filename).type || "non spécifié"}.`,
+    description: generateSmartDescription(filename),
     cloudinaryPublicIds: [image.public_id],
     cloudinaryUrls: [
       `https://res.cloudinary.com/dsrvzogof/image/upload/w_800,h_600,c_fit,f_auto,q_auto/${image.public_id}`,
