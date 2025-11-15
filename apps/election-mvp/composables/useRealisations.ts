@@ -20,7 +20,8 @@ export const useRealisations = () => {
     lastFetch: null,
   }));
 
-  // Utiliser useLazyFetch pour un chargement SSR/client optimal
+  // ✅ REFACTOR: useLazyFetch avec watch() au lieu de transform side-effects
+  // Pattern validé: Gemini Copilot Q2 (Audit Architecture /realisations)
   const {
     data,
     pending,
@@ -29,28 +30,42 @@ export const useRealisations = () => {
   } = useLazyFetch<HybridRealisation[]>("/api/realisations", {
     key: "realisations",
     default: () => [],
-    transform: (data: HybridRealisation[]) => {
-      // Mettre à jour l'état global
-      state.value.realisations = data;
-      state.value.featured = data.filter(
-        (r: HybridRealisation) => r.isFeatured
-      );
-      state.value.lastFetch = Date.now();
-      state.value.loading = false;
-      if (fetchError.value) {
-        state.value.error = "Impossible de charger les réalisations";
-      } else {
-        state.value.error = null;
-      }
-      return data;
-    },
+    server: true, // SSR-friendly
   });
+
+  // ✅ PURE FUNCTION: watch(data) pour synchroniser state (au lieu de transform)
+  watch(
+    data,
+    (newData) => {
+      if (newData) {
+        state.value.realisations = newData;
+        state.value.featured = newData.filter(
+          (r: HybridRealisation) => r.isFeatured
+        );
+        state.value.lastFetch = Date.now();
+      }
+    },
+    { immediate: true }
+  );
 
   // Synchroniser l'état de chargement
   watch(
     pending,
     (newPending) => {
       state.value.loading = newPending;
+    },
+    { immediate: true }
+  );
+
+  // Synchroniser l'état d'erreur
+  watch(
+    fetchError,
+    (newError) => {
+      if (newError) {
+        state.value.error = "Impossible de charger les réalisations";
+      } else {
+        state.value.error = null;
+      }
     },
     { immediate: true }
   );

@@ -5,6 +5,7 @@
 
 import { getDatabase } from "../../utils/database"
 import { z } from "zod"
+import { handleApiError, handleValidationError } from "../../utils/errorHandler"
 
 // Schéma de validation pour mise à jour de réalisation
 const updateRealisationSchema = z.object({
@@ -40,21 +41,13 @@ export default defineEventHandler(async (event) => {
     // Validation du body
     const body = await readBody(event)
 
+    // ✅ ERROR HANDLING UNIFIÉ: Validation Zod
     let validatedData
     try {
       validatedData = updateRealisationSchema.parse(body)
     } catch (error) {
       if (error instanceof z.ZodError) {
-        throw createError({
-          statusCode: 400,
-          statusMessage: 'Données invalides',
-          data: {
-            errors: error.errors.map(err => ({
-              field: err.path.join('.'),
-              message: err.message
-            }))
-          }
-        })
+        throw handleValidationError(error, event)
       }
       throw error
     }
@@ -239,28 +232,12 @@ export default defineEventHandler(async (event) => {
       if (dbError.statusCode) {
         throw dbError
       }
-
-      throw createError({
-        statusCode: 500,
-        statusMessage: 'Erreur lors de la mise à jour de la réalisation',
-        data: { error: dbError.message }
-      })
+      // ✅ ERROR HANDLING UNIFIÉ
+      throw handleApiError(dbError, event)
     }
 
   } catch (error) {
-    console.error(`❌ Erreur PUT /api/realisations/${getRouterParam(event, 'id')}:`, error)
-
-    if (error.statusCode) {
-      throw error
-    }
-
-    throw createError({
-      statusCode: 500,
-      statusMessage: 'Erreur interne du serveur',
-      data: {
-        error: error instanceof Error ? error.message : "Erreur inconnue",
-        duration: Date.now() - startTime
-      }
-    })
+    // ✅ ERROR HANDLING UNIFIÉ
+    throw handleApiError(error, event)
   }
 })

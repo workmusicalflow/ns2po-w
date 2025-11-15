@@ -4,6 +4,7 @@
  */
 
 import { getDatabase } from "../../utils/database"
+import { handleApiError } from "../../utils/errorHandler"
 
 // Import des services SOLID depuis assetService (temporaire - à déplacer vers services/domain)
 import { RealisationService } from "../../services/assetService"
@@ -134,34 +135,16 @@ export default defineEventHandler(async (event) => {
       return response
 
     } catch (dbError: any) {
-      console.error('❌ Erreur base de données:', dbError)
-
       // Si c'est une erreur de contrainte, la renvoyer telle quelle
       if (dbError.statusCode) {
         throw dbError
       }
-
-      throw createError({
-        statusCode: 500,
-        statusMessage: 'Erreur lors de la suppression de la réalisation',
-        data: { error: dbError.message }
-      })
+      // ✅ ERROR HANDLING UNIFIÉ
+      throw handleApiError(dbError, event)
     }
 
   } catch (error: any) {
-    console.error(`❌ Erreur DELETE /api/realisations/${getRouterParam(event, 'id')}:`, error)
-
-    if (error.statusCode) {
-      throw error
-    }
-
-    throw createError({
-      statusCode: 500,
-      statusMessage: 'Erreur interne du serveur',
-      data: {
-        error: error instanceof Error ? error.message : "Erreur inconnue",
-        duration: Date.now() - startTime
-      }
-    })
+    // ✅ ERROR HANDLING UNIFIÉ
+    throw handleApiError(error, event)
   }
 })

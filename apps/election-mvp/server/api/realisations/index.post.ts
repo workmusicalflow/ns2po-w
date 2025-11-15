@@ -5,6 +5,7 @@
 
 import { getDatabase } from "../../utils/database"
 import { z } from "zod"
+import { handleApiError, handleValidationError } from "../../utils/errorHandler"
 
 // Schéma de validation pour création de réalisation
 const createRealisationSchema = z.object({
@@ -32,21 +33,13 @@ export default defineEventHandler(async (event) => {
     // Validation du body
     const body = await readBody(event)
 
+    // ✅ ERROR HANDLING UNIFIÉ: Validation Zod
     let validatedData
     try {
       validatedData = createRealisationSchema.parse(body)
     } catch (error) {
       if (error instanceof z.ZodError) {
-        throw createError({
-          statusCode: 400,
-          statusMessage: 'Données invalides',
-          data: {
-            errors: error.errors.map(err => ({
-              field: err.path.join('.'),
-              message: err.message
-            }))
-          }
-        })
+        throw handleValidationError(error, event)
       }
       throw error
     }
@@ -166,34 +159,16 @@ export default defineEventHandler(async (event) => {
       return response
 
     } catch (dbError) {
-      console.error('❌ Erreur base de données:', dbError)
-
-      // Si c'est une erreur de contrainte, la renvoyer telle quelle
+      // Si c'est une erreur de contrainte (409), la renvoyer telle quelle
       if (dbError.statusCode) {
         throw dbError
       }
-
-      throw createError({
-        statusCode: 500,
-        statusMessage: 'Erreur lors de la création de la réalisation',
-        data: { error: dbError.message }
-      })
+      // ✅ ERROR HANDLING UNIFIÉ: Database errors
+      throw handleApiError(dbError, event)
     }
 
   } catch (error) {
-    console.error(`❌ Erreur POST /api/realisations:`, error)
-
-    if (error.statusCode) {
-      throw error
-    }
-
-    throw createError({
-      statusCode: 500,
-      statusMessage: 'Erreur interne du serveur',
-      data: {
-        error: error instanceof Error ? error.message : "Erreur inconnue",
-        duration: Date.now() - startTime
-      }
-    })
+    // ✅ ERROR HANDLING UNIFIÉ: Catch-all global
+    throw handleApiError(error, event)
   }
 })

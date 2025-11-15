@@ -9,6 +9,11 @@ import {
   getCloudinaryCreativeImages,
   cloudinaryImageToHybridRealisation,
 } from "../../utils/cloudinary-discovery";
+import {
+  getCachedCloudinaryRealisations,
+  setCachedCloudinaryRealisations,
+} from "../../utils/cloudinaryCache";
+import { handleApiError } from "../../utils/errorHandler";
 
 /**
  * Récupère réalisations depuis Turso
@@ -61,12 +66,20 @@ async function fetchTursoRealisations(): Promise<HybridRealisation[]> {
 
 /**
  * Génère réalisations auto-discovery Cloudinary
+ * ⚡ CACHE: Utilise cache Nitro (TTL 1h) pour éviter N+1 Problem
  */
 async function generateAutoDiscoveryRealisations(existingPublicIds: Set<string>): Promise<HybridRealisation[]> {
   try {
     console.log("🔍 Auto-discovery Cloudinary...");
 
-    const cloudinaryImages = await getCloudinaryCreativeImages();
+    // ✅ CACHE: Vérifier cache avant appel API Cloudinary
+    let cloudinaryImages = await getCachedCloudinaryRealisations();
+
+    if (!cloudinaryImages) {
+      // MISS: Appel API Cloudinary + mise en cache
+      cloudinaryImages = await getCloudinaryCreativeImages();
+      await setCachedCloudinaryRealisations(cloudinaryImages);
+    }
 
     // Récupérer les public_ids blacklistés
     const db = getDatabase();
@@ -158,10 +171,8 @@ export default defineEventHandler(async (event): Promise<HybridRealisation[]> =>
     return sortedRealisations;
 
   } catch (error: any) {
-    console.error("❌ API Réalisations erreur:", error);
-
-    // En cas d'erreur, retourner tableau vide plutôt que de crasher
-    setHeader(event, 'X-Source', 'error-fallback');
-    return [];
+    // ✅ ERROR HANDLING UNIFIÉ: Throw error structuré (au lieu de return [] silencieux)
+    // Pattern validé: Anti-pattern 5 corrigé (Audit Architecture /realisations)
+    throw handleApiError(error, event);
   }
 });
