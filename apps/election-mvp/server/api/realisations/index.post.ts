@@ -6,23 +6,8 @@
 import { getDatabase } from "../../utils/database"
 import { z } from "zod"
 import { handleApiError, handleValidationError } from "../../utils/errorHandler"
-
-// Schéma de validation pour création de réalisation
-const createRealisationSchema = z.object({
-  title: z.string().min(1, "Le titre est requis").max(200, "Le titre ne peut pas dépasser 200 caractères"),
-  description: z.string().optional(),
-  cloudinary_public_ids: z.array(z.string()).optional(),
-  product_ids: z.array(z.string()).optional(),
-  category_ids: z.array(z.string()).optional(),
-  customization_option_ids: z.array(z.string()).optional(),
-  tags: z.array(z.string()).optional(),
-  is_featured: z.boolean().optional(),
-  order_position: z.number().min(0).optional(),
-  is_active: z.boolean().optional(),
-  source: z.enum(['airtable', 'cloudinary-auto-discovery', 'turso']).optional(),
-  cloudinary_urls: z.array(z.string().url()).optional(),
-  cloudinary_metadata: z.record(z.any()).optional()
-})
+// ✅ DRY: Import schema centralisé (Single Source of Truth)
+import { createRealisationSchema } from "../../../schemas/realisation"
 
 export default defineEventHandler(async (event) => {
   const startTime = Date.now()
