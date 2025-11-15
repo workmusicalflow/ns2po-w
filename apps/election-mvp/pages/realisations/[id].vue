@@ -174,42 +174,6 @@
             </div>
           </div>
 
-          <!-- Produits associés -->
-          <div v-if="relatedProducts.length > 0">
-            <h3 class="font-medium text-gray-900 mb-3">
-              Produits utilisés ({{ relatedProducts.length }})
-            </h3>
-            <div class="grid grid-cols-2 gap-3">
-              <div
-                v-for="product in relatedProducts.slice(0, 4)"
-                :key="product.id"
-                class="p-3 border border-gray-200 rounded-lg hover:border-accent transition-colors"
-              >
-                <div class="flex items-center gap-3">
-                  <div
-                    class="w-12 h-12 bg-gray-100 rounded-md flex items-center justify-center"
-                  >
-                    <img
-                      v-if="product.image"
-                      :src="product.image"
-                      :alt="product.name"
-                      class="w-full h-full object-cover rounded-md"
-                    >
-                    <span v-else class="text-gray-400 text-lg">📦</span>
-                  </div>
-                  <div class="flex-1 min-w-0">
-                    <p class="font-medium text-sm text-gray-900 truncate">
-                      {{ product.name }}
-                    </p>
-                    <p class="text-xs text-gray-600">
-                      {{ product.category }}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
           <!-- Actions CTA -->
           <div class="space-y-4 pt-6 border-t border-gray-200">
             <div class="space-y-3">
@@ -272,7 +236,7 @@
 
 <script setup lang="ts">
 import { Button } from "@ns2po/ui";
-import type { Product, Realisation } from "@ns2po/types";
+import type { Realisation } from "@ns2po/types";
 
 // Paramètres de la route
 const route = useRoute();
@@ -282,14 +246,12 @@ const realisationId = route.params.id as string;
 const loading = ref(true);
 const realisation = ref<Realisation | null>(null);
 const mainImage = ref<string>("");
-const relatedProducts = ref<Product[]>([]);
 const similarRealisations = ref<Realisation[]>([]);
 
 // Composables
 const { getRealisationById, getSimilarRealisations, fetchRealisations } =
   useRealisations();
 
-const { activeProducts, loadProducts } = useProducts();
 const { trackRealisationInteraction, trackUserJourney } = useObservability();
 const { openModal } = useImageModal();
 
@@ -297,7 +259,7 @@ const { openModal } = useImageModal();
 onMounted(async () => {
   try {
     // Charger les données de base si nécessaire
-    await Promise.all([fetchRealisations(), loadProducts()]);
+    await fetchRealisations();
 
     // Charger la réalisation spécifique
     const loadedRealisation = await getRealisationById(realisationId);
@@ -308,13 +270,6 @@ onMounted(async () => {
       // Image principale (première image ou image par défaut)
       if (loadedRealisation.cloudinaryUrls?.length > 0) {
         mainImage.value = loadedRealisation.cloudinaryUrls[0];
-      }
-
-      // Charger les produits associés
-      if (loadedRealisation.productIds?.length > 0) {
-        relatedProducts.value = activeProducts.value.filter((product) =>
-          loadedRealisation.productIds.includes(product.id)
-        );
       }
 
       // Charger les réalisations similaires
@@ -328,7 +283,6 @@ onMounted(async () => {
 
       trackUserJourney("realisation_detail_view", {
         realisationId: loadedRealisation.id,
-        hasRelatedProducts: relatedProducts.value.length > 0,
         hasSimilarRealisations: similarRealisations.value.length > 0,
       });
 
