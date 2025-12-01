@@ -316,94 +316,19 @@
           </div>
         </div>
 
-        <!-- Images -->
+        <!-- Images - Nouveau composant unifié -->
         <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
           <h2 class="text-lg font-medium text-gray-900 mb-6">
             Images du produit
           </h2>
 
-          <!-- Main Image -->
-          <div class="mb-6">
-            <label class="block text-sm font-medium text-gray-700 mb-2">Image principale</label>
-            <div class="flex items-center space-x-4">
-              <div class="flex-shrink-0">
-                <img
-                  v-if="form.image_url"
-                  :src="form.image_url"
-                  alt="Aperçu"
-                  class="w-24 h-24 rounded-lg object-cover border border-gray-300"
-                >
-                <div
-                  v-else
-                  class="w-24 h-24 rounded-lg bg-gray-100 border-2 border-dashed border-gray-300 flex items-center justify-center"
-                >
-                  <Icon name="heroicons:photo" class="w-8 h-8 text-gray-400" />
-                </div>
-              </div>
-              <div class="flex-1">
-                <input
-                  v-model="form.image_url"
-                  type="url"
-                  placeholder="URL de l'image principale..."
-                  class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
-                >
-                <p class="mt-1 text-xs text-gray-500">
-                  URL de l'image ou utilisez le bouton d'upload
-                </p>
-              </div>
-              <button
-                type="button"
-                class="px-4 py-2 bg-amber-600 text-white text-sm rounded-md hover:bg-amber-700"
-                @click="uploadMainImage"
-              >
-                Upload
-              </button>
-            </div>
-          </div>
-
-          <!-- Gallery Images -->
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Galerie d'images</label>
-            <div class="mb-4">
-              <div class="flex items-center space-x-2">
-                <input
-                  v-model="newGalleryUrl"
-                  type="url"
-                  placeholder="URL de l'image à ajouter..."
-                  class="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
-                  @keydown.enter.prevent="addGalleryImage"
-                >
-                <button
-                  type="button"
-                  class="px-3 py-2 bg-amber-600 text-white text-sm rounded-md hover:bg-amber-700"
-                  @click="addGalleryImage"
-                >
-                  Ajouter
-                </button>
-              </div>
-            </div>
-
-            <div v-if="form.gallery_urls.length > 0" class="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div
-                v-for="(url, index) in form.gallery_urls"
-                :key="index"
-                class="relative group"
-              >
-                <img
-                  :src="url"
-                  :alt="`Image ${index + 1}`"
-                  class="w-full h-24 rounded-lg object-cover border border-gray-300"
-                >
-                <button
-                  type="button"
-                  class="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                  @click="removeGalleryImage(index)"
-                >
-                  <Icon name="heroicons:x-mark" class="w-3 h-3" />
-                </button>
-              </div>
-            </div>
-          </div>
+          <!-- ProductMediaManager avec v-model -->
+          <AdminProductMediaManager
+            v-model="mediaItems"
+            :max-items="10"
+            folder="ns2po-election/products"
+            :disabled="isSubmitting"
+          />
         </div>
       </div>
 
@@ -542,6 +467,8 @@
 // Imports explicites (doivent être en haut)
 import { useQueryClient } from '@tanstack/vue-query'
 import { productQueryKeys } from '~/composables/useProductsQuery'
+import type { ProductMedia } from '~/types/media'
+import { legacyToProductMedia, productMediaToLegacy } from '~/types/media'
 
 // Layout admin
 definePageMeta({
@@ -644,7 +571,9 @@ if (fetchError.value) {
 const isSubmitting = ref(false)
 const newColor = ref('')
 const newSize = ref('')
-const newGalleryUrl = ref('')
+
+// Media items (remplace image_url + gallery_urls)
+const mediaItems = ref<ProductMedia[]>([])
 
 // Form data
 const form = reactive({
@@ -674,6 +603,13 @@ watch(productData, (newData) => {
     mapProductToForm(newData)
   }
 }, { immediate: true }) // immediate pour initialiser dès que les données arrivent
+
+// Synchroniser mediaItems → form.image_url + form.gallery_urls (pour API)
+watch(mediaItems, (newItems) => {
+  const legacy = productMediaToLegacy(newItems)
+  form.image_url = legacy.imageUrl
+  form.gallery_urls = legacy.galleryUrls
+}, { deep: true })
 
 // Form errors
 const errors = reactive({
@@ -717,6 +653,11 @@ function mapProductToForm(data: any) {
     mappedPrice
   })
 
+  // Mapper les images legacy vers ProductMedia[]
+  const imageUrl = data.image || data.image_url || ''
+  const galleryUrls = data.galleryUrls || data.gallery_urls || []
+  mediaItems.value = legacyToProductMedia(imageUrl, galleryUrls)
+
   Object.assign(form, {
     name: data.name,
     description: data.description || '',
@@ -731,8 +672,8 @@ function mapProductToForm(data: any) {
     materials: data.materials || '',
     colors: data.colors || [],
     sizes: data.sizes || [],
-    image_url: data.image || data.image_url || '', // API: image → form: image_url
-    gallery_urls: data.galleryUrls || data.gallery_urls || [], // API: galleryUrls → form: gallery_urls
+    image_url: imageUrl, // Conservé pour rétrocompatibilité API
+    gallery_urls: galleryUrls, // Conservé pour rétrocompatibilité API
     specifications: data.specifications || '',
     is_active: data.isActive ?? data.is_active ?? true // API: isActive → form: is_active
   })
@@ -775,59 +716,8 @@ function removeSize(index: number) {
   form.sizes.splice(index, 1)
 }
 
-function addGalleryImage() {
-  const url = newGalleryUrl.value.trim()
-  if (url && !form.gallery_urls.includes(url)) {
-    form.gallery_urls.push(url)
-    newGalleryUrl.value = ''
-  }
-}
-
-function removeGalleryImage(index: number) {
-  form.gallery_urls.splice(index, 1)
-}
-
-async function uploadMainImage() {
-  const fileInput = document.createElement('input')
-  fileInput.type = 'file'
-  fileInput.accept = 'image/jpeg,image/png,image/webp,image/svg+xml'
-
-  fileInput.onchange = async (e: Event) => {
-    const target = e.target as HTMLInputElement
-    const file = target.files?.[0]
-
-    if (!file) return
-
-    try {
-      isSubmitting.value = true
-
-      // Prepare form data
-      const formData = new FormData()
-      formData.append('file', file)
-      formData.append('folder', 'ns2po-election')
-      formData.append('preset', 'product')
-
-      // Upload to Cloudinary
-      const response = await $fetch('/api/cloudinary/upload', {
-        method: 'POST',
-        body: formData
-      })
-
-      if (response.success && response.data) {
-        // Update main image URL
-        form.image_url = response.data.secure_url
-        crudSuccess.updated('Image principale mise à jour avec succès')
-      }
-    } catch (error) {
-      console.error('Error uploading image:', error)
-      crudError.validation('Erreur lors de l\'upload de l\'image')
-    } finally {
-      isSubmitting.value = false
-    }
-  }
-
-  fileInput.click()
-}
+// Les anciennes fonctions addGalleryImage, removeGalleryImage, uploadMainImage
+// ont été remplacées par le composant ProductMediaManager
 
 function validateForm(): boolean {
   errors.name = form.name.trim() === '' ? 'Le nom est requis' : ''
