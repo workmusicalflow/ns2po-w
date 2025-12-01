@@ -104,7 +104,7 @@
     <EmailConfirmationModal
       :show="showEmailModal"
       :reference="emailQuoteReference"
-      :trackingUrl="emailTrackingUrl"
+      :tracking-url="emailTrackingUrl"
       @close="showEmailModal = false"
       @new-quote="resetForm"
     />

@@ -1,0 +1,90 @@
+{
+  "id": "sprint-1763212929290-5a56a85f",
+  "name": "Sprint 1 - Stabilisation MVP & Qualité Code",
+  "startDate": "2025-01-15",
+  "endDate": "2025-01-22",
+  "goals": "Finaliser stabilisation architecture /realisations avec tâches IMPORTANTES identifiées dans l'audit. Focus: Éliminer duplication Zod schemas (DRY principle), tests manuels cache Cloudinary, monitoring production. Effort: 4-7h. Target: Codebase maintenable sans dette technique.",
+  "status": "active",
+  "created": "2025-11-15T13:22:09.291Z",
+  "tasks": [
+    {
+      "id": 1,
+      "title": "🟠-2A: Analyser duplication Zod schemas (schemas/realisation.ts vs API routes)",
+      "description": "Identifier schémas Zod dupliqués entre schemas/realisation.ts et server/api/realisations/*.ts. Documenter patterns duplication existants. Pattern DRY violation identifié dans audit (Anti-pattern 4).",
+      "status": "completed",
+      "priority": 4,
+      "dependencies": [],
+      "created": "2025-11-15T13:22:32.289Z",
+      "updated": "2025-11-15T13:23:18.950Z",
+      "isPareto80": false
+    },
+    {
+      "id": 2,
+      "title": "🟠-2B: Centraliser imports Zod dans API routes (index.post.ts, [id].put.ts)",
+      "description": "Remplacer définitions locales par imports depuis schemas/realisation.ts. Appliquer pattern Single Source of Truth. Vérifier createRealisationSchema et updateRealisationSchema.",
+      "status": "completed",
+      "priority": 4,
+      "dependencies": [
+        1
+      ],
+      "created": "2025-11-15T13:22:32.726Z",
+      "updated": "2025-11-15T13:23:46.758Z",
+      "isPareto80": false
+    },
+    {
+      "id": 3,
+      "title": "🟠-2C: Vérifier type-safety après centralisation schemas",
+      "description": "Exécuter pnpm exec nuxi typecheck. Garantir zéro régression TypeScript. Valider imports schema fonctionnent correctement.",
+      "status": "completed",
+      "priority": 4,
+      "dependencies": [
+        2
+      ],
+      "created": "2025-11-15T13:22:33.158Z",
+      "updated": "2025-11-15T13:26:53.641Z",
+      "isPareto80": false
+    },
+    {
+      "id": 4,
+      "title": "🔴-1C: Tests manuels cache Cloudinary (MISS → HIT → TTL expiration)",
+      "description": "Démarrer pnpm dev. Test 1: Première requête MISS. Test 2: Seconde requête HIT. Test 3: Attendre TTL expiration (modifier à 60s pour test rapide). Vérifier logs cache détaillés.",
+      "status": "pending",
+      "priority": 5,
+      "dependencies": [],
+      "created": "2025-11-15T13:22:33.575Z",
+      "updated": "2025-11-15T13:22:33.575Z",
+      "isPareto80": false
+    },
+    {
+      "id": 5,
+      "title": "📊 Monitoring: Ajouter metrics cache hit rate (logs Railway)",
+      "description": "Améliorer logs cloudinaryCache.ts avec métriques: hit_count, miss_count, hit_rate%. Faciliter monitoring production Railway. Optionnel: Ajouter endpoint /api/admin/cache/stats.",
+      "status": "pending",
+      "priority": 3,
+      "dependencies": [],
+      "created": "2025-11-15T13:22:34.020Z",
+      "updated": "2025-11-15T13:22:34.020Z",
+      "isPareto80": false
+    },
+    {
+      "id": 6,
+      "title": "✅ Tests manuels complets feature /realisations (pages + admin CRUD)",
+      "description": "Tester pages/realisations/index.vue (liste). Tester pages/realisations/[id].vue (détail). Tester admin CRUD (create, update, delete). Vérifier réactivité state après refactor transform. Valider error handling UX.",
+      "status": "pending",
+      "priority": 4,
+      "dependencies": [
+        4
+      ],
+      "created": "2025-11-15T13:22:34.491Z",
+      "updated": "2025-11-15T13:22:34.491Z",
+      "isPareto80": false
+    }
+  ],
+  "paretoDecisions": [],
+  "metrics": {
+    "tasksCompleted": 3,
+    "tasksMovedToVault": 0,
+    "velocityPoints": 0
+  },
+  "updated": "2025-11-15T13:26:53.641Z"
+}

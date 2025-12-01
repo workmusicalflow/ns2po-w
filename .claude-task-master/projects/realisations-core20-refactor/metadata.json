@@ -1,0 +1,12 @@
+{
+  "id": "realisations-core20-refactor",
+  "name": "Réalisations Core 20% - Performance & Architecture",
+  "description": "Implémentation des 3 tâches critiques identifiées dans l'audit architecture /realisations: Cache Cloudinary API, Refactor Transform Side-Effects, Unifier Error Handling. Focus performance 3G et maintenabilité MVP.",
+  "created": "2025-11-15T13:01:32.209Z",
+  "sprints": [
+    "sprint-1763211701914-1da7ef46",
+    "sprint-1763212929290-5a56a85f"
+  ],
+  "activeSprint": "sprint-1763212929290-5a56a85f",
+  "updated": "2025-11-15T13:22:09.292Z"
+}

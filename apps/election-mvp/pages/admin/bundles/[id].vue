@@ -207,10 +207,10 @@
               <div class="flex items-center gap-2 min-w-[140px]">
                 <label class="flex items-center gap-2 cursor-pointer group relative">
                   <input
-                    type="checkbox"
                     v-model="product.priceLocked"
+                    type="checkbox"
                     class="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
-                  />
+                  >
                   <span class="text-xs text-gray-600">
                     {{ product.priceLocked ? '🔒 Prix fixe' : '🔄 Auto-sync' }}
                   </span>
@@ -229,7 +229,7 @@
                       <p>• ✅ Recommandé (80% des cas)</p>
                     </div>
                     <!-- Flèche du tooltip -->
-                    <div class="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900"></div>
+                    <div class="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900" />
                   </div>
                 </label>
               </div>

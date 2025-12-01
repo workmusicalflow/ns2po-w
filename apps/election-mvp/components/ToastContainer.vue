@@ -27,7 +27,9 @@
 
           <!-- Content -->
           <div class="toast-text">
-            <p class="toast-title">{{ notification.title }}</p>
+            <p class="toast-title">
+              {{ notification.title }}
+            </p>
             <p v-if="notification.message" class="toast-message">
               {{ notification.message }}
             </p>
@@ -36,8 +38,8 @@
           <!-- Close button -->
           <button
             class="toast-close"
-            @click="removeNotification(notification.id)"
             :aria-label="`Fermer notification ${notification.title}`"
+            @click="removeNotification(notification.id)"
           >
             <svg class="icon-sm" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />

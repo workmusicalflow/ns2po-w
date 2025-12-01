@@ -5,10 +5,12 @@
       <div class="modal-header">
         <div class="status-icon success">
           <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
           </svg>
         </div>
-        <h3 class="modal-title">Devis envoyé par email !</h3>
+        <h3 class="modal-title">
+          Devis envoyé par email !
+        </h3>
       </div>
 
       <!-- Message principal -->
@@ -19,19 +21,21 @@
 
         <!-- Référence de suivi -->
         <div v-if="reference" class="reference-section">
-          <h4 class="reference-title">📋 Référence de suivi</h4>
+          <h4 class="reference-title">
+            📋 Référence de suivi
+          </h4>
           <div class="reference-box">
             <code class="reference-code">{{ reference }}</code>
             <button
               class="copy-btn"
-              @click="copyReference"
               :disabled="copied"
+              @click="copyReference"
             >
               <svg v-if="!copied" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
               </svg>
               <svg v-else class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
               </svg>
               {{ copied ? 'Copié' : 'Copier' }}
             </button>
@@ -40,7 +44,9 @@
 
         <!-- Étapes suivantes -->
         <div class="next-steps-section">
-          <h4 class="steps-title">🎯 Prochaines étapes</h4>
+          <h4 class="steps-title">
+            🎯 Prochaines étapes
+          </h4>
           <ul class="steps-list">
             <li>✅ Votre demande a été enregistrée avec la référence {{ reference }}</li>
             <li>📧 Vous recevrez un email de confirmation dans les prochaines minutes</li>
@@ -51,20 +57,26 @@
 
         <!-- Actions -->
         <div class="action-section">
-          <h4 class="action-title">📞 Besoin d'assistance ?</h4>
+          <h4 class="action-title">
+            📞 Besoin d'assistance ?
+          </h4>
 
           <!-- Option 1: Consulter email -->
           <div class="action-option">
             <span class="option-number">1.</span>
             <div class="option-content">
-              <p class="option-label">Vérifiez votre boîte email</p>
-              <p class="option-desc">Un email de confirmation a été envoyé</p>
+              <p class="option-label">
+                Vérifiez votre boîte email
+              </p>
+              <p class="option-desc">
+                Un email de confirmation a été envoyé
+              </p>
               <button
                 class="btn btn-secondary"
                 @click="openEmailClient"
               >
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                 </svg>
                 Ouvrir Email
               </button>
@@ -75,8 +87,12 @@
           <div class="action-option">
             <span class="option-number">2.</span>
             <div class="option-content">
-              <p class="option-label">Contact direct</p>
-              <p class="option-desc">Appelez notre équipe commerciale</p>
+              <p class="option-label">
+                Contact direct
+              </p>
+              <p class="option-desc">
+                Appelez notre équipe commerciale
+              </p>
               <div class="contact-buttons">
                 <a
                   href="tel:+2250777104936"
@@ -84,7 +100,7 @@
                   @click="trackAction('phone_clicked')"
                 >
                   <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
+                    <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z" />
                   </svg>
                   Appeler
                 </a>
@@ -94,7 +110,7 @@
                   @click="trackAction('email_clicked')"
                 >
                   <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                   </svg>
                   Email
                 </a>

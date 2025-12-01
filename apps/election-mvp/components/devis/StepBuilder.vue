@@ -87,11 +87,15 @@
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
             </svg>
           </div>
-          <h3 class="text-lg font-semibold text-gray-700 mb-2">Aucun pack disponible</h3>
-          <p class="text-gray-600">Les packs de campagne sont en cours de chargement...</p>
+          <h3 class="text-lg font-semibold text-gray-700 mb-2">
+            Aucun pack disponible
+          </h3>
+          <p class="text-gray-600">
+            Les packs de campagne sont en cours de chargement...
+          </p>
           <button
-            @click="activeTab = 'products'"
             class="mt-4 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark"
+            @click="activeTab = 'products'"
           >
             Voir les produits individuels
           </button>
@@ -317,7 +321,7 @@
                       loading="lazy"
                       class="w-full h-full object-cover"
                       @error="handleImageError(virtualRow.index)"
-                    />
+                    >
                     <!-- Fallback si pas d'image -->
                     <div v-else class="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200">
                       <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -363,8 +367,8 @@
                         class="flex items-center gap-1"
                         :title="`Score: ${searchResults[virtualRow.index].score}/100`"
                       >
-                        <span v-for="n in Math.min(3, Math.ceil(searchResults[virtualRow.index].score / 33))" :key="n" class="w-1.5 h-1.5 bg-blue-500 rounded-full"></span>
-                        <span v-for="n in (3 - Math.min(3, Math.ceil(searchResults[virtualRow.index].score / 33)))" :key="`empty-${n}`" class="w-1.5 h-1.5 bg-gray-300 rounded-full"></span>
+                        <span v-for="n in Math.min(3, Math.ceil(searchResults[virtualRow.index].score / 33))" :key="n" class="w-1.5 h-1.5 bg-blue-500 rounded-full" />
+                        <span v-for="n in (3 - Math.min(3, Math.ceil(searchResults[virtualRow.index].score / 33)))" :key="`empty-${n}`" class="w-1.5 h-1.5 bg-gray-300 rounded-full" />
                       </div>
                     </div>
                   </div>
@@ -374,8 +378,8 @@
                     <!-- Quantité cliquable pour ouvrir le bottom sheet -->
                     <button
                       class="quantity-display px-3 py-1 text-sm font-medium bg-gray-50 border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors min-w-[3rem] text-center"
-                      @click="openQuantitySheet(searchResults[virtualRow.index]?.product)"
                       :title="getProductQuantity(searchResults[virtualRow.index]?.product?.id) ? 'Modifier la quantité' : 'Ajouter une quantité'"
+                      @click="openQuantitySheet(searchResults[virtualRow.index]?.product)"
                     >
                       {{ getProductQuantity(searchResults[virtualRow.index]?.product?.id) || 0 }}
                     </button>
@@ -383,8 +387,8 @@
                     <!-- Bouton principal pour ouvrir le bottom sheet -->
                     <button
                       class="quantity-button w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center hover:bg-primary-dark transition-colors relative"
-                      @click="openQuantitySheet(searchResults[virtualRow.index]?.product)"
                       :title="getProductQuantity(searchResults[virtualRow.index]?.product?.id) ? 'Modifier la quantité' : 'Choisir une quantité'"
+                      @click="openQuantitySheet(searchResults[virtualRow.index]?.product)"
                     >
                       +
                       <!-- Indicateur d'options avancées -->
@@ -418,7 +422,9 @@
               <div class="smart-suggestions space-y-4 mb-6">
                 <!-- Suggestions orthographiques -->
                 <div v-if="getSpellingSuggestions().length > 0" class="suggestion-group">
-                  <p class="text-sm font-medium text-gray-700 mb-2">Voulez-vous dire :</p>
+                  <p class="text-sm font-medium text-gray-700 mb-2">
+                    Voulez-vous dire :
+                  </p>
                   <div class="flex flex-wrap justify-center gap-2">
                     <button
                       v-for="suggestion in getSpellingSuggestions().slice(0, 3)"
@@ -433,7 +439,9 @@
 
                 <!-- Suggestions de catégories -->
                 <div v-if="availableCategories.length > 0" class="suggestion-group">
-                  <p class="text-sm font-medium text-gray-700 mb-2">Ou explorez par catégorie :</p>
+                  <p class="text-sm font-medium text-gray-700 mb-2">
+                    Ou explorez par catégorie :
+                  </p>
                   <div class="flex flex-wrap justify-center gap-2">
                     <button
                       v-for="category in availableCategories.slice(0, 4)"

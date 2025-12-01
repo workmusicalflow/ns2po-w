@@ -1,7 +1,7 @@
 {
   "version": "3.0",
   "created": "2025-09-20T18:38:27.616Z",
-  "activeProject": "proj-1762984262089-e7e5c9a7",
+  "activeProject": "realisations-core20-refactor",
   "projects": [
     {
       "id": "bundles-crud-enhancement",
@@ -71,7 +71,12 @@
       "id": "proj-1762984262089-e7e5c9a7",
       "name": "Quote PDF Generation + Email Integration",
       "path": "/Users/logansery/Documents/ns2po-w/.claude-task-master/projects/proj-1762984262089-e7e5c9a7"
+    },
+    {
+      "id": "realisations-core20-refactor",
+      "name": "Réalisations Core 20% - Performance & Architecture",
+      "path": "/Users/logansery/Documents/ns2po-w/.claude-task-master/projects/realisations-core20-refactor"
     }
   ],
-  "updated": "2025-11-12T21:51:02.090Z"
+  "updated": "2025-11-15T13:01:41.738Z"
 }
