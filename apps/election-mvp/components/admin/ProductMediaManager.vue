@@ -186,9 +186,9 @@ function getStatusColor(status: ProductMedia['status']): string {
       class="relative border-2 border-dashed rounded-lg p-4 transition-colors"
       :class="[
         isDragging ? 'border-primary-500 bg-primary-50' : 'border-gray-300',
-        disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:border-gray-400'
+        disabled ? 'opacity-50 cursor-not-allowed' : (!hasItems ? 'cursor-pointer hover:border-gray-400' : '')
       ]"
-      @click="openFilePicker"
+      @click="!hasItems && openFilePicker()"
       @dragover="handleDragOver"
       @dragleave="handleDragLeave"
       @drop="handleDrop"
