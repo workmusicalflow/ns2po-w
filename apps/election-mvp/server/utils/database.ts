@@ -82,6 +82,26 @@ export async function initDatabase() {
       )
     `)
 
+    // Create promoted_cloudinary_assets table for auto-discovery tracking
+    // This table tracks Cloudinary images that have been promoted to Turso realisations
+    // to prevent duplication when the realisation is later modified
+    await db.execute(`
+      CREATE TABLE IF NOT EXISTS promoted_cloudinary_assets (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        public_id TEXT UNIQUE NOT NULL,
+        promoted_to_realisation_id TEXT,
+        original_title TEXT,
+        promoted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        promoted_by TEXT DEFAULT 'admin'
+      )
+    `)
+
+    // Create index for fast filtering in auto-discovery
+    await db.execute(`
+      CREATE INDEX IF NOT EXISTS idx_promoted_assets_public_id
+      ON promoted_cloudinary_assets(public_id)
+    `)
+
     console.log('✅ Database tables initialized')
   } catch (error) {
     console.error('❌ Failed to initialize database tables:', error)

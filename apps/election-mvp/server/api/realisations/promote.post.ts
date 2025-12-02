@@ -130,6 +130,25 @@ export default defineEventHandler(async (event) => {
 
       console.log(`✅ Promotion réussie: ${realisationId} (${isUpdate ? 'UPDATE' : 'INSERT'})`)
 
+      // 🔧 FIX Bug #2: Enregistrer les cloudinary_public_ids promus pour éviter re-découverte
+      // Même si l'image est changée plus tard, les originaux restent "consommés"
+      if (validatedData.cloudinary_public_ids && validatedData.cloudinary_public_ids.length > 0) {
+        for (const publicId of validatedData.cloudinary_public_ids) {
+          try {
+            await db.execute({
+              sql: `INSERT OR IGNORE INTO promoted_cloudinary_assets
+                    (public_id, promoted_to_realisation_id, original_title)
+                    VALUES (?, ?, ?)`,
+              args: [publicId, realisationId, validatedData.title]
+            })
+          } catch (insertError) {
+            // Ignorer si déjà existant (UNIQUE constraint)
+            console.log(`📝 Public ID ${publicId} déjà enregistré ou erreur:`, insertError)
+          }
+        }
+        console.log(`📦 ${validatedData.cloudinary_public_ids.length} public_ids enregistrés comme promus`)
+      }
+
       // Récupérer la réalisation promue
       const realisationResult = await db.execute({
         sql: `SELECT

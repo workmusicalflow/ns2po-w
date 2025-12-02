@@ -68,6 +68,10 @@ async function fetchTursoRealisations(): Promise<HybridRealisation[]> {
 /**
  * Génère réalisations auto-discovery Cloudinary
  * ⚡ CACHE: Utilise cache Nitro (TTL 1h) pour éviter N+1 Problem
+ *
+ * 🔧 FIX Architecture (2025-12-02):
+ * - Bug #1: Comparaison formats incompatibles → Maintenant compare public_id BRUT
+ * - Bug #2: Perte traçabilité après modification → Utilise promoted_cloudinary_assets
  */
 async function generateAutoDiscoveryRealisations(existingPublicIds: Set<string>): Promise<HybridRealisation[]> {
   try {
@@ -82,22 +86,38 @@ async function generateAutoDiscoveryRealisations(existingPublicIds: Set<string>)
       await setCachedCloudinaryRealisations(cloudinaryImages);
     }
 
-    // Récupérer les public_ids blacklistés
     const db = getDatabase();
     if (!db) {
-      console.warn("⚠️ Database non disponible pour auto-discovery blacklist");
+      console.warn("⚠️ Database non disponible pour auto-discovery filtering");
       return cloudinaryImages.map((image: any) => cloudinaryImageToHybridRealisation(image));
     }
 
+    // 1. Récupérer les public_ids blacklistés (supprimés par l'admin)
     const blacklistResult = await db.execute('SELECT public_id FROM realisation_blacklist');
     const blacklistedPublicIds = new Set(blacklistResult.rows.map(row => row.public_id));
-
     console.log(`🚫 ${blacklistedPublicIds.size} réalisations blacklistées`);
 
-    // Transformer le public_id original pour comparaison blacklist
+    // 2. Récupérer les public_ids promus (déjà transformés en réalisations Turso)
+    // Cette table persiste même si l'image de la réalisation est modifiée plus tard
+    const promotedResult = await db.execute('SELECT public_id FROM promoted_cloudinary_assets');
+    const promotedPublicIds = new Set(promotedResult.rows.map(row => row.public_id));
+    console.log(`📦 ${promotedPublicIds.size} réalisations promues`);
+
+    // 3. Filtrer les images auto-discovery
+    // ✅ FIX Bug #1: Comparer le public_id BRUT (pas l'ID transformé)
     const autoDiscoveryImages = cloudinaryImages.filter((image: any) => {
-      const transformedId = `cloudinary_${image.public_id.replace(/[^a-zA-Z0-9]/g, "_")}`;
-      return !existingPublicIds.has(transformedId) && !blacklistedPublicIds.has(transformedId);
+      const rawPublicId = image.public_id; // ex: "ns2po/gallery/creative/banderole-001"
+      const transformedId = `cloudinary_${rawPublicId.replace(/[^a-zA-Z0-9]/g, "_")}`;
+
+      // Exclure si:
+      // a) Le public_id brut est déjà dans une réalisation Turso (existingPublicIds)
+      // b) Le public_id brut a été promu (même si l'image a changé depuis)
+      // c) L'ID transformé est blacklisté (suppression admin)
+      const isInTurso = existingPublicIds.has(rawPublicId);
+      const wasPromoted = promotedPublicIds.has(rawPublicId);
+      const isBlacklisted = blacklistedPublicIds.has(transformedId);
+
+      return !isInTurso && !wasPromoted && !isBlacklisted;
     });
 
     const autoDiscoveryRealisations = autoDiscoveryImages.map((image: any) =>
