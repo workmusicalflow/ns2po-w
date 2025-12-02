@@ -62,14 +62,36 @@
       <div v-if="formData.cloudinary_public_ids && formData.cloudinary_public_ids.length > 0" class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
         <div
           v-for="(publicId, index) in formData.cloudinary_public_ids"
-          :key="index"
-          class="relative group"
+          :key="publicId"
+          :class="[
+            'relative group rounded-lg overflow-hidden',
+            index === 0 ? 'ring-2 ring-amber-500' : 'hover:ring-2 hover:ring-gray-300'
+          ]"
         >
           <img
             :src="getCloudinaryUrl(publicId)"
             :alt="`Image ${index + 1}`"
-            class="w-full h-24 object-cover rounded-lg"
+            class="w-full h-24 object-cover"
           >
+          <!-- Badge "Image principale" pour la première image -->
+          <div
+            v-if="index === 0"
+            class="absolute top-1 left-1 px-1.5 py-0.5 bg-amber-500 text-white text-xs font-medium rounded"
+          >
+            Principale
+          </div>
+          <!-- Bouton "Définir comme principale" pour les autres images -->
+          <button
+            v-else
+            type="button"
+            class="absolute top-1 left-1 px-1.5 py-0.5 bg-gray-800/70 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity hover:bg-amber-600"
+            title="Définir comme image principale"
+            @click="setAsPrimaryImage(index)"
+          >
+            <Icon name="heroicons:star" class="w-3 h-3 inline-block mr-0.5" />
+            Principale
+          </button>
+          <!-- Bouton supprimer -->
           <button
             type="button"
             class="absolute top-1 right-1 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
@@ -538,6 +560,18 @@ const handleAssetsSelected = (assets: Asset[]) => {
 
 const removeImage = (index: number) => {
   formData.cloudinary_public_ids.splice(index, 1)
+}
+
+/**
+ * Définit une image comme image principale (la déplace en position 0)
+ */
+const setAsPrimaryImage = (index: number) => {
+  if (index <= 0 || index >= formData.cloudinary_public_ids.length) return
+
+  const [imageToPromote] = formData.cloudinary_public_ids.splice(index, 1)
+  formData.cloudinary_public_ids.unshift(imageToPromote)
+
+  console.log(`✅ [RealisationForm] Image ${imageToPromote} définie comme principale`)
 }
 
 const getCloudinaryUrl = (publicId: string) => {
