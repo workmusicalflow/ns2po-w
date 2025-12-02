@@ -425,7 +425,19 @@
 import type { Asset } from '~/composables/useAssetsQuery'
 import { useUploadAssetMutation } from '~/composables/useAssetsQuery'
 import AssetSelectionModal from '~/components/admin/AssetSelectionModal.vue'
+import type { ProductFromApi, ProductFormData } from '~/types/admin/product-form'
+import { mapApiToForm, mapFormToApi } from '~/utils/productMapper'
 
+/**
+ * Interface interne pour les données du formulaire
+ * Étendue avec les champs UI spécifiques (status, images)
+ */
+interface FormDataInternal extends ProductFormData {
+  status: 'active' | 'inactive' | 'draft'
+  images: string[]
+}
+
+// Legacy interface pour compatibilité avec les pages parentes
 interface Product {
   id?: string
   name: string
@@ -514,34 +526,55 @@ const showAssetModal = ref(false)
 // Template refs
 const fileInput = ref<HTMLInputElement>()
 
-// Initialize form with product data
-watchEffect(() => {
-  if (props.product) {
-    Object.assign(formData, {
-      ...props.product,
-      images: props.product.images || [],
-      materials: props.product.materials || '',
-      colors: props.product.colors?.length ? props.product.colors : [''],
-      sizes: props.product.sizes?.length ? props.product.sizes : ['']
-    })
-  } else {
-    // Reset form for new product
-    Object.assign(formData, {
-      name: '',
-      reference: '',
-      description: '',
-      category_id: '',
-      status: 'active',
-      price: 0,
-      min_quantity: 1,
-      max_quantity: undefined,
-      images: [],
-      materials: '',
-      colors: [''],
-      sizes: ['']
-    })
-  }
-})
+/**
+ * Initialisation du formulaire avec les données produit
+ * Pattern Adapter: watch au lieu de watchEffect pour éviter re-triggers indésirables
+ *
+ * @see Gemini audit: watch + immediate est plus prévisible que watchEffect
+ */
+watch(
+  () => props.product,
+  (newProduct) => {
+    if (newProduct) {
+      // ⭐ Utiliser le mapper pour transformation API → Form
+      const mapped = mapApiToForm(newProduct as unknown as ProductFromApi)
+
+      Object.assign(formData, {
+        ...mapped,
+        // Champs spécifiques au formulaire non gérés par le mapper
+        category_id: mapped.category,
+        price: mapped.basePrice ?? 0,
+        min_quantity: mapped.minQuantity,
+        max_quantity: mapped.maxQuantity,
+        status: newProduct.status || (mapped.isActive ? 'active' : 'inactive'),
+        images: (newProduct as Product).images || []
+      })
+
+      console.log('📥 [ProductForm] Données chargées via mapper:', {
+        materials: formData.materials,
+        colors: formData.colors,
+        sizes: formData.sizes
+      })
+    } else {
+      // Reset form pour nouveau produit
+      Object.assign(formData, {
+        name: '',
+        reference: '',
+        description: '',
+        category_id: '',
+        status: 'active',
+        price: 0,
+        min_quantity: 1,
+        max_quantity: undefined,
+        images: [],
+        materials: '',
+        colors: [''],
+        sizes: ['']
+      })
+    }
+  },
+  { immediate: true } // S'exécute immédiatement au montage
+)
 
 // --- Méthodes pour gérer les listes dynamiques ---
 const addColor = () => {
@@ -578,7 +611,12 @@ const isFormValid = computed(() => {
          Object.keys(errors.value).length === 0
 
   // Vérifier les nouveaux champs obligatoires pour création
-  const hasMaterials = formData.materials && formData.materials.trim() !== ''
+  // ⭐ Gérer les deux cas: string ou array (après normalisation c'est une string)
+  const hasMaterials = formData.materials && (
+    Array.isArray(formData.materials)
+      ? formData.materials.length > 0
+      : formData.materials.trim() !== ''
+  )
   const hasColors = formData.colors && formData.colors.some(c => c.trim() !== '')
   const hasSizes = formData.sizes && formData.sizes.some(s => s.trim() !== '')
 
@@ -698,44 +736,39 @@ const submitForm = async () => {
 
   isSubmitting.value = true
   try {
-    // ⭐ Transform form data to match API POST schema (camelCase + objets)
-    const apiData: Record<string, unknown> = {
-      // Champs de base
+    /**
+     * ⭐ Pattern Adapter: utilise mapFormToApi pour transformer Form → API
+     * Centralise la logique de transformation dans productMapper.ts
+     */
+    const mappedData = mapFormToApi({
       name: formData.name,
+      description: formData.description || '',
       reference: formData.reference,
-      description: formData.description || undefined,
-
-      // Catégorie et statut
       category: formData.category_id,
-      // isActive déduit du status
-      isActive: formData.status === 'active',
-
-      // Tarification (camelCase pour API)
+      subcategory: '',
       basePrice: formData.price,
       minQuantity: formData.min_quantity,
-      maxQuantity: formData.max_quantity || undefined,
-
-      // ⭐ Materials: texte multiligne → tableau de strings
-      materials: formData.materials
-        ? formData.materials.split(/[\n,]+/).map(m => m.trim()).filter(Boolean)
-        : [],
-
-      // ⭐ Colors: string[] → {name: string}[]
-      colors: formData.colors
-        ? formData.colors.filter(c => c.trim() !== '').map(c => ({ name: c.trim() }))
-        : [],
-
-      // ⭐ Sizes: string[] → {name: string}[]
-      sizes: formData.sizes
-        ? formData.sizes.filter(s => s.trim() !== '').map(s => ({ name: s.trim() }))
-        : [],
-
-      // Image principale
-      image: formData.images && formData.images.length > 0
+      maxQuantity: formData.max_quantity || 1000,
+      imageUrl: formData.images && formData.images.length > 0
         ? `https://res.cloudinary.com/dsrvzogof/image/upload/${formData.images[0]}`
-        : undefined,
+        : '',
+      isActive: formData.status === 'active',
+      materials: formData.materials,
+      colors: formData.colors || [''],
+      sizes: formData.sizes || ['']
+    })
 
-      // Gallery (images secondaires)
+    // Construire l'objet API final avec les champs additionnels
+    const apiData: Record<string, unknown> = {
+      ...mappedData,
+      // Renommer pour correspondre au schéma API (snake_case → camelCase pour certains)
+      basePrice: mappedData.base_price,
+      minQuantity: mappedData.min_quantity,
+      maxQuantity: mappedData.max_quantity || undefined,
+      isActive: mappedData.is_active,
+      image: mappedData.image || undefined,
+
+      // Gallery (images secondaires, non géré par le mapper)
       gallery: formData.images && formData.images.length > 1
         ? formData.images.slice(1).map(publicId => ({
             url: `https://res.cloudinary.com/dsrvzogof/image/upload/${publicId}`,
@@ -744,6 +777,12 @@ const submitForm = async () => {
         : undefined
     }
 
+    // Nettoyer les champs snake_case dupliqués
+    delete apiData.base_price
+    delete apiData.min_quantity
+    delete apiData.max_quantity
+    delete apiData.is_active
+
     // Clean undefined fields
     Object.keys(apiData).forEach(key => {
       if (apiData[key] === undefined) {
@@ -751,7 +790,7 @@ const submitForm = async () => {
       }
     })
 
-    console.log('📤 [ProductForm] Submitting to API:', apiData)
+    console.log('📤 [ProductForm] Submitting to API (via mapper):', apiData)
     emit('submit', apiData as unknown as Product)
   } catch (error) {
     console.error('Erreur soumission:', error)
