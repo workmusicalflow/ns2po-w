@@ -173,33 +173,24 @@
                     </div>
                   </div>
 
-                  <!-- Add Images -->
-                  <div class="border-2 border-dashed border-gray-300 rounded-lg p-4">
-                    <div class="text-center">
-                      <Icon name="heroicons:photo" class="mx-auto h-12 w-12 text-gray-400" />
-                      <div class="mt-2">
-                        <input
-                          ref="fileInput"
-                          type="file"
-                          multiple
-                          accept="image/*"
-                          class="hidden"
-                          @change="handleFileUpload"
-                        >
-                        <button
-                          type="button"
-                          class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
-                          @click="triggerFileInput"
-                        >
-                          <Icon name="heroicons:cloud-arrow-up" class="w-4 h-4 mr-2" />
-                          Ajouter des images
-                        </button>
-                      </div>
-                      <p class="text-xs text-gray-500 mt-1">
-                        PNG, JPG, GIF jusqu'à 10MB
-                      </p>
-                    </div>
+                  <!-- Add Images via AssetSelectionModal -->
+                  <div class="flex items-center justify-between">
+                    <button
+                      type="button"
+                      :disabled="form.cloudinary_public_ids.length >= 10"
+                      class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                      @click="showAssetModal = true"
+                    >
+                      <Icon name="heroicons:photo" class="w-4 h-4 mr-2" />
+                      Ajouter des images
+                    </button>
+                    <span class="text-xs text-gray-500">
+                      {{ form.cloudinary_public_ids.length }}/10 images
+                    </span>
                   </div>
+                  <p v-if="form.cloudinary_public_ids.length >= 10" class="text-xs text-amber-600 mt-1">
+                    Limite de 10 images atteinte
+                  </p>
                 </div>
               </div>
 
@@ -324,6 +315,14 @@
             </button>
           </div>
         </form>
+
+        <!-- Asset Selection Modal (Upload + Galerie existante) -->
+        <AssetSelectionModal
+          :show="showAssetModal"
+          :multiple="true"
+          @close="showAssetModal = false"
+          @selected="handleAssetsSelected"
+        />
       </div>
     </div>
   </div>
@@ -348,8 +347,11 @@ import {
   isFormDataValid
 } from '~/utils/realisationMapper'
 
-// ✅ Composable Cloudinary existant (évite duplication upload)
-import { useCloudinary } from '~/composables/useCloudinary'
+// ✅ Type Asset pour la sélection d'images existantes
+import type { Asset } from '~/composables/useAssetsQuery'
+
+// ✅ Composant de sélection d'assets (Upload + Galerie existante)
+import AssetSelectionModal from '~/components/admin/AssetSelectionModal.vue'
 
 const props = defineProps<{
   realisation?: RealisationFromApi | null
@@ -362,23 +364,13 @@ const emit = defineEmits<{
   saved: [realisation: RealisationFromApi]
 }>()
 
-// ✅ Utiliser le composable Cloudinary existant
-const cloudinary = useCloudinary()
-
 const isEdit = computed(() => !!props.realisation)
 const isLoading = ref(false)
 const errors = ref<Record<string, string>>({})
 const newTag = ref('')
 
-// ✅ Ref typée pour l'input file (évite erreur TS18046)
-const fileInput = ref<HTMLInputElement | null>(null)
-
-/**
- * Déclenche le click sur l'input file via la ref typée
- */
-const triggerFileInput = () => {
-  fileInput.value?.click()
-}
+// ✅ State pour la modal de sélection d'assets (Upload + Galerie)
+const showAssetModal = ref(false)
 
 // ✅ Form data avec type explicite
 const form = reactive<RealisationFormData>(getDefaultRealisationFormData())
@@ -437,36 +429,32 @@ const removeImage = (index: number) => {
 }
 
 /**
- * ✅ Utilise le composable useCloudinary au lieu de l'appel direct
- * Avantages: DRY, gestion d'erreurs centralisée, progress tracking
+ * ✅ Handler pour la sélection d'assets via AssetSelectionModal
+ * Gère: limite 10 images, doublons, ajout au formulaire
  */
-const handleFileUpload = async (event: Event) => {
-  const target = event.target as HTMLInputElement
-  const files = target.files
-  if (!files || files.length === 0) return
+const handleAssetsSelected = (assets: Asset[]) => {
+  if (!assets || assets.length === 0) return
 
-  isLoading.value = true
-  try {
-    // ✅ Utiliser le composable Cloudinary
-    const results = await cloudinary.uploadMultipleFiles(
-      Array.from(files),
-      { folder: 'ns2po/realisations' }
-    )
+  const maxAllowed = 10
+  const remainingSlots = maxAllowed - form.cloudinary_public_ids.length
 
-    // Ajouter les résultats au formulaire
-    results.forEach(result => {
-      form.cloudinary_public_ids.push(result.public_id)
-      form.cloudinary_urls.push(result.secure_url)
-    })
-
-    console.log(`✅ ${results.length} image(s) uploadée(s) via useCloudinary`)
-  } catch (error) {
-    console.error('Erreur upload:', error)
-    errors.value.upload = 'Erreur lors de l\'upload des images'
-  } finally {
-    isLoading.value = false
-    target.value = ''
+  if (remainingSlots <= 0) {
+    console.warn('Limite de 10 images atteinte')
+    return
   }
+
+  let addedCount = 0
+  for (const asset of assets) {
+    if (addedCount >= remainingSlots) break
+
+    // Éviter les doublons
+    if (!form.cloudinary_public_ids.includes(asset.public_id)) {
+      form.cloudinary_public_ids.push(asset.public_id)
+      addedCount++
+    }
+  }
+
+  console.log(`✅ [RealisationFormModal] ${addedCount} image(s) ajoutée(s) via AssetSelectionModal`)
 }
 
 // Form validation

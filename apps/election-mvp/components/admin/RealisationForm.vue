@@ -80,32 +80,26 @@
         </div>
       </div>
 
-      <!-- Upload Area -->
+      <!-- Add Images Button (ouvre AssetSelectionModal) -->
       <div class="border-2 border-dashed border-gray-300 rounded-lg p-6">
         <div class="text-center">
           <Icon name="heroicons:photo" class="mx-auto h-12 w-12 text-gray-400" />
           <div class="mt-2">
-            <input
-              ref="fileInput"
-              type="file"
-              multiple
-              accept="image/*"
-              class="hidden"
-              @change="handleFileUpload"
-            >
             <button
               type="button"
-              :disabled="isUploading"
-              class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
-              @click="triggerFileInput"
+              :disabled="formData.cloudinary_public_ids.length >= 10"
+              class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-amber-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              @click="showAssetModal = true"
             >
-              <Icon v-if="isUploading" name="heroicons:arrow-path" class="w-4 h-4 mr-2 animate-spin" />
-              <Icon v-else name="heroicons:cloud-arrow-up" class="w-4 h-4 mr-2" />
-              {{ isUploading ? 'Upload en cours...' : 'Ajouter des images' }}
+              <Icon name="heroicons:plus" class="w-4 h-4 mr-2" />
+              Ajouter des images
             </button>
           </div>
           <p class="text-xs text-gray-500 mt-1">
-            PNG, JPG, GIF jusqu'à 10MB (max 10 images)
+            Uploadez de nouvelles images ou sélectionnez depuis les assets existants
+          </p>
+          <p v-if="formData.cloudinary_public_ids.length > 0" class="text-xs text-amber-600 mt-1">
+            {{ formData.cloudinary_public_ids.length }}/10 images
           </p>
         </div>
       </div>
@@ -377,6 +371,14 @@
       </button>
     </div>
   </form>
+
+  <!-- Asset Selection Modal (Upload + Galerie existante) -->
+  <AssetSelectionModal
+    :show="showAssetModal"
+    :multiple="true"
+    @close="showAssetModal = false"
+    @selected="handleAssetsSelected"
+  />
 </template>
 
 <script setup lang="ts">
@@ -399,8 +401,11 @@ import {
   isFormDataValid
 } from '~/utils/realisationMapper'
 
-// ✅ Composable Cloudinary existant (évite duplication upload)
-import { useCloudinary } from '~/composables/useCloudinary'
+// ✅ Type Asset pour la sélection d'images existantes
+import type { Asset } from '~/composables/useAssetsQuery'
+
+// ✅ Composant de sélection d'assets (Upload + Galerie existante)
+import AssetSelectionModal from '~/components/admin/AssetSelectionModal.vue'
 
 /**
  * ✅ Props avec type flexible pour `realisation`
@@ -419,9 +424,6 @@ const emit = defineEmits<{
   submit: [realisation: ReturnType<typeof mapRealisationFormToApi>]
   cancel: []
 }>()
-
-// ✅ Utiliser le composable Cloudinary existant
-const cloudinary = useCloudinary()
 
 /**
  * ✅ Validation locale simplifiée (sans référence à 'client' inexistant)
@@ -453,18 +455,10 @@ const formData = reactive<RealisationFormData>(getDefaultRealisationFormData())
 
 const errors = ref<Record<string, string>>({})
 const isSubmitting = ref(false)
-const isUploading = ref(false)
 const tagsInput = ref('')
 
-// ✅ Ref typée pour l'input file (évite erreur TS18046)
-const fileInput = ref<HTMLInputElement | null>(null)
-
-/**
- * Déclenche le click sur l'input file via la ref typée
- */
-const triggerFileInput = () => {
-  fileInput.value?.click()
-}
+// ✅ State pour la modal de sélection d'assets (Upload + Galerie)
+const showAssetModal = ref(false)
 
 /**
  * ✅ Pattern Adapter: watch au lieu de watchEffect
@@ -513,56 +507,33 @@ const validateField = (fieldName: string) => {
 }
 
 /**
- * ✅ Utilise le composable useCloudinary au lieu de l'appel direct
- * Avantages: DRY, validation fichiers intégrée, gestion d'erreurs centralisée
+ * ✅ Handler pour les assets sélectionnés depuis AssetSelectionModal
+ * Gère la limite de 10 images et évite les doublons
+ * Pattern identique à ProductForm.vue
  */
-const handleFileUpload = async (event: Event) => {
-  const target = event.target as HTMLInputElement
-  const files = target.files
-  if (!files || files.length === 0) return
+const handleAssetsSelected = (assets: Asset[]) => {
+  if (!assets || assets.length === 0) return
 
-  // Check if adding these files would exceed the limit
-  const newImagesCount = formData.cloudinary_public_ids.length + files.length
-  if (newImagesCount > 10) {
-    crudError.validation('Maximum 10 images autorisées par réalisation')
+  const maxAllowed = 10
+  const remainingSlots = maxAllowed - formData.cloudinary_public_ids.length
+
+  if (remainingSlots <= 0) {
+    console.warn('Limite de 10 images atteinte')
     return
   }
 
-  isUploading.value = true
-  try {
-    // ✅ Utiliser le composable Cloudinary avec validation intégrée
-    const filesToUpload = Array.from(files).filter(file => {
-      // Validation via composable
-      const validation = cloudinary.validateFile(file, { maxSize: 10 })
-      if (!validation.valid) {
-        crudError.validation(validation.error || `Fichier ${file.name} invalide`)
-        return false
-      }
-      return true
-    })
+  // Filtrer les doublons et limiter au nombre de slots restants
+  let addedCount = 0
+  for (const asset of assets) {
+    if (addedCount >= remainingSlots) break
 
-    if (filesToUpload.length === 0) {
-      return
+    if (!formData.cloudinary_public_ids.includes(asset.public_id)) {
+      formData.cloudinary_public_ids.push(asset.public_id)
+      addedCount++
     }
-
-    const results = await cloudinary.uploadMultipleFiles(
-      filesToUpload,
-      { folder: 'ns2po/realisations' }
-    )
-
-    // Ajouter les résultats au formulaire
-    results.forEach(result => {
-      formData.cloudinary_public_ids.push(result.public_id)
-    })
-
-    console.log(`✅ ${results.length} image(s) uploadée(s) via useCloudinary`)
-  } catch (error) {
-    console.error('Erreur upload:', error)
-    crudError.validation('Erreur lors de l\'upload des images')
-  } finally {
-    isUploading.value = false
-    target.value = ''
   }
+
+  console.log(`✅ [RealisationForm] ${addedCount} image(s) ajoutée(s) via AssetSelectionModal`)
 }
 
 const removeImage = (index: number) => {
