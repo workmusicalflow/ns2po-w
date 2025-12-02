@@ -254,24 +254,25 @@ const { trackRealisationInteraction, trackUserJourney } = useObservability();
 const { openModal } = useImageModal();
 
 /**
- * Computed: Génère les URLs d'images depuis cloudinaryUrls OU cloudinaryPublicIds
- * Fallback important pour les réalisations Turso qui n'ont pas cloudinaryUrls
+ * Computed: Génère les URLs d'images depuis cloudinaryPublicIds (source de vérité)
+ * cloudinaryPublicIds est la source de vérité car c'est ce que le formulaire admin modifie
+ * cloudinaryUrls peut être désynchronisé après une modification d'images
  */
 const imageUrls = computed((): string[] => {
   if (!realisation.value) return [];
 
-  // Si cloudinaryUrls existe et n'est pas vide, l'utiliser
-  const urls = realisation.value.cloudinaryUrls;
-  if (urls && urls.length > 0) {
-    return [...urls];
-  }
-
-  // Sinon, générer les URLs depuis cloudinaryPublicIds
+  // PRIORITÉ 1: cloudinaryPublicIds est la source de vérité (modifiable via admin)
   const publicIds = realisation.value.cloudinaryPublicIds;
   if (publicIds && publicIds.length > 0) {
     return publicIds.map((publicId: string) =>
       buildCloudinaryUrl(publicId, cloudinaryPresets.gallery)
     );
+  }
+
+  // PRIORITÉ 2: Fallback sur cloudinaryUrls (pour auto-discovery non promues)
+  const urls = realisation.value.cloudinaryUrls;
+  if (urls && urls.length > 0) {
+    return [...urls];
   }
 
   return [];

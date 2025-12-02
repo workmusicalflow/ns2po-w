@@ -12,10 +12,8 @@
     <!-- Image principale avec overlay gradué -->
     <div class="relative h-full overflow-hidden">
       <NuxtImg
-        v-if="
-          realisation.cloudinaryUrls && realisation.cloudinaryUrls.length > 0
-        "
-        :src="realisation.cloudinaryUrls[0]"
+        v-if="primaryImageUrl"
+        :src="primaryImageUrl"
         :alt="realisation.title"
         :preset="variant === 'compact' ? 'thumbnail' : 'realisationHero'"
         class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105 cursor-pointer"
@@ -178,8 +176,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, toRefs, watch } from "vue";
+import { ref, toRefs, watch, computed } from "vue";
 import type { Realisation } from "@ns2po/types";
+import { buildCloudinaryUrl, cloudinaryPresets } from "~/utils/cloudinary";
 
 interface EnrichedRealisation extends Realisation {
   readonly cloudinaryUrls?: readonly string[];
@@ -213,6 +212,27 @@ const cardRef = ref<HTMLElement>();
 // Destructuration réactive
 const { realisation, variant } = toRefs(props);
 
+/**
+ * Computed: Image principale avec cloudinaryPublicIds comme source de vérité
+ * Priorité: cloudinaryPublicIds > cloudinaryUrls (pour éviter désynchronisation)
+ */
+const primaryImageUrl = computed((): string | null => {
+  const r = realisation.value;
+  if (!r) return null;
+
+  // PRIORITÉ 1: cloudinaryPublicIds est la source de vérité
+  if (r.cloudinaryPublicIds && r.cloudinaryPublicIds.length > 0) {
+    return buildCloudinaryUrl(r.cloudinaryPublicIds[0], cloudinaryPresets.gallery);
+  }
+
+  // PRIORITÉ 2: Fallback sur cloudinaryUrls (pour auto-discovery)
+  if (r.cloudinaryUrls && r.cloudinaryUrls.length > 0) {
+    return r.cloudinaryUrls[0];
+  }
+
+  return null;
+});
+
 // Gestionnaire de clic principal
 const handleClick = () => {
   trackRealisationInteraction("click", {
@@ -236,13 +256,10 @@ const handleInspiration = () => {
 
 // Gestionnaire de clic sur l'image pour ouvrir le modal
 const handleImageClick = () => {
-  if (
-    realisation.value.cloudinaryUrls &&
-    realisation.value.cloudinaryUrls.length > 0
-  ) {
+  if (primaryImageUrl.value) {
     // Utiliser une version haute qualité pour le modal
-    const fullImageUrl = realisation.value.cloudinaryUrls[0].replace(
-      /\/w_\d+,h_\d+,c_fill/,
+    const fullImageUrl = primaryImageUrl.value.replace(
+      /\/w_\d+,h_\d+,c_\w+/,
       "/w_1200,h_1200,c_fit"
     );
 
