@@ -84,7 +84,7 @@ export default defineEventHandler(async (event) => {
           validatedData.is_featured ? 1 : 0,
           orderPosition,
           validatedData.is_active !== undefined ? (validatedData.is_active ? 1 : 0) : 1,
-          validatedData.source || 'turso',
+          'turso', // Force toujours 'turso' pour les créations (SRP: l'API est gardienne de l'intégrité)
           validatedData.cloudinary_urls ? JSON.stringify(validatedData.cloudinary_urls) : null,
           validatedData.cloudinary_metadata ? JSON.stringify(validatedData.cloudinary_metadata) : null
         ]
