@@ -630,9 +630,20 @@ const categories = ref([
 
 // Computed
 const isFormValid = computed(() => {
-  return form.name.trim() !== '' &&
+  // Validation basique pour le bouton (création + édition)
+  const hasBasicFields = form.name.trim() !== '' &&
          form.category !== '' &&
          form.base_price > 0
+
+  // Pour la création, on vérifie aussi les champs requis par l'API
+  if (isNew.value) {
+    const hasMaterials = form.materials.trim() !== ''
+    const hasColors = form.colors.length > 0
+    const hasSizes = form.sizes.length > 0
+    return hasBasicFields && hasMaterials && hasColors && hasSizes
+  }
+
+  return hasBasicFields
 })
 
 // Methods
@@ -724,6 +735,22 @@ function validateForm(): boolean {
   errors.category = form.category === '' ? 'La catégorie est requise' : ''
   errors.base_price = form.base_price <= 0 ? 'Le prix doit être supérieur à 0' : ''
 
+  // Validation supplémentaire pour la création (champs requis par API)
+  if (isNew.value) {
+    if (form.materials.trim() === '') {
+      errors.name = 'Au moins un matériau est requis (ex: Coton, Polyester)'
+      return false
+    }
+    if (form.colors.length === 0) {
+      errors.name = 'Au moins une couleur est requise'
+      return false
+    }
+    if (form.sizes.length === 0) {
+      errors.name = 'Au moins une taille est requise'
+      return false
+    }
+  }
+
   return Object.values(errors).every(error => error === '')
 }
 
@@ -735,18 +762,49 @@ async function handleSubmit() {
     // 🔧 FIX: Utiliser toRaw() pour éviter erreurs sérialisation reactive() → 502
     const rawForm = toRaw(form)
 
-    // ✅ FIX: Transformer noms de champs pour correspondre au schéma API
-    // Frontend: image_url, gallery_urls → API: image, gallery
+    // ✅ FIX COMPLET: Transformer form → format API
+    // Frontend snake_case → API camelCase
+    // Frontend types simples → API types complexes
     const productData = {
-      ...rawForm,
-      image: rawForm.image_url || undefined, // API attend "image"
+      // Champs texte (direct)
+      name: rawForm.name,
+      description: rawForm.description || undefined,
+      category: rawForm.category,
+      subcategory: rawForm.subcategory || undefined,
+
+      // Champs numériques (snake_case → camelCase)
+      basePrice: rawForm.base_price,
+      minQuantity: rawForm.min_quantity,
+      maxQuantity: rawForm.max_quantity || undefined,
+
+      // Booléen (snake_case → camelCase)
+      isActive: rawForm.is_active,
+
+      // Image principale (image_url → image)
+      image: rawForm.image_url || undefined,
+
+      // Gallery (string[] → object[])
       gallery: rawForm.gallery_urls?.length
         ? rawForm.gallery_urls.map((url: string) => ({ url, type: 'variant' as const }))
-        : undefined // API attend "gallery" array d'objets
+        : undefined,
+
+      // Materials (string → array, split par virgule/newline)
+      materials: rawForm.materials
+        ? rawForm.materials.split(/[,\n]+/).map((m: string) => m.trim()).filter(Boolean)
+        : [],
+
+      // Colors (string[] → object[] avec {name})
+      colors: rawForm.colors?.length
+        ? rawForm.colors.map((c: string) => ({ name: c }))
+        : [],
+
+      // Sizes (string[] → object[] avec {name})
+      sizes: rawForm.sizes?.length
+        ? rawForm.sizes.map((s: string) => ({ name: s }))
+        : []
     }
-    // Supprimer les anciens champs pour éviter confusion
-    delete (productData as any).image_url
-    delete (productData as any).gallery_urls
+
+    console.log('📤 [handleSubmit] Payload transformé pour API:', productData)
 
     if (isNew.value) {
       // 🚨 PATCH GPT-5: Création directe via $fetch
