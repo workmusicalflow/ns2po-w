@@ -30,7 +30,7 @@ async function fetchTursoRealisations(): Promise<HybridRealisation[]> {
   const result = await db.execute({
     sql: `
       SELECT
-        id, title, description, cloudinary_public_ids, product_ids, category_ids,
+        id, title, description, cloudinary_public_ids, cloudinary_urls, product_ids, category_ids,
         customization_option_ids, tags, is_featured, order_position, is_active,
         source, created_at, updated_at
       FROM realisations
@@ -48,6 +48,7 @@ async function fetchTursoRealisations(): Promise<HybridRealisation[]> {
     title: row.title,
     description: row.description || undefined,
     cloudinaryPublicIds: JSON.parse(row.cloudinary_public_ids || '[]'),
+    cloudinaryUrls: row.cloudinary_urls ? JSON.parse(row.cloudinary_urls) : undefined,
     productIds: JSON.parse(row.product_ids || '[]'),
     categoryIds: JSON.parse(row.category_ids || '[]'),
     customizationOptionIds: JSON.parse(row.customization_option_ids || '[]'),

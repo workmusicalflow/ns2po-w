@@ -185,9 +185,9 @@ export interface Realisation {
   readonly customizationOptions?: readonly CustomizationOption[];
 }
 
-// Interface hybride pour la solution auto-discovery + Airtable
+// Interface hybride pour la solution auto-discovery + Turso + Airtable (legacy)
 export interface HybridRealisation extends Realisation {
-  readonly source: "airtable" | "cloudinary-auto-discovery";
+  readonly source: "turso" | "airtable" | "cloudinary-auto-discovery";
   readonly cloudinaryUrls?: readonly string[];
   readonly cloudinaryMetadata?: {
     readonly publicId: string;

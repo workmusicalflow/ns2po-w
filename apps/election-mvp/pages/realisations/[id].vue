@@ -108,14 +108,11 @@
 
           <!-- Galerie thumbnails -->
           <div
-            v-if="
-              realisation.cloudinaryUrls &&
-                realisation.cloudinaryUrls.length > 1
-            "
+            v-if="imageUrls.length > 1"
             class="grid grid-cols-4 gap-2"
           >
             <button
-              v-for="(url, index) in realisation.cloudinaryUrls"
+              v-for="(url, index) in imageUrls"
               :key="index"
               :class="[
                 'aspect-square bg-gray-200 rounded-md overflow-hidden border-2 transition-colors hover:scale-105 transform',
@@ -177,7 +174,7 @@
           <!-- Actions CTA -->
           <div class="space-y-4 pt-6 border-t border-gray-200">
             <div class="space-y-3">
-              <Button size="large" class="w-full" @click="handleInspiration">
+              <Button size="large" class="w-full" @click="() => handleInspiration()">
                 <svg
                   class="w-5 h-5 mr-2"
                   fill="none"
@@ -236,7 +233,8 @@
 
 <script setup lang="ts">
 import { Button } from "@ns2po/ui";
-import type { Realisation } from "@ns2po/types";
+import type { HybridRealisation } from "@ns2po/types";
+import { buildCloudinaryUrl, cloudinaryPresets } from "~/utils/cloudinary";
 
 // Paramètres de la route
 const route = useRoute();
@@ -244,9 +242,9 @@ const realisationId = route.params.id as string;
 
 // État de la page
 const loading = ref(true);
-const realisation = ref<Realisation | null>(null);
+const realisation = ref<HybridRealisation | null>(null);
 const mainImage = ref<string>("");
-const similarRealisations = ref<Realisation[]>([]);
+const similarRealisations = ref<HybridRealisation[]>([]);
 
 // Composables
 const { getRealisationById, getSimilarRealisations, fetchRealisations } =
@@ -254,6 +252,30 @@ const { getRealisationById, getSimilarRealisations, fetchRealisations } =
 
 const { trackRealisationInteraction, trackUserJourney } = useObservability();
 const { openModal } = useImageModal();
+
+/**
+ * Computed: Génère les URLs d'images depuis cloudinaryUrls OU cloudinaryPublicIds
+ * Fallback important pour les réalisations Turso qui n'ont pas cloudinaryUrls
+ */
+const imageUrls = computed((): string[] => {
+  if (!realisation.value) return [];
+
+  // Si cloudinaryUrls existe et n'est pas vide, l'utiliser
+  const urls = realisation.value.cloudinaryUrls;
+  if (urls && urls.length > 0) {
+    return [...urls];
+  }
+
+  // Sinon, générer les URLs depuis cloudinaryPublicIds
+  const publicIds = realisation.value.cloudinaryPublicIds;
+  if (publicIds && publicIds.length > 0) {
+    return publicIds.map((publicId: string) =>
+      buildCloudinaryUrl(publicId, cloudinaryPresets.gallery)
+    );
+  }
+
+  return [];
+});
 
 // Chargement des données
 onMounted(async () => {
@@ -267,9 +289,9 @@ onMounted(async () => {
     if (loadedRealisation) {
       realisation.value = loadedRealisation;
 
-      // Image principale (première image ou image par défaut)
-      if (loadedRealisation.cloudinaryUrls?.length > 0) {
-        mainImage.value = loadedRealisation.cloudinaryUrls[0];
+      // Image principale (première URL générée ou existante)
+      if (imageUrls.value.length > 0) {
+        mainImage.value = imageUrls.value[0];
       }
 
       // Charger les réalisations similaires
@@ -378,8 +400,9 @@ const handleThumbnailDoubleClick = (url: string) => {
   }
 };
 
-const handleInspiration = (targetRealisation?: Realisation) => {
-  const realisationToUse = targetRealisation || realisation.value;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const handleInspiration = (targetRealisation?: any) => {
+  const realisationToUse = (targetRealisation || realisation.value) as HybridRealisation | null;
   if (!realisationToUse) return;
 
   const productId = realisationToUse.productIds[0];
@@ -397,7 +420,8 @@ const handleInspiration = (targetRealisation?: Realisation) => {
   }
 };
 
-const handleViewDetails = (targetRealisation: Realisation) => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const handleViewDetails = (targetRealisation: any) => {
   navigateTo(`/realisations/${targetRealisation.id}`);
 };
 </script>

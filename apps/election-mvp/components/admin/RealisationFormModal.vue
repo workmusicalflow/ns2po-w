@@ -397,7 +397,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   close: []
-  saved: [realisation: RealisationFromApi]
+  saved: [message: string]
 }>()
 
 const isEdit = computed(() => !!props.realisation)
@@ -593,9 +593,10 @@ const submitForm = async () => {
 
     if (response.success) {
       console.log(`✅ [RealisationFormModal] ${submitSuccess.value}`)
-      emit('saved', response.data)
+      // Émettre le message de succès (string), pas l'objet réponse
+      emit('saved', submitSuccess.value)
 
-      // Délai court pour afficher le message de succès
+      // Délai court pour afficher le message de succès avant fermeture
       setTimeout(() => {
         emit('close')
       }, 800)
