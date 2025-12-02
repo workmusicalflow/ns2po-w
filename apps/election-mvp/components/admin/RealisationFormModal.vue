@@ -533,9 +533,9 @@ const validateForm = () => {
  * Avantages: transformation cohérente, validation intégrée
  *
  * Logique hybride (Gemini-validated):
- * - source='turso' + id → PUT (vraie mise à jour)
- * - source='cloudinary-auto-discovery' → POST (promotion vers Turso)
- * - pas d'id → POST (création pure)
+ * - source='turso' + id → PUT /api/realisations/:id (vraie mise à jour)
+ * - source='cloudinary-auto-discovery' → POST /api/realisations/promote (promotion UPSERT)
+ * - pas d'id → POST /api/realisations (création pure)
  */
 const submitForm = async () => {
   if (!validateForm()) return
@@ -562,9 +562,9 @@ const submitForm = async () => {
     const isUpdate = isEdit.value && props.realisation?.source === 'turso'
 
     console.log('📤 [RealisationFormModal] Payload via mapper:', payload)
-    console.log(`📋 [RealisationFormModal] Opération: ${isUpdate ? 'PUT' : 'POST'} (promotion: ${isPromotion})`)
+    console.log(`📋 [RealisationFormModal] Opération: ${isUpdate ? 'PUT' : isPromotion ? 'PROMOTE' : 'POST'}`)
 
-    let response
+    let response: any
     if (isUpdate && props.realisation?.id) {
       // Vraie mise à jour d'une réalisation existante en base
       response = await $fetch(`/api/realisations/${props.realisation.id}`, {
@@ -572,15 +572,23 @@ const submitForm = async () => {
         body: payload
       })
       submitSuccess.value = 'Réalisation mise à jour avec succès !'
+    } else if (isPromotion) {
+      // Promotion auto-discovery → endpoint dédié avec UPSERT atomique
+      response = await $fetch('/api/realisations/promote', {
+        method: 'POST',
+        body: payload
+      })
+      // Message contextuel selon si INSERT ou UPDATE
+      submitSuccess.value = response.operation === 'update'
+        ? 'Réalisation mise à jour avec succès !'
+        : 'Réalisation promue et enregistrée !'
     } else {
-      // Création nouvelle OU promotion d'une auto-discovery
+      // Création pure d'une nouvelle réalisation
       response = await $fetch('/api/realisations', {
         method: 'POST',
         body: payload
       })
-      submitSuccess.value = isPromotion
-        ? 'Réalisation promue et enregistrée !'
-        : 'Réalisation créée avec succès !'
+      submitSuccess.value = 'Réalisation créée avec succès !'
     }
 
     if (response.success) {
