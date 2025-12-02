@@ -318,6 +318,20 @@
             </div>
           </div>
 
+          <!-- Feedback UX: Messages d'erreur et succès -->
+          <div v-if="submitError" class="mb-4 p-3 rounded-md bg-red-50 border border-red-200">
+            <div class="flex items-center">
+              <Icon name="heroicons:exclamation-circle" class="w-5 h-5 text-red-500 mr-2" />
+              <span class="text-sm text-red-700">{{ submitError }}</span>
+            </div>
+          </div>
+          <div v-if="submitSuccess" class="mb-4 p-3 rounded-md bg-green-50 border border-green-200">
+            <div class="flex items-center">
+              <Icon name="heroicons:check-circle" class="w-5 h-5 text-green-500 mr-2" />
+              <span class="text-sm text-green-700">{{ submitSuccess }}</span>
+            </div>
+          </div>
+
           <!-- Form Actions -->
           <div class="flex justify-end space-x-3 pt-6 border-t">
             <button
@@ -390,6 +404,10 @@ const isEdit = computed(() => !!props.realisation)
 const isLoading = ref(false)
 const errors = ref<Record<string, string>>({})
 const newTag = ref('')
+
+// ✅ Feedback UX pour succès/erreur
+const submitError = ref('')
+const submitSuccess = ref('')
 
 // ✅ State pour la modal de sélection d'assets (Upload + Galerie)
 const showAssetModal = ref(false)
@@ -513,6 +531,11 @@ const validateForm = () => {
 /**
  * ✅ Form submission avec mapper centralisé
  * Avantages: transformation cohérente, validation intégrée
+ *
+ * Logique hybride (Gemini-validated):
+ * - source='turso' + id → PUT (vraie mise à jour)
+ * - source='cloudinary-auto-discovery' → POST (promotion vers Turso)
+ * - pas d'id → POST (création pure)
  */
 const submitForm = async () => {
   if (!validateForm()) return
@@ -527,31 +550,60 @@ const submitForm = async () => {
   }
 
   isLoading.value = true
+  submitError.value = ''
+  submitSuccess.value = ''
+
   try {
     // ✅ Utiliser le mapper pour transformer Form → API
     const payload = mapRealisationFormToApi(form)
 
+    // Déterminer le type d'opération basé sur la source
+    const isPromotion = isEdit.value && props.realisation?.source === 'cloudinary-auto-discovery'
+    const isUpdate = isEdit.value && props.realisation?.source === 'turso'
+
     console.log('📤 [RealisationFormModal] Payload via mapper:', payload)
+    console.log(`📋 [RealisationFormModal] Opération: ${isUpdate ? 'PUT' : 'POST'} (promotion: ${isPromotion})`)
 
     let response
-    if (isEdit.value && props.realisation?.id) {
+    if (isUpdate && props.realisation?.id) {
+      // Vraie mise à jour d'une réalisation existante en base
       response = await $fetch(`/api/realisations/${props.realisation.id}`, {
         method: 'PUT',
         body: payload
       })
+      submitSuccess.value = 'Réalisation mise à jour avec succès !'
     } else {
+      // Création nouvelle OU promotion d'une auto-discovery
       response = await $fetch('/api/realisations', {
         method: 'POST',
         body: payload
       })
+      submitSuccess.value = isPromotion
+        ? 'Réalisation promue et enregistrée !'
+        : 'Réalisation créée avec succès !'
     }
 
     if (response.success) {
+      console.log(`✅ [RealisationFormModal] ${submitSuccess.value}`)
       emit('saved', response.data)
-      emit('close')
+
+      // Délai court pour afficher le message de succès
+      setTimeout(() => {
+        emit('close')
+      }, 800)
     }
   } catch (error: any) {
-    console.error('Erreur:', error)
+    console.error('❌ [RealisationFormModal] Erreur:', error)
+
+    // Extraction du message d'erreur
+    const errorMessage = error.data?.message
+      || error.data?.statusMessage
+      || error.message
+      || 'Une erreur est survenue lors de la sauvegarde'
+
+    submitError.value = errorMessage
+
+    // Mapper les erreurs de champs si disponibles
     if (error.data?.errors) {
       error.data.errors.forEach((err: any) => {
         errors.value[err.field] = err.message
