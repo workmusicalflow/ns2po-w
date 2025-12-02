@@ -11,6 +11,9 @@ interface RealisationsState {
 
 const CACHE_DURATION = 15 * 60 * 1000; // 15 minutes
 
+// Map pour éviter les race conditions sur les requêtes individuelles
+const pendingRequests = new Map<string, Promise<HybridRealisation | null>>();
+
 export const useRealisations = () => {
   const state = useState<RealisationsState>("realisations", () => ({
     realisations: [],
@@ -91,21 +94,54 @@ export const useRealisations = () => {
 
   /**
    * Récupère une réalisation par son ID (depuis l'API hybride)
+   * Avec déduplication des requêtes pour éviter les race conditions
    */
   const getRealisationById = async (
     id: string
   ): Promise<HybridRealisation | null> => {
-    // Chercher dans le cache hybride
-    let cached = state.value.realisations.find((r) => r.id === id);
+    // 1. Chercher dans le cache hybride
+    const cached = state.value.realisations.find((r) => r.id === id);
     if (cached) return cached;
 
-    // Si pas en cache, charger toutes les réalisations
-    if (state.value.realisations.length === 0) {
-      await fetchRealisations();
-      return state.value.realisations.find((r) => r.id === id) || null;
+    // 2. Vérifier si une requête est déjà en cours pour cet ID (évite race condition)
+    if (pendingRequests.has(id)) {
+      return pendingRequests.get(id)!;
     }
 
-    return null;
+    // 3. Si cache vide, charger toutes les réalisations
+    if (state.value.realisations.length === 0) {
+      await fetchRealisations();
+      const foundAfterFetchAll = state.value.realisations.find((r) => r.id === id);
+      if (foundAfterFetchAll) return foundAfterFetchAll;
+    }
+
+    // 4. Si pas trouvé, appeler l'endpoint dédié /api/realisations/[id]
+    const fetchPromise = (async () => {
+      try {
+        const response = await $fetch<{
+          success: boolean;
+          data: HybridRealisation;
+        }>(`/api/realisations/${id}`);
+
+        if (response?.success && response.data) {
+          // Vérifier avant insertion pour éviter les doublons
+          if (!state.value.realisations.some(r => r.id === response.data.id)) {
+            state.value.realisations.push(response.data);
+          }
+          return response.data;
+        }
+        return null;
+      } catch (error) {
+        console.warn(`Réalisation ${id} non trouvée:`, error);
+        return null;
+      } finally {
+        // Nettoyer la map une fois la requête terminée
+        pendingRequests.delete(id);
+      }
+    })();
+
+    pendingRequests.set(id, fetchPromise);
+    return fetchPromise;
   };
 
   /**
