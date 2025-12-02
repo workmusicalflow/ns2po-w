@@ -312,11 +312,11 @@ const currentFilters = computed((): Partial<ProductFilters> => {
 // Pattern identique à [Page Édition [id].vue] → useAsyncData → Nuxt Cache
 // Utilise /api/products car /api/admin/products GET liste n'existe pas (seulement POST/PUT/DELETE)
 
-// ⭐ FIX 6: Cache invalidation tracker pour forcer refetch après mutations (sans F5)
-const { getCachedDataOrRefetch } = useCacheInvalidation()
+// ✅ Clean Architecture: Cache key centralisée
+import { CACHE_KEYS } from '~/utils/cacheKeys'
 
 const { data: productsData, pending, error, refresh } = await useAsyncData(
-  'admin-products-list', // Key unique pour le cache Nuxt
+  CACHE_KEYS.products.list, // ✅ Key centralisée (élimine magic strings)
   async () => {
     const startTime = Date.now()
     console.log('🔄 [useAsyncData] Fetching products list from API')
@@ -347,8 +347,8 @@ const { data: productsData, pending, error, refresh } = await useAsyncData(
   {
     server: true,   // SSR enabled
     lazy: false,    // Bloque le rendu jusqu'à ce que les données arrivent (spinner garanti visible)
-    immediate: true, // Exécute immédiatement
-    getCachedData: (key) => getCachedDataOrRefetch(key) // ⭐ FIX 6: Force refetch si cache invalidé récemment
+    immediate: true // Exécute immédiatement
+    // ✅ Simplification: refreshNuxtData() via useDataInvalidator gère l'invalidation
   }
 )
 
@@ -367,31 +367,17 @@ watch(pending, (isPending) => {
   }
 }, { immediate: true })
 
-// ⭐ FIX FINAL: Pinia Store + refresh() explicite (Solution Gemini Google Search)
-// Résout problème bfcache: refreshNuxtData inter-pages ne fonctionne pas
-// Pattern validé communauté 2024-2025 (24 sources citées)
-const productStore = useProductStore()
-
-onMounted(async () => {
-  console.log('🔄 [LISTE PRODUITS] onMounted - Check flag Pinia needsProductListRefresh:', productStore.needsProductListRefresh)
-
-  if (productStore.needsProductListRefresh) {
-    console.log('🔄 [LISTE PRODUITS] Détection besoin rafraîchissement via Pinia. Forçage refetch.')
-    await refresh() // Appel explicite refresh() de useAsyncData
-    productStore.clearProductListStaleFlag()
-    console.log('✅ [LISTE PRODUITS] Rafraîchissement terminé, flag réinitialisé')
-  }
-})
+// ✅ Clean Architecture: refreshNuxtData() de useDataInvalidator suffit
+// Plus besoin de Pinia store pour l'invalidation (SOLID: SRP respecté)
 
 // Créer isLoading et isFetching pour compatibilité template
 const isLoading = computed(() => pending.value)
 const isFetching = computed(() => pending.value)
 
-// ===== SYNCHRONISATION CACHE (Phase 3 Reversal Final) =====
-// ⭐ Synchronisation via refreshNuxtData() - Pas besoin d'Event Bus
-// [id].vue appelle refreshNuxtData('admin-products-list') après chaque mutation
-// → useAsyncData('admin-products-list') détecte cache stale et refetch automatiquement
-// → Fonctionne même si index.vue n'est pas encore monté (zéro problème de chronologie)
+// ===== SYNCHRONISATION CACHE (Clean Architecture) =====
+// ✅ [id].vue utilise useDataInvalidator().invalidateProductsList() après mutations
+// → refreshNuxtData(CACHE_KEYS.products.list) invalide le cache partagé
+// → Cette page reçoit automatiquement les données fraîches à la navigation
 
 // Search query (separate for performance)
 const {

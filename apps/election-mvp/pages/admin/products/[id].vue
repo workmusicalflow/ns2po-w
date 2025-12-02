@@ -743,15 +743,9 @@ async function handleSubmit() {
       }) as { success: boolean; data: any }
 
       if (response.success && response.data) {
-        // ⭐ PHASE 3 REVERSAL: refreshNuxtData invalide cache index.vue (useAsyncData)
-        // + Mark cache as invalidated pour forcer refetch même avec payload client
-        const { markInvalidated } = useCacheInvalidation()
-        await refreshNuxtData('admin-products-list')
-        markInvalidated('admin-products-list')
-
-        // ⭐ FIX FINAL: Pinia Store flag pour refresh() explicite (Solution Gemini)
-        const productStore = useProductStore()
-        productStore.markProductListAsStale()
+        // ✅ Clean Architecture: Invalidation centralisée via composable
+        const { invalidateProductsList } = useDataInvalidator()
+        await invalidateProductsList()
 
         crudSuccess.created(`Produit "${response.data.name}" créé avec succès`, 'product')
         await router.push('/admin/products')
@@ -764,19 +758,9 @@ async function handleSubmit() {
       }) as { success: boolean; data: any }
 
       if (response.success && response.data) {
-        console.log('🔍 [DEBUG UPDATE] AVANT refreshNuxtData() - response.data.base_price =', response.data.base_price)
-
-        // ⭐ PHASE 3 REVERSAL: refreshNuxtData invalide cache index.vue (useAsyncData)
-        // + Mark cache as invalidated pour forcer refetch même avec payload client
-        const { markInvalidated } = useCacheInvalidation()
-        await refreshNuxtData('admin-products-list')
-        markInvalidated('admin-products-list')
-
-        // ⭐ FIX FINAL: Pinia Store flag pour refresh() explicite (Solution Gemini)
-        const productStore = useProductStore()
-        productStore.markProductListAsStale()
-
-        console.log('✅ [DEBUG UPDATE] APRÈS refreshNuxtData() + markInvalidated - Cache invalidé pour clé: admin-products-list')
+        // ✅ Clean Architecture: Invalidation centralisée via composable
+        const { invalidateProductsList } = useDataInvalidator()
+        await invalidateProductsList()
 
         // Rafraîchir form local
         mapProductToForm(response.data)
@@ -821,11 +805,9 @@ async function deleteProduct() {
     }) as { success: boolean }
 
     if (response.success) {
-      // ⭐ PHASE 3 REVERSAL: refreshNuxtData invalide cache index.vue (useAsyncData)
-      // + Mark cache as invalidated pour forcer refetch même avec payload client
-      const { markInvalidated } = useCacheInvalidation()
-      await refreshNuxtData('admin-products-list')
-      markInvalidated('admin-products-list')
+      // ✅ Clean Architecture: Invalidation centralisée via composable
+      const { invalidateProductsList } = useDataInvalidator()
+      await invalidateProductsList()
 
       crudSuccess.deleted(`Produit "${form.name}" supprimé avec succès`, 'product')
       await router.push('/admin/products')
