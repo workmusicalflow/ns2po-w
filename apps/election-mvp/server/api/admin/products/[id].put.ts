@@ -124,7 +124,7 @@ export default defineEventHandler(async (event) => {
       mainValues.push(validatedData.max_quantity)
     }
     if (validatedData.image !== undefined) {
-      mainFields.push('image = ?')
+      mainFields.push('image_url = ?')  // ✅ FIX: Colonne BDD = image_url, pas image
       mainValues.push(validatedData.image)
     }
     if (validatedData.is_active !== undefined) {
