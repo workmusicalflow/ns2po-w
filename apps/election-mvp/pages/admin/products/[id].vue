@@ -788,20 +788,31 @@ async function handleSubmit() {
         ? rawForm.gallery_urls.map((url: string) => ({ url, type: 'variant' as const }))
         : undefined,
 
-      // Materials (string → array, split par virgule/newline)
-      materials: rawForm.materials
-        ? rawForm.materials.split(/[,\n]+/).map((m: string) => m.trim()).filter(Boolean)
-        : [],
+      // Materials (string ou string[] → array)
+      // ⭐ FIX: Gérer les deux cas - textarea string OU array déjà existant
+      materials: (() => {
+        if (!rawForm.materials) return []
+        if (Array.isArray(rawForm.materials)) return rawForm.materials
+        return rawForm.materials.split(/[,\n]+/).map((m: string) => m.trim()).filter(Boolean)
+      })(),
 
-      // Colors (string[] → object[] avec {name})
-      colors: rawForm.colors?.length
-        ? rawForm.colors.map((c: string) => ({ name: c }))
-        : [],
+      // Colors (string[] ou {name}[] → object[] avec {name})
+      // ⭐ FIX: Gérer les deux cas - form string[] OU API {name}[]
+      colors: (() => {
+        if (!rawForm.colors?.length) return []
+        return rawForm.colors.map((c: string | { name: string }) =>
+          typeof c === 'string' ? { name: c } : c
+        )
+      })(),
 
-      // Sizes (string[] → object[] avec {name})
-      sizes: rawForm.sizes?.length
-        ? rawForm.sizes.map((s: string) => ({ name: s }))
-        : []
+      // Sizes (string[] ou {name}[] → object[] avec {name})
+      // ⭐ FIX: Gérer les deux cas - form string[] OU API {name}[]
+      sizes: (() => {
+        if (!rawForm.sizes?.length) return []
+        return rawForm.sizes.map((s: string | { name: string }) =>
+          typeof s === 'string' ? { name: s } : s
+        )
+      })()
     }
 
     console.log('📤 [handleSubmit] Payload transformé pour API:', productData)
