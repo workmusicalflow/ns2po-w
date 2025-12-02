@@ -733,7 +733,20 @@ async function handleSubmit() {
   isSubmitting.value = true
   try {
     // 🔧 FIX: Utiliser toRaw() pour éviter erreurs sérialisation reactive() → 502
-    const productData = toRaw(form)
+    const rawForm = toRaw(form)
+
+    // ✅ FIX: Transformer noms de champs pour correspondre au schéma API
+    // Frontend: image_url, gallery_urls → API: image, gallery
+    const productData = {
+      ...rawForm,
+      image: rawForm.image_url || undefined, // API attend "image"
+      gallery: rawForm.gallery_urls?.length
+        ? rawForm.gallery_urls.map((url: string) => ({ url, type: 'variant' as const }))
+        : undefined // API attend "gallery" array d'objets
+    }
+    // Supprimer les anciens champs pour éviter confusion
+    delete (productData as any).image_url
+    delete (productData as any).gallery_urls
 
     if (isNew.value) {
       // 🚨 PATCH GPT-5: Création directe via $fetch

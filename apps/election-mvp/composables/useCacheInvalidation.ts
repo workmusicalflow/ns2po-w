@@ -52,8 +52,10 @@ export function useCacheInvalidation() {
 
   /**
    * Vérifie si une clé a été invalidée récemment
+   * FIX: TTL augmenté de 10s à 5 minutes (300000ms) pour correspondre au TTL Redis serveur
+   * Permet navigation lente entre pages sans perdre le flag d'invalidation
    */
-  function wasRecentlyInvalidated(key: string, withinMs = 10000) {
+  function wasRecentlyInvalidated(key: string, withinMs = 300000) {
     const map = getInvalidationMap()
     const timestamp = map[key]
     if (!timestamp) return false
