@@ -175,6 +175,33 @@ export default defineEventHandler(async (event) => {
       })
     }
 
+    // 5b. Mise à jour gallery (stratégie delete-then-insert pour éviter duplications)
+    if (validatedData.gallery !== undefined) {
+      // Supprimer TOUTES les anciennes images de gallery pour ce produit
+      await tursoClient.execute({
+        sql: 'DELETE FROM product_gallery WHERE product_id = ?',
+        args: [productId]
+      })
+      console.log(`🗑️ [API PUT] Anciennes images gallery supprimées pour ${productId}`)
+
+      // Insérer les nouvelles images de gallery (si présentes)
+      if (validatedData.gallery.length > 0) {
+        const galleryStatements = validatedData.gallery.map((item, index) => ({
+          sql: `INSERT INTO product_gallery (id, product_id, image_url, image_type, display_order, is_active)
+                VALUES (?, ?, ?, ?, ?, 1)`,
+          args: [
+            `gal_${Date.now()}_${index}`,
+            productId,
+            item.url,
+            item.type || 'variant',
+            index
+          ]
+        }))
+        await tursoClient.batch(galleryStatements, 'write')
+        console.log(`✅ [API PUT] ${validatedData.gallery.length} images gallery insérées pour ${productId}`)
+      }
+    }
+
     // 6. Récupérer produit mis à jour (APRÈS toutes les écritures)
     const updatedProduct = await getProductWithRelations(tursoClient, productId)
 

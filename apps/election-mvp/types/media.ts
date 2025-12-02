@@ -33,9 +33,13 @@ export interface ProductMediaState {
 
 /**
  * Convertit la structure legacy (image_url + gallery_urls) vers ProductMedia[]
+ *
+ * ✅ Protection anti-duplication: utilise un Set pour garantir unicité des URLs
+ * Même si l'API renvoie des données incohérentes, cette fonction ne créera jamais de doublons
  */
 export function legacyToProductMedia(imageUrl?: string, galleryUrls?: string[]): ProductMedia[] {
   const items: ProductMedia[] = []
+  const addedUrls = new Set<string>() // Protection anti-duplication
 
   // Image principale
   if (imageUrl) {
@@ -45,17 +49,22 @@ export function legacyToProductMedia(imageUrl?: string, galleryUrls?: string[]):
       isMain: true,
       status: 'uploaded'
     })
+    addedUrls.add(imageUrl) // Marquer comme ajoutée
   }
 
-  // Images galerie
+  // Images galerie (uniquement si pas déjà ajoutée)
   if (galleryUrls && galleryUrls.length > 0) {
     galleryUrls.forEach((url, index) => {
-      items.push({
-        id: extractPublicId(url) || `gallery-${index}-${Date.now()}`,
-        url,
-        isMain: false,
-        status: 'uploaded'
-      })
+      // ✅ Protection: ignorer si URL déjà présente (évite doublons visuels)
+      if (!addedUrls.has(url)) {
+        items.push({
+          id: extractPublicId(url) || `gallery-${index}-${Date.now()}`,
+          url,
+          isMain: false,
+          status: 'uploaded'
+        })
+        addedUrls.add(url)
+      }
     })
   }
 
