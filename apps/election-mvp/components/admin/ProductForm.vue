@@ -225,6 +225,124 @@
       </div>
     </div>
 
+    <!-- Materials, Colors, Sizes -->
+    <div class="bg-white p-6 rounded-lg border border-gray-200">
+      <h3 class="text-lg font-medium text-gray-900 mb-4">
+        Caractéristiques produit
+      </h3>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Materials -->
+        <div>
+          <label for="materials" class="block text-sm font-medium text-gray-700 mb-1">
+            Matériaux *
+          </label>
+          <textarea
+            id="materials"
+            v-model="formData.materials"
+            rows="3"
+            required
+            :class="[
+              'block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500',
+              errors.materials ? 'border-red-300' : 'border-gray-300'
+            ]"
+            placeholder="Coton&#10;Polyester&#10;Nylon"
+            @blur="validateField('materials')"
+          />
+          <p class="mt-1 text-xs text-gray-500">
+            Un matériau par ligne
+          </p>
+          <p v-if="errors.materials" class="mt-1 text-sm text-red-600">
+            {{ errors.materials }}
+          </p>
+        </div>
+
+        <!-- Colors -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">
+            Couleurs *
+          </label>
+          <div class="space-y-2">
+            <div
+              v-for="(color, index) in (formData.colors || [])"
+              :key="index"
+              class="flex items-center space-x-2"
+            >
+              <input
+                v-model="formData.colors![index]"
+                type="text"
+                :class="[
+                  'flex-1 px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500',
+                  errors.colors ? 'border-red-300' : 'border-gray-300'
+                ]"
+                placeholder="Ex: Rouge, Bleu..."
+              >
+              <button
+                type="button"
+                class="p-2 text-red-500 hover:text-red-700"
+                @click="removeColor(index)"
+              >
+                <Icon name="heroicons:x-mark" class="w-4 h-4" />
+              </button>
+            </div>
+            <button
+              type="button"
+              class="inline-flex items-center px-3 py-1 text-sm border border-gray-300 rounded-md hover:bg-gray-50"
+              @click="addColor"
+            >
+              <Icon name="heroicons:plus" class="w-4 h-4 mr-1" />
+              Ajouter couleur
+            </button>
+          </div>
+          <p v-if="errors.colors" class="mt-1 text-sm text-red-600">
+            {{ errors.colors }}
+          </p>
+        </div>
+
+        <!-- Sizes -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">
+            Tailles *
+          </label>
+          <div class="space-y-2">
+            <div
+              v-for="(size, index) in (formData.sizes || [])"
+              :key="index"
+              class="flex items-center space-x-2"
+            >
+              <input
+                v-model="formData.sizes![index]"
+                type="text"
+                :class="[
+                  'flex-1 px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500',
+                  errors.sizes ? 'border-red-300' : 'border-gray-300'
+                ]"
+                placeholder="Ex: S, M, L, XL..."
+              >
+              <button
+                type="button"
+                class="p-2 text-red-500 hover:text-red-700"
+                @click="removeSize(index)"
+              >
+                <Icon name="heroicons:x-mark" class="w-4 h-4" />
+              </button>
+            </div>
+            <button
+              type="button"
+              class="inline-flex items-center px-3 py-1 text-sm border border-gray-300 rounded-md hover:bg-gray-50"
+              @click="addSize"
+            >
+              <Icon name="heroicons:plus" class="w-4 h-4 mr-1" />
+              Ajouter taille
+            </button>
+          </div>
+          <p v-if="errors.sizes" class="mt-1 text-sm text-red-600">
+            {{ errors.sizes }}
+          </p>
+        </div>
+      </div>
+    </div>
+
     <!-- Images -->
     <div class="bg-white p-6 rounded-lg border border-gray-200">
       <h3 class="text-lg font-medium text-gray-900 mb-4">
@@ -319,6 +437,10 @@ interface Product {
   min_quantity: number
   max_quantity?: number
   images?: string[]
+  // Nouveaux champs obligatoires pour création
+  materials?: string  // Texte multiligne, séparé par \n
+  colors?: string[]   // Liste des noms de couleurs
+  sizes?: string[]    // Liste des tailles
 }
 
 interface Category {
@@ -377,7 +499,11 @@ const formData = reactive<Product>({
   price: 0,
   min_quantity: 1,
   max_quantity: undefined,
-  images: []
+  images: [],
+  // Nouveaux champs obligatoires
+  materials: '',        // Texte multiligne
+  colors: [''],         // Commence avec un champ vide
+  sizes: ['']           // Commence avec un champ vide
 })
 
 const errors = ref<Record<string, string>>({})
@@ -393,7 +519,10 @@ watchEffect(() => {
   if (props.product) {
     Object.assign(formData, {
       ...props.product,
-      images: props.product.images || []
+      images: props.product.images || [],
+      materials: props.product.materials || '',
+      colors: props.product.colors?.length ? props.product.colors : [''],
+      sizes: props.product.sizes?.length ? props.product.sizes : ['']
     })
   } else {
     // Reset form for new product
@@ -406,20 +535,54 @@ watchEffect(() => {
       price: 0,
       min_quantity: 1,
       max_quantity: undefined,
-      images: []
+      images: [],
+      materials: '',
+      colors: [''],
+      sizes: ['']
     })
   }
 })
 
+// --- Méthodes pour gérer les listes dynamiques ---
+const addColor = () => {
+  if (!formData.colors) formData.colors = []
+  formData.colors.push('')
+}
+
+const removeColor = (index: number) => {
+  if (formData.colors && formData.colors.length > 1) {
+    formData.colors.splice(index, 1)
+  }
+}
+
+const addSize = () => {
+  if (!formData.sizes) formData.sizes = []
+  formData.sizes.push('')
+}
+
+const removeSize = (index: number) => {
+  if (formData.sizes && formData.sizes.length > 1) {
+    formData.sizes.splice(index, 1)
+  }
+}
+
 // Computed
 const isFormValid = computed(() => {
-  return formData.name &&
+  // Vérifier les champs de base
+  const hasBasicFields = formData.name &&
          formData.reference &&
          formData.category_id &&
          formData.status &&
          formData.price >= 0 &&
          formData.min_quantity >= 1 &&
          Object.keys(errors.value).length === 0
+
+  // Vérifier les nouveaux champs obligatoires pour création
+  const hasMaterials = formData.materials && formData.materials.trim() !== ''
+  const hasColors = formData.colors && formData.colors.some(c => c.trim() !== '')
+  const hasSizes = formData.sizes && formData.sizes.some(s => s.trim() !== '')
+
+  return hasBasicFields && hasMaterials && hasColors && hasSizes
 })
 
 // Methods
@@ -535,23 +698,50 @@ const submitForm = async () => {
 
   isSubmitting.value = true
   try {
-    // Transform form data to match API schema
+    // ⭐ Transform form data to match API POST schema (camelCase + objets)
     const apiData: Record<string, unknown> = {
-      ...formData,
-      // Map UI fields to API fields
+      // Champs de base
+      name: formData.name,
+      reference: formData.reference,
+      description: formData.description || undefined,
+
+      // Catégorie et statut
       category: formData.category_id,
-      base_price: formData.price,
-      // Transform images array to API format
-      image_url: formData.images && formData.images.length > 0
+      // isActive déduit du status
+      isActive: formData.status === 'active',
+
+      // Tarification (camelCase pour API)
+      basePrice: formData.price,
+      minQuantity: formData.min_quantity,
+      maxQuantity: formData.max_quantity || undefined,
+
+      // ⭐ Materials: texte multiligne → tableau de strings
+      materials: formData.materials
+        ? formData.materials.split(/[\n,]+/).map(m => m.trim()).filter(Boolean)
+        : [],
+
+      // ⭐ Colors: string[] → {name: string}[]
+      colors: formData.colors
+        ? formData.colors.filter(c => c.trim() !== '').map(c => ({ name: c.trim() }))
+        : [],
+
+      // ⭐ Sizes: string[] → {name: string}[]
+      sizes: formData.sizes
+        ? formData.sizes.filter(s => s.trim() !== '').map(s => ({ name: s.trim() }))
+        : [],
+
+      // Image principale
+      image: formData.images && formData.images.length > 0
         ? `https://res.cloudinary.com/dsrvzogof/image/upload/${formData.images[0]}`
         : undefined,
-      gallery_urls: formData.images && formData.images.length > 1
-        ? formData.images.slice(1).map(publicId => `https://res.cloudinary.com/dsrvzogof/image/upload/${publicId}`)
-        : [],
-      // Remove UI-specific fields
-      category_id: undefined,
-      price: undefined,
-      images: undefined
+
+      // Gallery (images secondaires)
+      gallery: formData.images && formData.images.length > 1
+        ? formData.images.slice(1).map(publicId => ({
+            url: `https://res.cloudinary.com/dsrvzogof/image/upload/${publicId}`,
+            type: 'variant' as const
+          }))
+        : undefined
     }
 
     // Clean undefined fields
@@ -561,7 +751,8 @@ const submitForm = async () => {
       }
     })
 
-    emit('submit', apiData as Product)
+    console.log('📤 [ProductForm] Submitting to API:', apiData)
+    emit('submit', apiData as unknown as Product)
   } catch (error) {
     console.error('Erreur soumission:', error)
   } finally {
