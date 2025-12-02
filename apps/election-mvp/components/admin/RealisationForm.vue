@@ -97,7 +97,7 @@
               type="button"
               :disabled="isUploading"
               class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
-              @click="$refs.fileInput.click()"
+              @click="triggerFileInput"
             >
               <Icon v-if="isUploading" name="heroicons:arrow-path" class="w-4 h-4 mr-2 animate-spin" />
               <Icon v-else name="heroicons:cloud-arrow-up" class="w-4 h-4 mr-2" />
@@ -380,64 +380,59 @@
 </template>
 
 <script setup lang="ts">
-interface Product {
-  id: string
-  name: string
-  reference?: string
-}
+// ✅ Types centralisés (DRY - Single Source of Truth)
+import type {
+  RealisationFormData,
+  RealisationFromApi,
+  RealisationProduct,
+  RealisationCategory,
+  RealisationCustomizationOption
+} from '~/types/admin/realisation-form'
+import {
+  getDefaultRealisationFormData
+} from '~/types/admin/realisation-form'
 
-interface Category {
-  id: string
-  name: string
-}
+// ✅ Pattern Adapter: Mapper + Validation centralisés
+import {
+  normalizeToFormData,
+  mapRealisationFormToApi,
+  isFormDataValid
+} from '~/utils/realisationMapper'
 
-interface CustomizationOption {
-  id: string
-  name: string
-}
+// ✅ Composable Cloudinary existant (évite duplication upload)
+import { useCloudinary } from '~/composables/useCloudinary'
 
-interface Realisation {
-  id?: string
-  title: string
-  description?: string
-  cloudinary_public_ids: string[]
-  product_ids: string[]
-  category_ids: string[]
-  customization_option_ids: string[]
-  tags: string[]
-  is_featured: boolean
-  order_position: number
-  is_active: boolean
-  source: 'airtable' | 'cloudinary-auto-discovery' | 'turso'
-  cloudinary_urls?: string[]
-  cloudinary_metadata?: Record<string, any>
-}
-
+/**
+ * ✅ Props avec type flexible pour `realisation`
+ * Accepte RealisationFromApi (camelCase) ou RealisationFormData (snake_case)
+ * Le mapper normalizeToFormData() gère la transformation automatiquement
+ */
 const props = defineProps<{
-  realisation?: Realisation | null
-  availableProducts: Product[]
-  availableCategories: Category[]
-  availableCustomizationOptions: CustomizationOption[]
+  realisation?: RealisationFormData | RealisationFromApi | Record<string, unknown> | null
+  availableProducts: RealisationProduct[]
+  availableCategories: RealisationCategory[]
+  availableCustomizationOptions: RealisationCustomizationOption[]
   isEdit?: boolean
 }>()
 
 const emit = defineEmits<{
-  submit: [realisation: Realisation]
+  submit: [realisation: ReturnType<typeof mapRealisationFormToApi>]
   cancel: []
 }>()
 
-// Simple validation function instead of undefined useFormValidation
-const validateRealisation = (realisation: Realisation) => {
+// ✅ Utiliser le composable Cloudinary existant
+const cloudinary = useCloudinary()
+
+/**
+ * ✅ Validation locale simplifiée (sans référence à 'client' inexistant)
+ */
+const validateRealisation = (realisation: RealisationFormData) => {
   const errors: Array<{ field: string; message: string }> = []
 
   if (!realisation.title?.trim()) {
     errors.push({ field: 'title', message: 'Le titre est requis' })
-  }
-  if (!realisation.description?.trim()) {
-    errors.push({ field: 'description', message: 'La description est requise' })
-  }
-  if (!realisation.client?.trim()) {
-    errors.push({ field: 'client', message: 'Le nom du client est requis' })
+  } else if (realisation.title.length < 3) {
+    errors.push({ field: 'title', message: 'Le titre doit contenir au moins 3 caractères' })
   }
 
   return {
@@ -446,63 +441,52 @@ const validateRealisation = (realisation: Realisation) => {
   }
 }
 
-// Simple notification functions instead of undefined globalNotifications
+// Simple notification functions
 const crudError = {
   validation: (message: string) => console.error(`❌ Validation:`, message),
   created: (type: string, message: string) => console.error(`❌ Erreur création ${type}:`, message),
   updated: (type: string, message: string) => console.error(`❌ Erreur mise à jour ${type}:`, message)
 }
 
-// Form state
-const formData = reactive<Realisation>({
-  title: '',
-  description: '',
-  cloudinary_public_ids: [],
-  product_ids: [],
-  category_ids: [],
-  customization_option_ids: [],
-  tags: [],
-  is_featured: false,
-  order_position: 0,
-  is_active: true,
-  source: 'turso'
-})
+// ✅ Form state avec type explicite
+const formData = reactive<RealisationFormData>(getDefaultRealisationFormData())
 
 const errors = ref<Record<string, string>>({})
 const isSubmitting = ref(false)
 const isUploading = ref(false)
 const tagsInput = ref('')
 
-// Initialize form with realisation data
-watchEffect(() => {
-  if (props.realisation) {
-    Object.assign(formData, {
-      ...props.realisation,
-      cloudinary_public_ids: props.realisation.cloudinary_public_ids || [],
-      product_ids: props.realisation.product_ids || [],
-      category_ids: props.realisation.category_ids || [],
-      customization_option_ids: props.realisation.customization_option_ids || [],
-      tags: props.realisation.tags || []
-    })
-    tagsInput.value = props.realisation.tags?.join(', ') || ''
-  } else {
-    // Reset form for new realisation
-    Object.assign(formData, {
-      title: '',
-      description: '',
-      cloudinary_public_ids: [],
-      product_ids: [],
-      category_ids: [],
-      customization_option_ids: [],
-      tags: [],
-      is_featured: false,
-      order_position: 0,
-      is_active: true,
-      source: 'turso'
-    })
-    tagsInput.value = ''
-  }
-})
+// ✅ Ref typée pour l'input file (évite erreur TS18046)
+const fileInput = ref<HTMLInputElement | null>(null)
+
+/**
+ * Déclenche le click sur l'input file via la ref typée
+ */
+const triggerFileInput = () => {
+  fileInput.value?.click()
+}
+
+/**
+ * ✅ Pattern Adapter: watch au lieu de watchEffect
+ * Plus prévisible, s'exécute seulement quand props.realisation change
+ */
+watch(
+  () => props.realisation,
+  (newRealisation) => {
+    if (newRealisation) {
+      // ✅ Utiliser le mapper pour normaliser les données (gère API et Form formats)
+      const normalized = normalizeToFormData(newRealisation)
+      Object.assign(formData, normalized)
+      tagsInput.value = normalized.tags.join(', ')
+      console.log('📥 [RealisationForm] Données normalisées via mapper')
+    } else {
+      // Reset form pour nouvelle réalisation
+      Object.assign(formData, getDefaultRealisationFormData())
+      tagsInput.value = ''
+    }
+  },
+  { immediate: true }
+)
 
 // Computed
 const isFormValid = computed(() => {
@@ -513,7 +497,8 @@ const isFormValid = computed(() => {
 
 // Methods
 const validateField = (fieldName: string) => {
-  const result = validateRealisation(formData, props.isEdit)
+  // ✅ FIX: validateRealisation prend 1 seul argument
+  const result = validateRealisation(formData)
 
   if (!result.success) {
     const fieldError = result.errors.find(err => err.field === fieldName)
@@ -527,6 +512,10 @@ const validateField = (fieldName: string) => {
   }
 }
 
+/**
+ * ✅ Utilise le composable useCloudinary au lieu de l'appel direct
+ * Avantages: DRY, validation fichiers intégrée, gestion d'erreurs centralisée
+ */
 const handleFileUpload = async (event: Event) => {
   const target = event.target as HTMLInputElement
   const files = target.files
@@ -541,43 +530,37 @@ const handleFileUpload = async (event: Event) => {
 
   isUploading.value = true
   try {
-    for (const file of Array.from(files)) {
-      // Validate file size and type
-      if (file.size > 10 * 1024 * 1024) { // 10MB
-        crudError.validation(`Le fichier ${file.name} est trop volumineux (max 10MB)`)
-        continue
+    // ✅ Utiliser le composable Cloudinary avec validation intégrée
+    const filesToUpload = Array.from(files).filter(file => {
+      // Validation via composable
+      const validation = cloudinary.validateFile(file, { maxSize: 10 })
+      if (!validation.valid) {
+        crudError.validation(validation.error || `Fichier ${file.name} invalide`)
+        return false
       }
+      return true
+    })
 
-      if (!file.type.startsWith('image/')) {
-        crudError.validation(`Le fichier ${file.name} n'est pas une image`)
-        continue
-      }
-
-      const formDataUpload = new FormData()
-      formDataUpload.append('file', file)
-      formDataUpload.append('upload_preset', 'realisations')
-      formDataUpload.append('folder', 'ns2po/realisations')
-
-      const response = await fetch('https://api.cloudinary.com/v1_1/dsrvzogof/image/upload', {
-        method: 'POST',
-        body: formDataUpload
-      })
-
-      if (!response.ok) {
-        throw new Error('Erreur lors de l\'upload')
-      }
-
-      const data = await response.json()
-
-      // Add to form images
-      formData.cloudinary_public_ids.push(data.public_id)
+    if (filesToUpload.length === 0) {
+      return
     }
+
+    const results = await cloudinary.uploadMultipleFiles(
+      filesToUpload,
+      { folder: 'ns2po/realisations' }
+    )
+
+    // Ajouter les résultats au formulaire
+    results.forEach(result => {
+      formData.cloudinary_public_ids.push(result.public_id)
+    })
+
+    console.log(`✅ ${results.length} image(s) uploadée(s) via useCloudinary`)
   } catch (error) {
     console.error('Erreur upload:', error)
     crudError.validation('Erreur lors de l\'upload des images')
   } finally {
     isUploading.value = false
-    // Reset input
     target.value = ''
   }
 }
@@ -608,9 +591,12 @@ const removeTag = (index: number) => {
   tagsInput.value = formData.tags.join(', ')
 }
 
+/**
+ * ✅ Form submission avec mapper centralisé
+ */
 const submitForm = async () => {
-  // Validate entire form
-  const result = validateRealisation(formData, props.isEdit)
+  // ✅ FIX: validateRealisation prend 1 seul argument
+  const result = validateRealisation(formData)
 
   if (!result.success) {
     errors.value = {}
@@ -620,9 +606,21 @@ const submitForm = async () => {
     return
   }
 
+  // ✅ Validation supplémentaire via mapper
+  const mapperValidation = isFormDataValid(formData)
+  if (!mapperValidation.valid) {
+    mapperValidation.errors.forEach(err => {
+      errors.value.form = err
+    })
+    return
+  }
+
   isSubmitting.value = true
   try {
-    emit('submit', { ...formData })
+    // ✅ Utiliser le mapper pour transformer Form → API
+    const payload = mapRealisationFormToApi(formData)
+    console.log('📤 [RealisationForm] Payload via mapper:', payload)
+    emit('submit', payload)
   } catch (error) {
     console.error('Erreur soumission:', error)
   } finally {

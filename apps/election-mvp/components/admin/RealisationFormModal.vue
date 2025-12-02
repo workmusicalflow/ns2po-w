@@ -189,7 +189,7 @@
                         <button
                           type="button"
                           class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
-                          @click="$refs.fileInput.click()"
+                          @click="triggerFileInput"
                         >
                           <Icon name="heroicons:cloud-arrow-up" class="w-4 h-4 mr-2" />
                           Ajouter des images
@@ -330,103 +330,82 @@
 </template>
 
 <script setup lang="ts">
-interface Realisation {
-  id?: string
-  title: string
-  description?: string
-  cloudinaryPublicIds: string[]
-  productIds: string[]
-  categoryIds: string[]
-  customizationOptionIds: string[]
-  tags: string[]
-  isFeatured: boolean
-  orderPosition: number
-  isActive: boolean
-  source: string
-  cloudinaryUrls?: string[]
-  cloudinaryMetadata?: Record<string, any>
-}
+// ✅ Types centralisés (DRY - Single Source of Truth)
+import type {
+  RealisationFromApi,
+  RealisationFormData,
+  RealisationCategory,
+  RealisationProduct
+} from '~/types/admin/realisation-form'
+import {
+  getDefaultRealisationFormData
+} from '~/types/admin/realisation-form'
 
-interface Category {
-  id: string
-  name: string
-}
+// ✅ Pattern Adapter: Mapper centralisé
+import {
+  mapRealisationApiToForm,
+  mapRealisationFormToApi,
+  isFormDataValid
+} from '~/utils/realisationMapper'
 
-interface Product {
-  id: string
-  name: string
-}
+// ✅ Composable Cloudinary existant (évite duplication upload)
+import { useCloudinary } from '~/composables/useCloudinary'
 
 const props = defineProps<{
-  realisation?: Realisation | null
-  categories: Category[]
-  products: Product[]
+  realisation?: RealisationFromApi | null
+  categories: RealisationCategory[]
+  products: RealisationProduct[]
 }>()
 
 const emit = defineEmits<{
   close: []
-  saved: [realisation: Realisation]
+  saved: [realisation: RealisationFromApi]
 }>()
+
+// ✅ Utiliser le composable Cloudinary existant
+const cloudinary = useCloudinary()
 
 const isEdit = computed(() => !!props.realisation)
 const isLoading = ref(false)
 const errors = ref<Record<string, string>>({})
 const newTag = ref('')
 
-// Form data
-const form = reactive({
-  title: '',
-  description: '',
-  cloudinary_public_ids: [] as string[],
-  product_ids: [] as string[],
-  category_ids: [] as string[],
-  customization_option_ids: [] as string[],
-  tags: [] as string[],
-  is_featured: false,
-  order_position: 0,
-  is_active: true,
-  source: 'turso',
-  cloudinary_urls: [] as string[],
-  cloudinary_metadata: {} as Record<string, any>
-})
+// ✅ Ref typée pour l'input file (évite erreur TS18046)
+const fileInput = ref<HTMLInputElement | null>(null)
 
-// Initialize form with existing data
-watchEffect(() => {
-  if (props.realisation) {
-    Object.assign(form, {
-      title: props.realisation.title || '',
-      description: props.realisation.description || '',
-      cloudinary_public_ids: [...(props.realisation.cloudinaryPublicIds || [])],
-      product_ids: [...(props.realisation.productIds || [])],
-      category_ids: [...(props.realisation.categoryIds || [])],
-      customization_option_ids: [...(props.realisation.customizationOptionIds || [])],
-      tags: [...(props.realisation.tags || [])],
-      is_featured: props.realisation.isFeatured || false,
-      order_position: props.realisation.orderPosition || 0,
-      is_active: props.realisation.isActive !== undefined ? props.realisation.isActive : true,
-      source: props.realisation.source || 'turso',
-      cloudinary_urls: [...(props.realisation.cloudinaryUrls || [])],
-      cloudinary_metadata: { ...(props.realisation.cloudinaryMetadata || {}) }
-    })
-  } else {
-    // Reset form for new realisation
-    Object.assign(form, {
-      title: '',
-      description: '',
-      cloudinary_public_ids: [],
-      product_ids: [],
-      category_ids: [],
-      customization_option_ids: [],
-      tags: [],
-      is_featured: false,
-      order_position: 0,
-      is_active: true,
-      source: 'turso',
-      cloudinary_urls: [],
-      cloudinary_metadata: {}
-    })
-  }
-})
+/**
+ * Déclenche le click sur l'input file via la ref typée
+ */
+const triggerFileInput = () => {
+  fileInput.value?.click()
+}
+
+// ✅ Form data avec type explicite
+const form = reactive<RealisationFormData>(getDefaultRealisationFormData())
+
+/**
+ * ✅ Pattern Adapter: watch au lieu de watchEffect
+ * Plus prévisible, s'exécute seulement quand props.realisation change
+ * @see Gemini audit: watch + immediate est plus prévisible que watchEffect
+ */
+watch(
+  () => props.realisation,
+  (newRealisation) => {
+    if (newRealisation) {
+      // ✅ Utiliser le mapper centralisé
+      const mapped = mapRealisationApiToForm(newRealisation)
+      Object.assign(form, mapped)
+      console.log('📥 [RealisationFormModal] Données chargées via mapper:', {
+        title: form.title,
+        imagesCount: form.cloudinary_public_ids.length
+      })
+    } else {
+      // Reset form pour nouvelle réalisation
+      Object.assign(form, getDefaultRealisationFormData())
+    }
+  },
+  { immediate: true }
+)
 
 // Helper function for Cloudinary URLs
 const getCloudinaryUrl = (publicId: string, transformations = '') => {
@@ -457,6 +436,10 @@ const removeImage = (index: number) => {
   }
 }
 
+/**
+ * ✅ Utilise le composable useCloudinary au lieu de l'appel direct
+ * Avantages: DRY, gestion d'erreurs centralisée, progress tracking
+ */
 const handleFileUpload = async (event: Event) => {
   const target = event.target as HTMLInputElement
   const files = target.files
@@ -464,31 +447,24 @@ const handleFileUpload = async (event: Event) => {
 
   isLoading.value = true
   try {
-    for (const file of Array.from(files)) {
-      const formData = new FormData()
-      formData.append('file', file)
-      formData.append('upload_preset', 'realisations')
-      formData.append('folder', 'ns2po/realisations')
+    // ✅ Utiliser le composable Cloudinary
+    const results = await cloudinary.uploadMultipleFiles(
+      Array.from(files),
+      { folder: 'ns2po/realisations' }
+    )
 
-      const response = await fetch('https://api.cloudinary.com/v1_1/dsrvzogof/image/upload', {
-        method: 'POST',
-        body: formData
-      })
+    // Ajouter les résultats au formulaire
+    results.forEach(result => {
+      form.cloudinary_public_ids.push(result.public_id)
+      form.cloudinary_urls.push(result.secure_url)
+    })
 
-      if (!response.ok) {
-        throw new Error('Erreur lors de l\'upload')
-      }
-
-      const data = await response.json()
-      form.cloudinary_public_ids.push(data.public_id)
-      form.cloudinary_urls.push(data.secure_url)
-    }
+    console.log(`✅ ${results.length} image(s) uploadée(s) via useCloudinary`)
   } catch (error) {
     console.error('Erreur upload:', error)
-    // Handle error appropriately
+    errors.value.upload = 'Erreur lors de l\'upload des images'
   } finally {
     isLoading.value = false
-    // Reset input
     target.value = ''
   }
 }
@@ -506,27 +482,28 @@ const validateForm = () => {
   return Object.keys(errors.value).length === 0
 }
 
-// Form submission
+/**
+ * ✅ Form submission avec mapper centralisé
+ * Avantages: transformation cohérente, validation intégrée
+ */
 const submitForm = async () => {
   if (!validateForm()) return
 
+  // ✅ Validation supplémentaire via mapper
+  const validation = isFormDataValid(form)
+  if (!validation.valid) {
+    validation.errors.forEach(err => {
+      errors.value.form = err
+    })
+    return
+  }
+
   isLoading.value = true
   try {
-    const payload = {
-      title: form.title,
-      description: form.description || undefined,
-      cloudinary_public_ids: form.cloudinary_public_ids,
-      product_ids: form.product_ids,
-      category_ids: form.category_ids,
-      customization_option_ids: form.customization_option_ids,
-      tags: form.tags,
-      is_featured: form.is_featured,
-      order_position: form.order_position,
-      is_active: form.is_active,
-      source: form.source,
-      cloudinary_urls: form.cloudinary_urls.length > 0 ? form.cloudinary_urls : undefined,
-      cloudinary_metadata: Object.keys(form.cloudinary_metadata).length > 0 ? form.cloudinary_metadata : undefined
-    }
+    // ✅ Utiliser le mapper pour transformer Form → API
+    const payload = mapRealisationFormToApi(form)
+
+    console.log('📤 [RealisationFormModal] Payload via mapper:', payload)
 
     let response
     if (isEdit.value && props.realisation?.id) {
