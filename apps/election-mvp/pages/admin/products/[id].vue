@@ -572,6 +572,10 @@ const isSubmitting = ref(false)
 const newColor = ref('')
 const newSize = ref('')
 
+// 🛡️ Guard flag: Empêche le watch(productData) d'écraser le form après un PUT réussi
+// Fix race condition: API response (fresh) vs useAsyncData refetch (potentiellement stale)
+const skipWatchRefresh = ref(false)
+
 // Media items (remplace image_url + gallery_urls)
 const mediaItems = ref<ProductMedia[]>([])
 
@@ -599,6 +603,12 @@ const form = reactive({
 // Mapper les données productData vers le formulaire quand elles changent
 watch(productData, (newData) => {
   if (newData) {
+    // 🛡️ Guard: Si un PUT vient de réussir, ignorer ce refetch (données potentiellement stale)
+    if (skipWatchRefresh.value) {
+      console.log('🛡️ [watch(productData)] SKIP - Guard actif après PUT réussi')
+      skipWatchRefresh.value = false // Reset pour le prochain chargement
+      return
+    }
     console.log('📝 [watch(productData)] Mapping données vers formulaire')
     mapProductToForm(newData)
   }
@@ -840,11 +850,15 @@ async function handleSubmit() {
       }) as { success: boolean; data: any }
 
       if (response.success && response.data) {
+        // 🛡️ Activer le guard AVANT l'invalidation pour bloquer le refetch stale
+        skipWatchRefresh.value = true
+        console.log('🛡️ [handleSubmit] Guard activé - bloquer refetch stale')
+
         // ✅ Clean Architecture: Invalidation centralisée via composable
         const { invalidateProductsList } = useDataInvalidator()
         await invalidateProductsList()
 
-        // Rafraîchir form local
+        // Rafraîchir form local avec données fraîches de la réponse API
         mapProductToForm(response.data)
 
         crudSuccess.updated(`Produit "${response.data.name}" mis à jour`)
