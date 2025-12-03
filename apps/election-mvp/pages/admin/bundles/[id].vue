@@ -1023,19 +1023,25 @@ async function manualSync() {
 
             // Mettre à jour le produit avec synchronisation Cloudinary
             const catalogPrice = latestProduct.base_price || latestProduct.price || bundleProduct.basePrice
+            // 💰 Prix effectif: customPrice si priceLocked, sinon prix catalogue
+            const effectivePrice = (bundleProduct.priceLocked && bundleProduct.customPrice)
+              ? bundleProduct.customPrice
+              : catalogPrice
             // 🔧 FIX: Utiliser reactive() pour que v-model fonctionne correctement
             const updatedBundleProduct = reactive({
               ...bundleProduct,
               name: latestProduct.name || bundleProduct.name,
-              basePrice: latestProduct.base_price || latestProduct.price || bundleProduct.basePrice,
+              basePrice: catalogPrice,
               image_url: latestProduct.image_url || bundleProduct.image_url,
               images: enrichedImages,
-              subtotal: bundleProduct.quantity * (latestProduct.base_price || latestProduct.price || bundleProduct.basePrice),
+              subtotal: bundleProduct.quantity * effectivePrice,
               // Ajouter métadonnées de synchronisation
               lastSynced: new Date().toISOString(),
               cloudinarySync,
               // Price Lock: préserve le flag lors de la sync manuelle
               priceLocked: bundleProduct.priceLocked ?? false,
+              // 💰 Préserver customPrice lors de la sync
+              customPrice: bundleProduct.customPrice,
               // Price Warning: stocke le prix catalogue pour calcul d'écart (Phase 3.2)
               catalogPrice: catalogPrice
             })
@@ -1539,16 +1545,22 @@ onMounted(async () => {
           if (latestProduct) {
             // Mettre à jour les données du produit dans le bundle
             const catalogPrice = latestProduct.base_price || latestProduct.price || bundleProduct.basePrice
+            // 💰 Prix effectif: customPrice si priceLocked, sinon prix catalogue
+            const effectivePrice = (bundleProduct.priceLocked && bundleProduct.customPrice)
+              ? bundleProduct.customPrice
+              : catalogPrice
             // 🔧 FIX: Utiliser reactive() pour que v-model fonctionne correctement
             const updatedBundleProduct = reactive({
               ...bundleProduct,
               name: latestProduct.name || bundleProduct.name,
-              basePrice: latestProduct.base_price || latestProduct.price || bundleProduct.basePrice,
+              basePrice: catalogPrice,
               image_url: latestProduct.image_url || bundleProduct.image_url,
               images: latestProduct.images || bundleProduct.images || [],
-              subtotal: bundleProduct.quantity * (latestProduct.base_price || latestProduct.price || bundleProduct.basePrice),
+              subtotal: bundleProduct.quantity * effectivePrice,
               // Price Lock: préserve le flag lors de la sync automatique
               priceLocked: bundleProduct.priceLocked ?? false,
+              // 💰 Préserver customPrice lors de la sync
+              customPrice: bundleProduct.customPrice,
               // Price Warning: stocke le prix catalogue pour calcul d'écart (Phase 3.2)
               catalogPrice: catalogPrice
             })
