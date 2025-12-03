@@ -11,6 +11,12 @@ export const bundleProductSchema = z.object({
   basePrice: z.number()
     .min(0, 'Le prix de base ne peut pas être négatif'),
 
+  // 💰 Custom Price: Prix personnalisé différent du catalogue (optionnel)
+  // Si défini, le subtotal utilise customPrice au lieu de basePrice
+  customPrice: z.number()
+    .min(0, 'Le prix personnalisé ne peut pas être négatif')
+    .optional(),
+
   quantity: z.number()
     .int('La quantité doit être un nombre entier')
     .min(1, 'La quantité doit être au moins 1'),
@@ -227,8 +233,10 @@ export function validateBundleProducts(products: any[]): string[] {
     try {
       bundleProductSchema.parse(product)
 
-      // Additional validation: subtotal should match quantity * basePrice
-      const expectedSubtotal = product.quantity * product.basePrice
+      // Additional validation: subtotal should match quantity * effectivePrice
+      // 💰 Utiliser customPrice si défini, sinon basePrice
+      const effectivePrice = product.customPrice ?? product.basePrice
+      const expectedSubtotal = product.quantity * effectivePrice
       if (Math.abs(product.subtotal - expectedSubtotal) > 0.01) {
         errors.push(`Sous-total incorrect pour le produit ${index + 1}`)
       }

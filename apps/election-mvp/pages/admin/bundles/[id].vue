@@ -1437,7 +1437,9 @@ async function handleSubmit() {
         basePrice: rawProduct.basePrice,
         quantity: rawProduct.quantity,
         subtotal: rawProduct.subtotal,
-        priceLocked: rawProduct.priceLocked ?? false // Price Lock: préserve le flag lors de la soumission
+        priceLocked: rawProduct.priceLocked ?? false, // Price Lock: préserve le flag lors de la soumission
+        // 💰 Inclure customPrice dans le payload API (fix bug 400)
+        customPrice: rawProduct.customPrice
       }
     }),
     tags: tagsInput.value.split(',').map(tag => tag.trim()).filter(Boolean),

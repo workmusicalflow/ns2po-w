@@ -338,7 +338,8 @@ export default defineEventHandler(async (event) => {
                 bundleId,
                 productId,
                 product.quantity,
-                product.basePrice,
+                // 💰 Utiliser customPrice si défini, sinon basePrice (fix bug 400)
+                product.customPrice ?? product.basePrice,
                 product.isRequired !== false ? 1 : 0,
                 i + 1,
                 product.priceLocked ? 1 : 0
