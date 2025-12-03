@@ -125,6 +125,8 @@ export function useBundleCalculations(
   })
 
   // 🎯 Recommendation Engine
+  // NOTE: Les recommandations sont informatives, jamais bloquantes
+  // L'admin a un contrôle total sur la politique de remise (peut être 0%)
   const recommendations = computed(() => {
     const analysis = productAnalysis.value
     const total = estimatedTotal.value
@@ -132,20 +134,23 @@ export function useBundleCalculations(
 
     const recs: string[] = []
 
-    if (discountPct < 5) {
-      recs.push('Consider adding more products to increase bundle savings')
+    // Info: Bundle sans remise (pas d'erreur, juste une info)
+    if (discountPct === 0) {
+      recs.push('Ce bundle ne propose aucune remise. Parfait pour un pack découverte ou thématique.')
+    } else if (discountPct > 0 && discountPct < 5) {
+      recs.push('Remise modeste appliquée. Vous pouvez ajuster si souhaité.')
     }
 
     if (totalQuantity.value < 50 && total > 30000) {
-      recs.push('Low quantities for this budget - consider higher volumes for better ROI')
+      recs.push('Quantités faibles pour ce budget - envisagez des volumes plus élevés pour un meilleur ROI')
     }
 
     if (analysis && analysis.priceRange.spread > 10000) {
-      recs.push('Wide price range detected - ensure consistent quality across products')
+      recs.push('Large écart de prix détecté - vérifiez la cohérence qualité des produits')
     }
 
     if (totalProducts.value === 1) {
-      recs.push('Single product bundle - consider adding complementary items')
+      recs.push('Bundle mono-produit - envisagez d\'ajouter des articles complémentaires')
     }
 
     return recs

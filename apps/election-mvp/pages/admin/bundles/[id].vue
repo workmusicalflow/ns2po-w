@@ -239,7 +239,7 @@
                   {{ formatPrice(product.subtotal) }}
                 </div>
 
-                <!-- 🔔 Price Warning (Phase 3.2): Alerte si écart > 5% -->
+                <!-- 🔔 Price Warning (Phase 3.2): Alerte si désynchronisation prix catalogue -->
                 <div v-if="getPriceWarning(product)" class="flex items-center gap-1 text-xs text-amber-600 bg-amber-50 px-2 py-1 rounded">
                   <Icon name="heroicons:exclamation-triangle" class="w-3 h-3" />
                   <span :title="getPriceWarning(product)?.message">
@@ -1376,7 +1376,10 @@ function formatPrice(price: number | undefined | null): string {
 }
 
 // 🔔 PRICE WARNING HELPER (Phase 3.2)
-// Calcule l'écart entre prix bundle et prix catalogue
+// Détecte les écarts de synchronisation entre prix bundle et prix catalogue
+// NOTE: Ce warning concerne la SYNCHRONISATION, pas la politique de remise
+// Un bundle peut avoir 0% de remise, mais si le prix du produit a changé
+// dans le catalogue sans synchronisation, l'admin doit être alerté
 function getPriceWarning(product: any): { hasWarning: boolean; percentage: number; message: string } | null {
   if (!product.catalogPrice || !product.basePrice) {
     return null
@@ -1389,13 +1392,13 @@ function getPriceWarning(product: any): { hasWarning: boolean; percentage: numbe
   const diff = Math.abs(catalog - bundle)
   const percentage = Math.round((diff / catalog) * 100)
 
-  // Warning si écart > 5%
+  // Warning si écart > 5% entre prix bundle et catalogue (indicateur de désynchronisation)
   if (percentage > 5) {
     const direction = bundle > catalog ? 'supérieur' : 'inférieur'
     return {
       hasWarning: true,
       percentage,
-      message: `Prix ${direction} de ${percentage}% au prix catalogue (${formatPrice(catalog)})`
+      message: `⚠️ Désync: Prix bundle ${direction} de ${percentage}% au catalogue (${formatPrice(catalog)}). Synchronisez si nécessaire.`
     }
   }
 

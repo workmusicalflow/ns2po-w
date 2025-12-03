@@ -312,13 +312,14 @@ export function validateBundleBusinessRules(bundle: any): string[] {
       errors.push('Les économies calculées ne correspondent pas à la différence de prix')
     }
 
-    // Minimum discount percentage for bundles
+    // Calcul du pourcentage de remise (peut être 0% - bundle sans remise autorisé)
     const discountPercentage = (calculatedSavings / bundle.originalTotal) * 100
-    if (discountPercentage > 0 && discountPercentage < 5) {
-      errors.push('La remise doit être d\'au moins 5% pour justifier un bundle')
-    }
 
-    // Maximum discount to prevent losses
+    // NOTE: La contrainte "remise minimum 5%" a été supprimée (2025-12-02)
+    // Un bundle est légitime même sans remise (ex: pack découverte, assemblage thématique)
+    // L'admin a maintenant un contrôle total sur la politique de remise
+
+    // Maximum discount to prevent losses (garde-fou contre erreurs de saisie)
     if (discountPercentage > 50) {
       errors.push('La remise ne peut pas dépasser 50%')
     }
