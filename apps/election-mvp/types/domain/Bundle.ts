@@ -36,6 +36,7 @@ export interface BundleProduct {
   readonly categoryId?: string
   readonly image_url?: string // Support pour les images de produits
   readonly price?: number // Compatibilité avec Product interface
+  readonly customPrice?: number // Prix personnalisé pour ce bundle (différent du basePrice catalogue)
   readonly priceLocked?: boolean // Price Lock: false = auto-sync (80%), true = fixé (20%)
 }
 

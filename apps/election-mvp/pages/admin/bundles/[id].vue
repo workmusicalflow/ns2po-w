@@ -203,6 +203,46 @@
                 @error="handleQuantityError(index, $event)"
               />
 
+              <!-- 💰 Input Prix Unitaire (Custom Price) - Permet de modifier le prix sans affecter le catalogue -->
+              <div class="flex flex-col items-center gap-1">
+                <label class="text-xs text-gray-500">Prix unitaire</label>
+                <div class="relative">
+                  <input
+                    :value="getEffectivePrice(product)"
+                    type="number"
+                    min="0"
+                    step="100"
+                    class="w-24 px-2 py-1 text-sm text-right border rounded focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+                    :class="{
+                      'border-amber-400 bg-amber-50': product.customPrice && product.customPrice !== product.basePrice,
+                      'border-gray-300': !product.customPrice || product.customPrice === product.basePrice
+                    }"
+                    :title="product.customPrice && product.customPrice !== product.basePrice
+                      ? `Prix custom (catalogue: ${formatPrice(product.basePrice)})`
+                      : 'Prix catalogue'"
+                    @change="updateProductPrice(index, Number(($event.target as HTMLInputElement).value))"
+                  >
+                  <!-- Indicateur prix modifié -->
+                  <div
+                    v-if="product.customPrice && product.customPrice !== product.basePrice"
+                    class="absolute -top-1 -right-1 w-3 h-3 bg-amber-500 rounded-full flex items-center justify-center"
+                    title="Prix personnalisé actif"
+                  >
+                    <span class="text-white text-[8px] font-bold">✎</span>
+                  </div>
+                </div>
+                <!-- Bouton reset vers prix catalogue -->
+                <button
+                  v-if="product.customPrice && product.customPrice !== product.basePrice"
+                  type="button"
+                  class="text-xs text-amber-600 hover:text-amber-800 underline"
+                  :title="`Remettre au prix catalogue: ${formatPrice(product.basePrice)}`"
+                  @click="resetToBasePrice(index)"
+                >
+                  ↩ Reset
+                </button>
+              </div>
+
               <!-- Price Lock Checkbox (Pareto 80/20) - Phase 3.3: Tooltip enrichi -->
               <div class="flex items-center gap-2 min-w-[140px]">
                 <label class="flex items-center gap-2 cursor-pointer group relative">
@@ -1225,10 +1265,71 @@ function handleValidationModalConfirm(forceDelete: boolean) {
   }
 }
 
+// 💰 Obtenir le prix effectif d'un produit (customPrice ou basePrice)
+function getEffectivePrice(product: BundleProduct): number {
+  return product.customPrice ?? product.basePrice ?? 0
+}
+
+// 💰 Mettre à jour le prix unitaire d'un produit dans le bundle
+function updateProductPrice(index: number, newPrice: number) {
+  const product = selectedProducts.value[index]
+  const validPrice = newPrice > 0 ? Math.round(newPrice) : product.basePrice
+
+  // Déterminer si le prix est custom (différent du basePrice)
+  const isCustomPrice = validPrice !== product.basePrice
+
+  // Mettre à jour le produit avec le nouveau prix
+  selectedProducts.value[index] = {
+    ...product,
+    customPrice: isCustomPrice ? validPrice : undefined,
+    priceLocked: isCustomPrice ? true : product.priceLocked, // Auto-lock si prix custom
+    subtotal: validPrice * product.quantity
+  }
+
+  // Recalculer les totaux
+  recalculateBundleTotals()
+
+  // Notification
+  if (isCustomPrice) {
+    info?.('Prix personnalisé', `${product.name} - Prix: ${formatPrice(validPrice)} (catalogue: ${formatPrice(product.basePrice)})`)
+  } else {
+    info?.('Prix catalogue', `${product.name} - Prix remis au catalogue: ${formatPrice(validPrice)}`)
+  }
+}
+
+// 💰 Remettre le prix au prix catalogue (basePrice)
+function resetToBasePrice(index: number) {
+  const product = selectedProducts.value[index]
+
+  selectedProducts.value[index] = {
+    ...product,
+    customPrice: undefined,
+    priceLocked: false, // Réactiver auto-sync
+    subtotal: product.basePrice * product.quantity
+  }
+
+  // Recalculer les totaux
+  recalculateBundleTotals()
+
+  info?.('Prix réinitialisé', `${product.name} - Prix remis au catalogue: ${formatPrice(product.basePrice)}`)
+}
+
+// 🔄 Recalculer les totaux du bundle après modification prix/quantité
+function recalculateBundleTotals() {
+  // Calculer originalTotal depuis les prix catalogue (basePrice)
+  const newOriginalTotal = selectedProducts.value.reduce((sum, p) => sum + (p.basePrice || 0) * p.quantity, 0)
+  form.originalTotal = newOriginalTotal
+
+  // Le estimatedTotal sera calculé automatiquement par le composable bundleCalculations
+}
+
 function updateProductTotal(index: number, newQuantity?: number) {
   const product = selectedProducts.value[index]
   // Use the new quantity passed from the event, or fallback to product.quantity
   const validQuantity = newQuantity !== undefined ? newQuantity : (product.quantity && !isNaN(product.quantity) ? product.quantity : 1)
+
+  // 💰 Utiliser le prix effectif (customPrice ou basePrice)
+  const effectivePrice = getEffectivePrice(product)
 
   // Update the product quantity in the local state if a new value was provided
   if (newQuantity !== undefined) {
@@ -1236,7 +1337,7 @@ function updateProductTotal(index: number, newQuantity?: number) {
     selectedProducts.value[index] = {
       ...product,
       quantity: validQuantity,
-      subtotal: product.basePrice * validQuantity
+      subtotal: effectivePrice * validQuantity
     }
   }
 
