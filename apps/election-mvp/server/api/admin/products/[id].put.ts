@@ -6,6 +6,11 @@
  * - Utilise updateProductWithRelations() pour materials/colors/sizes
  * - Synchronisation manuelle FTS avec updateProductFTS()
  * - Validation Zod stricte des données entrantes
+ *
+ * ANTI-CORRUPTION LAYER (2025-12-02):
+ * - Accepte camelCase OU snake_case grâce à z.preprocess()
+ * - Transformation automatique vers snake_case avant validation
+ * - Frontend peut utiliser sa convention Vue.js (camelCase)
  */
 
 import { z } from 'zod'
@@ -16,9 +21,10 @@ import {
   updateProductFTS
 } from '../../../utils/db-queries'
 import { invalidateProductRelatedCaches } from '../../../utils/cache-invalidation'
+import { createSnakeCasePreprocess } from '../../../utils/caseConverter'
 
-// Schéma de validation pour update produit
-const UpdateProductSchema = z.object({
+// Schéma de validation interne (snake_case - convention BDD)
+const ProductSchemaInternal = z.object({
   name: z.string().min(3).max(255).optional(),
   description: z.string().max(2000).optional(),
   category: z.string().max(100).optional(),
@@ -52,6 +58,13 @@ const UpdateProductSchema = z.object({
   })).optional(),
   tags: z.array(z.string()).optional()
 })
+
+// 🔄 ANTI-CORRUPTION LAYER: Accepte camelCase (frontend Vue.js) → snake_case (BDD)
+// Le frontend peut envoyer basePrice, minQuantity, etc. → transformé en base_price, min_quantity
+const UpdateProductSchema = z.preprocess(
+  createSnakeCasePreprocess(),
+  ProductSchemaInternal
+)
 
 export default defineEventHandler(async (event) => {
   const startTime = Date.now()
