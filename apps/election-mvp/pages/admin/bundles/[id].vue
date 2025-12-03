@@ -211,7 +211,7 @@
                     :value="getEffectivePrice(product)"
                     type="number"
                     min="0"
-                    step="100"
+                    step="1"
                     class="w-24 px-2 py-1 text-sm text-right border rounded focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
                     :class="{
                       'border-amber-400 bg-amber-50': product.customPrice && product.customPrice !== product.basePrice,
