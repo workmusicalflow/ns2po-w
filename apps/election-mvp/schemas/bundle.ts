@@ -268,14 +268,18 @@ export function validateBundleTotal(bundle: any): string[] {
     errors.push('Le prix total ne correspond pas à la somme des produits')
   }
 
-  if (bundle.originalTotal && bundle.originalTotal < bundle.estimatedTotal) {
-    errors.push('Le prix original ne peut pas être inférieur au prix estimé')
-  }
+  // NOTE: Validation originalTotal >= estimatedTotal SUPPRIMÉE (2025-12-03)
+  // Raison: customPrice peut être un markup (> basePrice) ou une remise (< basePrice)
+  // Exemples: Foulard 350→1450 (markup), Tee-shirt 1400→1350 (remise)
+  // Dans ce cas, originalTotal (somme basePrice) peut être < estimatedTotal (somme effectivePrice)
 
-  if (bundle.savings) {
+  // Validation savings: permet valeurs négatives (markup) ou positives (remise)
+  if (bundle.savings !== undefined && bundle.savings !== null) {
     const expectedSavings = (bundle.originalTotal || 0) - bundle.estimatedTotal
-    if (Math.abs(bundle.savings - expectedSavings) > 0.01) {
-      errors.push('Les économies calculées sont incorrectes')
+    // Tolérance: savings peut être 0 même si expectedSavings est légèrement différent
+    if (Math.abs(bundle.savings - expectedSavings) > 1 && bundle.savings !== 0) {
+      // Note: On ne bloque plus, juste log pour debug
+      console.warn('⚠️ Savings mismatch:', { savings: bundle.savings, expected: expectedSavings })
     }
   }
 
@@ -313,23 +317,32 @@ export function validateBundleBusinessRules(bundle: any): string[] {
     }
   }
 
-  // 5. Price consistency validation
-  if (bundle.originalTotal && bundle.estimatedTotal && bundle.savings) {
+  // 5. Price consistency validation (adapté pour markups et remises)
+  // NOTE: Avec customPrice, on peut avoir:
+  // - Remise: customPrice < basePrice → originalTotal > estimatedTotal → savings > 0
+  // - Markup: customPrice > basePrice → originalTotal < estimatedTotal → savings < 0 (ou 0 si ignoré)
+  if (bundle.originalTotal && bundle.estimatedTotal) {
     const calculatedSavings = bundle.originalTotal - bundle.estimatedTotal
-    if (Math.abs(bundle.savings - calculatedSavings) > 0.01) {
-      errors.push('Les économies calculées ne correspondent pas à la différence de prix')
+
+    // Ne valider savings que si explicitement fourni et non-null
+    if (bundle.savings !== undefined && bundle.savings !== null && bundle.savings !== 0) {
+      if (Math.abs(bundle.savings - calculatedSavings) > 1) {
+        // Juste un warning, ne bloque pas (frontend peut envoyer 0)
+        console.warn('⚠️ Savings inconsistency:', { provided: bundle.savings, calculated: calculatedSavings })
+      }
     }
 
-    // Calcul du pourcentage de remise (peut être 0% - bundle sans remise autorisé)
-    const discountPercentage = (calculatedSavings / bundle.originalTotal) * 100
+    // Calcul du pourcentage de variation (remise si positif, markup si négatif)
+    const variationPercentage = bundle.originalTotal > 0
+      ? (calculatedSavings / bundle.originalTotal) * 100
+      : 0
 
-    // NOTE: La contrainte "remise minimum 5%" a été supprimée (2025-12-02)
-    // Un bundle est légitime même sans remise (ex: pack découverte, assemblage thématique)
-    // L'admin a maintenant un contrôle total sur la politique de remise
-
-    // Maximum discount to prevent losses (garde-fou contre erreurs de saisie)
-    if (discountPercentage > 50) {
+    // Garde-fou: remise max 50%, markup max 200% (protection erreurs de saisie)
+    if (variationPercentage > 50) {
       errors.push('La remise ne peut pas dépasser 50%')
+    }
+    if (variationPercentage < -200) {
+      errors.push('Le markup ne peut pas dépasser 200% du prix original')
     }
   }
 
