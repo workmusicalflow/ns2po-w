@@ -723,6 +723,26 @@ const errors = reactive<Record<string, string>>({
 const selectedProducts = ref<BundleProduct[]>([])
 const bundleCalculations = useBundleCalculations(selectedProducts)
 
+// 🔔 Système de notifications dédupliquées (fix duplications)
+const lastNotification = ref<{ type: string; productId: string; timestamp: number } | null>(null)
+const NOTIFICATION_DEBOUNCE_MS = 500
+
+// 🛡️ Garde pour éviter re-initialisation multiple (fix cascades reactives)
+const isFormInitialized = ref(false)
+
+function emitDebouncedNotification(type: 'price' | 'quantity' | 'sync', productId: string, title: string, message: string) {
+  const now = Date.now()
+  const last = lastNotification.value
+
+  // Skip si même type + même produit + moins de 500ms
+  if (last && last.type === type && last.productId === productId && (now - last.timestamp) < NOTIFICATION_DEBOUNCE_MS) {
+    return
+  }
+
+  lastNotification.value = { type, productId, timestamp: now }
+  info?.(title, message)
+}
+
 // Options
 const audienceOptions = [
   { value: 'local', label: 'Local' },
@@ -1295,11 +1315,13 @@ function updateProductPrice(index: number, newPrice: number) {
   // Recalculer les totaux
   recalculateBundleTotals()
 
-  // Notification
+  // Notification dédupliquée (fix duplications)
   if (isCustomPrice) {
-    info?.('Prix personnalisé', `${product.name} - Prix: ${formatPrice(validPrice)} (catalogue: ${formatPrice(product.basePrice)})`)
+    emitDebouncedNotification('price', product.id, 'Prix personnalisé',
+      `${product.name} - Prix: ${formatPrice(validPrice)} (catalogue: ${formatPrice(product.basePrice)})`)
   } else {
-    info?.('Prix catalogue', `${product.name} - Prix remis au catalogue: ${formatPrice(validPrice)}`)
+    emitDebouncedNotification('price', product.id, 'Prix catalogue',
+      `${product.name} - Prix remis au catalogue: ${formatPrice(validPrice)}`)
   }
 }
 
@@ -1317,7 +1339,9 @@ function resetToBasePrice(index: number) {
   // Recalculer les totaux
   recalculateBundleTotals()
 
-  info?.('Prix réinitialisé', `${product.name} - Prix remis au catalogue: ${formatPrice(product.basePrice)}`)
+  // Notification dédupliquée (fix duplications)
+  emitDebouncedNotification('price', product.id, 'Prix réinitialisé',
+    `${product.name} - Prix remis au catalogue: ${formatPrice(product.basePrice)}`)
 }
 
 // 🔄 Recalculer les totaux du bundle après modification prix/quantité
@@ -1358,9 +1382,9 @@ function updateProductTotal(index: number, newQuantity?: number) {
   // This ensures originalTotal >= estimatedTotal validation consistency
   form.originalTotal = newOriginalTotal
 
-  // Show info notification for quantity/price updates with the ACTUAL updated quantity
-  // This ensures the notification shows the real new value, not stale data
-  info?.('Produit mis à jour', `${product.name} - Quantité: ${validQuantity}`)
+  // Notification dédupliquée (fix duplications) - utilise la vraie quantité mise à jour
+  emitDebouncedNotification('quantity', product.id, 'Quantité mise à jour',
+    `${product.name} - Quantité: ${validQuantity}`)
 }
 
 // Removed: updateCalculatedTotal() - now handled reactively by bundleCalculations composable
@@ -1515,12 +1539,13 @@ function getPriceWarning(product: any): { hasWarning: boolean; percentage: numbe
 }
 
 // ===== LIFECYCLE & WATCHERS =====
-// Initialize form when bundle data is loaded
+// Initialize form when bundle data is loaded (with guard to prevent cascades)
 watchEffect(() => {
-  if (bundleData.value && !isNew.value) {
+  if (bundleData.value && !isNew.value && !isFormInitialized.value) {
     initializeFormFromBundle(bundleData.value)
+    isFormInitialized.value = true
   }
-})
+}, { flush: 'post' }) // flush: 'post' évite les cascades pre-render
 
 // Watch calculated total to update form - using centralized calculations
 watch(() => bundleCalculations.estimatedTotal.value, (newTotal) => {
