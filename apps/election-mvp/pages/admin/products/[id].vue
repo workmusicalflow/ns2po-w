@@ -772,9 +772,9 @@ async function handleSubmit() {
     // 🔧 FIX: Utiliser toRaw() pour éviter erreurs sérialisation reactive() → 502
     const rawForm = toRaw(form)
 
-    // ✅ FIX COMPLET: Transformer form → format API
-    // Frontend snake_case → API camelCase
-    // Frontend types simples → API types complexes
+    // ✅ FIX: Transformer form → format API (snake_case cohérent avec Zod schema)
+    // NOTE: L'API Zod schema attend snake_case, le form utilise snake_case
+    // TODO Sprint+1: Implémenter transformation camelCase↔snake_case centralisée (recommandation Gemini)
     const productData = {
       // Champs texte (direct)
       name: rawForm.name,
@@ -782,13 +782,13 @@ async function handleSubmit() {
       category: rawForm.category,
       subcategory: rawForm.subcategory || undefined,
 
-      // Champs numériques (snake_case → camelCase)
-      basePrice: rawForm.base_price,
-      minQuantity: rawForm.min_quantity,
-      maxQuantity: rawForm.max_quantity || undefined,
+      // Champs numériques (snake_case - cohérent avec Zod schema API)
+      base_price: rawForm.base_price,
+      min_quantity: rawForm.min_quantity,
+      max_quantity: rawForm.max_quantity || undefined,
 
-      // Booléen (snake_case → camelCase)
-      isActive: rawForm.is_active,
+      // Booléen (snake_case - cohérent avec Zod schema API)
+      is_active: rawForm.is_active,
 
       // Image principale (image_url → image)
       image: rawForm.image_url || undefined,
