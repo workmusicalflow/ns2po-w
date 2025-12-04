@@ -105,26 +105,12 @@ export default defineEventHandler(async (event): Promise<BundleApiResponse> => {
             SELECT
               bp.product_id, p.name as product_name, p.description as product_description,
               p.id as product_reference,
-              p.base_price as product_base_price,
+              p.base_price as base_price,
               bp.custom_price,
-              CASE
-                WHEN bp.price_locked = 1 THEN bp.custom_price
-                ELSE p.base_price
-              END as base_price,
-              CASE
-                WHEN bp.price_locked = 1 THEN bp.custom_price
-                ELSE p.base_price
-              END as unit_price,
-              CASE
-                WHEN bp.price_locked = 1 THEN bp.custom_price
-                ELSE p.base_price
-              END as price,
+              bp.price_locked,
               bp.quantity,
-              (CASE
-                WHEN bp.price_locked = 1 THEN bp.custom_price
-                ELSE p.base_price
-              END * bp.quantity) as subtotal,
-              bp.is_required, bp.price_locked, p.image_url, p.category,
+              (COALESCE(bp.custom_price, p.base_price) * bp.quantity) as subtotal,
+              bp.is_required, p.image_url, p.category,
               bp.created_at as bp_created_at
             FROM bundle_products bp
             LEFT JOIN products p ON bp.product_id = p.id
