@@ -385,15 +385,18 @@ export default defineEventHandler(async (event) => {
 
       const bundleData = updatedBundleResult.rows[0]
 
-      // Récupérer les produits associés
+      // Récupérer les produits associés avec customPrice et priceLocked
       const productsResult = await db.execute({
         sql: `
           SELECT
             bp.product_id, p.name as product_name,
-            COALESCE(bp.custom_price, p.base_price) as basePrice,
+            p.base_price as basePrice,
+            bp.custom_price,
+            bp.price_locked,
             bp.quantity,
             (COALESCE(bp.custom_price, p.base_price) * bp.quantity) as subtotal,
-            bp.is_required
+            bp.is_required,
+            p.image_url
           FROM bundle_products bp
           LEFT JOIN products p ON bp.product_id = p.id
           WHERE bp.bundle_id = ?
@@ -406,9 +409,12 @@ export default defineEventHandler(async (event) => {
         id: row.product_id,
         name: row.product_name,
         basePrice: Number(row.basePrice) || 0,
+        customPrice: row.custom_price ? Number(row.custom_price) : undefined,
+        priceLocked: Boolean(row.price_locked),
         quantity: Number(row.quantity) || 1,
         subtotal: Number(row.subtotal) || 0,
-        isRequired: Boolean(row.is_required)
+        isRequired: Boolean(row.is_required),
+        image_url: row.image_url || undefined
       }))
 
       // Calculer les totaux

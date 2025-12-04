@@ -183,9 +183,11 @@ export default defineEventHandler(async (event): Promise<BundleApiResponse> => {
             id: productRow.product_id,
             name: productRow.product_name || 'Produit sans nom',
             basePrice: Number(productRow.base_price) || 0,
+            customPrice: productRow.custom_price ? Number(productRow.custom_price) : undefined,
+            priceLocked: Boolean(productRow.price_locked),
             quantity: Number(productRow.quantity) || 1,
             subtotal: Number(productRow.subtotal) || 0,
-            priceLocked: Boolean(productRow.price_locked) // Price Lock: expose le flag dans l'API
+            image_url: productRow.image_url || undefined
           }
         })
 

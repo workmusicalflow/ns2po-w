@@ -11,9 +11,13 @@ import type { QuoteItemCatalog } from "./product";
 export interface BundleProduct {
   readonly id: string; // ID du produit depuis QuoteItemCatalog
   readonly name: string;
-  readonly basePrice: number;
+  readonly basePrice: number; // Prix catalogue original
+  readonly customPrice?: number; // Prix personnalisé (si différent du catalogue)
+  readonly priceLocked?: boolean; // Verrouiller le prix personnalisé (empêche sync auto)
   readonly quantity: number;
-  readonly subtotal: number; // quantity * basePrice
+  readonly subtotal: number; // quantity * (customPrice ?? basePrice)
+  readonly isRequired?: boolean; // Produit obligatoire dans le bundle
+  readonly image_url?: string; // URL image Cloudinary du produit
 }
 
 
