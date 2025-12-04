@@ -1567,7 +1567,9 @@ onMounted(async () => {
       const syncPromises = selectedProducts.value.map(async (bundleProduct) => {
         try {
           // Récupérer les données les plus récentes du produit
-          const latestProduct = await $fetch(`/api/products/${bundleProduct.id}`)
+          const response = await $fetch(`/api/products/${bundleProduct.id}`)
+          // 🔧 FIX: L'API retourne { success, data, source } - extraire data
+          const latestProduct = response?.data || response
 
           if (latestProduct) {
             // Mettre à jour les données du produit dans le bundle
