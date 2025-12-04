@@ -2,8 +2,12 @@ import { z } from 'zod'
 
 // Bundle Product Schema
 export const bundleProductSchema = z.object({
+  // ID principal du produit (requis)
   id: z.string()
     .min(1, 'L\'ID du produit est requis'),
+
+  // ID produit alternatif (backend accepte productId || id)
+  productId: z.string().nullish(),
 
   name: z.string()
     .min(1, 'Le nom du produit est requis'),
@@ -13,9 +17,10 @@ export const bundleProductSchema = z.object({
 
   // 💰 Custom Price: Prix personnalisé différent du catalogue (optionnel)
   // Si défini, le subtotal utilise customPrice au lieu de basePrice
+  // 🔧 FIX: .nullish() au lieu de .optional() pour accepter null (DB) et undefined (frontend)
   customPrice: z.number()
     .min(0, 'Le prix personnalisé ne peut pas être négatif')
-    .optional(),
+    .nullish(),
 
   quantity: z.number()
     .int('La quantité doit être un nombre entier')
@@ -27,9 +32,14 @@ export const bundleProductSchema = z.object({
   // Price Lock: Contrôle sync auto vs prix fixe (Pareto 80/20)
   // false (default) = prix sync auto avec products.base_price (80% cas)
   // true = custom_price figé, ignore modifs produit (20% cas)
+  // 🔧 FIX: .nullish() pour tolérer null depuis DB/API
   priceLocked: z.boolean()
-    .optional()
-    .default(false)
+    .nullish()
+    .transform(val => val ?? false),
+
+  // Champs optionnels additionnels (cohérence avec Domain BundleProduct)
+  isRequired: z.boolean().nullish(),
+  image_url: z.string().nullish()
 })
 
 export type BundleProductInput = z.infer<typeof bundleProductSchema>
