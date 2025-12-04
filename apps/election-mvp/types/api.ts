@@ -173,6 +173,7 @@ export interface BundleProduct {
   id: string;
   name: string;
   basePrice: number;
+  customPrice?: number; // Prix personnalisé (différent du basePrice catalogue)
   price?: number; // Alias pour compatibilité
   quantity: number;
   subtotal: number;
