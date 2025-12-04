@@ -67,7 +67,7 @@ export const campaignBundleSchema = z.object({
 
   products: z.array(bundleProductSchema)
     .min(1, 'Au moins un produit est requis')
-    .max(20, 'Un bundle ne peut pas contenir plus de 20 produits'),
+    .max(50, 'Un bundle ne peut pas contenir plus de 50 produits'),
 
   estimatedTotal: z.number()
     .min(0, 'Le prix total ne peut pas être négatif')
