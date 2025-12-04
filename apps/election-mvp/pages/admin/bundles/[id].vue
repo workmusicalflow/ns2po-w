@@ -1449,27 +1449,38 @@ async function handleSubmit() {
   // Both form and selectedProducts are reactive() objects that need toRaw()
   const rawForm = toRaw(form)
 
+  // 🔧 FIX: Préparer les produits avec subtotals recalculés AVANT le bundleData
+  const preparedProducts = selectedProducts.value.map(p => {
+    const rawProduct = toRaw(p)
+    // Recalculer subtotal avec effectivePrice (customPrice ?? basePrice)
+    // Évite erreur validation backend "Sous-total incorrect"
+    const effectivePrice = rawProduct.customPrice ?? rawProduct.basePrice
+    const calculatedSubtotal = effectivePrice * rawProduct.quantity
+    return {
+      id: rawProduct.id,
+      name: rawProduct.name,
+      basePrice: rawProduct.basePrice,
+      quantity: rawProduct.quantity,
+      subtotal: calculatedSubtotal,
+      priceLocked: rawProduct.priceLocked ?? false,
+      customPrice: rawProduct.customPrice
+    }
+  })
+
+  // Recalculer les totaux de manière cohérente
+  const calculatedEstimatedTotal = preparedProducts.reduce((sum, p) => sum + p.subtotal, 0)
+  const calculatedOriginalTotal = preparedProducts.reduce((sum, p) => sum + (p.basePrice * p.quantity), 0)
+  const calculatedSavings = Math.max(0, calculatedOriginalTotal - calculatedEstimatedTotal)
+
   // Prepare bundle data with proper type casting
   const bundleData = {
     ...rawForm,
     targetAudience: rawForm.targetAudience as BundleTargetAudience,
-    products: selectedProducts.value.map(p => {
-      const rawProduct = toRaw(p)
-      return {
-        id: rawProduct.id,
-        name: rawProduct.name,
-        basePrice: rawProduct.basePrice,
-        quantity: rawProduct.quantity,
-        subtotal: rawProduct.subtotal,
-        priceLocked: rawProduct.priceLocked ?? false, // Price Lock: préserve le flag lors de la soumission
-        // 💰 Inclure customPrice dans le payload API (fix bug 400)
-        customPrice: rawProduct.customPrice
-      }
-    }),
-    tags: tagsInput.value.split(',').map(tag => tag.trim()).filter(Boolean),
-    savings: rawForm.originalTotal && rawForm.originalTotal > rawForm.estimatedTotal
-      ? rawForm.originalTotal - rawForm.estimatedTotal
-      : 0
+    products: preparedProducts,
+    estimatedTotal: calculatedEstimatedTotal,
+    originalTotal: calculatedOriginalTotal,
+    savings: calculatedSavings,
+    tags: tagsInput.value.split(',').map(tag => tag.trim()).filter(Boolean)
   }
 
   // 🐛 DEBUG: Log payload before API submission
