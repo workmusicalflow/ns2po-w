@@ -48,8 +48,12 @@ export function adaptCampaignBundleToBundle(campaignBundle: CampaignBundle): Bun
 
 /**
  * Transforms external BundleProduct to domain BundleProduct
+ * 🔧 FIX: Préserver customPrice, priceLocked et image_url lors de la transformation
  */
 export function adaptExternalBundleProduct(externalProduct: ExternalBundleProduct): BundleProduct {
+  // Calculer le prix effectif pour le subtotal
+  const effectivePrice = externalProduct.customPrice ?? externalProduct.basePrice ?? 0
+
   return {
     id: externalProduct.id || generateTempId(),
     productId: externalProduct.id, // External BundleProduct id = productId
@@ -60,9 +64,16 @@ export function adaptExternalBundleProduct(externalProduct: ExternalBundleProduc
     // Pricing - using available properties from ExternalBundleProduct
     basePrice: externalProduct.basePrice || 0,
 
+    // 💰 Prix personnalisé et verrouillage (CRITIQUE pour persistance)
+    customPrice: externalProduct.customPrice,
+    priceLocked: externalProduct.priceLocked ?? false,
+
     // Quantity and calculations
     quantity: externalProduct.quantity || 1,
-    subtotal: externalProduct.subtotal || (externalProduct.quantity || 1) * (externalProduct.basePrice || 0)
+    subtotal: externalProduct.subtotal || (externalProduct.quantity || 1) * effectivePrice,
+
+    // 🖼️ Image du produit
+    image_url: externalProduct.image_url
   }
 }
 
